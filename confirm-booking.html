@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Confirm cruise booking - Interline Asia Staff">
+  <title>Confirm Booking - Interline Asia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="auth.css">
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FYGT92WCXC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-FYGT92WCXC');
+  </script>
+  <script src="https://www.google.com/recaptcha/api.js?render=6Ld43XUrAAAAAATguv7FHX2tHDTsnnpdBFQoXNKT"></script>
+  
+  <style>
+    .confirm-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+    }
+    
+    .confirm-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    
+    .booking-summary {
+      background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+      border: 1px solid #22c55e;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .booking-summary h3 {
+      color: #166534;
+      margin: 0 0 1rem 0;
+      font-size: 1.3rem;
+    }
+    
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    
+    .summary-item {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .summary-label {
+      font-weight: 600;
+      color: #166534;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+    
+    .summary-value {
+      color: #15803d;
+      font-weight: 500;
+    }
+    
+    .form-section {
+      margin-bottom: 2rem;
+    }
+    
+    .form-section h4 {
+      color: #1e40af;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 0.5rem;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .pricing-section {
+      background: #f8f9fa;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .pricing-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .pricing-row:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    
+    .pricing-label {
+      font-weight: 600;
+      color: #374151;
+    }
+    
+    .pricing-value {
+      font-weight: 600;
+      color: #059669;
+    }
+    
+    .nett-price {
+      background: #fef3c7;
+      border: 1px solid #f59e0b;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .nett-price .pricing-label {
+      color: #92400e;
+    }
+    
+    .nett-price .pricing-value {
+      color: #92400e;
+      font-weight: 700;
+    }
+    
+    .submit-section {
+      text-align: center;
+      margin-top: 2rem;
+    }
+    
+    .btn-confirm {
+      background: linear-gradient(135deg, #059669, #047857);
+      color: white;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 200px;
+    }
+    
+    .btn-confirm:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(5, 150, 105, 0.3);
+    }
+    
+    .btn-confirm:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .warning-note {
+      background: #fef3c7;
+      border: 1px solid #f59e0b;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 2rem;
+      color: #92400e;
+    }
+    
+    @media (max-width: 768px) {
+      .confirm-container {
+        padding: 1rem;
+      }
+      
+      .confirm-card {
+        padding: 1.5rem;
+      }
+      
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      
+      .pricing-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="confirm-container">
+    <div class="confirm-card">
+      <div class="auth-header">
+        <h1>✅ Confirm Booking</h1>
+        <p>Complete the booking confirmation for the customer</p>
+      </div>
+
+      <!-- Booking Summary -->
+      <div class="booking-summary">
+        <h3 id="booking-title">Loading booking details...</h3>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <span class="summary-label">Customer</span>
+            <span class="summary-value" id="customer-name">-</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Email</span>
+            <span class="summary-value" id="customer-email">-</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Ship</span>
+            <span class="summary-value" id="ship-name">-</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Departure</span>
+            <span class="summary-value" id="departure-date">-</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Cabin Type</span>
+            <span class="summary-value" id="cabin-type">-</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Guests</span>
+            <span class="summary-value" id="guest-count">-</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="warning-note">
+        ⚠️ <strong>Important:</strong> Nett prices are for internal use only and will never be visible to the customer.
+      </div>
+
+      <div id="error-message" class="error-message"></div>
+      <div id="success-message" class="success-message"></div>
+
+      <form id="confirm-form">
+        <!-- Booking Details -->
+        <div class="form-section">
+          <h4>🎯 Booking Confirmation Details</h4>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="cruiseBookingNumber">Cruise Line Booking Number *</label>
+              <input type="text" id="cruiseBookingNumber" name="cruiseBookingNumber" required
+                     placeholder="e.g., RCL123456789">
+            </div>
+            <div class="form-group">
+              <label for="cabinNumber">Confirmed Cabin Number *</label>
+              <input type="text" id="cabinNumber" name="cabinNumber" required
+                     placeholder="e.g., 8234, A-123">
+            </div>
+          </div>
+        </div>
+
+        <!-- Pricing -->
+        <div class="form-section">
+          <h4>💰 Pricing Information</h4>
+          <div class="pricing-section">
+            <div class="pricing-row">
+              <span class="pricing-label">Original Quote:</span>
+              <span class="pricing-value" id="original-price">Loading...</span>
+            </div>
+            
+            <div class="form-group">
+              <label for="clientPrice">Final Price Charged to Client *</label>
+              <input type="number" id="clientPrice" name="clientPrice" required
+                     placeholder="2500" step="0.01" min="0">
+              <small>This price will be shown to the customer</small>
+            </div>
+            
+            <div class="nett-price">
+              <div class="form-group">
+                <label for="nettPrice">Nett Price (Internal Only) *</label>
+                <input type="number" id="nettPrice" name="nettPrice" required
+                       placeholder="2200" step="0.01" min="0">
+                <small>⚠️ This will NEVER be shown to the customer</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Notes -->
+        <div class="form-section">
+          <h4>📝 Additional Information</h4>
+          <div class="form-group">
+            <label for="confirmationNotes">Confirmation Notes (Optional)</label>
+            <textarea id="confirmationNotes" name="confirmationNotes" rows="3"
+                      placeholder="Any additional information for the customer (special arrangements, upgrade details, etc.)"></textarea>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <div class="submit-section">
+          <button type="submit" class="btn-confirm" id="submit-btn">
+            ✅ Send Confirmation to Customer
+          </button>
+          <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">
+            This will send a professional confirmation email to the customer and admin copy to the team.
+          </p>
+        </div>
+      </form>
+
+      <div class="auth-links">
+        <p><a href="admin.html">← Back to Admin Dashboard</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let bookingData = null;
+    let confirmToken = null;
+
+    // Load booking details from token
+    async function loadBookingDetails() {
+      const urlParams = new URLSearchParams(window.location.search);
+      confirmToken = urlParams.get('token');
+      
+      if (!confirmToken) {
+        showError('Invalid or missing confirmation token.');
+        return;
+      }
+
+      try {
+        const response = await fetch(`/booking-details?token=${confirmToken}&type=confirm`);
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to load booking details');
+        }
+
+        bookingData = result.booking;
+        populateBookingDetails(bookingData);
+        
+      } catch (error) {
+        console.error('Error loading booking:', error);
+        showError('Failed to load booking details. The link may be expired or invalid.');
+      }
+    }
+
+    // Populate booking details in the form
+    function populateBookingDetails(booking) {
+      document.getElementById('booking-title').textContent = 
+        `${booking.deal?.shipName || 'Cruise'} - ${booking.deal?.cruiseLine || 'Unknown Line'}`;
+      
+      document.getElementById('customer-name').textContent = 
+        `${booking.firstName} ${booking.lastName}`;
+      document.getElementById('customer-email').textContent = booking.email;
+      document.getElementById('ship-name').textContent = booking.deal?.shipName || '-';
+      document.getElementById('departure-date').textContent = booking.deal?.departureDate || '-';
+      document.getElementById('cabin-type').textContent = booking.cabinType || '-';
+      document.getElementById('guest-count').textContent = booking.guestCount || '-';
+      document.getElementById('original-price').textContent = booking.totalAmount || '-';
+    }
+
+    // Handle form submission
+    document.getElementById('confirm-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      hideError();
+      hideSuccess();
+      
+      const submitButton = document.getElementById('submit-btn');
+      const originalText = submitButton.textContent;
+      submitButton.textContent = '✅ Sending Confirmation...';
+      submitButton.disabled = true;
+      
+      try {
+        const formData = new FormData(this);
+        
+        const confirmationData = {
+          token: confirmToken,
+          cruiseBookingNumber: formData.get('cruiseBookingNumber'),
+          cabinNumber: formData.get('cabinNumber'),
+          clientPrice: parseFloat(formData.get('clientPrice')),
+          nettPrice: parseFloat(formData.get('nettPrice')),
+          confirmationNotes: formData.get('confirmationNotes'),
+          confirmedBy: 'staff', // You can get this from logged-in staff user
+          confirmationDate: new Date().toISOString()
+        };
+
+        // Validate required fields
+        if (!confirmationData.cruiseBookingNumber || !confirmationData.cabinNumber) {
+          throw new Error('Please fill in all required fields');
+        }
+
+        if (confirmationData.clientPrice <= 0 || confirmationData.nettPrice <= 0) {
+          throw new Error('Prices must be greater than zero');
+        }
+
+        // reCAPTCHA v3 validation
+        const recaptchaToken = await grecaptcha.execute(window.RECAPTCHA_SITE_KEY, {
+          action: 'booking_confirmation'
+        });
+        
+        if (!recaptchaToken) {
+          throw new Error('reCAPTCHA verification failed. Please try again.');
+        }
+
+        // Submit confirmation
+        const response = await fetch('/confirm-booking', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ...confirmationData,
+            recaptchaToken
+          })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to confirm booking');
+        }
+
+        // Track successful confirmation
+        gtag('event', 'booking_confirmed', {
+          booking_id: bookingData?.bookingId,
+          cruise_line: bookingData?.deal?.cruiseLine,
+          client_price: confirmationData.clientPrice
+        });
+
+        showSuccess(`
+          ✅ Booking confirmed successfully!<br>
+          <strong>Booking Number:</strong> ${confirmationData.cruiseBookingNumber}<br>
+          <strong>Cabin:</strong> ${confirmationData.cabinNumber}<br>
+          Customer confirmation email has been sent.
+        `);
+        
+        // Clear form
+        this.reset();
+        
+      } catch (error) {
+        console.error('Confirmation error:', error);
+        showError(error.message || 'Failed to confirm booking. Please try again.');
+      } finally {
+        submitButton.textContent = originalText;
+        submitButton.disabled = false;
+      }
+    });
+
+    // Initialize
+    window.addEventListener('load', () => {
+      loadBookingDetails();
+      
+      // Initialize reCAPTCHA v3
+      grecaptcha.ready(() => {
+        console.log('reCAPTCHA v3 ready for booking confirmation');
+      });
+    });
+  </script>
+</body>
+</html>

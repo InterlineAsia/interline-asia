@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Booking unavailable - Alternative options - Interline Asia">
+  <title>Booking Response - Interline Asia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="auth.css">
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FYGT92WCXC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-FYGT92WCXC');
+  </script>
+  <script src="https://www.google.com/recaptcha/api.js?render=6Ld43XUrAAAAAATguv7FHX2tHDTsnnpdBFQoXNKT"></script>
+  
+  <style>
+    .response-container {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+    }
+    
+    .response-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    
+    .booking-reference {
+      background: linear-gradient(135deg, #fff3cd, #fef3c7);
+      border: 1px solid #f59e0b;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    
+    .booking-reference h3 {
+      color: #92400e;
+      margin: 0 0 0.5rem 0;
+      font-size: 1.3rem;
+    }
+    
+    .booking-id {
+      font-family: monospace;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #92400e;
+      background: rgba(146, 64, 14, 0.1);
+      padding: 0.5rem;
+      border-radius: 6px;
+      display: inline-block;
+    }
+    
+    .response-section {
+      margin-bottom: 2rem;
+    }
+    
+    .response-section h4 {
+      color: #1e40af;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 0.5rem;
+    }
+    
+    .response-options {
+      display: grid;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .response-option {
+      background: #f8f9fa;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .response-option:hover {
+      border-color: #3b82f6;
+      background: #dbeafe;
+    }
+    
+    .response-option.selected {
+      border-color: #3b82f6;
+      background: #dbeafe;
+    }
+    
+    .option-title {
+      font-weight: 600;
+      color: #1e40af;
+      margin-bottom: 0.5rem;
+    }
+    
+    .option-description {
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+    
+    .custom-response {
+      margin-top: 1rem;
+    }
+    
+    .submit-section {
+      text-align: center;
+      margin-top: 2rem;
+    }
+    
+    .btn-send {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 200px;
+    }
+    
+    .btn-send:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+    }
+    
+    .btn-send:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    @media (max-width: 768px) {
+      .response-container {
+        padding: 1rem;
+      }
+      
+      .response-card {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="response-container">
+    <div class="response-card">
+      <div class="auth-header">
+        <h1>📧 Booking Response</h1>
+        <p>Send a response to the customer's booking request</p>
+      </div>
+
+      <!-- Booking Reference -->
+      <div class="booking-reference">
+        <h3>📋 Booking Reference</h3>
+        <div class="booking-id" id="booking-id">Loading...</div>
+        <p style="margin: 0.5rem 0 0 0; color: #92400e;">
+          <small>Customer will receive this reference in their email</small>
+        </p>
+      </div>
+
+      <div id="error-message" class="error-message"></div>
+      <div id="success-message" class="success-message"></div>
+
+      <form id="response-form">
+        <!-- Response Type Selection -->
+        <div class="response-section">
+          <h4>📝 Response Type</h4>
+          <div class="response-options">
+            <div class="response-option" data-type="unavailable">
+              <div class="option-title">❌ Booking Unavailable</div>
+              <div class="option-description">Cabin sold out, dates unavailable, or other booking issues</div>
+            </div>
+            
+            <div class="response-option" data-type="alternative">
+              <div class="option-title">🔄 Alternative Available</div>
+              <div class="option-description">Suggest different cabin, dates, or upgrade options</div>
+            </div>
+            
+            <div class="response-option" data-type="confirmed">
+              <div class="option-title">✅ Booking Confirmed</div>
+              <div class="option-description">Booking is available and confirmed at requested price</div>
+            </div>
+            
+            <div class="response-option" data-type="pending">
+              <div class="option-title">⏳ Pending Review</div>
+              <div class="option-description">Need more time to check availability or pricing</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Custom Message -->
+        <div class="response-section">
+          <h4>💬 Message to Customer</h4>
+          <div class="form-group">
+            <label for="responseMessage">Response Details *</label>
+            <textarea 
+              id="responseMessage" 
+              name="responseMessage" 
+              rows="6" 
+              required
+              placeholder="Enter your response message here...
+
+Examples:
+• Unfortunately, the requested cabin is sold out. However, we have a Balcony cabin available for $3,459 per person.
+• Your booking is confirmed! Final payment details will be sent separately.
+• We're checking availability with the cruise line and will respond within 24 hours."
+            ></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="contactInfo">Contact Information (Optional)</label>
+            <textarea 
+              id="contactInfo" 
+              name="contactInfo" 
+              rows="2"
+              placeholder="Additional contact details, phone numbers, or next steps..."
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <div class="submit-section">
+          <button type="submit" class="btn-send" id="submit-btn">
+            📧 Send Response to Customer
+          </button>
+          <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">
+            This will send an email to the customer and copy admin@interlineasia.com
+          </p>
+        </div>
+      </form>
+
+      <div class="auth-links">
+        <p><a href="admin.html">← Back to Admin Dashboard</a></p>
+        <p><a href="deals-styled.html">View All Deals</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let bookingReference = null;
+    let selectedResponseType = null;
+
+    // Load booking reference from URL
+    function loadBookingReference() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const bookingId = urlParams.get('booking');
+      
+      if (bookingId) {
+        bookingReference = bookingId;
+        document.getElementById('booking-id').textContent = bookingId;
+      } else {
+        // Generate a unique booking reference for this response
+        bookingReference = 'BR-' + Date.now();
+        document.getElementById('booking-id').textContent = bookingReference;
+      }
+    }
+
+    // Handle response type selection
+    function setupResponseOptions() {
+      const options = document.querySelectorAll('.response-option');
+      
+      options.forEach(option => {
+        option.addEventListener('click', () => {
+          // Remove previous selection
+          options.forEach(opt => opt.classList.remove('selected'));
+          
+          // Add selection to clicked option
+          option.classList.add('selected');
+          selectedResponseType = option.dataset.type;
+          
+          // Update placeholder text based on selection
+          updateMessagePlaceholder(selectedResponseType);
+        });
+      });
+    }
+
+    // Update message placeholder based on response type
+    function updateMessagePlaceholder(type) {
+      const textarea = document.getElementById('responseMessage');
+      const placeholders = {
+        unavailable: `Unfortunately, the requested cabin/dates are not available.
+
+Reason: [Cabin sold out / Dates unavailable / Price changed]
+
+We apologize for any inconvenience. Please let us know if you'd like us to check alternative options.`,
+        
+        alternative: `Your requested cabin is unavailable, but we have great alternatives:
+
+Option 1: [Alternative cabin type] - $[price] per person
+Option 2: [Different dates] - [Original cabin] available
+Option 3: [Upgrade option] - $[price] per person
+
+Please let us know which option interests you, or if you'd like us to check other alternatives.`,
+        
+        confirmed: `Great news! Your booking is confirmed.
+
+Booking Details:
+• Cabin: [Cabin type] 
+• Price: $[amount] per person
+• Total: $[total amount]
+
+Next Steps:
+1. Deposit required: $[amount] (due within 7 days)
+2. Final payment due: [date]
+3. Documentation needed: [passport details, etc.]
+
+We'll send detailed booking confirmation and payment instructions separately.`,
+        
+        pending: `Thank you for your booking request. We're currently checking availability with the cruise line.
+
+Expected response time: [24-48 hours / by [date]]
+
+We'll contact you as soon as we have confirmation. In the meantime, please let us know if you have any questions.`
+      };
+      
+      textarea.placeholder = placeholders[type] || textarea.placeholder;
+    }
+
+    // Handle form submission
+    document.getElementById('response-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      if (!selectedResponseType) {
+        showError('Please select a response type before submitting.');
+        return;
+      }
+      
+      hideError();
+      hideSuccess();
+      
+      const submitButton = document.getElementById('submit-btn');
+      const originalText = submitButton.textContent;
+      submitButton.textContent = '📧 Sending Response...';
+      submitButton.disabled = true;
+      
+      try {
+        const formData = new FormData(this);
+        
+        const responseData = {
+          bookingReference: bookingReference,
+          responseType: selectedResponseType,
+          message: formData.get('responseMessage'),
+          contactInfo: formData.get('contactInfo'),
+          responseDate: new Date().toISOString(),
+          responderId: 'admin' // You can get this from logged-in admin user
+        };
+
+        // reCAPTCHA v3 validation
+        const recaptchaToken = await grecaptcha.execute(window.RECAPTCHA_SITE_KEY, {
+          action: 'booking_response'
+        });
+        
+        if (!recaptchaToken) {
+          throw new Error('reCAPTCHA verification failed. Please try again.');
+        }
+
+        // Submit response
+        const response = await fetch('/booking-response', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ...responseData,
+            recaptchaToken
+          })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to send response');
+        }
+
+        // Track response sent
+        gtag('event', 'booking_response_sent', {
+          response_type: selectedResponseType,
+          booking_reference: bookingReference
+        });
+
+        showSuccess(`
+          ✅ Response sent successfully!<br>
+          <strong>Reference:</strong> ${bookingReference}<br>
+          The customer will receive your response via email.
+        `);
+        
+        // Clear form
+        this.reset();
+        document.querySelectorAll('.response-option').forEach(opt => opt.classList.remove('selected'));
+        selectedResponseType = null;
+        
+      } catch (error) {
+        console.error('Response submission error:', error);
+        showError(error.message || 'Failed to send response. Please try again.');
+      } finally {
+        submitButton.textContent = originalText;
+        submitButton.disabled = false;
+      }
+    });
+
+    // Initialize
+    window.addEventListener('load', () => {
+      loadBookingReference();
+      setupResponseOptions();
+      
+      // Initialize reCAPTCHA v3
+      grecaptcha.ready(() => {
+        console.log('reCAPTCHA v3 ready for booking response');
+      });
+    });
+  </script>
+</body>
+</html>

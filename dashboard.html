@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interline Asia Member Dashboard - Manage your profile and upload verification documents">
+  <title>Member Dashboard - Interline Asia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="auth.css">
+  <style>
+    .upload-success-card {
+      background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+      border: 1px solid #22c55e;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      color: #166534;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    .success-icon {
+      font-size: 2rem;
+      flex-shrink: 0;
+    }
+    
+    .success-content h3 {
+      margin: 0 0 0.5rem 0;
+      color: #166534;
+      font-size: 1.2rem;
+    }
+    
+    .success-content p {
+      margin: 0.25rem 0;
+      color: #166534;
+    }
+    
+    .success-content small {
+      color: #15803d;
+      font-style: italic;
+    }
+    
+    .files-received-banner {
+      background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+      border: 1px solid #3b82f6;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      overflow: hidden;
+      animation: slideDown 0.4s ease-out;
+    }
+    
+    .banner-content {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.5rem;
+      position: relative;
+    }
+    
+    .banner-icon {
+      font-size: 2.5rem;
+      flex-shrink: 0;
+    }
+    
+    .banner-text {
+      flex: 1;
+      color: #1e40af;
+    }
+    
+    .banner-text h3 {
+      margin: 0 0 0.5rem 0;
+      color: #1e40af;
+      font-size: 1.3rem;
+    }
+    
+    .banner-text p {
+      margin: 0;
+      color: #1d4ed8;
+      line-height: 1.5;
+    }
+    
+    .banner-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #1e40af;
+      cursor: pointer;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .banner-close:hover {
+      background: rgba(59, 130, 246, 0.1);
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FYGT92WCXC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-FYGT92WCXC');
+  </script>
+  <script src="https://www.google.com/recaptcha/api.js?render=6Ld43XUrAAAAAATguv7FHX2tHDTsnnpdBFQoXNKT"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+</head>
+<body>
+  <div class="dashboard-container">
+    <div class="dashboard-header">
+      <div>
+        <h1 id="welcome-message">Welcome to Interline Asia</h1>
+        <p>Manage your profile and access exclusive deals</p>
+      </div>
+      <div>
+        <button class="btn btn-secondary" onclick="window.supabaseClient.signOut()">Sign Out</button>
+      </div>
+    </div>
+
+    <div id="error-message" class="error-message"></div>
+    <div id="success-message" class="success-message"></div>
+
+    <div class="dashboard-grid">
+      <!-- Profile Information -->
+      <div class="dashboard-card">
+        <h2>Profile Information</h2>
+        <div class="profile-info" id="profile-info">
+          <!-- Profile data will be loaded here -->
+        </div>
+      </div>
+
+      <!-- Document Upload -->
+      <div class="dashboard-card">
+        <h2>Verification Documents</h2>
+        <p style="color: #666; margin-bottom: 1.5rem;">
+          Upload your business card or employment letter to verify your industry status and access exclusive pricing.
+        </p>
+
+        <div class="upload-area" id="upload-area">
+          <div style="margin-bottom: 1rem;">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7,10 12,15 17,10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+          </div>
+          <p><strong>Click to upload</strong> or drag and drop</p>
+          <p style="font-size: 0.875rem; color: #666;">
+            Business Card, Employment Letter, or ID<br>
+            Supported: PDF, PNG, JPG (max 10MB)
+          </p>
+          <input type="file" id="file-input" class="file-input" accept=".pdf,.png,.jpg,.jpeg" multiple>
+        </div>
+
+        <button class="btn btn-primary" onclick="document.getElementById('file-input').click()">
+          Choose Files
+        </button>
+
+        <div class="upload-list" id="upload-list">
+          <!-- Uploaded files will appear here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Access Status -->
+    <div class="dashboard-card" style="margin-top: 2rem;">
+      <h2>Access Status</h2>
+      <div class="info-row">
+        <span class="info-label">Account Status:</span>
+        <span class="info-value">
+          <span class="status-badge" id="account-status">Loading...</span>
+        </span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Pricing Access:</span>
+        <span class="info-value" id="pricing-access">Pending verification</span>
+      </div>
+      <div style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 6px;">
+        <p style="margin: 0; font-size: 0.875rem; color: #666;">
+          <strong>Note:</strong> Upload your business card or employment letter to verify your industry status. 
+          Once verified, you'll gain access to exclusive interline pricing and VIP deals.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Require authentication
+    window.addEventListener('load', async () => {
+      // Wait for Supabase client to initialize
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      if (!window.supabaseClient.requireAuth()) {
+        return; // Will redirect to login if not authenticated
+      }
+      
+      // Load dashboard data
+      loadDashboard();
+    });
+
+    // Load user data and populate dashboard
+    async function loadDashboard() {
+      const user = window.supabaseClient.currentUser;
+      if (!user) return;
+
+      // Update welcome message
+      document.getElementById('welcome-message').textContent = `Welcome, ${user.full_name}`;
+
+      // Populate profile info
+      const profileInfo = document.getElementById('profile-info');
+      profileInfo.innerHTML = `
+        <div class="info-row">
+          <span class="info-label">Full Name:</span>
+          <span class="info-value">${user.full_name}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Email:</span>
+          <span class="info-value">${user.email}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Member Since:</span>
+          <span class="info-value">${new Date(user.created_at).toLocaleDateString()}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Verification Status:</span>
+          <span class="info-value">
+            <span class="status-badge status-${user.verification_status}">${user.verification_status}</span>
+          </span>
+        </div>
+      `;
+
+      // Update account status
+      const statusEl = document.getElementById('account-status');
+      statusEl.textContent = user.verification_status;
+      statusEl.className = `status-badge status-${user.verification_status}`;
+
+      // Update pricing access
+      const pricingEl = document.getElementById('pricing-access');
+      if (user.verification_status === 'verified') {
+        pricingEl.innerHTML = '<span style="color: #155724; font-weight: 600;">✓ Full Access Granted</span>';
+      } else if (user.verification_status === 'pending') {
+        pricingEl.innerHTML = '<span style="color: #856404;">⏳ Pending Review</span>';
+      } else {
+        pricingEl.innerHTML = '<span style="color: #721c24;">❌ Verification Required</span>';
+      }
+
+      // Load uploads
+      await loadUploads();
+    }
+
+    // Load and display uploads
+    async function loadUploads() {
+      const user = window.supabaseClient.currentUser;
+      if (!user) return;
+
+      try {
+        const uploads = await window.supabaseClient.getUserUploads(user.id);
+        const uploadList = document.getElementById('upload-list');
+        
+        if (uploads.length === 0) {
+          uploadList.innerHTML = '<p style="color: #666; font-style: italic;">No documents uploaded yet</p>';
+          return;
+        }
+
+        uploadList.innerHTML = uploads.map(upload => `
+          <div class="upload-item">
+            <div class="upload-item-info">
+              <div class="upload-item-name">${upload.file_name}</div>
+              <div class="upload-item-date">Uploaded ${new Date(upload.uploaded_at).toLocaleDateString()}</div>
+              ${upload.admin_notes ? `<div style="font-size: 0.875rem; color: #666; margin-top: 0.25rem;">Note: ${upload.admin_notes}</div>` : ''}
+            </div>
+            <span class="status-badge status-${upload.upload_status}">${upload.upload_status}</span>
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error('Error loading uploads:', error);
+        document.getElementById('upload-list').innerHTML = '<p style="color: #d32f2f;">Error loading uploads</p>';
+      }
+    }
+
+    // File upload handling
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput = document.getElementById('file-input');
+
+    // Click to upload
+    uploadArea.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    // Drag and drop
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      handleFiles(e.dataTransfer.files);
+    });
+
+    // File input change
+    fileInput.addEventListener('change', (e) => {
+      handleFiles(e.target.files);
+    });
+
+    // Handle file uploads
+    async function handleFiles(files) {
+      const user = window.supabaseClient.currentUser;
+      if (!user) {
+        showError('Please log in to upload files');
+        return;
+      }
+
+      for (const file of files) {
+        try {
+          // Validate file size
+          if (file.size > window.FILE_CONFIG.maxSize) {
+            showError(`File "${file.name}" is too large. Maximum size is 10MB.`);
+            continue;
+          }
+
+          // Validate file type
+          if (!window.FILE_CONFIG.allowedTypes.includes(file.type)) {
+            showError(`File "${file.name}" is not supported. Please upload PDF, PNG, or JPG files.`);
+            continue;
+          }
+
+          // Show uploading state
+          showSuccess(`Uploading "${file.name}"...`);
+
+          // Upload with reCAPTCHA protection
+          const recaptchaToken = await grecaptcha.execute(window.RECAPTCHA_SITE_KEY, {
+            action: 'upload'
+          });
+
+          if (!recaptchaToken) {
+            showError('reCAPTCHA verification failed. Please try again.');
+            continue;
+          }
+
+          // Upload file
+          const upload = await window.supabaseClient.uploadFile(file, user.id);
+
+          // Track file upload
+          gtag('event', 'file_upload', {
+            file_type: file.type,
+            file_size: file.size
+          });
+
+          // Show immediate success feedback
+          showUploadSuccess(file.name, upload);
+          
+          // Refresh the uploads display
+          await loadUploads();
+          
+          // Clear the file input
+          fileInput.value = '';
+          
+          // Show files received confirmation
+          showFilesReceivedMessage();
+
+        } catch (error) {
+          console.error('Upload error:', error);
+          showError(`Error uploading "${file.name}": ${error.message}`);
+        }
+      }
+    }
+
+    // Show upload success with details
+    function showUploadSuccess(fileName, uploadData) {
+      const successDiv = document.createElement('div');
+      successDiv.className = 'upload-success-card';
+      successDiv.innerHTML = `
+        <div class="success-icon">✅</div>
+        <div class="success-content">
+          <h3>Upload Successful!</h3>
+          <p><strong>File:</strong> ${fileName}</p>
+          <p><strong>Status:</strong> Pending Review</p>
+          <p><strong>Uploaded:</strong> ${new Date().toLocaleString()}</p>
+          <small>Our team will review your document within 24-48 hours.</small>
+        </div>
+      `;
+      
+      // Insert after upload section
+      const uploadSection = document.querySelector('.upload-section');
+      uploadSection.parentNode.insertBefore(successDiv, uploadSection.nextSibling);
+      
+      // Auto-remove after 10 seconds
+      setTimeout(() => {
+        if (successDiv.parentNode) {
+          successDiv.remove();
+        }
+      }, 10000);
+    }
+    
+    // Show files received confirmation
+    function showFilesReceivedMessage() {
+      const existingMessage = document.getElementById('files-received-banner');
+      if (existingMessage) {
+        existingMessage.remove();
+      }
+      
+      const banner = document.createElement('div');
+      banner.id = 'files-received-banner';
+      banner.className = 'files-received-banner';
+      banner.innerHTML = `
+        <div class="banner-content">
+          <div class="banner-icon">📄</div>
+          <div class="banner-text">
+            <h3>Files Received ✅</h3>
+            <p>Your documents have been securely uploaded and our admin team has been notified. You'll receive an email update within 24-48 hours.</p>
+          </div>
+          <button class="banner-close" onclick="this.parentElement.parentElement.remove()">×</button>
+        </div>
+      `;
+      
+      // Insert at top of dashboard
+      const dashboard = document.querySelector('.dashboard-container');
+      dashboard.insertBefore(banner, dashboard.firstChild);
+    }
+
+    // Initialize dashboard
+    loadDashboard();
+  </script>
+</body>
+</html>

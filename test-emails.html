@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Email System - Interline Asia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      background-color: #f8f9fa;
+    }
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #1e40af;
+      margin-bottom: 2rem;
+    }
+    .test-section {
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+    }
+    .test-section h3 {
+      color: #0f172a;
+      margin-bottom: 1rem;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    input, select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    button {
+      background-color: #1e40af;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    button:hover {
+      background-color: #1d4ed8;
+    }
+    .result {
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 4px;
+      display: none;
+    }
+    .success {
+      background-color: #dcfce7;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+    .error {
+      background-color: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧪 Email System Testing</h1>
+    <p>Test all email flows for Interline Asia</p>
+
+    <div class="test-section">
+      <h3>📧 Signup Confirmation Email</h3>
+      <div class="form-group">
+        <label for="signup-email">Test Email:</label>
+        <input type="email" id="signup-email" value="test@example.com">
+      </div>
+      <div class="form-group">
+        <label for="signup-name">Test Name:</label>
+        <input type="text" id="signup-name" value="John Doe">
+      </div>
+      <button onclick="testEmail('signup')">Send Test Signup Email</button>
+      <div id="signup-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>🔐 Password Reset Email</h3>
+      <div class="form-group">
+        <label for="reset-email">Test Email:</label>
+        <input type="email" id="reset-email" value="test@example.com">
+      </div>
+      <button onclick="testEmail('reset')">Send Test Reset Email</button>
+      <div id="reset-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>👤 Admin New User Alert</h3>
+      <div class="form-group">
+        <label for="admin-user-email">User Email:</label>
+        <input type="email" id="admin-user-email" value="newuser@example.com">
+      </div>
+      <div class="form-group">
+        <label for="admin-user-name">User Name:</label>
+        <input type="text" id="admin-user-name" value="Jane Smith">
+      </div>
+      <button onclick="testEmail('admin-user')">Send Admin User Alert</button>
+      <div id="admin-user-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>📄 Admin Document Upload Alert</h3>
+      <div class="form-group">
+        <label for="admin-doc-email">User Email:</label>
+        <input type="email" id="admin-doc-email" value="user@example.com">
+      </div>
+      <div class="form-group">
+        <label for="admin-doc-name">User Name:</label>
+        <input type="text" id="admin-doc-name" value="Bob Johnson">
+      </div>
+      <button onclick="testEmail('admin-document')">Send Admin Document Alert</button>
+      <div id="admin-document-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>📊 System Status</h3>
+      <p><strong>Brevo API Key:</strong> <span id="api-status">Checking...</span></p>
+      <p><strong>Backend Server:</strong> <span id="server-status">Checking...</span></p>
+      <button onclick="checkStatus()">Refresh Status</button>
+    </div>
+  </div>
+
+  <script>
+    async function testEmail(type) {
+      const resultDiv = document.getElementById(`${type}-result`);
+      const button = event.target;
+      
+      // Get form data based on type
+      let email, name;
+      switch (type) {
+        case 'signup':
+          email = document.getElementById('signup-email').value;
+          name = document.getElementById('signup-name').value;
+          break;
+        case 'reset':
+          email = document.getElementById('reset-email').value;
+          name = 'Test User';
+          break;
+        case 'admin-user':
+          email = document.getElementById('admin-user-email').value;
+          name = document.getElementById('admin-user-name').value;
+          break;
+        case 'admin-document':
+          email = document.getElementById('admin-doc-email').value;
+          name = document.getElementById('admin-doc-name').value;
+          break;
+      }
+
+      if (!email || !name) {
+        showResult(resultDiv, 'Please fill in all fields', 'error');
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = 'Sending...';
+
+      try {
+        const response = await fetch('/test-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ type, email, name })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          showResult(resultDiv, `✅ ${result.message}`, 'success');
+        } else {
+          showResult(resultDiv, `❌ ${result.error}`, 'error');
+        }
+      } catch (error) {
+        showResult(resultDiv, `❌ Network error: ${error.message}`, 'error');
+      } finally {
+        button.disabled = false;
+        button.textContent = button.textContent.replace('Sending...', 'Send Test ' + type.charAt(0).toUpperCase() + type.slice(1) + ' Email');
+      }
+    }
+
+    function showResult(div, message, type) {
+      div.textContent = message;
+      div.className = `result ${type}`;
+      div.style.display = 'block';
+      
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+        div.style.display = 'none';
+      }, 5000);
+    }
+
+    async function checkStatus() {
+      document.getElementById('api-status').textContent = 'Checking...';
+      document.getElementById('server-status').textContent = 'Checking...';
+
+      try {
+        // Check if backend is running
+        const response = await fetch('/test-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: 'invalid' })
+        });
+        
+        document.getElementById('server-status').textContent = '✅ Running';
+        document.getElementById('api-status').textContent = '✅ Configured';
+      } catch (error) {
+        document.getElementById('server-status').textContent = '❌ Not running';
+        document.getElementById('api-status').textContent = '❓ Unknown';
+      }
+    }
+
+    // Check status on load
+    window.addEventListener('load', checkStatus);
+  </script>
+</body>
+</html>

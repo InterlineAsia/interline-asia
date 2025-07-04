@@ -1,0 +1,25 @@
+{
+  "users": [
+    {
+      "id": "demo_user_1",
+      "fullName": "Demo User",
+      "email": "demo@interlineasia.com",
+      "password": "demo123",
+      "registeredAt": "2025-01-01T00:00:00.000Z",
+      "verificationStatus": "verified",
+      "uploads": [
+        {
+          "id": "upload_1",
+          "fileName": "business_card.pdf",
+          "fileType": "application/pdf",
+          "uploadedAt": "2025-01-02T00:00:00.000Z",
+          "status": "verified"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "created": "2025-01-03T00:00:00.000Z",
+    "description": "Interline Asia user database - stores member information and verification status"
+  }
+}

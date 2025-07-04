@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interline Asia - Exclusive cruise deals and luxury travel offers">
+  <title>Cruise Deals - Interline Asia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FYGT92WCXC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-FYGT92WCXC');
+  </script>
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: #ffffff;
+      color: #222;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      color: #19273A;
+    }
+    
+    .header p {
+      font-size: 1.2rem;
+      color: #555;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      font-size: 1.2rem;
+      color: #666;
+    }
+    
+    .error {
+      text-align: center;
+      padding: 2rem;
+      font-size: 1.2rem;
+      color: #d32f2f;
+      background-color: #ffebee;
+      border-radius: 8px;
+    }
+    
+    .cruise-line-section {
+      margin-bottom: 3rem;
+    }
+    
+    .cruise-line-header {
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .filter-section {
+      background: #f8f9fa;
+      padding: 30px 0;
+      border-bottom: 1px solid #e9ecef;
+      margin-bottom: 2rem;
+      border-radius: 8px;
+    }
+    
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      align-items: end;
+    }
+    
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .filter-group label {
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #333;
+      font-size: 14px;
+    }
+    
+    .filter-group select {
+      padding: 10px 12px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      background: white;
+      transition: border-color 0.3s ease;
+    }
+    
+    .filter-group select:focus {
+      outline: none;
+      border-color: #007bff;
+    }
+    
+    .clear-btn {
+      padding: 10px 20px;
+      background: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s ease;
+    }
+    
+    .clear-btn:hover {
+      background: #5a6268;
+    }
+
+    .deals-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .deal-card {
+      background-color: #fff;
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .deal-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    
+    .ship-name {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #000;
+      margin-bottom: 1rem;
+    }
+    
+    .deal-details {
+      display: grid;
+      gap: 0.5rem;
+    }
+    
+    .price {
+      font-weight: 700;
+      color: #007bff;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+      
+      .header h1 {
+        font-size: 2rem;
+      }
+      
+      .deals-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .cruise-line-header {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Exclusive Cruise Deals</h1>
+      <p>Discover luxury cruise experiences with insider rates and VIP access</p>
+    </div>
+    
+    <!-- Filter Section -->
+    <div class="filter-section">
+      <div class="filters">
+        <div class="filter-group">
+          <label for="cruiseLineFilter">Filter by Cruise Line:</label>
+          <select id="cruiseLineFilter">
+            <option value="">All Cruise Lines</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label for="regionFilter">Filter by Destination:</label>
+          <select id="regionFilter">
+            <option value="">All Destinations</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label for="sortFilter">Sort by Price:</label>
+          <select id="sortFilter">
+            <option value="">Default Order</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+          </select>
+        </div>
+        
+        <button id="clearFilters" class="clear-btn">Clear Filters</button>
+      </div>
+    </div>
+    
+    <div id="deals-container">
+      <div class="loading">Loading cruise deals...</div>
+    </div>
+  </div>
+
+  <script>
+    // Global variables to store all deals and filtered deals
+    let allDeals = [];
+    let filteredDeals = [];
+    
+    // Format price with $ and comma separators
+    function formatPrice(price) {
+      if (price === 'Quote Available' || !price) return 'Quote Available';
+      
+      // If price is already a number, format it
+      if (typeof price === 'number') {
+        return '$' + price.toLocaleString();
+      }
+      
+      // Try to extract number from string
+      const numPrice = parseFloat(String(price).replace(/[$,]/g, ''));
+      if (isNaN(numPrice)) return price;
+      return '$' + numPrice.toLocaleString();
+    }
+    
+    // Format date to readable format
+    function formatDate(dateString) {
+      try {
+        // Handle DD-MMM-YY format
+        const parts = dateString.split('-');
+        if (parts.length === 3) {
+          const day = parts[0];
+          const month = parts[1];
+          const year = '20' + parts[2];
+          const monthMap = {
+            'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
+            'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
+            'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
+          };
+          
+          if (monthMap[month]) {
+            const date = new Date(`${year}-${monthMap[month]}-${day}`);
+            return date.toLocaleDateString('en-US', { 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            });
+          }
+        }
+        
+        // Try standard date parsing
+        const date = new Date(dateString);
+        if (!isNaN(date.getTime())) {
+          return date.toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          });
+        }
+      } catch (e) {
+        console.log('Date parsing error:', e);
+      }
+      
+      // Return original if parsing fails
+      return dateString;
+    }
+    
+    // Create a deal card
+    function createDealCard(deal) {
+      return `
+        <div class="deal-card">
+          <div class="ship-name">${deal.shipName}</div>
+          <div class="deal-details">
+            <div><strong>Departure:</strong> ${formatDate(deal.departureDate)}</div>
+            <div><strong>Duration:</strong> ${deal.nights} nights</div>
+            <div><strong>Route:</strong> ${deal.from} to ${deal.to}</div>
+            <div><strong>Region:</strong> ${deal.region}</div>
+            <div><strong>Inside:</strong> ${formatPrice(deal.insidePrice)}</div>
+            <div><strong>Balcony:</strong> ${formatPrice(deal.balconyPrice)}</div>
+          </div>
+        </div>
+      `;
+    }
+    
+    // Group deals by cruise line
+    function groupDealsByCruiseLine(deals) {
+      const groups = {};
+      deals.forEach(deal => {
+        const cruiseLine = deal.cruiseLine;
+        if (!groups[cruiseLine]) {
+          groups[cruiseLine] = [];
+        }
+        groups[cruiseLine].push(deal);
+      });
+      return groups;
+    }
+    
+    // Populate filter dropdowns
+    function populateFilters(deals) {
+      const cruiseLines = [...new Set(deals.map(deal => deal.cruiseLine))].sort();
+      const regions = [...new Set(deals.map(deal => deal.region))].filter(r => r).sort();
+      
+      const cruiseLineSelect = document.getElementById('cruiseLineFilter');
+      const regionSelect = document.getElementById('regionFilter');
+      
+      // Clear existing options (except first)
+      cruiseLineSelect.innerHTML = '<option value="">All Cruise Lines</option>';
+      regionSelect.innerHTML = '<option value="">All Destinations</option>';
+      
+      cruiseLines.forEach(line => {
+        cruiseLineSelect.innerHTML += `<option value="${line}">${line}</option>`;
+      });
+      
+      regions.forEach(region => {
+        regionSelect.innerHTML += `<option value="${region}">${region}</option>`;
+      });
+    }
+    
+    // Apply filters and sorting
+    function applyFilters() {
+      const cruiseLineFilter = document.getElementById('cruiseLineFilter').value;
+      const regionFilter = document.getElementById('regionFilter').value;
+      const sortFilter = document.getElementById('sortFilter').value;
+      
+      filteredDeals = allDeals.filter(deal => {
+        if (cruiseLineFilter && deal.cruiseLine !== cruiseLineFilter) return false;
+        if (regionFilter && deal.region !== regionFilter) return false;
+        return true;
+      });
+      
+      // Apply sorting
+      if (sortFilter === 'price-low' || sortFilter === 'price-high') {
+        filteredDeals.sort((a, b) => {
+          let priceA = 999999;
+          let priceB = 999999;
+          
+          if (a.insidePrice && a.insidePrice !== 'Quote Available') {
+            priceA = parseFloat(String(a.insidePrice).replace(/[$,]/g, '')) || 999999;
+          }
+          
+          if (b.insidePrice && b.insidePrice !== 'Quote Available') {
+            priceB = parseFloat(String(b.insidePrice).replace(/[$,]/g, '')) || 999999;
+          }
+          
+          return sortFilter === 'price-low' ? priceA - priceB : priceB - priceA;
+        });
+      }
+      
+      renderDeals(filteredDeals);
+    }
+    
+    // Clear all filters
+    function clearFilters() {
+      document.getElementById('cruiseLineFilter').value = '';
+      document.getElementById('regionFilter').value = '';
+      document.getElementById('sortFilter').value = '';
+      filteredDeals = [...allDeals];
+      renderDeals(filteredDeals);
+    }
+    
+    // Render deals grouped by cruise line
+    function renderDeals(deals) {
+      const container = document.getElementById('deals-container');
+      
+      if (!deals || deals.length === 0) {
+        container.innerHTML = '<div class="error">No cruise deals match your filters.</div>';
+        return;
+      }
+      
+      const groupedDeals = groupDealsByCruiseLine(deals);
+      const sortedCruiseLines = Object.keys(groupedDeals).sort();
+      
+      let html = '';
+      
+      sortedCruiseLines.forEach(cruiseLine => {
+        html += `
+          <div class="cruise-line-section">
+            <h2 class="cruise-line-header">${cruiseLine} (${groupedDeals[cruiseLine].length} deals)</h2>
+            <div class="deals-grid">
+              ${groupedDeals[cruiseLine].map(deal => createDealCard(deal)).join('')}
+            </div>
+          </div>
+        `;
+      });
+      
+      container.innerHTML = html;
+    }
+    
+    // Fetch and display deals
+    async function loadDeals() {
+      try {
+        // Try different paths to find the JSON file
+        let response;
+        try {
+          response = await fetch('public/deals.json');
+          console.log('Path 1 succeeded');
+          if (!response.ok) throw new Error('Path 1 failed');
+        } catch (e) {
+          console.log('Path 1 failed, trying path 2');
+          try {
+            response = await fetch('./public/deals.json');
+            console.log('Path 2 succeeded');
+            if (!response.ok) throw new Error('Path 2 failed');
+          } catch (e2) {
+            console.log('Path 2 failed, trying path 3');
+            try {
+              response = await fetch('/public/deals.json');
+              console.log('Path 3 succeeded');
+              if (!response.ok) throw new Error('Path 3 failed');
+            } catch (e3) {
+              console.log('All paths failed, trying relative path');
+              // Try a relative path based on current URL
+              const currentPath = window.location.pathname;
+              const basePath = currentPath.substring(0, currentPath.lastIndexOf('/'));
+              response = await fetch(`${basePath}/public/deals.json`);
+              console.log('Relative path succeeded');
+            }
+          }
+        }
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        allDeals = await response.json();
+        filteredDeals = [...allDeals];
+        
+        populateFilters(allDeals);
+        renderDeals(filteredDeals);
+        
+        // Add event listeners
+        document.getElementById('cruiseLineFilter').addEventListener('change', applyFilters);
+        document.getElementById('regionFilter').addEventListener('change', applyFilters);
+        document.getElementById('sortFilter').addEventListener('change', applyFilters);
+        document.getElementById('clearFilters').addEventListener('click', clearFilters);
+        
+      } catch (error) {
+        console.error('Error loading deals:', error);
+        const container = document.getElementById('deals-container');
+        container.innerHTML = `
+          <div class="error">
+            Unable to load cruise deals. Please try again later.<br>
+            Error details: ${error.message}
+          </div>
+        `;
+      }
+    }
+    
+    // Load deals when page loads
+    document.addEventListener('DOMContentLoaded', loadDeals);
+  </script>
+</body>
+</html>

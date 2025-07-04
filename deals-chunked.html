@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interline Asia - Exclusive cruise deals and luxury travel offers">
+  <title>Cruise Deals - Interline Asia (All 12,000+ Deals)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FYGT92WCXC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-FYGT92WCXC');
+  </script>
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: #ffffff;
+      color: #222;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      color: #19273A;
+    }
+    
+    .header p {
+      font-size: 1.2rem;
+      color: #555;
+    }
+    
+    .stats-bar {
+      background: #e3f2fd;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    
+    .stats-bar .stat {
+      display: inline-block;
+      margin: 0 20px;
+      font-weight: 600;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      font-size: 1.2rem;
+      color: #666;
+    }
+    
+    .loading-progress {
+      background: #f0f0f0;
+      border-radius: 10px;
+      height: 20px;
+      margin: 10px 0;
+      overflow: hidden;
+    }
+    
+    .loading-progress-bar {
+      background: linear-gradient(90deg, #007bff, #0056b3);
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    
+    .error {
+      text-align: center;
+      padding: 2rem;
+      font-size: 1.2rem;
+      color: #d32f2f;
+      background-color: #ffebee;
+      border-radius: 8px;
+    }
+    
+    .cruise-line-section {
+      margin-bottom: 3rem;
+    }
+    
+    .cruise-line-header {
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #e0e0e0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .filter-section {
+      background: #f8f9fa;
+      padding: 30px 0;
+      border-bottom: 1px solid #e9ecef;
+      margin-bottom: 2rem;
+      border-radius: 8px;
+    }
+    
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      align-items: end;
+    }
+    
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .filter-group label {
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #333;
+      font-size: 14px;
+    }
+    
+    .filter-group select, .filter-group input {
+      padding: 10px 12px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      background: white;
+      transition: border-color 0.3s ease;
+    }
+    
+    .filter-group select:focus, .filter-group input:focus {
+      outline: none;
+      border-color: #007bff;
+    }
+    
+    .clear-btn, .load-more-btn {
+      padding: 10px 20px;
+      background: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s ease;
+    }
+    
+    .clear-btn:hover, .load-more-btn:hover {
+      background: #5a6268;
+    }
+    
+    .load-more-btn {
+      background: #007bff;
+      margin: 20px auto;
+      display: block;
+    }
+    
+    .load-more-btn:hover {
+      background: #0056b3;
+    }
+    
+    .load-more-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .deals-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .deal-card {
+      background-color: #fff;
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .deal-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    
+    .ship-name {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #000;
+      margin-bottom: 1rem;
+    }
+    
+    .deal-details {
+      display: grid;
+      gap: 0.5rem;
+    }
+    
+    .price {
+      font-weight: 700;
+      color: #007bff;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+      
+      .header h1 {
+        font-size: 2rem;
+      }
+      
+      .deals-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .cruise-line-header {
+        font-size: 1.5rem;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .stats-bar .stat {
+        display: block;
+        margin: 5px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Exclusive Cruise Deals</h1>
+      <p>Discover luxury cruise experiences with insider rates and VIP access</p>
+    </div>
+    
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+      <span class="stat">Total Deals: <span id="totalDeals">Loading...</span></span>
+      <span class="stat">Loaded: <span id="loadedDeals">0</span></span>
+      <span class="stat">Showing: <span id="showingDeals">0</span></span>
+      <span class="stat">Chunks: <span id="loadedChunks">0</span>/<span id="totalChunks">0</span></span>
+    </div>
+    
+    <!-- Filter Section -->
+    <div class="filter-section">
+      <div class="filters">
+        <div class="filter-group">
+          <label for="cruiseLineFilter">Filter by Cruise Line:</label>
+          <select id="cruiseLineFilter">
+            <option value="">All Cruise Lines</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label for="regionFilter">Filter by Destination:</label>
+          <select id="regionFilter">
+            <option value="">All Destinations</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label for="nightsFilter">Filter by Duration:</label>
+          <select id="nightsFilter">
+            <option value="">All Durations</option>
+            <option value="7">7 Nights</option>
+            <option value="14">14 Nights</option>
+            <option value="21">21+ Nights</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label for="searchFilter">Search Ships/Itineraries:</label>
+          <input type="text" id="searchFilter" placeholder="Search...">
+        </div>
+        
+        <div class="filter-group">
+          <label for="sortFilter">Sort by Price:</label>
+          <select id="sortFilter">
+            <option value="">Default Order</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="nights-short">Duration: Short to Long</option>
+            <option value="nights-long">Duration: Long to Short</option>
+          </select>
+        </div>
+        
+        <button id="clearFilters" class="clear-btn">Clear Filters</button>
+      </div>
+    </div>
+    
+    <!-- Loading Progress -->
+    <div id="loadingSection" class="loading">
+      <div>Loading cruise deals...</div>
+      <div class="loading-progress">
+        <div id="loadingProgressBar" class="loading-progress-bar"></div>
+      </div>
+      <div id="loadingStatus">Initializing...</div>
+    </div>
+    
+    <div id="deals-container">
+      <!-- Deals will be loaded here -->
+    </div>
+    
+    <button id="loadMoreBtn" class="load-more-btn" style="display: none;">
+      Load More Deals (500 more)
+    </button>
+  </div>
+
+  <script>
+    // Global variables for chunked loading
+    let allDeals = [];
+    let filteredDeals = [];
+    let loadedChunks = 0;
+    let totalChunks = 0;
+    let chunkSize = 500;
+    let isLoading = false;
+    
+    // Format price with $ and comma separators
+    function formatPrice(price) {
+      if (price === 'Quote Available' || !price) return 'Quote Available';
+      
+      if (typeof price === 'number') {
+        return '$' + price.toLocaleString();
+      }
+      
+      const numPrice = parseFloat(String(price).replace(/[$,]/g, ''));
+      if (isNaN(numPrice)) return price;
+      return '$' + numPrice.toLocaleString();
+    }
+    
+    // Format date to readable format
+    function formatDate(dateString) {
+      try {
+        const parts = dateString.split('-');
+        if (parts.length === 3) {
+          const day = parts[0];
+          const month = parts[1];
+          const year = '20' + parts[2];
+          const monthMap = {
+            'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
+            'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
+            'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
+          };
+          
+          if (monthMap[month]) {
+            const date = new Date(`${year}-${monthMap[month]}-${day}`);
+            return date.toLocaleDateString('en-US', { 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            });
+          }
+        }
+        
+        const date = new Date(dateString);
+        if (!isNaN(date.getTime())) {
+          return date.toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          });
+        }
+      } catch (e) {
+        console.log('Date parsing error:', e);
+      }
+      
+      return dateString;
+    }
+    
+    // Create a deal card
+    function createDealCard(deal) {
+      return `
+        <div class="deal-card">
+          <div class="ship-name">${deal.shipName}</div>
+          <div class="deal-details">
+            <div><strong>Departure:</strong> ${formatDate(deal.departureDate)}</div>
+            <div><strong>Duration:</strong> ${deal.nights} nights</div>
+            <div><strong>Route:</strong> ${deal.from} to ${deal.to}</div>
+            <div><strong>Region:</strong> ${deal.region}</div>
+            <div><strong>Inside:</strong> ${formatPrice(deal.insidePrice)}</div>
+            <div><strong>Balcony:</strong> ${formatPrice(deal.balconyPrice)}</div>
+          </div>
+        </div>
+      `;
+    }
+    
+    // Update statistics
+    function updateStats() {
+      document.getElementById('totalDeals').textContent = allDeals.length.toLocaleString();
+      document.getElementById('loadedDeals').textContent = allDeals.length.toLocaleString();
+      document.getElementById('showingDeals').textContent = filteredDeals.length.toLocaleString();
+      document.getElementById('loadedChunks').textContent = loadedChunks;
+      document.getElementById('totalChunks').textContent = totalChunks;
+    }
+    
+    // Load a single chunk
+    async function loadChunk(chunkNumber) {
+      try {
+        const response = await fetch(`public/data/cruise-deals-${chunkNumber}.json`);
+        if (!response.ok) throw new Error(`Failed to load chunk ${chunkNumber}`);
+        
+        const chunkData = await response.json();
+        allDeals.push(...chunkData);
+        loadedChunks++;
+        
+        console.log(`✅ Loaded chunk ${chunkNumber} with ${chunkData.length} deals`);
+        return chunkData;
+      } catch (error) {
+        console.error(`❌ Error loading chunk ${chunkNumber}:`, error);
+        throw error;
+      }
+    }
+    
+    // Load initial chunks
+    async function loadInitialData() {
+      try {
+        isLoading = true;
+        document.getElementById('loadingSection').style.display = 'block';
+        document.getElementById('loadingStatus').textContent = 'Loading index...';
+        
+        // Load index to get total chunks
+        const indexResponse = await fetch('public/data/index.json');
+        if (!indexResponse.ok) throw new Error('Failed to load index');
+        
+        const indexData = await indexResponse.json();
+        totalChunks = indexData.totalChunks;
+        chunkSize = indexData.chunkSize;
+        
+        document.getElementById('totalChunks').textContent = totalChunks;
+        
+        // Load first 3 chunks (1500 deals) initially
+        const initialChunks = Math.min(3, totalChunks);
+        
+        for (let i = 1; i <= initialChunks; i++) {
+          document.getElementById('loadingStatus').textContent = `Loading chunk ${i} of ${initialChunks}...`;
+          document.getElementById('loadingProgressBar').style.width = `${(i / initialChunks) * 100}%`;
+          
+          await loadChunk(i);
+          updateStats();
+        }
+        
+        populateFilters();
+        applyFilters();
+        
+        // Show load more button if there are more chunks
+        if (loadedChunks < totalChunks) {
+          document.getElementById('loadMoreBtn').style.display = 'block';
+        }
+        
+        document.getElementById('loadingSection').style.display = 'none';
+        isLoading = false;
+        
+      } catch (error) {
+        console.error('Error loading initial data:', error);
+        document.getElementById('loadingSection').innerHTML = `
+          <div class="error">
+            Failed to load cruise deals: ${error.message}
+          </div>
+        `;
+        isLoading = false;
+      }
+    }
+    
+    // Load more chunks
+    async function loadMoreChunks() {
+      if (isLoading || loadedChunks >= totalChunks) return;
+      
+      isLoading = true;
+      const loadMoreBtn = document.getElementById('loadMoreBtn');
+      loadMoreBtn.disabled = true;
+      loadMoreBtn.textContent = 'Loading...';
+      
+      try {
+        // Load next 2 chunks
+        const chunksToLoad = Math.min(2, totalChunks - loadedChunks);
+        
+        for (let i = 0; i < chunksToLoad; i++) {
+          await loadChunk(loadedChunks + 1);
+          updateStats();
+        }
+        
+        populateFilters();
+        applyFilters();
+        
+        if (loadedChunks >= totalChunks) {
+          loadMoreBtn.style.display = 'none';
+        } else {
+          loadMoreBtn.disabled = false;
+          loadMoreBtn.textContent = `Load More Deals (${Math.min(1000, (totalChunks - loadedChunks) * chunkSize)} more)`;
+        }
+        
+      } catch (error) {
+        console.error('Error loading more chunks:', error);
+        loadMoreBtn.textContent = 'Error loading more';
+      }
+      
+      isLoading = false;
+    }
+    
+    // Group deals by cruise line
+    function groupDealsByCruiseLine(deals) {
+      const groups = {};
+      deals.forEach(deal => {
+        const cruiseLine = deal.cruiseLine;
+        if (!groups[cruiseLine]) {
+          groups[cruiseLine] = [];
+        }
+        groups[cruiseLine].push(deal);
+      });
+      return groups;
+    }
+    
+    // Populate filter dropdowns
+    function populateFilters() {
+      const cruiseLines = [...new Set(allDeals.map(deal => deal.cruiseLine))].sort();
+      const regions = [...new Set(allDeals.map(deal => deal.region))].filter(r => r).sort();
+      
+      const cruiseLineSelect = document.getElementById('cruiseLineFilter');
+      const regionSelect = document.getElementById('regionFilter');
+      
+      // Store current values
+      const currentCruiseLine = cruiseLineSelect.value;
+      const currentRegion = regionSelect.value;
+      
+      // Update cruise lines
+      const existingCruiseLines = Array.from(cruiseLineSelect.options).map(opt => opt.value);
+      cruiseLines.forEach(line => {
+        if (!existingCruiseLines.includes(line)) {
+          cruiseLineSelect.innerHTML += `<option value="${line}">${line}</option>`;
+        }
+      });
+      
+      // Update regions
+      const existingRegions = Array.from(regionSelect.options).map(opt => opt.value);
+      regions.forEach(region => {
+        if (!existingRegions.includes(region)) {
+          regionSelect.innerHTML += `<option value="${region}">${region}</option>`;
+        }
+      });
+      
+      // Restore values
+      cruiseLineSelect.value = currentCruiseLine;
+      regionSelect.value = currentRegion;
+    }
+    
+    // Apply filters and sorting
+    function applyFilters() {
+      const cruiseLineFilter = document.getElementById('cruiseLineFilter').value;
+      const regionFilter = document.getElementById('regionFilter').value;
+      const nightsFilter = document.getElementById('nightsFilter').value;
+      const searchFilter = document.getElementById('searchFilter').value.toLowerCase();
+      const sortFilter = document.getElementById('sortFilter').value;
+      
+      filteredDeals = allDeals.filter(deal => {
+        if (cruiseLineFilter && deal.cruiseLine !== cruiseLineFilter) return false;
+        if (regionFilter && deal.region !== regionFilter) return false;
+        if (nightsFilter) {
+          const nights = parseInt(deal.nights);
+          if (nightsFilter === '21' && nights < 21) return false;
+          if (nightsFilter !== '21' && nights !== parseInt(nightsFilter)) return false;
+        }
+        if (searchFilter) {
+          const searchText = `${deal.shipName} ${deal.itinerary} ${deal.from} ${deal.to}`.toLowerCase();
+          if (!searchText.includes(searchFilter)) return false;
+        }
+        return true;
+      });
+      
+      // Apply sorting
+      if (sortFilter) {
+        filteredDeals.sort((a, b) => {
+          switch (sortFilter) {
+            case 'price-low':
+            case 'price-high':
+              let priceA = 999999;
+              let priceB = 999999;
+              
+              if (a.insidePrice && a.insidePrice !== 'Quote Available') {
+                priceA = parseFloat(String(a.insidePrice).replace(/[$,]/g, '')) || 999999;
+              }
+              
+              if (b.insidePrice && b.insidePrice !== 'Quote Available') {
+                priceB = parseFloat(String(b.insidePrice).replace(/[$,]/g, '')) || 999999;
+              }
+              
+              return sortFilter === 'price-low' ? priceA - priceB : priceB - priceA;
+              
+            case 'nights-short':
+            case 'nights-long':
+              const nightsA = parseInt(a.nights) || 0;
+              const nightsB = parseInt(b.nights) || 0;
+              return sortFilter === 'nights-short' ? nightsA - nightsB : nightsB - nightsA;
+              
+            default:
+              return 0;
+          }
+        });
+      }
+      
+      renderDeals(filteredDeals);
+      updateStats();
+    }
+    
+    // Clear all filters
+    function clearFilters() {
+      document.getElementById('cruiseLineFilter').value = '';
+      document.getElementById('regionFilter').value = '';
+      document.getElementById('nightsFilter').value = '';
+      document.getElementById('searchFilter').value = '';
+      document.getElementById('sortFilter').value = '';
+      applyFilters();
+    }
+    
+    // Render deals grouped by cruise line
+    function renderDeals(deals) {
+      const container = document.getElementById('deals-container');
+      
+      if (!deals || deals.length === 0) {
+        container.innerHTML = '<div class="error">No cruise deals match your filters.</div>';
+        return;
+      }
+      
+      const groupedDeals = groupDealsByCruiseLine(deals);
+      const sortedCruiseLines = Object.keys(groupedDeals).sort();
+      
+      let html = '';
+      
+      sortedCruiseLines.forEach(cruiseLine => {
+        html += `
+          <div class="cruise-line-section">
+            <h2 class="cruise-line-header">
+              <span>${cruiseLine}</span>
+              <span>(${groupedDeals[cruiseLine].length} deals)</span>
+            </h2>
+            <div class="deals-grid">
+              ${groupedDeals[cruiseLine].map(deal => createDealCard(deal)).join('')}
+            </div>
+          </div>
+        `;
+      });
+      
+      container.innerHTML = html;
+    }
+    
+    // Event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+      loadInitialData();
+      
+      // Filter event listeners
+      document.getElementById('cruiseLineFilter').addEventListener('change', applyFilters);
+      document.getElementById('regionFilter').addEventListener('change', applyFilters);
+      document.getElementById('nightsFilter').addEventListener('change', applyFilters);
+      document.getElementById('searchFilter').addEventListener('input', applyFilters);
+      document.getElementById('sortFilter').addEventListener('change', applyFilters);
+      document.getElementById('clearFilters').addEventListener('click', clearFilters);
+      document.getElementById('loadMoreBtn').addEventListener('click', loadMoreChunks);
+    });
+  </script>
+</body>
+</html>

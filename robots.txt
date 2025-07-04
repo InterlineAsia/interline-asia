@@ -1,0 +1,40 @@
+User-agent: *
+Disallow: /deals
+Disallow: /deals-styled.html
+Disallow: /deals-chunked.html
+Disallow: /deals-styled-fixed.html
+Disallow: /booking
+Disallow: /booking.html
+Disallow: /booking-unavailable.html
+Disallow: /confirm-booking.html
+Disallow: /uploads
+Disallow: /dashboard
+Disallow: /dashboard.html
+Disallow: /admin
+Disallow: /admin.html
+Disallow: /operator
+Disallow: /test-*
+Disallow: /login.html
+Disallow: /signup.html
+Disallow: /reset-password.html
+Disallow: /public/data/
+Disallow: /*.json
+Disallow: /config.js
+Disallow: /supabase-client.js
+Disallow: /backend.js
+Disallow: /emailUtils.js
+Disallow: /email-scheduler.js
+Disallow: /card-validator.js
+Disallow: /member-gate.js
+Disallow: /currency-manager.js
+Disallow: /language-router.js
+
+# Allow public pages
+Allow: /
+Allow: /index.html
+Allow: /cruise-ship.png
+Allow: /styles.css
+Allow: /auth.css
+
+# Sitemap location
+Sitemap: https://interlineasia.com/sitemap.xml

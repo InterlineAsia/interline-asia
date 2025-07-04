@@ -1,0 +1,182 @@
+{
+  "totalDeals": 12029,
+  "chunkSize": 500,
+  "totalChunks": 25,
+  "chunks": [
+    {
+      "chunkNumber": 1,
+      "filename": "data/cruise-deals-1.json",
+      "dealCount": 500,
+      "startRow": 1,
+      "endRow": 500
+    },
+    {
+      "chunkNumber": 2,
+      "filename": "data/cruise-deals-2.json",
+      "dealCount": 500,
+      "startRow": 501,
+      "endRow": 1000
+    },
+    {
+      "chunkNumber": 3,
+      "filename": "data/cruise-deals-3.json",
+      "dealCount": 498,
+      "startRow": 1001,
+      "endRow": 1500
+    },
+    {
+      "chunkNumber": 4,
+      "filename": "data/cruise-deals-4.json",
+      "dealCount": 496,
+      "startRow": 1501,
+      "endRow": 2000
+    },
+    {
+      "chunkNumber": 5,
+      "filename": "data/cruise-deals-5.json",
+      "dealCount": 496,
+      "startRow": 2001,
+      "endRow": 2500
+    },
+    {
+      "chunkNumber": 6,
+      "filename": "data/cruise-deals-6.json",
+      "dealCount": 496,
+      "startRow": 2501,
+      "endRow": 3000
+    },
+    {
+      "chunkNumber": 7,
+      "filename": "data/cruise-deals-7.json",
+      "dealCount": 500,
+      "startRow": 3001,
+      "endRow": 3500
+    },
+    {
+      "chunkNumber": 8,
+      "filename": "data/cruise-deals-8.json",
+      "dealCount": 500,
+      "startRow": 3501,
+      "endRow": 4000
+    },
+    {
+      "chunkNumber": 9,
+      "filename": "data/cruise-deals-9.json",
+      "dealCount": 500,
+      "startRow": 4001,
+      "endRow": 4500
+    },
+    {
+      "chunkNumber": 10,
+      "filename": "data/cruise-deals-10.json",
+      "dealCount": 500,
+      "startRow": 4501,
+      "endRow": 5000
+    },
+    {
+      "chunkNumber": 11,
+      "filename": "data/cruise-deals-11.json",
+      "dealCount": 500,
+      "startRow": 5001,
+      "endRow": 5500
+    },
+    {
+      "chunkNumber": 12,
+      "filename": "data/cruise-deals-12.json",
+      "dealCount": 500,
+      "startRow": 5501,
+      "endRow": 6000
+    },
+    {
+      "chunkNumber": 13,
+      "filename": "data/cruise-deals-13.json",
+      "dealCount": 500,
+      "startRow": 6001,
+      "endRow": 6500
+    },
+    {
+      "chunkNumber": 14,
+      "filename": "data/cruise-deals-14.json",
+      "dealCount": 500,
+      "startRow": 6501,
+      "endRow": 7000
+    },
+    {
+      "chunkNumber": 15,
+      "filename": "data/cruise-deals-15.json",
+      "dealCount": 500,
+      "startRow": 7001,
+      "endRow": 7500
+    },
+    {
+      "chunkNumber": 16,
+      "filename": "data/cruise-deals-16.json",
+      "dealCount": 500,
+      "startRow": 7501,
+      "endRow": 8000
+    },
+    {
+      "chunkNumber": 17,
+      "filename": "data/cruise-deals-17.json",
+      "dealCount": 500,
+      "startRow": 8001,
+      "endRow": 8500
+    },
+    {
+      "chunkNumber": 18,
+      "filename": "data/cruise-deals-18.json",
+      "dealCount": 500,
+      "startRow": 8501,
+      "endRow": 9000
+    },
+    {
+      "chunkNumber": 19,
+      "filename": "data/cruise-deals-19.json",
+      "dealCount": 500,
+      "startRow": 9001,
+      "endRow": 9500
+    },
+    {
+      "chunkNumber": 20,
+      "filename": "data/cruise-deals-20.json",
+      "dealCount": 500,
+      "startRow": 9501,
+      "endRow": 10000
+    },
+    {
+      "chunkNumber": 21,
+      "filename": "data/cruise-deals-21.json",
+      "dealCount": 500,
+      "startRow": 10001,
+      "endRow": 10500
+    },
+    {
+      "chunkNumber": 22,
+      "filename": "data/cruise-deals-22.json",
+      "dealCount": 500,
+      "startRow": 10501,
+      "endRow": 11000
+    },
+    {
+      "chunkNumber": 23,
+      "filename": "data/cruise-deals-23.json",
+      "dealCount": 500,
+      "startRow": 11001,
+      "endRow": 11500
+    },
+    {
+      "chunkNumber": 24,
+      "filename": "data/cruise-deals-24.json",
+      "dealCount": 500,
+      "startRow": 11501,
+      "endRow": 12000
+    },
+    {
+      "chunkNumber": 25,
+      "filename": "data/cruise-deals-25.json",
+      "dealCount": 25,
+      "startRow": 12001,
+      "endRow": 12029
+    }
+  ]
+}

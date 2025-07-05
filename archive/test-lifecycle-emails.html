@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Lifecycle Emails - Interline Asia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+      background-color: #f8f9fa;
+    }
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #1e40af;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    .test-section {
+      margin-bottom: 3rem;
+      padding: 2rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: #f8f9fa;
+    }
+    .test-section h3 {
+      color: #0f172a;
+      margin-bottom: 1.5rem;
+      font-size: 1.3rem;
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #374151;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+    button {
+      background-color: #1e40af;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: background-color 0.2s;
+    }
+    button:hover {
+      background-color: #1d4ed8;
+    }
+    button:disabled {
+      background-color: #9ca3af;
+      cursor: not-allowed;
+    }
+    .result {
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 6px;
+      display: none;
+    }
+    .success {
+      background-color: #dcfce7;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+    .error {
+      background-color: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+    }
+    .info {
+      background-color: #dbeafe;
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+    }
+    .email-preview {
+      background: #f8f9fa;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 1rem;
+      margin-top: 1rem;
+      font-family: monospace;
+      font-size: 0.9rem;
+    }
+    .checkbox-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .status-indicator {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 0.5rem;
+    }
+    .status-running { background-color: #22c55e; }
+    .status-stopped { background-color: #ef4444; }
+    .status-unknown { background-color: #6b7280; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📅 Lifecycle Email Testing System</h1>
+    <p style="text-align: center; color: #6b7280; margin-bottom: 2rem;">
+      Test and monitor automated email campaigns for Bon Voyage, Welcome Home, and Birthday emails
+    </p>
+
+    <!-- Scheduler Status -->
+    <div class="test-section">
+      <h3>📊 Email Scheduler Status</h3>
+      <div id="scheduler-status">
+        <p><span class="status-indicator status-unknown"></span>Checking scheduler status...</p>
+      </div>
+      <button onclick="checkSchedulerStatus()">Refresh Status</button>
+      <button onclick="runSchedulerManually()">Run Scheduler Now</button>
+    </div>
+
+    <!-- Test Individual Emails -->
+    <div class="test-section">
+      <h3>🧪 Test Individual Lifecycle Emails</h3>
+      <div class="form-group">
+        <label for="test-booking-id">Booking ID:</label>
+        <input type="text" id="test-booking-id" placeholder="e.g., BK-1234567890">
+      </div>
+      
+      <div class="form-group">
+        <label>Email Types to Test:</label>
+        <div class="checkbox-group">
+          <div class="checkbox-item">
+            <input type="checkbox" id="test-bon-voyage" value="bon_voyage" checked>
+            <label for="test-bon-voyage">⛵ Bon Voyage</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="test-welcome-home" value="welcome_home" checked>
+            <label for="test-welcome-home">🏠 Welcome Home</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="test-birthday" value="birthday" checked>
+            <label for="test-birthday">🎂 Birthday</label>
+          </div>
+        </div>
+      </div>
+      
+      <button onclick="testLifecycleEmails()">Send Test Emails</button>
+      <div id="test-result" class="result"></div>
+    </div>
+
+    <!-- Create Test Booking -->
+    <div class="test-section">
+      <h3>➕ Create Test Booking for Email Testing</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+        <div class="form-group">
+          <label for="test-name">Customer Name:</label>
+          <input type="text" id="test-name" value="Test Customer">
+        </div>
+        <div class="form-group">
+          <label for="test-email">Email:</label>
+          <input type="email" id="test-email" value="test@example.com">
+        </div>
+        <div class="form-group">
+          <label for="test-dob">Date of Birth:</label>
+          <input type="date" id="test-dob">
+        </div>
+        <div class="form-group">
+          <label for="test-departure">Departure Date:</label>
+          <input type="date" id="test-departure">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="test-ship">Ship Name:</label>
+        <input type="text" id="test-ship" value="Test Ship Explorer">
+      </div>
+      
+      <button onclick="createTestBooking()">Create Test Booking</button>
+      <div id="create-result" class="result"></div>
+    </div>
+
+    <!-- Email Templates Preview -->
+    <div class="test-section">
+      <h3>📧 Email Template Previews</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+        <div>
+          <h4>⛵ Bon Voyage Email</h4>
+          <div class="email-preview">
+            <strong>Subject:</strong> ⛵ Bon Voyage! Your [Ship] cruise departs in 3 days<br>
+            <strong>Content:</strong> Pre-departure checklist, travel tips, excitement builder<br>
+            <strong>Timing:</strong> 3 days before departure<br>
+            <strong>Trigger:</strong> Confirmed bookings with departure date
+          </div>
+        </div>
+        
+        <div>
+          <h4>🏠 Welcome Home Email</h4>
+          <div class="email-preview">
+            <strong>Subject:</strong> 🏠 Welcome home from your [Ship] cruise!<br>
+            <strong>Content:</strong> Feedback request, photo sharing, future deals<br>
+            <strong>Timing:</strong> 3 days after return<br>
+            <strong>Trigger:</strong> Departure date + cruise nights + 3 days
+          </div>
+        </div>
+        
+        <div>
+          <h4>🎂 Birthday Email</h4>
+          <div class="email-preview">
+            <strong>Subject:</strong> 🎂 Happy Birthday [Name]! Special cruise offers await<br>
+            <strong>Content:</strong> Birthday wishes, travel inspiration, special offers<br>
+            <strong>Timing:</strong> Annual on birthday<br>
+            <strong>Trigger:</strong> Date of birth match (month/day)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- System Logs -->
+    <div class="test-section">
+      <h3>📋 Recent Email Activity</h3>
+      <button onclick="loadEmailLogs()">Load Recent Logs</button>
+      <div id="email-logs" style="margin-top: 1rem;">
+        <p style="color: #6b7280;">Click "Load Recent Logs" to see email activity</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Set default dates for testing
+    document.addEventListener('DOMContentLoaded', () => {
+      // Set birthday to today for immediate testing
+      const today = new Date();
+      document.getElementById('test-dob').value = today.toISOString().split('T')[0];
+      
+      // Set departure to 3 days from now for bon voyage testing
+      const threeDaysFromNow = new Date();
+      threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
+      document.getElementById('test-departure').value = threeDaysFromNow.toISOString().split('T')[0];
+      
+      // Check scheduler status on load
+      checkSchedulerStatus();
+    });
+
+    async function checkSchedulerStatus() {
+      const statusDiv = document.getElementById('scheduler-status');
+      statusDiv.innerHTML = '<p><span class="status-indicator status-unknown"></span>Checking...</p>';
+      
+      try {
+        const response = await fetch('/scheduler-status');
+        const result = await response.json();
+        
+        if (response.ok) {
+          statusDiv.innerHTML = `
+            <p><span class="status-indicator status-running"></span>Scheduler is running</p>
+            <p><small>Last check: ${new Date().toLocaleString()}</small></p>
+          `;
+        } else {
+          statusDiv.innerHTML = `
+            <p><span class="status-indicator status-stopped"></span>Scheduler status unknown</p>
+          `;
+        }
+      } catch (error) {
+        statusDiv.innerHTML = `
+          <p><span class="status-indicator status-stopped"></span>Cannot connect to scheduler</p>
+        `;
+      }
+    }
+
+    async function runSchedulerManually() {
+      const button = event.target;
+      const originalText = button.textContent;
+      button.textContent = 'Running...';
+      button.disabled = true;
+      
+      try {
+        const response = await fetch('/run-email-scheduler', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+          showResult('scheduler-status', 'Scheduler run completed successfully!', 'success');
+        } else {
+          showResult('scheduler-status', `Error: ${result.error}`, 'error');
+        }
+      } catch (error) {
+        showResult('scheduler-status', `Network error: ${error.message}`, 'error');
+      } finally {
+        button.textContent = originalText;
+        button.disabled = false;
+      }
+    }
+
+    async function testLifecycleEmails() {
+      const bookingId = document.getElementById('test-booking-id').value;
+      if (!bookingId) {
+        showResult('test-result', 'Please enter a booking ID', 'error');
+        return;
+      }
+
+      const emailTypes = [];
+      if (document.getElementById('test-bon-voyage').checked) emailTypes.push('bon_voyage');
+      if (document.getElementById('test-welcome-home').checked) emailTypes.push('welcome_home');
+      if (document.getElementById('test-birthday').checked) emailTypes.push('birthday');
+
+      if (emailTypes.length === 0) {
+        showResult('test-result', 'Please select at least one email type', 'error');
+        return;
+      }
+
+      const button = event.target;
+      const originalText = button.textContent;
+      button.textContent = 'Sending...';
+      button.disabled = true;
+
+      try {
+        const response = await fetch('/test-lifecycle-emails', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bookingId, emailTypes })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          const resultText = Object.entries(result.results)
+            .map(([type, status]) => `${type}: ${status}`)
+            .join(', ');
+          showResult('test-result', `✅ Test emails sent: ${resultText}`, 'success');
+        } else {
+          showResult('test-result', `❌ Error: ${result.error}`, 'error');
+        }
+      } catch (error) {
+        showResult('test-result', `❌ Network error: ${error.message}`, 'error');
+      } finally {
+        button.textContent = originalText;
+        button.disabled = false;
+      }
+    }
+
+    async function createTestBooking() {
+      const testData = {
+        name: document.getElementById('test-name').value,
+        email: document.getElementById('test-email').value,
+        dateOfBirth: document.getElementById('test-dob').value,
+        departureDate: document.getElementById('test-departure').value,
+        shipName: document.getElementById('test-ship').value
+      };
+
+      if (!testData.name || !testData.email || !testData.dateOfBirth || !testData.departureDate) {
+        showResult('create-result', 'Please fill in all required fields', 'error');
+        return;
+      }
+
+      const button = event.target;
+      const originalText = button.textContent;
+      button.textContent = 'Creating...';
+      button.disabled = true;
+
+      try {
+        const response = await fetch('/create-test-booking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(testData)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          showResult('create-result', `✅ Test booking created: ${result.bookingId}`, 'success');
+          document.getElementById('test-booking-id').value = result.bookingId;
+        } else {
+          showResult('create-result', `❌ Error: ${result.error}`, 'error');
+        }
+      } catch (error) {
+        showResult('create-result', `❌ Network error: ${error.message}`, 'error');
+      } finally {
+        button.textContent = originalText;
+        button.disabled = false;
+      }
+    }
+
+    async function loadEmailLogs() {
+      const logsDiv = document.getElementById('email-logs');
+      logsDiv.innerHTML = '<p>Loading...</p>';
+
+      try {
+        const response = await fetch('/email-logs');
+        const result = await response.json();
+
+        if (response.ok && result.logs) {
+          if (result.logs.length === 0) {
+            logsDiv.innerHTML = '<p style="color: #6b7280;">No recent email activity</p>';
+          } else {
+            const logsHtml = result.logs.map(log => `
+              <div style="border: 1px solid #e2e8f0; border-radius: 6px; padding: 1rem; margin-bottom: 0.5rem;">
+                <strong>${log.email_type}</strong> - ${log.booking_id}<br>
+                <small>Sent: ${new Date(log.sent_at).toLocaleString()}</small>
+              </div>
+            `).join('');
+            logsDiv.innerHTML = logsHtml;
+          }
+        } else {
+          logsDiv.innerHTML = '<p style="color: #dc2626;">Failed to load logs</p>';
+        }
+      } catch (error) {
+        logsDiv.innerHTML = '<p style="color: #dc2626;">Network error loading logs</p>';
+      }
+    }
+
+    function showResult(containerId, message, type) {
+      const container = document.getElementById(containerId);
+      let resultDiv = container.querySelector('.result');
+      
+      if (!resultDiv) {
+        resultDiv = document.createElement('div');
+        resultDiv.className = 'result';
+        container.appendChild(resultDiv);
+      }
+      
+      resultDiv.textContent = message;
+      resultDiv.className = `result ${type}`;
+      resultDiv.style.display = 'block';
+      
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+        resultDiv.style.display = 'none';
+      }, 5000);
+    }
+  </script>
+</body>
+</html>

@@ -771,17 +771,27 @@
                 </div>
             </div>
 
-            <div style="background-color: #fff3cd; border: 2px solid #ffc107; border-radius: 12px; padding: 30px; margin-bottom: 30px; text-align: center;">
-                <p style="color: #856404; font-weight: bold; font-size: 18px; margin: 0;">
-                    WARNING: Verification Required - Travel Industry Staff Only<br>
-                    <span style="font-size: 16px; font-weight: normal; color: #d63384;">Public Access Not Permitted</span>
-                </p>
-                <p style="color: #666; font-size: 14px; margin-top: 15px; font-style: italic;">
-                    This platform is exclusively for verified travel industry professionals
-                </p>
+            <div id="verify" style="background-color: #f8f9fa; border: 2px dashed #0C1E36; border-radius: 12px; padding: 40px; margin-bottom: 30px; transition: all 0.3s ease;">
+                <div style="margin-bottom: 25px;">
+                    <div style="background-color: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                        <p style="color: #856404; font-weight: bold; font-size: 16px; margin: 0; text-align: center;">
+                            WARNING: Verification Required - Travel Industry Staff Only<br>
+                            <span style="font-size: 14px; font-weight: normal;">Public Access Not Permitted</span>
+                        </p>
+                    </div>
+                    <i class="ri-upload-cloud-2-line" style="font-size: 48px; color: #0C1E36; margin-bottom: 15px;"></i>
+                    <h3 style="color: #0C1E36; font-size: 22px; margin-bottom: 10px; font-weight: 700;">Upload ID to Unlock Cruise Deals</h3>
+                    <p style="color: #666; font-size: 16px; margin-bottom: 15px; font-weight: 500;">This isn't a general discount site - it's a gated platform for professionals</p>
+                    <p style="color: #666; font-size: 14px; margin-bottom: 20px;">Accepted formats: PDF, PNG, JPG (Max 5MB) - ID verification is non-negotiable for access</p>
+                </div>
+                <input type="file" id="industry-proof" accept=".pdf,.png,.jpg,.jpeg" style="display: none;">
+                <label for="industry-proof" style="display: inline-block; background-color: #0C1E36; color: white; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 500; transition: background-color 0.3s ease; border: none;">
+                    Choose File
+                </label>
+                <div id="file-name" style="margin-top: 15px; color: #666; font-size: 14px; min-height: 20px;"></div>
             </div>
 
-            <button onclick="window.location.href='verify.html'" style="background: linear-gradient(45deg, rgb(12, 30, 54), rgb(8, 21, 43)); color: white; font-weight: bold; padding: 16px 32px; border-radius: 8px; font-size: 18px; border: medium; cursor: pointer; transition: 0.3s; box-shadow: rgba(12, 30, 54, 0.3) 0px 4px 15px; transform: translateY(0px);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(12, 30, 54, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(12, 30, 54, 0.3)'">
+            <button onclick="document.getElementById('verify').scrollIntoView({behavior: 'smooth'})" style="background: linear-gradient(45deg, rgb(12, 30, 54), rgb(8, 21, 43)); color: white; font-weight: bold; padding: 16px 32px; border-radius: 8px; font-size: 18px; border: medium; cursor: pointer; transition: 0.3s; box-shadow: rgba(12, 30, 54, 0.3) 0px 4px 15px; transform: translateY(0px);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(12, 30, 54, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(12, 30, 54, 0.3)'">
                 Join Now - Verify Your Industry Status
             </button>
         </div>

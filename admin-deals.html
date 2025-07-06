@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Cruise Deals - Interline Asia Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="auth.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="supabase-client.js"></script>
+    <script src="member-gate.js"></script>
+</head>
+<body>
+    <div style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
+        <div style="background: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); padding: 2rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1>Manage Cruise Deals</h1>
+                <p>View and manage all cruise deals in the database</p>
+            </div>
+            <div>
+                <button onclick="refreshDeals()" class="btn btn-secondary">Refresh</button>
+                <a href="admin-verifications.html" class="btn btn-secondary">Verifications</a>
+                <a href="upload.html" class="btn btn-primary">Upload CSV</a>
+            </div>
+        </div>
+        
+        <div id="content">
+            <p>Loading deals management interface...</p>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('load', async () => {
+            await initializeMemberGate();
+            document.getElementById('content').innerHTML = '<p>Deals management interface loaded. <a href="admin-verifications.html">Go to Verifications</a></p>';
+        });
+        
+        function refreshDeals() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>

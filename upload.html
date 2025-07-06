@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CSV Upload Interface - Interline Asia Admin">
+  <title>CSV Upload - Interline Asia Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="auth.css">
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FYGT92WCXC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-FYGT92WCXC');
+  </script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+  <script src="member-gate.js"></script>
+  
+  <style>
+    .upload-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .upload-header {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    
+    .upload-area {
+      background: #f8f9fa;
+      border: 2px dashed #dee2e6;
+      border-radius: 12px;
+      padding: 3rem;
+      text-align: center;
+      margin-bottom: 2rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .upload-area:hover {
+      border-color: #0070f3;
+      background: #f0f8ff;
+    }
+    
+    .upload-area.dragover {
+      border-color: #0070f3;
+      background: #e6f3ff;
+    }
+    
+    .upload-icon {
+      font-size: 3rem;
+      color: #6c757d;
+      margin-bottom: 1rem;
+    }
+    
+    .file-input {
+      display: none;
+    }
+    
+    .btn {
+      background: #0070f3;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    
+    .btn:hover {
+      background: #0059c1;
+    }
+    
+    .btn:disabled {
+      background: #6c757d;
+      cursor: not-allowed;
+    }
+    
+    .progress-container {
+      display: none;
+      margin: 2rem 0;
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 20px;
+      background: #e9ecef;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: #0070f3;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    
+    .file-info {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1rem 0;
+      border-left: 4px solid #0070f3;
+      display: none;
+    }
+    
+    .validation-results {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1rem 0;
+      display: none;
+    }
+    
+    .success {
+      border-left-color: #28a745;
+      background: #f8fff9;
+    }
+    
+    .warning {
+      border-left-color: #ffc107;
+      background: #fffdf0;
+    }
+    
+    .error {
+      border-left-color: #dc3545;
+      background: #fff5f5;
+    }
+    
+    .results-container {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1rem 0;
+      display: none;
+    }
+    
+    .json-preview {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      padding: 1rem;
+      max-height: 400px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+    }
+    
+    .nav-links {
+      margin-bottom: 2rem;
+    }
+    
+    .nav-links a {
+      color: #0070f3;
+      text-decoration: none;
+      margin-right: 1rem;
+      font-weight: 500;
+    }
+    
+    .nav-links a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="upload-container">
+    <div class="nav-links">
+      <a href="admin.html">← Back to Admin Panel</a>
+      <a href="monitoring.html">System Monitor</a>
+    </div>
+    
+    <div class="upload-header">
+      <h1>CSV Upload & Processing</h1>
+      <p>Upload cruise deals CSV files for automated processing with Google Gemini AI</p>
+    </div>
+    
+    <div class="upload-area" id="uploadArea">
+      <div class="upload-icon">📁</div>
+      <h3>Drag & Drop CSV File Here</h3>
+      <p>or click to select a file</p>
+      <p style="font-size: 0.9rem; color: #6c757d; margin-top: 1rem;">
+        Supported: .csv files up to 10MB
+      </p>
+      <input type="file" id="fileInput" class="file-input" accept=".csv" />
+    </div>
+    
+    <div class="file-info" id="fileInfo">
+      <h4>File Information</h4>
+      <div id="fileDetails"></div>
+    </div>
+    
+    <div class="validation-results" id="validationResults">
+      <h4>Validation Results</h4>
+      <div id="validationDetails"></div>
+    </div>
+    
+    <div style="text-align: center; margin: 2rem 0;">
+      <button class="btn" id="validateBtn" onclick="validateFile()" disabled>
+        Validate CSV Structure
+      </button>
+      <button class="btn" id="processBtn" onclick="processFile()" disabled style="margin-left: 1rem;">
+        Process with Gemini AI
+      </button>
+    </div>
+    
+    <div class="progress-container" id="progressContainer">
+      <h4>Processing Progress</h4>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <p id="progressText">Initializing...</p>
+    </div>
+    
+    <div class="results-container" id="resultsContainer">
+      <h4>Processing Results</h4>
+      <div style="margin-bottom: 1rem;">
+        <button class="btn" onclick="downloadResults()">Download JSON</button>
+      </div>
+      <div class="json-preview" id="jsonPreview"></div>
+    </div>
+  </div>
+
+  <script>
+    let selectedFile = null;
+    let processedData = null;
+    
+    // Initialize upload area
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    
+    uploadArea.addEventListener('click', () => fileInput.click());
+    uploadArea.addEventListener('dragover', handleDragOver);
+    uploadArea.addEventListener('drop', handleDrop);
+    uploadArea.addEventListener('dragleave', handleDragLeave);
+    
+    fileInput.addEventListener('change', handleFileSelect);
+    
+    function handleDragOver(e) {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    }
+    
+    function handleDragLeave(e) {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+    }
+    
+    function handleDrop(e) {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handleFile(files[0]);
+      }
+    }
+    
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (file) {
+        handleFile(file);
+      }
+    }
+    
+    function handleFile(file) {
+      // Validate file type and size
+      if (!file.name.toLowerCase().endsWith('.csv')) {
+        alert('Please select a CSV file');
+        return;
+      }
+      
+      if (file.size > 10 * 1024 * 1024) { // 10MB limit
+        alert('File size must be less than 10MB');
+        return;
+      }
+      
+      selectedFile = file;
+      showFileInfo(file);
+      document.getElementById('validateBtn').disabled = false;
+    }
+    
+    function showFileInfo(file) {
+      const fileInfo = document.getElementById('fileInfo');
+      const fileDetails = document.getElementById('fileDetails');
+      
+      fileDetails.innerHTML = `
+        <p><strong>Name:</strong> ${file.name}</p>
+        <p><strong>Size:</strong> ${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+        <p><strong>Type:</strong> ${file.type || 'text/csv'}</p>
+        <p><strong>Last Modified:</strong> ${new Date(file.lastModified).toLocaleString()}</p>
+      `;
+      
+      fileInfo.style.display = 'block';
+    }
+    
+    async function validateFile() {
+      if (!selectedFile) return;
+      
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      
+      try {
+        document.getElementById('validateBtn').disabled = true;
+        document.getElementById('validateBtn').textContent = 'Validating...';
+        
+        const response = await fetch('/api/validate-csv', {
+          method: 'POST',
+          body: formData
+        });
+        
+        const result = await response.json();
+        showValidationResults(result);
+        
+        if (result.valid) {
+          document.getElementById('processBtn').disabled = false;
+        }
+        
+      } catch (error) {
+        console.error('Validation error:', error);
+        showValidationResults({
+          valid: false,
+          error: 'Failed to validate file: ' + error.message
+        });
+      } finally {
+        document.getElementById('validateBtn').disabled = false;
+        document.getElementById('validateBtn').textContent = 'Validate CSV Structure';
+      }
+    }
+    
+    function showValidationResults(result) {
+      const container = document.getElementById('validationResults');
+      const details = document.getElementById('validationDetails');
+      
+      let className = result.valid ? 'success' : 'error';
+      if (result.warnings && result.warnings.length > 0) {
+        className = 'warning';
+      }
+      
+      container.className = `validation-results ${className}`;
+      
+      let html = `<p><strong>Status:</strong> ${result.valid ? 'Valid' : 'Invalid'}</p>`;
+      
+      if (result.rowCount) {
+        html += `<p><strong>Rows:</strong> ${result.rowCount}</p>`;
+      }
+      
+      if (result.columns) {
+        html += `<p><strong>Columns:</strong> ${result.columns.join(', ')}</p>`;
+      }
+      
+      if (result.estimatedTime) {
+        html += `<p><strong>Estimated Processing Time:</strong> ${result.estimatedTime}</p>`;
+      }
+      
+      if (result.warnings && result.warnings.length > 0) {
+        html += `<div style="margin-top: 1rem;"><strong>Warnings:</strong><ul>`;
+        result.warnings.forEach(warning => {
+          html += `<li>${warning}</li>`;
+        });
+        html += `</ul></div>`;
+      }
+      
+      if (result.error) {
+        html += `<p style="color: #dc3545;"><strong>Error:</strong> ${result.error}</p>`;
+      }
+      
+      details.innerHTML = html;
+      container.style.display = 'block';
+    }
+    
+    async function processFile() {
+      if (!selectedFile) return;
+      
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      
+      try {
+        document.getElementById('processBtn').disabled = true;
+        document.getElementById('processBtn').textContent = 'Processing...';
+        showProgress(0, 'Starting processing...');
+        
+        const response = await fetch('/api/process-csv-supabase', {
+          method: 'POST',
+          body: formData
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop(); // Keep incomplete line in buffer
+          
+          for (const line of lines) {
+            if (line.trim()) {
+              try {
+                const data = JSON.parse(line);
+                if (data.type === 'progress') {
+                  showProgress(data.progress, data.message);
+                } else if (data.type === 'complete') {
+                  processedData = data.data;
+                  showResults(data.data);
+                  showProgress(100, 'Processing complete!');
+                } else if (data.type === 'error') {
+                  throw new Error(data.error);
+                }
+              } catch (e) {
+                console.warn('Failed to parse line:', line);
+              }
+            }
+          }
+        }
+        
+      } catch (error) {
+        console.error('Processing error:', error);
+        showProgress(0, 'Error: ' + error.message);
+        alert('Processing failed: ' + error.message);
+      } finally {
+        document.getElementById('processBtn').disabled = false;
+        document.getElementById('processBtn').textContent = 'Process with Gemini AI';
+      }
+    }
+    
+    function showProgress(percent, message) {
+      const container = document.getElementById('progressContainer');
+      const fill = document.getElementById('progressFill');
+      const text = document.getElementById('progressText');
+      
+      container.style.display = 'block';
+      fill.style.width = percent + '%';
+      text.textContent = message;
+    }
+    
+    function showResults(data) {
+      const container = document.getElementById('resultsContainer');
+      const preview = document.getElementById('jsonPreview');
+      
+      preview.textContent = JSON.stringify(data, null, 2);
+      container.style.display = 'block';
+    }
+    
+    function downloadResults() {
+      if (!processedData) return;
+      
+      const blob = new Blob([JSON.stringify(processedData, null, 2)], {
+        type: 'application/json'
+      });
+      
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `processed-deals-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+    
+    // Initialize member gate
+    window.addEventListener('load', () => {
+      initializeMemberGate();
+    });
+  </script>
+</body>
+</html>

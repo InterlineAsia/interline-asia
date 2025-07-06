@@ -1,0 +1,926 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interline Asia - Luxury Cruise Agency</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+    <style>
+        /* Using Google Fonts instead of Lovart assets */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans', Arial, sans-serif;
+        }
+        
+        body {
+            width: 1200px;
+            margin: 0 auto;
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Header Styles */
+        header {
+            width: 100%;
+            height: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            background: linear-gradient(to right, rgba(12, 30, 54, 0.95), rgba(8, 21, 43, 0.95));
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .logo h1 {
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        
+        .logo span {
+            color: #ccc;
+            font-size: 12px;
+            font-style: italic;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin-left: 30px;
+        }
+        
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav ul li a:hover {
+            color: #FF7F41;
+        }
+        
+        .contact-btn {
+            background-color: #FF7F41;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .contact-btn:hover {
+            background-color: #e66a2e;
+        }
+        
+        /* Hero Section */
+        .hero {
+            width: 100%;
+            height: 600px;
+            background: linear-gradient(rgba(12, 30, 54, 0.8), rgba(8, 21, 43, 0.9)), 
+                        linear-gradient(45deg, #0C1E36, #08152B);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 70% 30%, rgba(0, 198, 255, 0.1), transparent 60%);
+            z-index: 1;
+        }
+        
+        .hero::after {
+            content: "";
+            position: absolute;
+            bottom: -50px;
+            right: -50px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 127, 65, 0.1), transparent 70%);
+            z-index: 1;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+        }
+        
+        .hero h2 {
+            color: #fff;
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+        
+        .hero p {
+            color: #e0e0e0;
+            font-size: 18px;
+            margin-bottom: 30px;
+            max-width: 600px;
+        }
+        
+        .cta-btn {
+            background-color: #FF7F41;
+            color: #fff;
+            padding: 15px 30px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background-color 0.3s, transform 0.3s;
+            display: inline-block;
+        }
+        
+        .cta-btn:hover {
+            background-color: #e66a2e;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(230, 106, 46, 0.3);
+        }
+        
+        /* Services Section */
+        .services {
+            padding: 80px 40px;
+            background-color: #fff;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .section-title h2 {
+            font-size: 36px;
+            color: #0C1E36;
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title h2::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(to right, #00c6ff, #0072ff);
+        }
+        
+        .section-title p {
+            color: #666;
+            font-size: 16px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+        
+        .service-card {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .service-icon {
+            font-size: 40px;
+            color: #0C1E36;
+            margin-bottom: 20px;
+        }
+        
+        .service-card h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #0C1E36;
+        }
+        
+        .service-card p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        /* About Section */
+        .about {
+            padding: 80px 40px;
+            background-color: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .about-content {
+            flex: 1;
+            padding-right: 50px;
+        }
+        
+        .about-content h2 {
+            font-size: 36px;
+            color: #0C1E36;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .about-content h2::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(to right, #00c6ff, #0072ff);
+        }
+        
+        .about-content p {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+        
+        .about-image {
+            flex: 1;
+            height: 400px;
+            background: linear-gradient(45deg, #0C1E36, #08152B);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .about-image::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1), transparent 70%);
+        }
+        
+        /* Cruises Section */
+        .cruises {
+            padding: 80px 40px;
+            background-color: #fff;
+        }
+        
+        .cruises-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+        
+        .cruise-card {
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        
+        .cruise-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .cruise-image {
+            height: 200px;
+            background: linear-gradient(45deg, #0C1E36, #08152B);
+            position: relative;
+        }
+        
+        .cruise-image::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1), transparent 70%);
+        }
+        
+        .cruise-content {
+            padding: 20px;
+        }
+        
+        .cruise-content h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #0C1E36;
+        }
+        
+        .cruise-content p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .cruise-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+        
+        .cruise-price {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0C1E36;
+        }
+        
+        .cruise-btn {
+            background-color: #0C1E36;
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-size: 12px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .cruise-btn:hover {
+            background-color: #FF7F41;
+        }
+        
+        /* FAQ Section */
+        .faq {
+            padding: 80px 40px;
+            background-color: #f5f5f5;
+        }
+        
+        .faq-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+        
+        .faq-item {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .faq-question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px 0;
+        }
+        
+        .faq-question h3 {
+            font-size: 18px;
+            color: #0C1E36;
+        }
+        
+        .faq-question i {
+            color: #0C1E36;
+            transition: transform 0.3s;
+        }
+        
+        .faq-answer {
+            color: #666;
+            font-size: 14px;
+            padding: 10px 0;
+            border-top: 1px solid #eee;
+            margin-top: 10px;
+        }
+        
+        /* Partners Section */
+        .partners {
+            width: 100%;
+            background: linear-gradient(to bottom, #0C1E36, #08152B);
+            padding: 60px 30px;
+            position: relative;
+        }
+        
+        .partners::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, #00c6ff, #0072ff);
+        }
+        
+        .partners-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .partners-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .partners-title h2 {
+            font-size: 28px;
+            color: #ffffff;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .partners-title p {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.85);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .partners-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .partner-logo {
+            background-color: rgba(255, 255, 255, 0.1);
+            height: 80px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s, background-color 0.3s;
+        }
+        
+        .partner-logo:hover {
+            transform: translateY(-5px);
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .partner-logo span {
+            color: #fff;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 40px;
+        }
+        
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        
+        .social-icon:hover {
+            background-color: #FF7F41;
+        }
+        
+        .social-icon i {
+            color: #fff;
+            font-size: 18px;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: #08152B;
+            padding: 60px 40px 20px;
+            color: #fff;
+        }
+        
+        .footer-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-about h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+        
+        .footer-about p {
+            color: #ccc;
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+        
+        .footer-links h3 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+        
+        .footer-links ul {
+            list-style: none;
+        }
+        
+        .footer-links ul li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links ul li a {
+            color: #ccc;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        
+        .footer-links ul li a:hover {
+            color: #FF7F41;
+        }
+        
+        .footer-contact h3 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+        
+        .contact-info {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .contact-info i {
+            color: #FF7F41;
+            font-size: 16px;
+            margin-right: 10px;
+            margin-top: 3px;
+        }
+        
+        .contact-info p {
+            color: #ccc;
+            font-size: 14px;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #999;
+            font-size: 12px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            body {
+                width: 100%;
+            }
+            
+            .services-grid, .cruises-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .partners-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .footer-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                padding: 0 20px;
+            }
+            
+            .hero h2 {
+                font-size: 36px;
+            }
+            
+            .hero p {
+                font-size: 16px;
+            }
+            
+            .services-grid, .cruises-grid, .faq-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .about {
+                flex-direction: column;
+            }
+            
+            .about-content {
+                padding-right: 0;
+                margin-bottom: 40px;
+            }
+            
+            .partners-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .partners-title h2 {
+                font-size: 20px;
+            }
+            
+            .partners-title p {
+                font-size: 14px;
+            }
+            
+            .footer-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .partners-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <h1>INTERLINE ASIA</h1>
+            <span>Exclusive Cruise Offers for Travel Professionals</span>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Services</a></li>
+                <li><a href="#">Cruises</a></li>
+                <li><a href="#">Partners</a></li>
+                <li><a href="#">FAQ</a></li>
+                <li><a href="#" class="contact-btn">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Exclusive Cruise Offers for Travel Professionals</h2>
+            <p>Discover premium cruise experiences at special industry rates. Designed exclusively for airline staff, travel agents, and tourism professionals.</p>
+            <a href="#" class="cta-btn">Explore Cruise Offers</a>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services">
+        <div class="section-title">
+            <h2>Our Services</h2>
+            <p>We provide exclusive access to premium cruise experiences at special industry rates for travel professionals.</p>
+        </div>
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="ri-ship-line"></i>
+                </div>
+                <h3>Exclusive Cruise Deals</h3>
+                <p>Access special rates on premium and luxury cruises worldwide, available only to travel industry professionals.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="ri-customer-service-2-line"></i>
+                </div>
+                <h3>Dedicated Support</h3>
+                <p>Our experienced team provides personalized assistance throughout your booking process and journey.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="ri-global-line"></i>
+                </div>
+                <h3>Global Destinations</h3>
+                <p>Explore a wide range of cruise itineraries covering all major destinations across the globe.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about">
+        <div class="about-content">
+            <h2>About Interline Asia</h2>
+            <p>Interline Asia is a premier cruise agency dedicated to providing exclusive cruise offers to airline staff, travel agents, and tourism professionals. With years of experience in the travel industry, we have established strong partnerships with leading cruise lines worldwide.</p>
+            <p>Our mission is to make luxury cruise experiences accessible to travel industry professionals through special interline rates and exceptional service. We understand the unique needs of travel professionals and strive to create memorable cruise experiences that exceed expectations.</p>
+        </div>
+        <div class="about-image"></div>
+    </section>
+
+    <!-- Cruises Section -->
+    <section class="cruises">
+        <div class="section-title">
+            <h2>Featured Cruises</h2>
+            <p>Explore our selection of premium cruise experiences available at exclusive industry rates.</p>
+        </div>
+        <div class="cruises-grid">
+            <div class="cruise-card">
+                <div class="cruise-image"></div>
+                <div class="cruise-content">
+                    <h3>Mediterranean Elegance</h3>
+                    <p>7-night cruise exploring the stunning coastlines of Italy, France, and Spain.</p>
+                    <div class="cruise-details">
+                        <span class="cruise-price">From $699</span>
+                        <a href="#" class="cruise-btn">View Details</a>
+                    </div>
+                </div>
+            </div>
+            <div class="cruise-card">
+                <div class="cruise-image"></div>
+                <div class="cruise-content">
+                    <h3>Caribbean Paradise</h3>
+                    <p>10-night cruise visiting exotic Caribbean islands with pristine beaches.</p>
+                    <div class="cruise-details">
+                        <span class="cruise-price">From $899</span>
+                        <a href="#" class="cruise-btn">View Details</a>
+                    </div>
+                </div>
+            </div>
+            <div class="cruise-card">
+                <div class="cruise-image"></div>
+                <div class="cruise-content">
+                    <h3>Alaska Adventure</h3>
+                    <p>7-night cruise exploring the breathtaking glaciers and wildlife of Alaska.</p>
+                    <div class="cruise-details">
+                        <span class="cruise-price">From $799</span>
+                        <a href="#" class="cruise-btn">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq">
+        <div class="section-title">
+            <h2>Frequently Asked Questions</h2>
+            <p>Find answers to common questions about our services and cruise offers.</p>
+        </div>
+        <div class="faq-container">
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>Who is eligible for interline rates?</h3>
+                    <i class="ri-add-line"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Interline rates are available to current and retired airline staff, travel agents, and tourism professionals with valid industry ID.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>How do I book a cruise?</h3>
+                    <i class="ri-add-line"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>You can book a cruise through our website or by contacting our dedicated support team. We'll guide you through the entire process.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>What documents do I need to provide?</h3>
+                    <i class="ri-add-line"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>You'll need to provide a valid industry ID, passport, and other relevant travel documents as required by the cruise line.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>Can I bring family members?</h3>
+                    <i class="ri-add-line"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Yes, most cruise lines allow eligible industry professionals to bring family members at the same special rates.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Partners Section -->
+    <section class="partners">
+        <div class="partners-container">
+            <div class="partners-title">
+                <h2>Trusted by Industry-Leading Cruise Lines</h2>
+                <p>We proudly work with the most respected brands in the cruise industry — from premium to ultra-luxury.</p>
+            </div>
+            <div class="partners-grid">
+                <div class="partner-logo"><span>Royal Caribbean</span></div>
+                <div class="partner-logo"><span>Celebrity Cruises</span></div>
+                <div class="partner-logo"><span>Norwegian</span></div>
+                <div class="partner-logo"><span>MSC Cruises</span></div>
+                <div class="partner-logo"><span>Princess</span></div>
+                <div class="partner-logo"><span>Carnival</span></div>
+                <div class="partner-logo"><span>Holland America</span></div>
+                <div class="partner-logo"><span>Cunard</span></div>
+                <div class="partner-logo"><span>Seabourn</span></div>
+                <div class="partner-logo"><span>Silversea</span></div>
+                <div class="partner-logo"><span>Regent</span></div>
+                <div class="partner-logo"><span>Oceania</span></div>
+                <div class="partner-logo"><span>Viking</span></div>
+                <div class="partner-logo"><span>Azamara</span></div>
+                <div class="partner-logo"><span>Crystal</span></div>
+                <div class="partner-logo"><span>Windstar</span></div>
+                <div class="partner-logo"><span>Paul Gauguin</span></div>
+                <div class="partner-logo"><span>Ponant</span></div>
+                <div class="partner-logo"><span>Hurtigruten</span></div>
+            </div>
+            <div class="social-icons">
+                <a href="#" class="social-icon"><i class="ri-facebook-fill"></i></a>
+                <a href="#" class="social-icon"><i class="ri-instagram-line"></i></a>
+                <a href="#" class="social-icon"><i class="ri-twitter-x-line"></i></a>
+                <a href="#" class="social-icon"><i class="ri-linkedin-fill"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-about">
+                <h3>INTERLINE ASIA</h3>
+                <p>Interline Asia is a premier cruise agency providing exclusive offers to airline staff, travel agents, and tourism professionals. We partner with leading cruise lines to offer special industry rates on premium cruise experiences worldwide.</p>
+            </div>
+            <div class="footer-links">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Services</a></li>
+                    <li><a href="#">Cruises</a></li>
+                    <li><a href="#">Partners</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h3>Resources</h3>
+                <ul>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Terms & Conditions</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Careers</a></li>
+                </ul>
+            </div>
+            <div class="footer-contact">
+                <h3>Contact Us</h3>
+                <div class="contact-info">
+                    <i class="ri-map-pin-line"></i>
+                    <p>123 Business Street, Suite 100<br>Singapore 123456</p>
+                </div>
+                <div class="contact-info">
+                    <i class="ri-phone-line"></i>
+                    <p>+65 1234 5678</p>
+                </div>
+                <div class="contact-info">
+                    <i class="ri-mail-line"></i>
+                    <p>info@interlineasia.com</p>
+                </div>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>&copy; 2023 Interline Asia. All Rights Reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

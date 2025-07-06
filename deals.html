@@ -7,6 +7,10 @@
   <title>Cruise Deals - Interline Asia</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-FYGT92WCXC"></script>
   <script>
@@ -413,46 +417,52 @@
       container.innerHTML = html;
     }
     
-    // Fetch and display deals
+    // Fetch and display deals from Supabase
     async function loadDeals() {
       try {
-        // Try different paths to find the JSON file
-        let response;
-        try {
-          response = await fetch('public/deals.json');
-          console.log('Path 1 succeeded');
-          if (!response.ok) throw new Error('Path 1 failed');
-        } catch (e) {
-          console.log('Path 1 failed, trying path 2');
-          try {
-            response = await fetch('./public/deals.json');
-            console.log('Path 2 succeeded');
-            if (!response.ok) throw new Error('Path 2 failed');
-          } catch (e2) {
-            console.log('Path 2 failed, trying path 3');
-            try {
-              response = await fetch('/public/deals.json');
-              console.log('Path 3 succeeded');
-              if (!response.ok) throw new Error('Path 3 failed');
-            } catch (e3) {
-              console.log('All paths failed, trying relative path');
-              // Try a relative path based on current URL
-              const currentPath = window.location.pathname;
-              const basePath = currentPath.substring(0, currentPath.lastIndexOf('/'));
-              response = await fetch(`${basePath}/public/deals.json`);
-              console.log('Relative path succeeded');
-            }
-          }
+        // Initialize Supabase client
+        const supabaseUrl = window.SUPABASE_URL;
+        const supabaseAnonKey = window.SUPABASE_ANON_KEY;
+        
+        if (!supabaseUrl || !supabaseAnonKey) {
+          throw new Error('Supabase configuration missing');
         }
         
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        const { createClient } = supabase;
+        const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+        
+        // Fetch active cruise deals from Supabase
+        const { data: deals, error } = await supabaseClient
+          .from('cruise_deals')
+          .select('*')
+          .eq('is_active', true)
+          .order('departure_date', { ascending: true });
+        
+        if (error) {
+          throw new Error('Failed to load deals: ' + error.message);
         }
         
-        allDeals = await response.json();
-        filteredDeals = [...allDeals];
+        // Convert Supabase data to frontend format
+        const formattedDeals = deals.map(deal => ({
+          cruiseLine: deal.cruise_line,
+          shipName: deal.ship_name,
+          departureDate: deal.departure_date,
+          region: deal.region || '',
+          nights: deal.nights || '',
+          from: deal.departure_port || '',
+          to: deal.arrival_port || '',
+          itinerary: deal.itinerary || '',
+          insidePrice: deal.inside_price || 'Quote Available',
+          oceanviewPrice: deal.oceanview_price || 'Quote Available',
+          balconyPrice: deal.balcony_price || 'Quote Available',
+          suitePrice: deal.suite_price || 'Quote Available',
+          seq: deal.seq_number || ''
+        }));
         
-        populateFilters(allDeals);
+        allDeals = formattedDeals;
+        filteredDeals = [...formattedDeals];
+        
+        populateFilters(formattedDeals);
         renderDeals(filteredDeals);
         
         // Add event listeners

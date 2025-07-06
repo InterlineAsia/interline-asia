@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Received - Interline Asia</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .success-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            animation: pulse 2s infinite;
+        }
+
+        .success-icon i {
+            color: white;
+            font-size: 40px;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7);
+            }
+            70% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 10px rgba(46, 204, 113, 0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(46, 204, 113, 0);
+            }
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            color: #7f8c8d;
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .timeline {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .timeline h3 {
+            color: #2c3e50;
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .timeline h3 i {
+            color: #3498db;
+            margin-right: 10px;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        .timeline-item i {
+            color: #27ae60;
+            margin-right: 12px;
+            width: 16px;
+        }
+
+        .contact-info {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+
+        .contact-info h4 {
+            color: #1976d2;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .contact-info h4 i {
+            margin-right: 8px;
+        }
+
+        .contact-info p {
+            color: #1976d2;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+
+        .action-buttons {
+            margin-top: 30px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin: 0 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #ecf0f1;
+            color: #2c3e50;
+            border: 1px solid #bdc3c7;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .security-note {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #856404;
+        }
+
+        .security-note i {
+            color: #ffc107;
+            margin-right: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .success-container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .message {
+                font-size: 16px;
+            }
+
+            .btn {
+                display: block;
+                margin: 10px 0;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <div class="success-icon">
+            <i class="ri-check-line"></i>
+        </div>
+
+        <h1>Application Received!</h1>
+        
+        <div class="message">
+            Thank you! Your application has been submitted successfully.
+        </div>
+
+        <div class="timeline">
+            <h3><i class="ri-time-line"></i> What happens next?</h3>
+            <div class="timeline-item">
+                <i class="ri-check-line"></i>
+                <span>Your documents are being securely processed</span>
+            </div>
+            <div class="timeline-item">
+                <i class="ri-eye-line"></i>
+                <span>Our team will review your application within 72 business hours</span>
+            </div>
+            <div class="timeline-item">
+                <i class="ri-mail-line"></i>
+                <span>You'll receive a confirmation email with access details if approved</span>
+            </div>
+        </div>
+
+        <div class="contact-info">
+            <h4><i class="ri-mail-line"></i> Important</h4>
+            <p>Please check your inbox (and your spam folder just in case).</p>
+            <p>If you don't hear from us within 72 hours, please contact support.</p>
+        </div>
+
+        <div class="action-buttons">
+            <a href="index.html" class="btn btn-primary">
+                <i class="ri-home-line"></i> Return to Homepage
+            </a>
+            <a href="mailto:support@interlineasia.com" class="btn btn-secondary">
+                <i class="ri-customer-service-line"></i> Contact Support
+            </a>
+        </div>
+
+        <div class="security-note">
+            <i class="ri-shield-check-line"></i>
+            Your information is encrypted and secure. We take privacy seriously and will never share your details with third parties.
+        </div>
+    </div>
+
+    <script>
+        // Add some interactive elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate timeline items
+            const timelineItems = document.querySelectorAll('.timeline-item');
+            timelineItems.forEach((item, index) => {
+                setTimeout(() => {
+                    item.style.opacity = '0';
+                    item.style.transform = 'translateX(-20px)';
+                    item.style.transition = 'all 0.5s ease';
+                    
+                    setTimeout(() => {
+                        item.style.opacity = '1';
+                        item.style.transform = 'translateX(0)';
+                    }, 100);
+                }, index * 200);
+            });
+
+            // Store submission timestamp for potential follow-up
+            localStorage.setItem('applicationSubmitted', new Date().toISOString());
+        });
+    </script>
+</body>
+</html>

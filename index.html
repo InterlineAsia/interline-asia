@@ -297,20 +297,15 @@
       If you work in travel, you qualify. Airline crew, travel agents, IATA cardholders, hotel staff, car rental, cruise lines, wholesalers – welcome aboard.
     </p>
     
-    <form id="newsletter-form" class="email-form">
+    <form id="sib-form" class="email-form" method="POST" action="https://8d9b60d5.sibforms.com/serve/MUIFABH969j8ReJVIoNVBz18IzzUgEO9PJwTIfVtdGOlJ_YIZUyLL-jombtFtud6amZ9oaH5EsGxWzf67WebkLjVqN1_pAH69wbPARiyVfX_ky1tp79mrupePf7YawaJs1JI5yWieVreQ6lMS-wneISAdQ3oNj-Iniio3pwvq_VLUKJ-rW4Fwbnah039iaCR96IVtyRTZ2ZTwxTj" data-type="subscription">
       <label for="email" class="hidden-input">Email Address</label>
-      <input type="email" id="email" name="email" class="email-input" placeholder="Your professional email address" required aria-describedby="email-help">
-      <button type="submit" class="submit-button" id="submit-btn">Join Free - Access Travel Industry Cruise Rates</button>
+      <input type="email" id="email" name="EMAIL" class="email-input" placeholder="Your professional email address" required aria-describedby="email-help">
+      <button type="submit" class="submit-button">Join Free - Access Travel Industry Cruise Rates</button>
       <p style="margin-top: 10px; font-size: 14px; color: #ccc;">Join free to access travel industry cruise rates. Instant pricing, private deals, and priority support for verified members.</p>
-      <div id="form-message" style="margin-top: 15px; text-align: center; display: none;"></div>
+      
+      <input type="text" name="email_address_check" value="" class="hidden-input" tabindex="-1" autocomplete="off">
+      <input type="hidden" name="locale" value="en">
     </form>
-    
-    <div style="margin-top: 30px; text-align: center;">
-      <p style="color: #ccc; margin-bottom: 15px;">Already a member?</p>
-      <a href="login.html" style="color: #ffb347; text-decoration: none; font-weight: 600; padding: 10px 20px; border: 1px solid #ffb347; border-radius: 6px; transition: all 0.3s ease;">
-        Member Login
-      </a>
-    </div>
     
     <!-- FAQ Section -->
     <div style="margin-top: 40px; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto;">
@@ -406,67 +401,6 @@
     };
     var AUTOHIDE = Boolean(0);
   </script>
-
-  <script>
-    // Newsletter form submission
-    document.getElementById('newsletter-form').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      
-      const email = document.getElementById('email').value.trim();
-      const button = document.getElementById('submit-btn');
-      const message = document.getElementById('form-message');
-      
-      if (!email) {
-        showMessage('Please enter your email address', 'error');
-        return;
-      }
-      
-      // Disable button and show loading
-      button.disabled = true;
-      button.textContent = 'Subscribing...';
-      button.style.opacity = '0.7';
-      
-      try {
-        const response = await fetch('/api/newsletter-signup', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email: email })
-        });
-        
-        const result = await response.json();
-        
-        if (response.ok) {
-          showMessage('Success! You will be notified when we launch exclusive deals.', 'success');
-          document.getElementById('email').value = '';
-        } else {
-          throw new Error(result.error || 'Subscription failed');
-        }
-        
-      } catch (error) {
-        console.error('Newsletter signup error:', error);
-        showMessage('Something went wrong. Please try again.', 'error');
-      } finally {
-        // Reset button
-        button.disabled = false;
-        button.textContent = 'Join Free - Access Travel Industry Cruise Rates';
-        button.style.opacity = '1';
-      }
-    });
-    
-    function showMessage(text, type) {
-      const message = document.getElementById('form-message');
-      message.textContent = text;
-      message.style.display = 'block';
-      message.style.color = type === 'success' ? '#27ae60' : '#e74c3c';
-      message.style.fontWeight = '600';
-      
-      // Hide message after 5 seconds
-      setTimeout(() => {
-        message.style.display = 'none';
-      }, 5000);
-    }
-  </script>
+  <script defer src="https://sibforms.com/forms/end-form/build/main.js"></script>
 </body>
 </html>

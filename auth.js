@@ -121,8 +121,7 @@ class AuthSystem {
     // Create mailto link (in real app, this would be an API call)
     const mailtoLink = `mailto:admin@interlineasia.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     
-    // Log for development
-    console.log('Admin Notification:', { type, subject, body, mailtoLink });
+    // Admin notification logged securely (details omitted for security)
     
     // In a real app, you'd send this to your backend
     // For now, we'll just log it

@@ -18,7 +18,7 @@ class EmailScheduler {
     if (this.isRunning) return;
     
     this.isRunning = true;
-    console.log('📅 Email scheduler started');
+    // Email scheduler started - logging removed for security
     
     // Run immediately on start
     this.processScheduledEmails();

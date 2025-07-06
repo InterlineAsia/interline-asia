@@ -1,0 +1,27 @@
+{
+  "name": "interline-asia-csv-processor",
+  "version": "1.0.0",
+  "description": "CSV upload and processing system for Interline Asia cruise deals",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'Static site - no build needed'",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "papaparse": "^5.4.1"
+  },
+  "devDependencies": {
+    "@vercel/node": "^2.3.0"
+  },
+  "keywords": [
+    "cruise",
+    "deals",
+    "csv",
+    "gemini",
+    "ai"
+  ],
+  "author": "Interline Asia",
+  "license": "MIT"
+}

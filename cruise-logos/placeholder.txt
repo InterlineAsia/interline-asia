@@ -1,0 +1,25 @@
+Cruise line logos will be placed here.
+
+Required files (all lowercase, hyphenated):
+- atlas.png
+- azamara.png
+- carnival.png
+- celebrity.png
+- coral-expeditions.png
+- crystal.png
+- cunard.png
+- explora-journeys.png
+- hx-hurtigruten-expeditions.png
+- heritage-expeditions.png
+- holland-america.png
+- msc.png
+- norwegian.png
+- oceania.png
+- princess.png
+- regent.png
+- royal-caribbean.png
+- seabourn.png
+- silversea.png
+
+Format: PNG or SVG with transparent backgrounds
+Size: Optimized for web (max 200px width recommended)

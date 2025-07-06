@@ -1,0 +1,406 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interline Asia - Exclusive luxury cruise deals and VIP travel offers for industry professionals. Coming soon with insider access and privileged rates.">
+  <meta name="keywords" content="interline, cruise deals, luxury travel, VIP access, travel industry, exclusive offers">
+  <title>Interline Asia | Exclusive Cruise Deals for Airline, Travel & Tourism Staff</title>
+  <meta name="description" content="Get insider access to exclusive cruise deals. Interline Asia offers private rates for airline, tourism, and travel industry employees. Limited access.">
+  <meta name="keywords" content="interline cruise rates, staff-only cruise discounts, travel industry insider cruise deals, airline employee cruise deals, tourism staff cruise rates">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="Interline Asia">
+  
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="Interline Asia | Exclusive Cruise Deals for Travel Industry Staff">
+  <meta property="og:description" content="Get insider access to exclusive cruise deals. Private rates for airline, tourism, and travel industry employees. Limited access.">
+  <meta property="og:image" content="https://interlineasia.com/cruise-ship.png">
+  <meta property="og:url" content="https://interlineasia.com">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Interline Asia">
+  
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Interline Asia | Exclusive Cruise Deals for Travel Industry Staff">
+  <meta name="twitter:description" content="Get insider access to exclusive cruise deals. Private rates for airline, tourism, and travel industry employees.">
+  <meta name="twitter:image" content="https://interlineasia.com/cruise-ship.png">
+  
+  <!-- Additional SEO -->
+  <link rel="canonical" href="https://interlineasia.com">
+  <meta name="theme-color" content="#1a1a2e">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+  
+  <!-- Google tag (gtag.js) -->
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://interlineasia.com/#organization",
+        "name": "Interline Asia",
+        "url": "https://interlineasia.com",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://interlineasia.com/cruise-ship.png",
+          "width": 512,
+          "height": 512
+        },
+        "description": "Exclusive cruise deals and luxury travel offers for airline, tourism, and travel industry professionals.",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "email": "admin@interlineasia.com",
+          "contactType": "customer service"
+        }
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://interlineasia.com/#website",
+        "url": "https://interlineasia.com",
+        "name": "Interline Asia",
+        "description": "Exclusive cruise deals for travel industry professionals",
+        "publisher": {
+          "@id": "https://interlineasia.com/#organization"
+        }
+      },
+      {
+        "@type": "Service",
+        "name": "Exclusive Cruise Deals",
+        "description": "Private cruise rates and insider deals for airline, tourism, and travel industry employees",
+        "provider": {
+          "@id": "https://interlineasia.com/#organization"
+        },
+        "serviceType": "Travel Booking Service",
+        "audience": {
+          "@type": "Audience",
+          "audienceType": "Travel Industry Professionals"
+        }
+      }
+    ]
+  }
+  </script>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FYGT92WCXC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-FYGT92WCXC');
+  </script>
+  
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(to bottom, #004e92, #000428), url('cruise-ship.png') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+      position: relative;
+    }
+    
+    /* Social Media Icons Header */
+    .social-header {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 15px;
+      z-index: 1000;
+    }
+    
+    .social-icon {
+      width: 24px;
+      height: 24px;
+      opacity: 0.8;
+      transition: opacity 0.3s ease;
+      filter: brightness(0) invert(1);
+    }
+    
+    .social-icon:hover {
+      opacity: 1;
+    }
+    
+    /* Cruise Line Logo Section */
+    .cruise-logos-section {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 40px 20px;
+      margin-top: 40px;
+      text-align: center;
+    }
+    
+    .cruise-logos-title {
+      color: #ffb347;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 30px;
+      opacity: 0.9;
+    }
+    
+    .cruise-logos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+      align-items: center;
+    }
+    
+    .cruise-logo {
+      height: 40px;
+      max-width: 120px;
+      object-fit: contain;
+      opacity: 0.9;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      /* Remove filter to test visibility */
+      background: rgba(255, 255, 255, 0.2);
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .cruise-logo:hover {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+    
+    @media (max-width: 768px) {
+      .cruise-logos-grid {
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        gap: 15px;
+      }
+      
+      .cruise-logo {
+        height: 30px;
+        max-width: 80px;
+      }
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-radius: 24px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      padding: 3rem 2rem;
+      max-width: 680px;
+      width: 90%;
+      text-align: center;
+      color: #ffffff;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      font-weight: 900;
+      line-height: 1.3;
+    }
+    .tagline {
+      color: #ffb347;
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-bottom: 0.3rem;
+    }
+    p.subtitle {
+      font-style: italic;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+      opacity: 0.9;
+    }
+    p.desc {
+      font-size: 1rem;
+      margin: 1.2rem 0;
+      line-height: 1.5;
+      color: #e0e0e0;
+    }
+    input[type="email"] {
+      padding: 0.75rem;
+      width: 60%;
+      max-width: 280px;
+      border: none;
+      border-radius: 8px;
+      margin-right: 0.5rem;
+    }
+    button {
+      background-color: #ffb347;
+      color: #000;
+      padding: 0.75rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(255, 179, 71, 0.4);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 18px rgba(255, 179, 71, 0.6);
+    }
+    input.hidden-input {
+      position: absolute;
+      left: -9999px;
+      opacity: 0;
+    }
+    label.hidden-input {
+      position: absolute;
+      left: -9999px;
+      opacity: 0;
+    }
+    .footer {
+      font-size: 0.8rem;
+      margin-top: 1.5rem;
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <!-- Social Media Icons Header -->
+  <div class="social-header">
+    <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor">
+      <!-- Facebook -->
+      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+    </svg>
+    <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor">
+      <!-- Instagram -->
+      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+    </svg>
+    <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor">
+      <!-- LinkedIn -->
+      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+    </svg>
+    <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor">
+      <!-- TikTok -->
+      <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
+    </svg>
+    <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor">
+      <!-- YouTube -->
+      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+    </svg>
+    <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor">
+      <!-- X (Twitter) -->
+      <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/>
+    </svg>
+  </div>
+
+  <div class="glass-card">
+    <div class="tagline">INTERLINE ASIA</div>
+    <p class="subtitle">Luxury Cruise Deals. Private Access. Insider Exclusives.</p>
+    <h1>Unlock Exclusive Cruise Deals – For All Travel Industry Professionals</h1>
+    <p class="desc">
+      If you work in travel, you qualify. Airline crew, travel agents, IATA cardholders, hotel staff, car rental, cruise lines, wholesalers – welcome aboard.
+    </p>
+    
+    <form id="sib-form" class="email-form" method="POST" action="https://8d9b60d5.sibforms.com/serve/MUIFABH969j8ReJVIoNVBz18IzzUgEO9PJwTIfVtdGOlJ_YIZUyLL-jombtFtud6amZ9oaH5EsGxWzf67WebkLjVqN1_pAH69wbPARiyVfX_ky1tp79mrupePf7YawaJs1JI5yWieVreQ6lMS-wneISAdQ3oNj-Iniio3pwvq_VLUKJ-rW4Fwbnah039iaCR96IVtyRTZ2ZTwxTj" data-type="subscription">
+      <label for="email" class="hidden-input">Email Address</label>
+      <input type="email" id="email" name="EMAIL" class="email-input" placeholder="Your professional email address" required aria-describedby="email-help">
+      <button type="submit" class="submit-button">Join Free - Access Travel Industry Cruise Rates</button>
+      <p style="margin-top: 10px; font-size: 14px; color: #ccc;">Join free to access travel industry cruise rates. Instant pricing, private deals, and priority support for verified members.</p>
+      
+      <input type="text" name="email_address_check" value="" class="hidden-input" tabindex="-1" autocomplete="off">
+      <input type="hidden" name="locale" value="en">
+    </form>
+    
+    <!-- FAQ Section -->
+    <div style="margin-top: 40px; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto;">
+      <h3 style="color: #ffb347; margin-bottom: 20px; text-align: center;">Frequently Asked Questions</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+        <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px;">
+          <h4 style="color: #ffb347; margin-bottom: 8px;">Q: Who can join?</h4>
+          <p style="color: #ccc; margin: 0; font-size: 14px;">A: Anyone working in travel – airline, hotel, car rental, cruise, IATA, and more.</p>
+        </div>
+        <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px;">
+          <h4 style="color: #ffb347; margin-bottom: 8px;">Q: Is it free?</h4>
+          <p style="color: #ccc; margin: 0; font-size: 14px;">A: Yes. Membership is 100% free.</p>
+        </div>
+        <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px;">
+          <h4 style="color: #ffb347; margin-bottom: 8px;">Q: What do I need to join?</h4>
+          <p style="color: #ccc; margin: 0; font-size: 14px;">A: Upload a business card, company letter, or industry ID.</p>
+        </div>
+        <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px;">
+          <h4 style="color: #ffb347; margin-bottom: 8px;">Q: Can I book for family or friends?</h4>
+          <p style="color: #ccc; margin: 0; font-size: 14px;">A: Most deals allow it – we'll let you know when they don't.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">© 2025 Interline Asia. All rights reserved.</div>
+  </div>
+
+  <!-- Cruise Line Logos Section -->
+  <div class="cruise-logos-section">
+    <div class="cruise-logos-title">Trusted by industry-leading cruise lines</div>
+    <div class="cruise-logos-grid">
+      <!-- Complete cruise line logos collection -->
+      <img src="public/logos/cruiselines/royal-caribbean.png" alt="Royal Caribbean International" class="cruise-logo" loading="lazy">
+      <img src="public/logos/cruiselines/norwegian.png" alt="Norwegian Cruise Line" class="cruise-logo" loading="lazy">
+      <img src="public/logos/cruiselines/carnival.png" alt="Carnival Cruise Line" class="cruise-logo" loading="lazy">
+      <img src="public/logos/cruiselines/celebrity.png" alt="Celebrity Cruises" class="cruise-logo" loading="lazy">
+      <img src="public/logos/cruiselines/princess.png" alt="Princess Cruises" class="cruise-logo" loading="lazy">
+      <img src="public/logos/cruiselines/holland-america.png" alt="Holland America Line" class="cruise-logo" loading="lazy">
+      <img src="public/logos/cruiselines/msc.png" alt="MSC Cruises" class="cruise-logo" loading="lazy">
+      <img src="public/logos/cruiselines/cunard.png" alt="Cunard Line" class="cruise-logo" loading="lazy">
+      <img src="public/logos/cruiselines/oceania.png" alt="Oceania Cruises" class="cruise-logo" loading="lazy">
+      <img src="public/logos/cruiselines/atlas.png" alt="Atlas Ocean Voyages" class="cruise-logo" loading="lazy">
+      <img src="public/logos/cruiselines/azamara.png" alt="Azamara" class="cruise-logo" loading="lazy">
+      <img src="public/logos/cruiselines/coral-expeditions.png" alt="Coral Expeditions" class="cruise-logo" loading="lazy">
+      <img src="public/logos/cruiselines/crystal.png" alt="Crystal Cruises" class="cruise-logo" loading="lazy">
+      <img src="public/logos/cruiselines/explora-journeys.png" alt="Explora Journeys" class="cruise-logo" loading="lazy">
+      <img src="public/logos/cruiselines/hx-hurtigruten-expeditions.png" alt="HX Hurtigruten Expeditions" class="cruise-logo" loading="lazy">
+      <img src="public/logos/cruiselines/heritage-expeditions.png" alt="Heritage Expeditions" class="cruise-logo" loading="lazy">
+      
+      <!-- Placeholder for remaining cruise lines (logos not yet available) -->
+      <div style="height: 40px; background: rgba(255,255,255,0.1); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #ccc;">REGENT</div>
+      <div style="height: 40px; background: rgba(255,255,255,0.1); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #ccc;">SEABOURN</div>
+      <div style="height: 40px; background: rgba(255,255,255,0.1); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #ccc;">SILVERSEA</div>
+      
+      <!-- When actual logos are available, replace placeholders with:
+      <img src="/public/logos/cruiselines/atlas.png" alt="Atlas Ocean Voyages" class="cruise-logo">
+      <img src="/public/logos/cruiselines/azamara.png" alt="Azamara" class="cruise-logo">
+      <img src="/public/logos/cruiselines/carnival.png" alt="Carnival Cruise Line" class="cruise-logo">
+      <img src="/public/logos/cruiselines/celebrity.png" alt="Celebrity Cruises" class="cruise-logo">
+      <img src="/public/logos/cruiselines/coral-expeditions.png" alt="Coral Expeditions" class="cruise-logo">
+      <img src="/public/logos/cruiselines/crystal.png" alt="Crystal Cruises" class="cruise-logo">
+      <img src="/public/logos/cruiselines/cunard.png" alt="Cunard Line" class="cruise-logo">
+      <img src="/public/logos/cruiselines/explora-journeys.png" alt="Explora Journeys" class="cruise-logo">
+      <img src="/public/logos/cruiselines/hx-hurtigruten-expeditions.png" alt="HX Hurtigruten Expeditions" class="cruise-logo">
+      <img src="/public/logos/cruiselines/heritage-expeditions.png" alt="Heritage Expeditions" class="cruise-logo">
+      <img src="/public/logos/cruiselines/holland-america.png" alt="Holland America Line" class="cruise-logo">
+      <img src="/public/logos/cruiselines/msc.png" alt="MSC Cruises" class="cruise-logo">
+      <img src="/public/logos/cruiselines/norwegian.png" alt="Norwegian Cruise Line" class="cruise-logo">
+      <img src="/public/logos/cruiselines/oceania.png" alt="Oceania Cruises" class="cruise-logo">
+      <img src="/public/logos/cruiselines/princess.png" alt="Princess Cruises" class="cruise-logo">
+      <img src="/public/logos/cruiselines/regent.png" alt="Regent Seven Seas Cruises" class="cruise-logo">
+      <img src="/public/logos/cruiselines/royal-caribbean.png" alt="Royal Caribbean International" class="cruise-logo">
+      <img src="/public/logos/cruiselines/seabourn.png" alt="Seabourn" class="cruise-logo">
+      <img src="/public/logos/cruiselines/silversea.png" alt="Silversea Cruises" class="cruise-logo">
+      -->
+    </div>
+  </div>
+
+  <script>
+    // Sendinblue form configuration
+    window.REQUIRED_CODE_ERROR_MESSAGE = 'Please choose a country code';
+    window.LOCALE = 'en';
+    window.EMAIL_INVALID_MESSAGE = window.SMS_INVALID_MESSAGE = "Oops! Please check your email address and try again.";
+    window.REQUIRED_ERROR_MESSAGE = "This field is required — please fill it out before continuing.";
+    window.GENERIC_INVALID_MESSAGE = "Oops! Please check your email address and try again.";
+    window.translation = {
+      common: {
+        selectedList: '{quantity} list selected',
+        selectedLists: '{quantity} lists selected',
+        selectedOption: '{quantity} selected',
+        selectedOptions: '{quantity} selected',
+      }
+    };
+    var AUTOHIDE = Boolean(0);
+  </script>
+  <script defer src="https://sibforms.com/forms/end-form/build/main.js"></script>
+</body>
+</html>

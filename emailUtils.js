@@ -44,7 +44,7 @@ async function sendEmail(to, subject, htmlContent, textContent = '') {
     }
 
     const result = await response.json();
-    console.log(`✅ Email sent successfully to ${to}:`, result.messageId);
+    // Email sent successfully (details omitted for security)
     return result;
 
   } catch (error) {

@@ -310,37 +310,6 @@ function initializeSignupForm() {
     }
 }
 
-// Utility functions for error/success messages
-function showError(message) {
-    const errorEl = document.getElementById('error-message');
-    if (errorEl) {
-        errorEl.textContent = message;
-        errorEl.style.display = 'block';
-    }
-}
-
-function hideError() {
-    const errorEl = document.getElementById('error-message');
-    if (errorEl) {
-        errorEl.style.display = 'none';
-    }
-}
-
-function showSuccess(message) {
-    const successEl = document.getElementById('success-message');
-    if (successEl) {
-        successEl.textContent = message;
-        successEl.style.display = 'block';
-    }
-}
-
-function hideSuccess() {
-    const successEl = document.getElementById('success-message');
-    if (successEl) {
-        successEl.style.display = 'none';
-    }
-}
-
 // Wait for DOM and dependencies to load
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded, initializing signup form...');

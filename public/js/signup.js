@@ -2,52 +2,35 @@
 // Handles form submission, file upload validation, and reCAPTCHA integration
 
 // File upload validation for signup process
-function validateUploads() {
-    const businessCard = document.getElementById('businessCardUpload').files[0];
-    const letter = document.getElementById('letterUpload').files[0];
+function validateUpload() {
+    const documentFile = document.getElementById('documentUpload').files[0];
     const submitButton = document.getElementById('create-account-btn');
     const uploadError = document.getElementById('upload-error');
     
     // Reset error state
     uploadError.style.display = 'none';
     
-    // Validate file size and type if files are selected
+    // Validate file size and type if file is selected
     const maxSize = 5 * 1024 * 1024; // 5MB
     const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
     
     let hasValidFile = false;
     let errorMessage = '';
     
-    // Validate business card if uploaded
-    if (businessCard) {
-        if (businessCard.size > maxSize) {
-            errorMessage = 'Business card file size must be less than 5MB';
-            showFileValidation('businessCard', false, errorMessage);
-        } else if (!allowedTypes.includes(businessCard.type)) {
-            errorMessage = 'Business card must be a PDF, PNG, or JPG file';
-            showFileValidation('businessCard', false, errorMessage);
+    // Validate document if uploaded
+    if (documentFile) {
+        if (documentFile.size > maxSize) {
+            errorMessage = 'File size must be less than 5MB';
+            showFileValidation('document', false, errorMessage);
+        } else if (!allowedTypes.includes(documentFile.type)) {
+            errorMessage = 'File must be a PDF, PNG, or JPG';
+            showFileValidation('document', false, errorMessage);
         } else {
             hasValidFile = true;
-            showFileValidation('businessCard', true, 'Valid: ' + businessCard.name + ' (' + (businessCard.size / 1024 / 1024).toFixed(2) + ' MB)');
+            showFileValidation('document', true, 'Valid: ' + documentFile.name + ' (' + (documentFile.size / 1024 / 1024).toFixed(2) + ' MB)');
         }
     } else {
-        hideFileValidation('businessCard');
-    }
-    
-    // Validate employment letter if uploaded (independent of business card validation)
-    if (letter) {
-        if (letter.size > maxSize) {
-            errorMessage = 'Employment letter file size must be less than 5MB';
-            showFileValidation('letter', false, errorMessage);
-        } else if (!allowedTypes.includes(letter.type)) {
-            errorMessage = 'Employment letter must be a PDF, PNG, or JPG file';
-            showFileValidation('letter', false, errorMessage);
-        } else {
-            hasValidFile = true;
-            showFileValidation('letter', true, 'Valid: ' + letter.name + ' (' + (letter.size / 1024 / 1024).toFixed(2) + ' MB)');
-        }
-    } else {
-        hideFileValidation('letter');
+        hideFileValidation('document');
     }
     
     // Show error if validation failed
@@ -58,13 +41,13 @@ function validateUploads() {
         return;
     }
     
-    // Enable button if at least one valid file is selected
+    // Enable button if valid file is selected
     if (hasValidFile) {
         submitButton.disabled = false;
         uploadError.style.display = 'none';
     } else {
         submitButton.disabled = true;
-        uploadError.textContent = 'Please upload at least one document to continue.';
+        uploadError.textContent = 'Please upload a verification document to continue.';
         uploadError.style.display = 'block';
     }
 }
@@ -193,30 +176,23 @@ async function handleFormSubmission(e) {
         console.log('Starting signup process for:', userData.email);
         
         // File upload validation
-        const businessCard = document.getElementById('businessCardUpload').files[0];
-        const letter = document.getElementById('letterUpload').files[0];
+        const documentFile = document.getElementById('documentUpload').files[0];
         
-        if (!businessCard && !letter) {
+        if (!documentFile) {
             document.getElementById('upload-error').style.display = 'block';
-            throw new Error('Please upload at least one document to continue');
+            throw new Error('Please upload a verification document to continue');
         }
         
         // File size validation (5MB max)
         const maxSize = 5 * 1024 * 1024;
-        if (businessCard && businessCard.size > maxSize) {
-            throw new Error('Business card file size must be less than 5MB');
-        }
-        if (letter && letter.size > maxSize) {
-            throw new Error('Employment letter file size must be less than 5MB');
+        if (documentFile.size > maxSize) {
+            throw new Error('File size must be less than 5MB');
         }
         
         // File type validation
         const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
-        if (businessCard && !allowedTypes.includes(businessCard.type)) {
-            throw new Error('Business card must be a PDF, PNG, or JPG file');
-        }
-        if (letter && !allowedTypes.includes(letter.type)) {
-            throw new Error('Employment letter must be a PDF, PNG, or JPG file');
+        if (!allowedTypes.includes(documentFile.type)) {
+            throw new Error('File must be a PDF, PNG, or JPG');
         }
         
         // Basic validation
@@ -255,19 +231,16 @@ async function handleFormSubmission(e) {
         if (result.user) {
             // Upload file after successful signup
             console.log('Uploading verification document...');
-            const file = businessCard || letter;
             let uploadSuccess = false;
             
-            if (file) {
-                try {
-                    await window.supabaseClient.uploadFile(file, result.user.id);
-                    console.log('File uploaded successfully');
-                    uploadSuccess = true;
-                } catch (uploadError) {
-                    console.error('File upload failed:', uploadError);
-                    // Don't fail the signup if file upload fails
-                    showError('Account created but file upload failed. Please upload your document from the dashboard after logging in.');
-                }
+            try {
+                await window.supabaseClient.uploadFile(documentFile, result.user.id);
+                console.log('File uploaded successfully');
+                uploadSuccess = true;
+            } catch (uploadError) {
+                console.error('File upload failed:', uploadError);
+                // Don't fail the signup if file upload fails
+                showError('Account created but file upload failed. Please upload your document from the dashboard after logging in.');
             }
             
             // Track successful signup
@@ -286,9 +259,8 @@ async function handleFormSubmission(e) {
             // Clear form
             e.target.reset();
             
-            // Reset file validation indicators
-            hideFileValidation('businessCard');
-            hideFileValidation('letter');
+            // Reset file validation indicator
+            hideFileValidation('document');
             
             // Redirect to login after 4 seconds (longer message)
             setTimeout(() => {
@@ -315,16 +287,10 @@ function initializeSignupForm() {
         form.addEventListener('submit', handleFormSubmission);
     }
     
-    // Add file upload validation listeners
-    const businessCardInput = document.getElementById('businessCardUpload');
-    const letterInput = document.getElementById('letterUpload');
-    
-    if (businessCardInput) {
-        businessCardInput.addEventListener('change', validateUploads);
-    }
-    
-    if (letterInput) {
-        letterInput.addEventListener('change', validateUploads);
+    // Add file upload validation listener
+    const documentInput = document.getElementById('documentUpload');
+    if (documentInput) {
+        documentInput.addEventListener('change', validateUpload);
     }
     
     // Check if user is already logged in
@@ -341,6 +307,37 @@ function initializeSignupForm() {
         });
     } else {
         console.warn('reCAPTCHA not loaded, will attempt to load on form submission');
+    }
+}
+
+// Utility functions for error/success messages
+function showError(message) {
+    const errorEl = document.getElementById('error-message');
+    if (errorEl) {
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
+    }
+}
+
+function hideError() {
+    const errorEl = document.getElementById('error-message');
+    if (errorEl) {
+        errorEl.style.display = 'none';
+    }
+}
+
+function showSuccess(message) {
+    const successEl = document.getElementById('success-message');
+    if (successEl) {
+        successEl.textContent = message;
+        successEl.style.display = 'block';
+    }
+}
+
+function hideSuccess() {
+    const successEl = document.getElementById('success-message');
+    if (successEl) {
+        successEl.style.display = 'none';
     }
 }
 

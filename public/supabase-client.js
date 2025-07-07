@@ -3,21 +3,48 @@
 
 class SupabaseClient {
   constructor() {
-    if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
-      console.error('Supabase URL or Anon Key is missing. Check config.js');
+    this.supabase = null;
+    this.currentUser = null;
+    this.currentSession = null;
+    this.authReady = false;
+    this._initialize();
+  }
+
+  async _initialize() {
+    // Wait for the Supabase library to be loaded from the CDN
+    let attempts = 0;
+    while (!window.supabase && attempts < 50) { // Wait for 5 seconds max
+      await new Promise(resolve => setTimeout(resolve, 100));
+      attempts++;
+    }
+
+    if (!window.supabase) {
+      const msg = 'Supabase client library not loaded. Please check the script tag in your HTML.';
+      console.error(msg);
+      showError('Critical Error: Could not connect to authentication service.');
       return;
     }
+
+    if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
+      const msg = 'Supabase URL or Anon Key is missing. Check config.js';
+      console.error(msg);
+      showError('Critical Error: Application is not configured correctly.');
+      return;
+    }
+
+    // Now it's safe to create the client
     this.supabase = window.supabase.createClient(
       window.SUPABASE_URL,
       window.SUPABASE_ANON_KEY
     );
-    this.currentUser = null;
-    this.currentSession = null;
-    this.authReady = false;
-    this.initializeAuth();
+    console.log('Supabase client initialized successfully.');
+
+    // Now that the client exists, initialize auth state
+    await this.initializeAuth();
   }
 
   async initializeAuth() {
+    if (!this.supabase) return; // Guard against initialization failure
     const { data: { session } } = await this.supabase.auth.getSession();
     if (session) {
       this.currentSession = session;

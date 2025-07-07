@@ -174,4 +174,10 @@ footer .copyright {
     footer {
         padding: 30px 20px;
     }
+    
+    footer .footer-links div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+        gap: 10px 20px !important;
+        text-align: center;
+    }
 }

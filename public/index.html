@@ -795,8 +795,8 @@ Most cruise lines allow bookings for companions. We'll clearly state any restric
 
     <script>
         // Handle file upload display
-        document.getElementById('industry-proof').addEventListener('change', function(e) {
-            const fileName = e.target.files[0] ? e.target.files[0].name : '';
+        // Removed orphaned script reference to non-existent #industry-proof element
+        console.log('File upload functionality removed - element does not exist');
             const fileDisplay = document.getElementById('file-name');
             if (fileName) {
                 fileDisplay.innerHTML = `<i class="ri-check-line" style="color: #00c6ff; margin-right: 8px;"></i>Selected: ${fileName}`;

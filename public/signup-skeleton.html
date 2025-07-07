@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supabase Signup Skeleton</title>
+
+  <!-- 
+    SCRIPT LOADING ORDER IS CRITICAL
+    1. Load configuration first. These are plain <script> tags to ensure they block
+       and execute in order, making the global variables available immediately.
+  -->
+  <script src="config.js"></script>
+
+  <!-- 2. Load the Supabase library from the CDN. -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- 3. Load your custom Supabase client. This script depends on the two above.
+       It creates the global `window.supabaseClient` and starts its async initialization. -->
+  <script src="supabase-client.js"></script>
+
+  <!-- 4. Defer your page-specific logic. `defer` ensures this script runs only after
+       the HTML document has been parsed, but before DOMContentLoaded. It also respects
+       the execution order relative to other deferred scripts. -->
+  <script src="/js/signup.js" defer></script>
+
+  <style>
+    body { font-family: sans-serif; padding: 2em; }
+    .error-message { display: none; color: red; border: 1px solid red; padding: 1em; margin-bottom: 1em; }
+    .success-message { display: none; color: green; border: 1px solid green; padding: 1em; margin-bottom: 1em; }
+    form { display: flex; flex-direction: column; gap: 1em; max-width: 400px; }
+  </style>
+</head>
+<body>
+
+  <h1>Signup</h1>
+
+  <div id="error-message" class="error-message"></div>
+  <div id="success-message" class="success-message"></div>
+
+  <form id="signup-form">
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required>
+
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required>
+
+    <!-- This hidden input is used by your `supabase-client.js` showError/showSuccess helpers -->
+    <input type="hidden" id="cf-turnstile-response" name="cf-turnstile-response" />
+
+    <button type="submit" id="submit-btn">Sign Up</button>
+  </form>
+
+  <script>
+    // This is a simplified version of your signup.js for demonstration.
+    // Your actual /js/signup.js file should contain this logic.
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      const signupForm = document.getElementById('signup-form');
+      const submitButton = document.getElementById('submit-btn');
+
+      // 1. Initialize the page safely
+      async function initializePage() {
+        try {
+          // This is where the failure is likely happening.
+          // Awaiting the promise ensures we don't proceed if the client isn't ready.
+          await window.supabaseClient.readyPromise;
+          console.log('Page initialization successful. Supabase client is ready.');
+
+          // You could check for logged-in users here
+          if (window.supabaseClient.isLoggedIn()) {
+            // window.location.href = 'dashboard.html';
+          }
+        } catch (error) {
+          // This block executes if readyPromise REJECTS.
+          console.error('CRITICAL: Supabase client failed to initialize.', error);
+          showError('Error initializing the page. Please refresh and try again.');
+          submitButton.disabled = true; // Disable form if init fails
+        }
+      }
+
+      initializePage();
+
+      // 2. Handle form submission
+      signupForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        // The `initializePage` function already confirmed the client is ready,
+        // and the `await` inside `signUp()` provides a final guarantee.
+        console.log('Form submitted. Calling supabaseClient.signUp()');
+      });
+    });
+  </script>
+</body>
+</html>

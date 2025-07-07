@@ -76,9 +76,9 @@
     }
   </script>
 
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Config and Libraries (Load config first) -->
   <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-client.js"></script>
 </head>
 <body>
@@ -134,7 +134,7 @@
         </div>
 
         <!-- Cloudflare Turnstile -->
-        <div class="cf-turnstile" data-sitekey="0x4AAAAAABkLNMf0cRO37SRL" data-callback="onTurnstileSuccess" data-size="invisible"></div>
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAABkLNMf0cRO37SRL" data-callback="onTurnstileSuccess" data-size="compact"></div>
         <input type="hidden" id="cf-turnstile-response" name="cf-turnstile-response" />
 
         <button type="submit" class="btn btn-primary" id="create-account-btn" disabled>Create Account</button>

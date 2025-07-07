@@ -263,6 +263,18 @@ async function handleFormSubmission(e) {
         const result = await window.supabaseClient.signUp(userData);
         
         if (result.user) {
+            // Upload files after successful signup
+            console.log('Uploading verification documents...');
+            const file = businessCard || letter;
+            if (file) {
+                try {
+                    await window.supabaseClient.uploadFile(file, result.user.id);
+                    console.log('File uploaded successfully');
+                } catch (uploadError) {
+                    console.error('File upload failed:', uploadError);
+                    // Don't fail the signup if file upload fails
+                }
+            }
             // Track successful signup
             if (typeof gtag !== 'undefined') {
                 gtag('event', 'sign_up', {

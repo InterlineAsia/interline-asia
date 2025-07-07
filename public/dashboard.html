@@ -166,7 +166,7 @@
       </div>
 
       <!-- Document Upload -->
-      <div class="dashboard-card">
+      <div class="dashboard-card upload-section">
         <h2>Verification Documents</h2>
         <p style="color: #666; margin-bottom: 1.5rem;">
           Upload your business card or employment letter to verify your industry status and access exclusive pricing.
@@ -224,10 +224,10 @@
 
   <script src="/js/loadPartials.js" defer></script>
   <script>
-    // Require authentication
+    // Require authentication with proper initialization
     window.addEventListener('load', async () => {
-      // Wait for Supabase client to initialize
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Wait for Supabase client to be properly initialized
+      await waitForSupabaseClient();
       
       if (!window.supabaseClient.requireAuth()) {
         return; // Will redirect to login if not authenticated
@@ -236,6 +236,24 @@
       // Load dashboard data
       loadDashboard();
     });
+
+    // Robust Supabase client initialization check
+    async function waitForSupabaseClient() {
+      let attempts = 0;
+      const maxAttempts = 50; // 5 seconds max wait
+      
+      while (attempts < maxAttempts) {
+        if (window.supabaseClient && window.supabaseClient.supabase && window.supabaseClient.currentSession !== undefined) {
+          console.log('Supabase client ready');
+          return;
+        }
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+      }
+      
+      console.error('Supabase client failed to initialize');
+      showError('Unable to connect to authentication service. Please refresh the page.');
+    }
 
     // Load user data and populate dashboard
     async function loadDashboard() {

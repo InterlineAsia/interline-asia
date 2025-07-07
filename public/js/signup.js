@@ -72,19 +72,38 @@ function hideFileValidation(fileType) {
  * @returns {Promise<string>} A promise that resolves with the reCAPTCHA token.
  */
 async function validateRecaptcha() {
-    console.log('Validating reCAPTCHA...');
-    if (typeof grecaptcha === 'undefined' || !window.RECAPTCHA_SITE_KEY) {
+    console.log('Attempting reCAPTCHA validation...');
+
+    // Wait for grecaptcha to be available on the window object
+    let attempts = 0;
+    while (typeof grecaptcha === 'undefined' && attempts < 50) { // Wait up to 5 seconds
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+    }
+
+    if (typeof grecaptcha === 'undefined') {
+        console.error('reCAPTCHA library failed to load in time.');
+        throw new Error('reCAPTCHA not loaded or configured.');
+    }
+    
+    if (!window.RECAPTCHA_SITE_KEY) {
+        console.error('reCAPTCHA_SITE_KEY is not available on window object.');
         throw new Error('reCAPTCHA not loaded or configured.');
     }
 
     return new Promise((resolve, reject) => {
+        console.log('grecaptcha object found. Calling grecaptcha.ready()...');
         grecaptcha.ready(async () => {
             try {
+                console.log('✅ reCAPTCHA is ready. Starting execute()...');
                 const token = await grecaptcha.execute(window.RECAPTCHA_SITE_KEY, { action: 'signup' });
+                console.log('grecaptcha.execute() completed.');
+
                 if (!token) {
+                    console.error('reCAPTCHA token was empty.');
                     throw new Error('Received an empty reCAPTCHA token.');
                 }
-                console.log('✅ reCAPTCHA validation successful.');
+                console.log('✅ reCAPTCHA token received:', token);
                 resolve(token);
             } catch (error) {
                 console.error('reCAPTCHA execution error:', error);

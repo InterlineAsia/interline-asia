@@ -100,64 +100,38 @@ footer .footer-container {
     width: 100%;
 }
 
-footer .footer-links {
-    width: 100%;
-}
-
-footer .footer-links h3 {
-    display: none;
-}
-
-footer .footer-links ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: nowrap;
-    width: 100%;
-}
-
-footer .footer-links ul li {
-    white-space: nowrap;
-    margin: 0;
-    flex: 1;
-    text-align: center;
-}
-
-footer .footer-links ul li a {
-    color: #ccc;
-    text-decoration: none;
-    transition: all 0.3s;
-    font-size: 14px;
-    display: block;
-    padding: 10px 5px;
-}
-
-footer .footer-links ul li a:hover {
-    color: #FF7F41;
-}
-
 .footer-quick-links {
     display: flex;
+    flex-wrap: nowrap;
     justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px 24px;
-    margin-top: 20px;
+    align-items: center;
+    gap: 18px;
     font-size: 14px;
     color: #ccc;
-    text-align: center;
+    list-style: none;
+    padding: 0;
+    margin: 20px auto 10px;
+}
+
+.footer-quick-links li {
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+}
+
+.footer-quick-links li::after {
+    content: "\00B7";
+    padding: 0 6px;
+}
+
+.footer-quick-links li:last-child::after {
+    content: "";
 }
 
 .footer-quick-links a {
-    color: #ccc;
     text-decoration: none;
-    white-space: nowrap;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    transition: all 0.3s ease;
+    color: #ccc;
+    transition: all 0.2s ease;
 }
 
 .footer-quick-links a:hover {
@@ -215,14 +189,8 @@ footer .copyright {
         padding: 30px 20px;
     }
     
-    footer .footer-links ul {
+    .footer-quick-links {
         flex-wrap: wrap !important;
-        justify-content: center !important;
         gap: 10px 15px;
-    }
-    
-    footer .footer-links ul li {
-        flex: none !important;
-        margin: 5px;
     }
 }

@@ -10,6 +10,43 @@
   <link rel="stylesheet" href="auth.css">
   <link rel="stylesheet" href="/css/main.css">
   
+  <style>
+    .file-input-container {
+      position: relative;
+    }
+    
+    .file-validation-indicator {
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .file-validation-indicator.valid {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .file-validation-indicator.invalid {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    
+    .upload-info {
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+  
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-FYGT92WCXC"></script>
   <script>
@@ -59,13 +96,35 @@
         </div>
 
         <div class="form-group">
-          <div class="info-box" style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
-            <p style="margin: 0 0 0.5rem 0; font-weight: 600;">Next Steps After Registration:</p>
-            <p style="margin: 0; color: #666;">Once your account is created, you'll be able to upload your verification documents (business card or employment letter) from your dashboard to gain access to exclusive pricing.</p>
+          <div class="upload-info" style="background: #e3f2fd; border: 1px solid #2196f3; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+            <p style="margin: 0; font-weight: 600; color: #1976d2;">Document Upload Required</p>
+            <p style="margin: 0.5rem 0 0 0; color: #1565c0;">You only need to upload ONE document Ñ either a business card or a letter from your employer.</p>
           </div>
         </div>
 
-        <button type="submit" class="btn btn-primary" id="create-account-btn">Create Account</button>
+        <div class="form-group">
+          <label for="businessCardUpload">Business Card Upload</label>
+          <div class="file-input-container">
+            <input type="file" id="businessCardUpload" name="businessCardUpload" accept=".pdf,.png,.jpg,.jpeg">
+            <div class="file-validation-indicator" id="businessCard-indicator" style="display: none;"></div>
+          </div>
+          <small class="file-hint">Accepted formats: PDF, PNG, JPG (Max 5MB)</small>
+        </div>
+
+        <div class="form-group">
+          <label for="letterUpload">OR Employment Letter Upload</label>
+          <div class="file-input-container">
+            <input type="file" id="letterUpload" name="letterUpload" accept=".pdf,.png,.jpg,.jpeg">
+            <div class="file-validation-indicator" id="letter-indicator" style="display: none;"></div>
+          </div>
+          <small class="file-hint">Accepted formats: PDF, PNG, JPG (Max 5MB)</small>
+        </div>
+
+        <div id="upload-error" class="error-message" style="display: none;">
+          Please upload at least one document (business card or employment letter) to continue.
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="create-account-btn" disabled>Create Account</button>
       </form>
 
       <div class="auth-links">

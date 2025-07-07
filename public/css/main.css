@@ -117,10 +117,12 @@ footer .footer-links h3 {
     list-style: none;
     padding: 0;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 10px 25px;
+    flex-wrap: nowrap;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .footer-links ul li {
@@ -189,7 +191,13 @@ footer .copyright {
         padding: 30px 20px;
     }
     
-    footer .footer-links div[style*="text-align: center"] {
-        text-align: center !important;
+    .footer-links ul {
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 10px 15px;
+    }
+    
+    .footer-links ul li {
+        margin-bottom: 5px;
     }
 }

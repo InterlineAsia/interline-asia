@@ -1,194 +1,163 @@
-// public/js/signup.js
+// Interline Asia - Signup Form Logic (Cloudflare Turnstile)
 
-// ✅ Cloudflare Turnstile Site Key (used in signup.html widget)
-// Site Key: 0x4AAAAAABkLNMf0cRO37SRL
-// 🚫 Secret Key: 0x4AAAAAABkLNCChkuNkZYu6XPeq34ueKXU (use only on the server)
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM fully loaded. Initializing signup form logic...');
 
-function onTurnstileSuccess(token) {
-  console.log('✅ Cloudflare Turnstile verification successful.');
-  const tokenInput = document.getElementById('cf-turnstile-response');
-  if (tokenInput) {
-    tokenInput.value = token;
-  }
-}
+    const signupForm = document.getElementById('signup-form');
+    const documentUploadInput = document.getElementById('documentUpload');
+    const submitButton = document.getElementById('create-account-btn');
+    const uploadErrorEl = document.getElementById('upload-error');
 
-function validateUpload() {
-  const documentFile = document.getElementById('documentUpload').files[0];
-  const submitButton = document.getElementById('create-account-btn');
-  const uploadError = document.getElementById('upload-error');
-
-  uploadError.style.display = 'none';
-
-  const maxSize = 5 * 1024 * 1024; // 5MB
-  const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
-
-  let hasValidFile = false;
-  let errorMessage = '';
-
-  if (documentFile) {
-    if (documentFile.size > maxSize) {
-      errorMessage = 'File size must be less than 5MB';
-      showFileValidation('document', false, errorMessage);
-    } else if (!allowedTypes.includes(documentFile.type)) {
-      errorMessage = 'File must be a PDF, PNG, or JPG';
-      showFileValidation('document', false, errorMessage);
-    } else {
-      hasValidFile = true;
-      showFileValidation('document', true, 'Valid: ' + documentFile.name + ' (' + (documentFile.size / 1024 / 1024).toFixed(2) + ' MB)');
-    }
-  } else {
-    hideFileValidation('document');
-  }
-
-  if (errorMessage) {
-    uploadError.textContent = errorMessage;
-    uploadError.style.display = 'block';
-    submitButton.disabled = true;
-    return;
-  }
-
-  if (hasValidFile) {
-    submitButton.disabled = false;
-    uploadError.style.display = 'none';
-  } else {
-    submitButton.disabled = true;
-    uploadError.textContent = 'Please upload a verification document to continue.';
-    uploadError.style.display = 'block';
-  }
-}
-
-function showFileValidation(fileType, isValid, message) {
-  const indicator = document.getElementById(fileType + '-indicator');
-  indicator.className = 'file-validation-indicator ' + (isValid ? 'valid' : 'invalid');
-  indicator.innerHTML = '<i class="ri-' + (isValid ? 'check' : 'error-warning') + '-line"></i> ' + message;
-  indicator.style.display = 'flex';
-}
-
-function hideFileValidation(fileType) {
-  const indicator = document.getElementById(fileType + '-indicator');
-  indicator.style.display = 'none';
-}
-
-async function handleFormSubmission(e) {
-  e.preventDefault();
-
-  hideError();
-  hideSuccess();
-
-  const submitButton = document.querySelector('button[type="submit"]');
-  const originalText = submitButton.textContent;
-  submitButton.textContent = 'Creating Account...';
-  submitButton.disabled = true;
-
-  try {
-    const formData = new FormData(e.target);
-    const userData = {
-      fullName: formData.get('fullName').trim(),
-      email: formData.get('email').trim().toLowerCase(),
-      password: formData.get('password'),
-      confirmPassword: formData.get('confirmPassword')
-    };
-
-    const documentFile = document.getElementById('documentUpload').files[0];
-    if (!documentFile) {
-      document.getElementById('upload-error').style.display = 'block';
-      throw new Error('Please upload a verification document to continue');
+    if (!signupForm || !documentUploadInput || !submitButton || !uploadErrorEl) {
+        console.error('A required form element is missing from signup.html. Script will not run.');
+        return;
     }
 
-    const maxSize = 5 * 1024 * 1024;
-    if (documentFile.size > maxSize) throw new Error('File size must be less than 5MB');
+    // --- File Validation Logic ---
+    function validateFile() {
+        const file = documentUploadInput.files[0];
+        let isValid = false;
+        let errorMessage = '';
 
-    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
-    if (!allowedTypes.includes(documentFile.type)) throw new Error('File must be a PDF, PNG, or JPG');
+        if (file) {
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
 
-    if (!userData.fullName || !userData.email || !userData.password)
-      throw new Error('Please fill in all required fields');
+            if (file.size > maxSize) {
+                errorMessage = 'File size must be less than 5MB.';
+            } else if (!allowedTypes.includes(file.type)) {
+                errorMessage = 'File must be a PDF, PNG, or JPG.';
+            } else {
+                isValid = true;
+                showFileValidation(true, `Valid: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`);
+            }
+        } else {
+            errorMessage = 'Please upload a verification document to continue.';
+        }
 
-    if (userData.password.length < 8)
-      throw new Error('Password must be at least 8 characters long');
+        if (!isValid) {
+            showFileValidation(false, errorMessage);
+        }
 
-    if (userData.password !== userData.confirmPassword)
-      throw new Error('Passwords do not match');
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(userData.email))
-      throw new Error('Please enter a valid email address');
-
-    const turnstileToken = document.getElementById('cf-turnstile-response').value;
-    if (!turnstileToken)
-      throw new Error('Security verification failed. Please try again.');
-
-    userData.recaptchaToken = turnstileToken;
-
-    console.log('Creating account with Supabase...', userData);
-    const result = await window.supabaseClient.signUp(userData);
-
-    if (result.user) {
-      let uploadSuccess = false;
-      try {
-        await window.supabaseClient.uploadFile(documentFile, result.user.id);
-        uploadSuccess = true;
-        console.log('File uploaded successfully');
-      } catch (uploadError) {
-        console.error('File upload failed:', uploadError);
-        showError('Account created but file upload failed. Please upload your document from the dashboard after logging in.');
-      }
-
-      if (typeof gtag !== 'undefined') {
-        gtag('event', 'sign_up', { method: 'email' });
-      }
-
-      const successMessage = uploadSuccess
-        ? 'Account created successfully! Your document has been uploaded. Please check your email to verify your account, then log in to complete your profile.'
-        : 'Account created successfully! Please check your email to verify your account, then sign in.';
-
-      showSuccess(successMessage);
-      e.target.reset();
-      hideFileValidation('document');
-
-      setTimeout(() => {
-        window.location.href = 'login.html?registered=true';
-      }, 4000);
+        // The submit button is enabled by the Turnstile callback, but we can disable it here if the file is invalid.
+        if (!isValid) {
+            submitButton.disabled = true;
+        }
+        
+        uploadErrorEl.textContent = errorMessage;
+        uploadErrorEl.style.display = isValid ? 'none' : 'block';
+        return isValid;
     }
 
-  } catch (error) {
-    console.error('Signup error:', error);
-    showError(error.message || 'An error occurred during signup. Please try again.');
-  } finally {
-    submitButton.textContent = originalText;
-    submitButton.disabled = false;
-  }
-}
+    function showFileValidation(isValid, message) {
+        const indicator = document.getElementById('document-indicator');
+        if (!indicator) return;
 
-function initializeSignupForm() {
-  console.log('Initializing signup form...');
-
-  const form = document.getElementById('signup-form');
-  if (form) {
-    form.addEventListener('submit', handleFormSubmission);
-  }
-
-  const documentInput = document.getElementById('documentUpload');
-  if (documentInput) {
-    documentInput.addEventListener('change', validateUpload);
-  }
-
-  setTimeout(async () => {
-    if (window.supabaseClient && window.supabaseClient.isLoggedIn()) {
-      window.location.href = 'dashboard.html';
+        indicator.className = 'file-validation-indicator ' + (isValid ? 'valid' : 'invalid');
+        indicator.innerHTML = `<i class="ri-${isValid ? 'check' : 'error-warning'}-line"></i> ${message}`;
+        indicator.style.display = 'flex';
     }
-  }, 500);
-}
 
-document.addEventListener('DOMContentLoaded', function () {
-  console.log('DOM loaded, initializing signup form...');
-  setTimeout(initializeSignupForm, 100);
-});
+    documentUploadInput.addEventListener('change', validateFile);
 
-window.addEventListener('load', function () {
-  const form = document.getElementById('signup-form');
-  if (form && !form.hasAttribute('data-initialized')) {
-    form.setAttribute('data-initialized', 'true');
-    initializeSignupForm();
-  }
+    // --- Form Submission Logic ---
+    signupForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        hideError();
+        hideSuccess();
+
+        const originalText = submitButton.textContent;
+        submitButton.textContent = 'Creating Account...';
+        submitButton.disabled = true;
+
+        try {
+            const formData = new FormData(this);
+            const userData = {
+                fullName: formData.get('fullName').trim(),
+                email: formData.get('email').trim().toLowerCase(),
+                password: formData.get('password'),
+                confirmPassword: formData.get('confirmPassword')
+            };
+            const documentFile = documentUploadInput.files[0];
+
+            // --- Client-side validation ---
+            if (!userData.fullName || !userData.email || !userData.password) {
+                throw new Error('Please fill in all required fields.');
+            }
+            if (userData.password.length < 8) {
+                throw new Error('Password must be at least 8 characters long.');
+            }
+            if (userData.password !== userData.confirmPassword) {
+                throw new Error('Passwords do not match.');
+            }
+            if (!documentFile) {
+                throw new Error('Please upload a verification document.');
+            }
+
+            // --- Turnstile Token Check ---
+            const turnstileToken = document.getElementById('cf-turnstile-response').value;
+            if (!turnstileToken) {
+                // Ask Turnstile to run explicitly if the token is missing.
+                if (window.turnstile) {
+                    window.turnstile.execute();
+                }
+                throw new Error('Security verification failed. Please try submitting again.');
+            }
+            // Supabase expects the captcha token under the key 'recaptchaToken'
+            userData.recaptchaToken = turnstileToken;
+
+            // --- Supabase Signup ---
+            console.log('Creating account with Supabase...');
+            const result = await window.supabaseClient.signUp(userData);
+
+            if (result.user) {
+                // --- File Upload ---
+                console.log('Uploading verification document...');
+                try {
+                    await window.supabaseClient.uploadFile(documentFile, result.user.id);
+                    console.log('File uploaded successfully.');
+                } catch (uploadError) {
+                    console.error('File upload failed after signup:', uploadError);
+                    showError('Account created, but file upload failed. Please upload from your dashboard.');
+                }
+
+                // --- Success Feedback ---
+                showSuccess('Account created successfully! Please check your email to verify your account, then log in.');
+                this.reset();
+                submitButton.disabled = true; // Keep disabled after success
+
+                setTimeout(() => {
+                    window.location.href = 'login.html?registered=true';
+                }, 4000);
+            }
+
+        } catch (error) {
+            console.error('Signup error:', error);
+            showError(error.message || 'An unknown error occurred during signup.');
+            // Re-enable the button on error
+            validateFile();
+        } finally {
+            // Only reset button text if it hasn't been changed by a success message
+            if (document.getElementById('success-message').style.display !== 'block') {
+                submitButton.textContent = originalText;
+            }
+        }
+    });
+
+    // --- Initialization ---
+    async function initializePage() {
+        // Wait for Supabase client to be ready
+        let attempts = 0;
+        while (!window.supabaseClient?.authReady && attempts < 50) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+        }
+
+        if (window.supabaseClient?.isLoggedIn()) {
+            window.location.href = 'dashboard.html';
+        }
+    }
+
+    initializePage();
 });

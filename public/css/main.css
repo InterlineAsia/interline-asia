@@ -139,6 +139,32 @@ footer .footer-links ul li a:hover {
     color: #FF7F41;
 }
 
+.footer-quick-links {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px 24px;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #ccc;
+    text-align: center;
+}
+
+.footer-quick-links a {
+    color: #ccc;
+    text-decoration: none;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.3s ease;
+}
+
+.footer-quick-links a:hover {
+    color: #FF7F41;
+    transform: translateY(-1px);
+}
+
 footer .copyright {
     text-align: center;
     margin-top: 30px;

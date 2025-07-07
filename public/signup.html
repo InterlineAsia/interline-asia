@@ -56,6 +56,7 @@
 
     gtag('config', 'G-FYGT92WCXC');
   </script>
+  <!-- Statically load reCAPTCHA to ensure it is available before other scripts execute. This standardizes the loading method across the site. -->
   <script src="https://www.google.com/recaptcha/api.js?render=6Ld43XUrAAAAAATguv7FHX2tHDTsnnpdBFQoXNKT" async defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
@@ -104,7 +105,7 @@
             <input type="file" id="documentUpload" name="documentUpload" accept=".pdf,.png,.jpg,.jpeg" required>
             <div class="file-validation-indicator" id="document-indicator" style="display: none;"></div>
           </div>
-          <small class="file-hint">PDF, PNG, or JPG Ñ max 5MB</small>
+          <small class="file-hint">PDF, PNG, or JPG ï¿½ max 5MB</small>
         </div>
 
         <div id="upload-error" class="error-message" style="display: none;">

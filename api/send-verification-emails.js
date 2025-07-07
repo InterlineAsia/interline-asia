@@ -91,7 +91,7 @@ export default async function handler(req, res) {
 
 // Send notification email to admin
 async function sendAdminNotification({ applicantEmail, applicantName, employer, verificationId, brevoApiKey }) {
-  const adminEmail = 'admin@interlineasia.com';
+  const adminEmail = process.env.EMAIL_TO_ADMIN || 'admin@interlineasia.com';
   
   const emailData = {
     sender: {

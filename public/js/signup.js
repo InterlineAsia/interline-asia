@@ -1,69 +1,7 @@
 // Interline Asia - Signup Form Logic
 // Handles form submission, file upload validation, and reCAPTCHA integration
 
-// File upload validation and button state management
-function validateUploads() {
-    const businessCard = document.getElementById('businessCardUpload').files[0];
-    const letter = document.getElementById('letterUpload').files[0];
-    const submitButton = document.getElementById('create-account-btn');
-    const uploadError = document.getElementById('upload-error');
-    
-    // Reset error state
-    uploadError.style.display = 'none';
-    
-    // Validate file size and type if files are selected
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
-    
-    let hasValidFile = false;
-    let errorMessage = '';
-    
-    // Validate business card if uploaded
-    if (businessCard) {
-        if (businessCard.size > maxSize) {
-            errorMessage = 'Business card file size must be less than 5MB';
-        } else if (!allowedTypes.includes(businessCard.type)) {
-            errorMessage = 'Business card must be a PDF, PNG, or JPG file';
-        } else {
-            hasValidFile = true;
-            addFileValidationIndicator('businessCardUpload', true);
-        }
-    } else {
-        removeFileValidationIndicator('businessCardUpload');
-    }
-    
-    // Validate employment letter if uploaded
-    if (letter && !errorMessage) {
-        if (letter.size > maxSize) {
-            errorMessage = 'Employment letter file size must be less than 5MB';
-        } else if (!allowedTypes.includes(letter.type)) {
-            errorMessage = 'Employment letter must be a PDF, PNG, or JPG file';
-        } else {
-            hasValidFile = true;
-            addFileValidationIndicator('letterUpload', true);
-        }
-    } else if (!letter) {
-        removeFileValidationIndicator('letterUpload');
-    }
-    
-    // Show error if validation failed
-    if (errorMessage) {
-        uploadError.textContent = errorMessage;
-        uploadError.style.display = 'block';
-        submitButton.disabled = true;
-        return;
-    }
-    
-    // Enable button if at least one valid file is selected
-    if (hasValidFile) {
-        submitButton.disabled = false;
-        uploadError.style.display = 'none';
-    } else {
-        submitButton.disabled = true;
-        uploadError.textContent = 'Please upload at least one document (business card or employment letter) to continue.';
-        uploadError.style.display = 'block';
-    }
-}
+// File upload validation removed - users upload documents from dashboard after signup
 
 // Add visual validation indicator for file inputs
 function addFileValidationIndicator(inputId, isValid) {
@@ -202,32 +140,7 @@ async function handleFormSubmission(e) {
         
         console.log('Starting signup process for:', userData.email);
         
-        // File upload validation
-        const businessCard = document.getElementById('businessCardUpload').files[0];
-        const letter = document.getElementById('letterUpload').files[0];
-        
-        if (!businessCard && !letter) {
-            document.getElementById('upload-error').style.display = 'block';
-            throw new Error('Please upload at least one document (business card or employment letter)');
-        }
-        
-        // File size validation (5MB max)
-        const maxSize = 5 * 1024 * 1024;
-        if (businessCard && businessCard.size > maxSize) {
-            throw new Error('Business card file size must be less than 5MB');
-        }
-        if (letter && letter.size > maxSize) {
-            throw new Error('Employment letter file size must be less than 5MB');
-        }
-        
-        // File type validation
-        const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
-        if (businessCard && !allowedTypes.includes(businessCard.type)) {
-            throw new Error('Business card must be a PDF, PNG, or JPG file');
-        }
-        if (letter && !allowedTypes.includes(letter.type)) {
-            throw new Error('Employment letter must be a PDF, PNG, or JPG file');
-        }
+        // No file upload validation needed - files will be uploaded from dashboard
         
         // Basic validation
         if (!userData.fullName || !userData.email || !userData.password) {
@@ -263,18 +176,6 @@ async function handleFormSubmission(e) {
         const result = await window.supabaseClient.signUp(userData);
         
         if (result.user) {
-            // Upload files after successful signup
-            console.log('Uploading verification documents...');
-            const file = businessCard || letter;
-            if (file) {
-                try {
-                    await window.supabaseClient.uploadFile(file, result.user.id);
-                    console.log('File uploaded successfully');
-                } catch (uploadError) {
-                    console.error('File upload failed:', uploadError);
-                    // Don't fail the signup if file upload fails
-                }
-            }
             // Track successful signup
             if (typeof gtag !== 'undefined') {
                 gtag('event', 'sign_up', {
@@ -316,17 +217,7 @@ function initializeSignupForm() {
         form.addEventListener('submit', handleFormSubmission);
     }
     
-    // Add file upload validation listeners
-    const businessCardInput = document.getElementById('businessCardUpload');
-    const letterInput = document.getElementById('letterUpload');
-    
-    if (businessCardInput) {
-        businessCardInput.addEventListener('change', validateUploads);
-    }
-    
-    if (letterInput) {
-        letterInput.addEventListener('change', validateUploads);
-    }
+    // File upload listeners removed - no file uploads in signup form
     
     // Check if user is already logged in
     setTimeout(async () => {

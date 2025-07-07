@@ -73,6 +73,34 @@ body {
   box-shadow: 0 0 0 3px rgba(0, 112, 243, 0.1);
 }
 
+.form-group input[type="file"] {
+  padding: 0.5rem;
+  border: 2px dashed #ddd;
+  border-radius: 6px;
+  background-color: #fafafa;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.form-group input[type="file"]:hover {
+  border-color: #0070f3;
+  background-color: #f8f9ff;
+}
+
+.form-group input[type="file"]:focus {
+  border-color: #0070f3;
+  background-color: #f8f9ff;
+  box-shadow: 0 0 0 3px rgba(0, 112, 243, 0.1);
+}
+
+.file-hint {
+  display: block;
+  font-size: 0.875rem;
+  color: #666;
+  margin-top: 0.25rem;
+  font-style: italic;
+}
+
 .btn {
   display: inline-block;
   padding: 0.75rem 1.5rem;
@@ -95,6 +123,18 @@ body {
 .btn-primary:hover {
   background-color: #0059c1;
   transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-primary:disabled:hover {
+  background-color: #ccc;
+  transform: none;
 }
 
 .btn-secondary {

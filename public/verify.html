@@ -306,12 +306,6 @@
             </div>
 
             <div class="form-group">
-                <label for="passcode">Industry Passcode <span class="required">*</span></label>
-                <input type="password" id="passcode" name="passcode" placeholder="Enter the passcode provided by your partner" required>
-                <div class="error-message" id="passcodeError"></div>
-            </div>
-
-            <div class="form-group">
                 <label for="document">Document Upload <span class="required">*</span></label>
                 <div class="file-upload">
                     <input type="file" id="document" name="document" accept=".pdf,.png,.jpg,.jpeg" required>
@@ -410,7 +404,7 @@
             document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
             
             // Validate required fields
-            const requiredFields = ['firstName', 'surname', 'dateOfBirth', 'email', 'phone', 'employer', 'passcode'];
+            const requiredFields = ['firstName', 'surname', 'dateOfBirth', 'email', 'phone', 'employer'];
             
             requiredFields.forEach(field => {
                 const input = document.getElementById(field);
@@ -428,12 +422,6 @@
                 isValid = false;
             }
             
-            // Validate passcode
-            const passcode = document.getElementById('passcode').value;
-            if (passcode && passcode !== 'TRAVEL2025') {
-                showError('passcodeError', 'Invalid passcode. Please contact your partner for the correct code.');
-                isValid = false;
-            }
             
             // Validate file upload
             const fileInput = document.getElementById('document');
@@ -502,7 +490,6 @@
                     email: formData.get('email'),
                     phone: formData.get('phone'),
                     employer: formData.get('employer'),
-                    passcode: formData.get('passcode'),
                     file_url: urlData.publicUrl
                 };
                 

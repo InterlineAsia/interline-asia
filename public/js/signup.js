@@ -107,6 +107,10 @@ document.addEventListener('DOMContentLoaded', function() {
             // Supabase expects the captcha token under the key 'recaptchaToken'
             userData.recaptchaToken = turnstileToken;
 
+            // Ensure the Supabase client is fully initialized before making an auth call
+            console.log('Waiting for Supabase client to be ready...');
+            await window.supabaseClient.readyPromise;
+
             // --- Supabase Signup ---
             console.log('Creating account with Supabase...');
             const result = await window.supabaseClient.signUp(userData);

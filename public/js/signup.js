@@ -34,8 +34,8 @@ function validateUploads() {
         hideFileValidation('businessCard');
     }
     
-    // Validate employment letter if uploaded
-    if (letter && !errorMessage) {
+    // Validate employment letter if uploaded (independent of business card validation)
+    if (letter) {
         if (letter.size > maxSize) {
             errorMessage = 'Employment letter file size must be less than 5MB';
             showFileValidation('letter', false, errorMessage);
@@ -46,7 +46,7 @@ function validateUploads() {
             hasValidFile = true;
             showFileValidation('letter', true, 'Valid: ' + letter.name + ' (' + (letter.size / 1024 / 1024).toFixed(2) + ' MB)');
         }
-    } else if (!letter) {
+    } else {
         hideFileValidation('letter');
     }
     
@@ -64,7 +64,7 @@ function validateUploads() {
         uploadError.style.display = 'none';
     } else {
         submitButton.disabled = true;
-        uploadError.textContent = 'Please upload at least one document (business card or employment letter) to continue.';
+        uploadError.textContent = 'Please upload at least one document to continue.';
         uploadError.style.display = 'block';
     }
 }
@@ -198,7 +198,7 @@ async function handleFormSubmission(e) {
         
         if (!businessCard && !letter) {
             document.getElementById('upload-error').style.display = 'block';
-            throw new Error('Please upload at least one document (business card or employment letter)');
+            throw new Error('Please upload at least one document to continue');
         }
         
         // File size validation (5MB max)

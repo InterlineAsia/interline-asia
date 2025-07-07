@@ -225,34 +225,22 @@
   <script src="/js/loadPartials.js" defer></script>
   <script>
     // Require authentication with proper initialization
-    window.addEventListener('load', async () => {
-      // Wait for Supabase client to be properly initialized
-      await waitForSupabaseClient();
-      
-      if (!window.supabaseClient.requireAuth()) {
-        return; // Will redirect to login if not authenticated
-      }
-      
-      // Load dashboard data
-      loadDashboard();
-    });
-
-    // Robust Supabase client initialization check
-    async function waitForSupabaseClient() {
-      let attempts = 0;
-      const maxAttempts = 50; // 5 seconds max wait
-      
-      while (attempts < maxAttempts) {
-        if (window.supabaseClient && window.supabaseClient.supabase && window.supabaseClient.currentSession !== undefined) {
-          console.log('Supabase client ready');
-          return;
+    async function initializeDashboard() {
+      try {
+        // Wait for the Supabase client to be fully initialized and ready.
+        await window.supabaseClient.readyPromise;
+        
+        // requireAuth will now work reliably. It redirects if the user is not logged in.
+        if (await window.supabaseClient.requireAuth()) {
+          // If authenticated, load the dashboard data.
+          loadDashboard();
         }
-        await new Promise(resolve => setTimeout(resolve, 100));
-        attempts++;
+      } catch (error) {
+        console.error('Dashboard initialization failed:', error);
+        showError('Could not load dashboard. Please try logging in again.');
+        // Optional: Redirect to login after a delay if init fails catastrophically
+        setTimeout(() => window.location.href = 'login.html', 3000);
       }
-      
-      console.error('Supabase client failed to initialize');
-      showError('Unable to connect to authentication service. Please refresh the page.');
     }
 
     // Load user data and populate dashboard
@@ -485,8 +473,8 @@
       dashboard.insertBefore(banner, dashboard.firstChild);
     }
 
-    // Initialize dashboard
-    loadDashboard();
+    // Start the dashboard initialization process when the page loads.
+    document.addEventListener('DOMContentLoaded', initializeDashboard);
   </script>
   
   <div id="footer-placeholder"></div>

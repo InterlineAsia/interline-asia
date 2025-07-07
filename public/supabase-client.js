@@ -7,7 +7,8 @@ class SupabaseClient {
     this.currentUser = null;
     this.currentSession = null;
     this.authReady = false;
-    this._initialize();
+    // This promise resolves when the client is fully initialized and ready.
+    this.readyPromise = this._initialize();
   }
 
   async _initialize() {
@@ -44,6 +45,7 @@ class SupabaseClient {
   }
 
   async initializeAuth() {
+    // This method is part of the internal initialization process.
     if (!this.supabase) return; // Guard against initialization failure
     const { data: { session } } = await this.supabase.auth.getSession();
     if (session) {
@@ -73,6 +75,7 @@ class SupabaseClient {
   }
 
   async signUp(userData) {
+    await this.readyPromise;
     const { data, error } = await this.supabase.auth.signUp({
       email: userData.email,
       password: userData.password,
@@ -88,6 +91,7 @@ class SupabaseClient {
   }
 
   async signIn(email, password) {
+    await this.readyPromise;
     const { data, error } = await this.supabase.auth.signInWithPassword({
       email,
       password,
@@ -98,6 +102,7 @@ class SupabaseClient {
   }
 
   async signOut() {
+    await this.readyPromise;
     await this.supabase.auth.signOut();
     window.location.href = 'login.html';
   }
@@ -111,6 +116,7 @@ class SupabaseClient {
   }
 
   requireAuth() {
+    // Note: This is synchronous and relies on other parts of the app waiting for `authReady`.
     if (!this.isLoggedIn()) {
       window.location.href = 'login.html';
       return false;
@@ -119,6 +125,7 @@ class SupabaseClient {
   }
 
   async getUserUploads(userId) {
+    await this.readyPromise;
     if (!userId) userId = this.currentUser?.id;
     if (!userId) throw new Error('User not authenticated');
 
@@ -133,6 +140,7 @@ class SupabaseClient {
   }
 
   async uploadFile(file, userId) {
+    await this.readyPromise;
     if (!userId) throw new Error('User ID is required for upload');
     
     const fileName = `${userId}/${Date.now()}-${file.name}`;

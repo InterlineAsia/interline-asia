@@ -85,11 +85,14 @@ async function validateRecaptcha(retryCount = 0) {
         // Execute reCAPTCHA with timeout
         const recaptchaToken = await Promise.race([
             new Promise((resolve, reject) => {
+                console.log('grecaptcha.ready() called...');
                 grecaptcha.ready(async () => {
                     try {
+                        console.log('grecaptcha.execute() called...');
                         const token = await grecaptcha.execute(window.RECAPTCHA_SITE_KEY, {
                             action: 'signup'
                         });
+                        console.log('grecaptcha.execute() completed.');
                         resolve(token);
                     } catch (err) {
                         reject(err);
@@ -103,10 +106,11 @@ async function validateRecaptcha(retryCount = 0) {
         
         // Validate token
         if (!recaptchaToken || recaptchaToken.length < 10) {
+            console.error('Invalid or empty reCAPTCHA token received:', recaptchaToken);
             throw new Error('Invalid reCAPTCHA token received');
         }
         
-        console.log('reCAPTCHA validation successful');
+        console.log('✅ reCAPTCHA validation successful. Token:', recaptchaToken);
         return recaptchaToken;
         
     } catch (error) {

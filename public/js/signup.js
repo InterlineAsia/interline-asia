@@ -66,93 +66,32 @@ function hideFileValidation(fileType) {
     indicator.style.display = 'none';
 }
 
-// Enhanced reCAPTCHA validation with retry logic
-async function validateRecaptcha(retryCount = 0) {
-    const maxRetries = 3;
-    
-    console.log(`Attempting reCAPTCHA validation (attempt ${retryCount + 1}/${maxRetries})...`);
-    
-    try {
-        // Check if reCAPTCHA is loaded
-        if (typeof grecaptcha === 'undefined') {
-            throw new Error('reCAPTCHA library not loaded');
-        }
-        
-        if (!window.RECAPTCHA_SITE_KEY) {
-            throw new Error('reCAPTCHA site key not configured');
-        }
-        
-        // Execute reCAPTCHA with timeout
-        const recaptchaToken = await Promise.race([
-            new Promise((resolve, reject) => {
-                console.log('grecaptcha.ready() called...');
-                grecaptcha.ready(async () => {
-                    try {
-                        console.log('grecaptcha.execute() called...');
-                        const token = await grecaptcha.execute(window.RECAPTCHA_SITE_KEY, {
-                            action: 'signup'
-                        });
-                        console.log('grecaptcha.execute() completed.');
-                        resolve(token);
-                    } catch (err) {
-                        reject(err);
-                    }
-                });
-            }),
-            new Promise((_, reject) => 
-                setTimeout(() => reject(new Error('reCAPTCHA timeout')), 10000)
-            )
-        ]);
-        
-        // Validate token
-        if (!recaptchaToken || recaptchaToken.length < 10) {
-            console.error('Invalid or empty reCAPTCHA token received:', recaptchaToken);
-            throw new Error('Invalid reCAPTCHA token received');
-        }
-        
-        console.log('✅ reCAPTCHA validation successful. Token:', recaptchaToken);
-        return recaptchaToken;
-        
-    } catch (error) {
-        console.error(`reCAPTCHA validation failed (attempt ${retryCount + 1}):`, error);
-        
-        // Retry logic
-        if (retryCount < maxRetries - 1) {
-            console.log(`Retrying reCAPTCHA validation in 2 seconds...`);
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            return validateRecaptcha(retryCount + 1);
-        }
-        
-        // Show user-friendly error message
-        showRecaptchaError('reCAPTCHA verification failed. Please refresh the page and try again.');
-        throw error;
+/**
+ * Validates reCAPTCHA v3, returning a token.
+ * This function is robust and waits for the reCAPTCHA library to be ready.
+ * @returns {Promise<string>} A promise that resolves with the reCAPTCHA token.
+ */
+async function validateRecaptcha() {
+    console.log('Validating reCAPTCHA...');
+    if (typeof grecaptcha === 'undefined' || !window.RECAPTCHA_SITE_KEY) {
+        throw new Error('reCAPTCHA not loaded or configured.');
     }
-}
 
-// Show reCAPTCHA error message
-function showRecaptchaError(message) {
-    let errorDiv = document.getElementById('recaptcha-error');
-    if (!errorDiv) {
-        errorDiv = document.createElement('div');
-        errorDiv.id = 'recaptcha-error';
-        errorDiv.className = 'error-message';
-        errorDiv.style.marginBottom = '1rem';
-        
-        // Insert before the submit button
-        const submitButton = document.getElementById('create-account-btn');
-        submitButton.parentElement.insertBefore(errorDiv, submitButton);
-    }
-    
-    errorDiv.textContent = message;
-    errorDiv.style.display = 'block';
-}
-
-// Hide reCAPTCHA error message
-function hideRecaptchaError() {
-    const errorDiv = document.getElementById('recaptcha-error');
-    if (errorDiv) {
-        errorDiv.style.display = 'none';
-    }
+    return new Promise((resolve, reject) => {
+        grecaptcha.ready(async () => {
+            try {
+                const token = await grecaptcha.execute(window.RECAPTCHA_SITE_KEY, { action: 'signup' });
+                if (!token) {
+                    throw new Error('Received an empty reCAPTCHA token.');
+                }
+                console.log('✅ reCAPTCHA validation successful.');
+                resolve(token);
+            } catch (error) {
+                console.error('reCAPTCHA execution error:', error);
+                reject(new Error('reCAPTCHA verification failed. Please refresh the page and try again.'));
+            }
+        });
+    });
 }
 
 // Form submission handler
@@ -161,7 +100,6 @@ async function handleFormSubmission(e) {
     
     hideError();
     hideSuccess();
-    hideRecaptchaError();
     
     const submitButton = document.querySelector('button[type="submit"]');
     const originalText = submitButton.textContent;

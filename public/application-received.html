@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Application Received - Interline Asia</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
     <style>
         * {
             margin: 0;
@@ -207,6 +208,8 @@
     </style>
 </head>
 <body>
+    <div id="header-placeholder"></div>
+    
     <div class="success-container">
         <div class="success-icon">
             <i class="ri-check-line"></i>
@@ -277,5 +280,9 @@
             localStorage.setItem('applicationSubmitted', new Date().toISOString());
         });
     </script>
+    
+    <div id="footer-placeholder"></div>
+    
+    <script src="/js/loadPartials.js" defer></script>
 </body>
 </html>

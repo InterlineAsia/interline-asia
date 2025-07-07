@@ -6,6 +6,7 @@
     <title>Verification Management - Interline Asia Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="auth.css">
+    <link rel="stylesheet" href="/css/main.css">
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
@@ -302,6 +303,8 @@
     </style>
 </head>
 <body>
+    <div id="header-placeholder"></div>
+    
     <div class="verifications-container">
         <div class="verifications-header">
             <div>
@@ -374,6 +377,9 @@
         </div>
     </div>
 
+    <div id="footer-placeholder"></div>
+
+    <script src="/js/loadPartials.js" defer></script>
     <script>
         let allVerifications = [];
         let currentVerification = null;

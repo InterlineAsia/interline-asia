@@ -3,94 +3,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interline Asia - Luxury Cruise Agency</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
     <style>
-        /* Using Google Fonts instead of Lovart assets */
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap');
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Noto Sans', Arial, sans-serif;
-        }
-        
-        body {
-            width: 1200px;
-            margin: 0 auto;
-            color: #333;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-        
-        /* Header Styles */
-        header {
-            width: 100%;
-            height: 80px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 40px;
-            background: linear-gradient(to right, rgba(12, 30, 54, 0.95), rgba(8, 21, 43, 0.95));
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .logo {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        
-        .logo h1 {
-            color: #fff;
-            font-size: 24px;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
-        
-        .logo span {
-            color: #ccc;
-            font-size: 12px;
-            font-style: italic;
-        }
-        
-        nav ul {
-            display: flex;
-            list-style: none;
-        }
-        
-        nav ul li {
-            margin-left: 30px;
-        }
-        
-        nav ul li a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-        
-        nav ul li a:hover {
-            color: #FF7F41;
-        }
-        
-        .contact-btn {
-            background-color: #FF7F41;
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 4px;
-            font-weight: 500;
-            text-decoration: none;
-            transition: background-color 0.3s;
-        }
-        
-        .contact-btn:hover {
-            background-color: #e66a2e;
-        }
-        
         /* Hero Section */
         .hero {
             width: 100%;
@@ -690,25 +604,7 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="logo">
-            <h1>INTERLINE ASIA</h1>
-            <span>Luxury Cruises. Verified Access. Exceptional Value for Travel Professionals.</span>
-        </div>
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="#about">About Us</a></li>
-                <li><a href="deals.html">Cruises</a></li>
-                <li><a href="#partners">Partners</a></li>
-                <li><a href="#faq">FAQ</a></li>
-                <li><a href="terms-and-conditions.html">Terms &amp; Conditions</a></li>
-                <li><a href="privacy-policy.html">Privacy Policy</a></li>
-                <li><a href="login.html">Login / Signup</a></li>
-            </ul>
-        </nav>
-    </header>
+    <div id="header-placeholder"></div>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -922,27 +818,7 @@ Most cruise lines allow bookings for companions. We'll clearly state any restric
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer>
-        <div class="footer-container">
-            <div class="footer-links">
-                <h3>Quick Links</h3>
-                <ul>
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="#about">About Us</a></li>
-                    <li><a href="deals.html">Cruises</a></li>
-                    <li><a href="#partners">Partners</a></li>
-                    <li><a href="#faq">FAQ</a></li>
-                    <li><a href="terms-and-conditions.html">Terms &amp; Conditions</a></li>
-                    <li><a href="privacy-policy.html">Privacy Policy</a></li>
-                    <li><a href="login.html">Login / Signup</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="copyright">
-            <p>© 2025 Interline Asia.</p>
-        </div>
-    </footer>
+    <div id="footer-placeholder"></div>
 
     <script>
         // Handle file upload display
@@ -970,4 +846,6 @@ Most cruise lines allow bookings for companions. We'll clearly state any restric
             });
         });
     </script>
-
+    <script src="/js/loadPartials.js" defer></script>
+</body>
+</html>

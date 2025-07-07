@@ -261,13 +261,13 @@ function initializeSignupForm() {
         }
     }, 500);
     
-    // Initialize reCAPTCHA
+    // Test reCAPTCHA availability on load
     if (typeof grecaptcha !== 'undefined') {
         grecaptcha.ready(() => {
-            console.log('reCAPTCHA v3 ready for signup');
+            console.log('[reCAPTCHA Test] ✅ grecaptcha is ready on initial page load.');
         });
     } else {
-        console.warn('reCAPTCHA not loaded, will attempt to load on form submission');
+        console.warn('[reCAPTCHA Test] ⚠️ grecaptcha was not immediately available. The form submission logic will wait for it.');
     }
 }
 

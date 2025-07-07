@@ -22,15 +22,13 @@ class SupabaseClient {
     if (!window.supabase) {
       const msg = 'Supabase client library not loaded. Please check the script tag in your HTML.';
       console.error(msg);
-      showError('Critical Error: Could not connect to authentication service.');
-      return;
+      throw new Error(msg);
     }
 
     if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
       const msg = 'Supabase URL or Anon Key is missing. Check config.js';
       console.error(msg);
-      showError('Critical Error: Application is not configured correctly.');
-      return;
+      throw new Error(msg);
     }
 
     // Now it's safe to create the client

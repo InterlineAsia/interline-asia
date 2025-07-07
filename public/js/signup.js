@@ -151,15 +151,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Initialization ---
     async function initializePage() {
-        // Wait for Supabase client to be ready
-        let attempts = 0;
-        while (!window.supabaseClient?.authReady && attempts < 50) {
-            await new Promise(resolve => setTimeout(resolve, 100));
-            attempts++;
-        }
-
-        if (window.supabaseClient?.isLoggedIn()) {
-            window.location.href = 'dashboard.html';
+        try {
+            // Wait for the Supabase client to be fully initialized and ready.
+            await window.supabaseClient.readyPromise;
+            // If the user is already logged in, redirect them to the dashboard.
+            if (window.supabaseClient.isLoggedIn()) {
+                window.location.href = 'dashboard.html';
+            }
+        } catch (error) {
+            console.error('Page initialization failed:', error);
+            showError('Error initializing the page. Please refresh and try again.');
         }
     }
 

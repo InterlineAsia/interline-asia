@@ -3,34 +3,6 @@
 
 // File upload validation removed - users upload documents from dashboard after signup
 
-// Add visual validation indicator for file inputs
-function addFileValidationIndicator(inputId, isValid) {
-    const input = document.getElementById(inputId);
-    const container = input.parentElement;
-    
-    // Remove existing indicators
-    removeFileValidationIndicator(inputId);
-    
-    // Add new indicator
-    const indicator = document.createElement('div');
-    indicator.className = `file-validation-indicator ${isValid ? 'valid' : 'invalid'}`;
-    indicator.innerHTML = isValid ? 
-        '<i class="ri-check-line"></i> File valid' : 
-        '<i class="ri-error-warning-line"></i> Invalid file';
-    
-    container.appendChild(indicator);
-}
-
-// Remove validation indicator
-function removeFileValidationIndicator(inputId) {
-    const input = document.getElementById(inputId);
-    const container = input.parentElement;
-    const existing = container.querySelector('.file-validation-indicator');
-    if (existing) {
-        existing.remove();
-    }
-}
-
 // Enhanced reCAPTCHA validation with retry logic
 async function validateRecaptcha(retryCount = 0) {
     const maxRetries = 3;
@@ -188,9 +160,7 @@ async function handleFormSubmission(e) {
             // Clear form
             e.target.reset();
             
-            // Reset file validation indicators
-            removeFileValidationIndicator('businessCardUpload');
-            removeFileValidationIndicator('letterUpload');
+            // Form cleared - no file indicators to reset
             
             // Redirect to login after 3 seconds
             setTimeout(() => {
@@ -236,16 +206,49 @@ function initializeSignupForm() {
     }
 }
 
+// Utility functions for error/success messages
+function showError(message) {
+    const errorEl = document.getElementById('error-message');
+    if (errorEl) {
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
+    }
+}
+
+function hideError() {
+    const errorEl = document.getElementById('error-message');
+    if (errorEl) {
+        errorEl.style.display = 'none';
+    }
+}
+
+function showSuccess(message) {
+    const successEl = document.getElementById('success-message');
+    if (successEl) {
+        successEl.textContent = message;
+        successEl.style.display = 'block';
+    }
+}
+
+function hideSuccess() {
+    const successEl = document.getElementById('success-message');
+    if (successEl) {
+        successEl.style.display = 'none';
+    }
+}
+
 // Wait for DOM and dependencies to load
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing signup form...');
     // Wait a bit for other scripts to load
     setTimeout(initializeSignupForm, 100);
 });
 
 // Also initialize on window load as backup
 window.addEventListener('load', function() {
-    if (!document.getElementById('signup-form').hasAttribute('data-initialized')) {
-        document.getElementById('signup-form').setAttribute('data-initialized', 'true');
+    const form = document.getElementById('signup-form');
+    if (form && !form.hasAttribute('data-initialized')) {
+        form.setAttribute('data-initialized', 'true');
         initializeSignupForm();
     }
 });

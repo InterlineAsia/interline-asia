@@ -6,6 +6,7 @@
   <title>CSV Processing Monitor - Interline Asia</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="auth.css">
+  <link rel="stylesheet" href="/css/main.css">
   <style>
     .monitor-container {
       max-width: 1200px;
@@ -207,6 +208,8 @@
   </style>
 </head>
 <body>
+  <div id="header-placeholder"></div>
+  
   <div class="monitor-container">
     <div class="monitor-header">
       <h1>CSV Processing Monitor</h1>
@@ -268,6 +271,9 @@
     </div>
   </div>
 
+  <div id="footer-placeholder"></div>
+
+  <script src="/js/loadPartials.js" defer></script>
   <script src="config.js"></script>
   <script src="supabase-client.js"></script>
   <script>

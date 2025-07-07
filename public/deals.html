@@ -6,6 +6,7 @@
   <meta name="description" content="Interline Asia - Exclusive cruise deals and luxury travel offers">
   <title>Cruise Deals - Interline Asia</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
   
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -193,6 +194,8 @@
   </style>
 </head>
 <body>
+  <div id="header-placeholder"></div>
+  
   <div class="container">
     <div class="header">
       <h1>Exclusive Cruise Deals</h1>
@@ -234,6 +237,9 @@
     </div>
   </div>
 
+  <div id="footer-placeholder"></div>
+
+  <script src="/js/loadPartials.js" defer></script>
   <script>
     // Global variables to store all deals and filtered deals
     let allDeals = [];

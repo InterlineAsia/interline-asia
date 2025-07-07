@@ -3,6 +3,12 @@
 
 class SupabaseClient {
   constructor() {
+    // Wait for Supabase library to be available
+    if (typeof window.supabase === 'undefined') {
+      console.error('Supabase library not loaded. Make sure @supabase/supabase-js is included before this script.');
+      return;
+    }
+    
     // Initialize Supabase client
     this.supabase = window.supabase.createClient(
       window.SUPABASE_URL,
@@ -356,8 +362,28 @@ class SupabaseClient {
   }
 }
 
-// Global instance
-window.supabaseClient = new SupabaseClient();
+// Global instance - ensure Supabase library is loaded first
+function initializeSupabaseClient() {
+  if (typeof window.supabase !== 'undefined' && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
+    window.supabaseClient = new SupabaseClient();
+    console.log('Supabase client initialized successfully');
+  } else {
+    console.error('Cannot initialize Supabase client:', {
+      supabaseLibrary: typeof window.supabase !== 'undefined' ? 'Available' : 'Missing',
+      supabaseUrl: window.SUPABASE_URL ? 'Present' : 'Missing',
+      supabaseKey: window.SUPABASE_ANON_KEY ? 'Present' : 'Missing'
+    });
+    // Retry after a short delay
+    setTimeout(initializeSupabaseClient, 100);
+  }
+}
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeSupabaseClient);
+} else {
+  initializeSupabaseClient();
+}
 
 // Utility functions for UI
 function showError(message, elementId = 'error-message') {

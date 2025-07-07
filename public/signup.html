@@ -7,6 +7,7 @@
   <title>Sign Up - Interline Asia</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="auth.css">
+  <link rel="stylesheet" href="/css/main.css">
   
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-FYGT92WCXC"></script>
@@ -17,12 +18,14 @@
 
     gtag('config', 'G-FYGT92WCXC');
   </script>
-  <script src="https://www.google.com/recaptcha/api.js?render=6Ld43XUrAAAAAATguv7FHX2tHDTsnnpdBFQoXNKT"></script>
+  <script src="https://www.google.com/recaptcha/api.js?render=6Ld43XUrAAAAAATguv7FHX2tHDTsnnpdBFQoXNKT" async defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="supabase-client.js"></script>
 </head>
 <body>
+  <div id="header-placeholder"></div>
+  
   <div class="auth-container">
     <div class="auth-card">
       <div class="auth-header">
@@ -54,8 +57,23 @@
           <input type="password" id="confirmPassword" name="confirmPassword" required>
         </div>
 
+        <div class="form-group">
+          <label for="businessCardUpload">Upload your company business card</label>
+          <input type="file" id="businessCardUpload" name="businessCardUpload" accept=".pdf,.png,.jpg,.jpeg">
+          <small class="file-hint">Accepted formats: PDF, PNG, JPG (Max 5MB)</small>
+        </div>
 
-        <button type="submit" class="btn btn-primary">Create Account</button>
+        <div class="form-group">
+          <label for="letterUpload">Or upload an employment confirmation letter</label>
+          <input type="file" id="letterUpload" name="letterUpload" accept=".pdf,.png,.jpg,.jpeg">
+          <small class="file-hint">Accepted formats: PDF, PNG, JPG (Max 5MB)</small>
+        </div>
+
+        <div id="upload-error" class="error-message" style="display: none;">
+          Please upload at least one document (business card or employment letter) to continue.
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="create-account-btn" disabled>Create Account</button>
       </form>
 
       <div class="auth-links">
@@ -65,6 +83,9 @@
     </div>
   </div>
 
+  <div id="footer-placeholder"></div>
+
+  <script src="/js/loadPartials.js" defer></script>
   <script>
     document.getElementById('signup-form').addEventListener('submit', async function(e) {
       e.preventDefault();
@@ -86,6 +107,33 @@
           confirmPassword: formData.get('confirmPassword')
         };
         
+        // File upload validation
+        const businessCard = document.getElementById('businessCardUpload').files[0];
+        const letter = document.getElementById('letterUpload').files[0];
+        
+        if (!businessCard && !letter) {
+          document.getElementById('upload-error').style.display = 'block';
+          throw new Error('Please upload at least one document (business card or employment letter)');
+        }
+        
+        // File size validation (5MB max)
+        const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+        if (businessCard && businessCard.size > maxSize) {
+          throw new Error('Business card file size must be less than 5MB');
+        }
+        if (letter && letter.size > maxSize) {
+          throw new Error('Employment letter file size must be less than 5MB');
+        }
+        
+        // File type validation
+        const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
+        if (businessCard && !allowedTypes.includes(businessCard.type)) {
+          throw new Error('Business card must be a PDF, PNG, or JPG file');
+        }
+        if (letter && !allowedTypes.includes(letter.type)) {
+          throw new Error('Employment letter must be a PDF, PNG, or JPG file');
+        }
+        
         // Validation
         if (!userData.fullName || !userData.email || !userData.password) {
           throw new Error('Please fill in all required fields');
@@ -105,9 +153,29 @@
         }
         
         // reCAPTCHA v3 validation
-        const recaptchaToken = await grecaptcha.execute(window.RECAPTCHA_SITE_KEY, {
-          action: 'signup'
-        });
+        let recaptchaToken;
+        try {
+          // Ensure reCAPTCHA is loaded
+          if (typeof grecaptcha === 'undefined') {
+            throw new Error('reCAPTCHA not loaded');
+          }
+          
+          recaptchaToken = await new Promise((resolve, reject) => {
+            grecaptcha.ready(async () => {
+              try {
+                const token = await grecaptcha.execute(window.RECAPTCHA_SITE_KEY, {
+                  action: 'signup'
+                });
+                resolve(token);
+              } catch (err) {
+                reject(err);
+              }
+            });
+          });
+        } catch (error) {
+          console.error('reCAPTCHA error:', error);
+          throw new Error('reCAPTCHA verification failed. Please try again.');
+        }
         
         if (!recaptchaToken) {
           throw new Error('reCAPTCHA verification failed. Please try again.');
@@ -142,6 +210,68 @@
       }
     });
 
+    // File upload validation and button state management
+    function validateUploads() {
+      const businessCard = document.getElementById('businessCardUpload').files[0];
+      const letter = document.getElementById('letterUpload').files[0];
+      const submitButton = document.getElementById('create-account-btn');
+      const uploadError = document.getElementById('upload-error');
+      
+      // Reset error state
+      uploadError.style.display = 'none';
+      
+      // Validate file size and type if files are selected
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
+      
+      let hasValidFile = false;
+      
+      if (businessCard) {
+        if (businessCard.size > maxSize) {
+          uploadError.textContent = 'Business card file size must be less than 5MB';
+          uploadError.style.display = 'block';
+          submitButton.disabled = true;
+          return;
+        }
+        if (!allowedTypes.includes(businessCard.type)) {
+          uploadError.textContent = 'Business card must be a PDF, PNG, or JPG file';
+          uploadError.style.display = 'block';
+          submitButton.disabled = true;
+          return;
+        }
+        hasValidFile = true;
+      }
+      
+      if (letter) {
+        if (letter.size > maxSize) {
+          uploadError.textContent = 'Employment letter file size must be less than 5MB';
+          uploadError.style.display = 'block';
+          submitButton.disabled = true;
+          return;
+        }
+        if (!allowedTypes.includes(letter.type)) {
+          uploadError.textContent = 'Employment letter must be a PDF, PNG, or JPG file';
+          uploadError.style.display = 'block';
+          submitButton.disabled = true;
+          return;
+        }
+        hasValidFile = true;
+      }
+      
+      // Enable button if at least one valid file is selected
+      if (hasValidFile) {
+        submitButton.disabled = false;
+        uploadError.style.display = 'none';
+      } else {
+        submitButton.disabled = true;
+        uploadError.textContent = 'Please upload at least one document (business card or employment letter) to continue.';
+      }
+    }
+
+    // Add event listeners to file inputs
+    document.getElementById('businessCardUpload').addEventListener('change', validateUploads);
+    document.getElementById('letterUpload').addEventListener('change', validateUploads);
+
     // Check if user is already logged in
     window.addEventListener('load', async () => {
       // Wait for Supabase client to initialize
@@ -154,9 +284,13 @@
 
     // Initialize reCAPTCHA v3
     window.addEventListener('load', () => {
-      grecaptcha.ready(() => {
-        console.log('reCAPTCHA v3 ready');
-      });
+      if (typeof grecaptcha !== 'undefined') {
+        grecaptcha.ready(() => {
+          console.log('reCAPTCHA v3 ready');
+        });
+      } else {
+        console.warn('reCAPTCHA not loaded yet, will retry on form submission');
+      }
     });
   </script>
 </body>

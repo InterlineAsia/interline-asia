@@ -123,26 +123,57 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // --- File Upload ---
                 console.log('Uploading verification document...');
+                let uploadSuccess = false;
                 try {
                     // Ensure we have the user session before uploading
                     if (result.session) {
                         window.supabaseClient.currentSession = result.session;
-                        window.supabaseClient.currentUser = result.user;
+                        await window.supabaseClient._setCurrentUserWithMetadata(result.user);
                     }
                     
+                    // Wait a bit more for the session to be fully established
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    
+                    console.log('Attempting file upload with user ID:', result.user.id);
                     const uploadResult = await window.supabaseClient.uploadFile(documentFile, result.user.id);
                     console.log('File uploaded successfully:', uploadResult);
+                    uploadSuccess = true;
+                    
+                    // Show success message with upload confirmation
+                    showSuccess('Account created successfully! Your verification document has been uploaded. Please check your email to verify your account, then log in.');
+                    
                 } catch (uploadError) {
                     console.error('File upload failed after signup:', uploadError);
                     console.error('Upload error details:', uploadError.message);
-                    showError(`Account created, but file upload failed: ${uploadError.message}. Please upload from your dashboard.`);
+                    
+                    // Provide specific error messages based on the error type
+                    let errorMessage = 'Account created, but file upload failed. ';
+                    
+                    if (uploadError.message.includes('Storage bucket not available')) {
+                        errorMessage += 'Storage system is not configured properly. Please contact support.';
+                    } else if (uploadError.message.includes('User must be authenticated')) {
+                        errorMessage += 'Authentication issue during upload. Please log in and upload from your dashboard.';
+                    } else if (uploadError.message.includes('Database error')) {
+                        errorMessage += 'File was uploaded but not recorded properly. Please contact support.';
+                    } else {
+                        errorMessage += `${uploadError.message}. Please upload from your dashboard after logging in.`;
+                    }
+                    
+                    showError(errorMessage);
                 }
 
                 // --- Success Feedback ---
-                if (result.user.identities && result.user.identities.length === 0) {
-                    showError('Account created, but requires manual verification. Please contact support.');
+                if (!uploadSuccess) {
+                    // Only show this if upload failed (error already shown above)
+                    if (result.user.identities && result.user.identities.length === 0) {
+                        showError('Account created, but requires manual verification. Please contact support.');
+                    } else {
+                        // Don't override the upload error message
+                        console.log('Account created but upload failed - error message already shown');
+                    }
                 } else {
-                    showSuccess('Account created successfully! Please check your email to verify your account, then log in.');
+                    // Upload was successful, success message already shown above
+                    console.log('Account and upload both successful - success message already shown');
                 }
 
                 this.reset();

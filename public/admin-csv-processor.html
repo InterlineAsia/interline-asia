@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSV Processor - Interline Asia Admin</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 2rem;
+      background-color: #f5f5f5;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    h1 {
+      color: #0C1E36;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    
+    .section {
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      border: 1px solid #e1e5e9;
+      border-radius: 8px;
+    }
+    
+    .section h2 {
+      color: #333;
+      margin-bottom: 1rem;
+    }
+    
+    .btn {
+      background-color: #FF7F41;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin: 0.5rem 0.5rem 0.5rem 0;
+      transition: background-color 0.3s;
+    }
+    
+    .btn:hover {
+      background-color: #e66a2e;
+    }
+    
+    .btn:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    
+    .status {
+      padding: 1rem;
+      border-radius: 6px;
+      margin: 1rem 0;
+    }
+    
+    .status.success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .status.error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    
+    .status.info {
+      background-color: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+    
+    .file-info {
+      background-color: #f8f9fa;
+      padding: 1rem;
+      border-radius: 6px;
+      margin: 1rem 0;
+      font-family: monospace;
+      font-size: 0.9rem;
+    }
+    
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 2rem;
+    }
+    
+    .loading.show {
+      display: block;
+    }
+  </style>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1><i class="ri-file-excel-2-line"></i> CSV Processor</h1>
+    
+    <div class="section">
+      <h2>Current CSV Files Status</h2>
+      <div id="file-status">
+        <div class="loading show">
+          <i class="ri-loader-4-line" style="font-size: 2rem; animation: spin 1s linear infinite;"></i>
+          <p>Checking CSV files...</p>
+        </div>
+      </div>
+      <button class="btn" onclick="checkFiles()">
+        <i class="ri-refresh-line"></i> Refresh Status
+      </button>
+    </div>
+    
+    <div class="section">
+      <h2>Process CSV Files</h2>
+      <p>Process the uploaded CSV files and update the deals database:</p>
+      <button class="btn" onclick="processCsvFiles()" id="process-btn">
+        <i class="ri-play-circle-line"></i> Process CSV Files
+      </button>
+      <div id="process-status"></div>
+    </div>
+    
+    <div class="section">
+      <h2>Database Status</h2>
+      <div id="db-status">
+        <div class="loading show">
+          <i class="ri-loader-4-line" style="font-size: 2rem; animation: spin 1s linear infinite;"></i>
+          <p>Checking database...</p>
+        </div>
+      </div>
+      <button class="btn" onclick="checkDatabase()">
+        <i class="ri-database-2-line"></i> Check Database
+      </button>
+    </div>
+  </div>
+
+  <script>
+    async function initializeAdmin() {
+      try {
+        await window.supabaseClient.readyPromise;
+        
+        if (!window.supabaseClient.isLoggedIn() || !window.supabaseClient.isAdmin()) {
+          window.location.href = 'login.html';
+          return;
+        }
+        
+        await checkFiles();
+        await checkDatabase();
+        
+      } catch (error) {
+        console.error('Admin initialization error:', error);
+        showStatus('error', 'Error initializing admin panel: ' + error.message);
+      }
+    }
+    
+    async function checkFiles() {
+      try {
+        const statusDiv = document.getElementById('file-status');
+        statusDiv.innerHTML = '<div class="loading show"><i class="ri-loader-4-line" style="font-size: 2rem; animation: spin 1s linear infinite;"></i><p>Checking CSV files...</p></div>';
+        
+        // Check if CSV files exist in Supabase Storage
+        const { data: files, error } = await window.supabaseClient.supabase.storage
+          .from('uploads')
+          .list('', { limit: 100 });
+        
+        if (error) throw error;
+        
+        const csvFiles = files.filter(file => file.name.endsWith('.csv'));
+        const cabinTypesFile = csvFiles.find(f => f.name.includes('2604 Cabin Types Upload'));
+        const masterFile = csvFiles.find(f => f.name.includes('2906 Master Upload Twins'));
+        
+        let html = '<div class="file-info">';
+        html += `<strong>CSV Files Found:</strong><br>`;
+        html += `Total CSV files: ${csvFiles.length}<br><br>`;
+        
+        if (cabinTypesFile) {
+          html += `✅ Cabin Types File: ${cabinTypesFile.name}<br>`;
+          html += `   Size: ${(cabinTypesFile.metadata?.size / 1024).toFixed(1)} KB<br>`;
+          html += `   Updated: ${new Date(cabinTypesFile.updated_at).toLocaleString()}<br><br>`;
+        } else {
+          html += `❌ Cabin Types File: Not found (looking for "2604 Cabin Types Upload")<br><br>`;
+        }
+        
+        if (masterFile) {
+          html += `✅ Master Upload File: ${masterFile.name}<br>`;
+          html += `   Size: ${(masterFile.metadata?.size / 1024).toFixed(1)} KB<br>`;
+          html += `   Updated: ${new Date(masterFile.updated_at).toLocaleString()}<br>`;
+        } else {
+          html += `❌ Master Upload File: Not found (looking for "2906 Master Upload Twins")<br>`;
+        }
+        
+        html += '</div>';
+        
+        if (cabinTypesFile && masterFile) {
+          html += '<div class="status success">✅ Both required CSV files are available for processing</div>';
+        } else {
+          html += '<div class="status error">❌ Missing required CSV files. Please upload both files to the uploads bucket.</div>';
+        }
+        
+        statusDiv.innerHTML = html;
+        
+      } catch (error) {
+        console.error('Error checking files:', error);
+        document.getElementById('file-status').innerHTML = `<div class="status error">Error checking files: ${error.message}</div>`;
+      }
+    }
+    
+    async function processCsvFiles() {
+      try {
+        const processBtn = document.getElementById('process-btn');
+        const statusDiv = document.getElementById('process-status');
+        
+        processBtn.disabled = true;
+        processBtn.innerHTML = '<i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i> Processing...';
+        
+        statusDiv.innerHTML = '<div class="status info"><i class="ri-time-line"></i> Processing CSV files... This may take a few minutes.</div>';
+        
+        // Call the CSV processing API
+        const result = await window.supabaseClient.processCsvDeals();
+        
+        statusDiv.innerHTML = `<div class="status success">
+          <i class="ri-check-circle-line"></i> 
+          <strong>Processing Complete!</strong><br>
+          ${result.message}<br>
+          Deals processed: ${result.deals_count || 'Unknown'}
+        </div>`;
+        
+        // Refresh database status
+        await checkDatabase();
+        
+      } catch (error) {
+        console.error('Error processing CSV files:', error);
+        document.getElementById('process-status').innerHTML = `<div class="status error">
+          <i class="ri-error-warning-line"></i> 
+          <strong>Processing Failed:</strong><br>
+          ${error.message}
+        </div>`;
+      } finally {
+        const processBtn = document.getElementById('process-btn');
+        processBtn.disabled = false;
+        processBtn.innerHTML = '<i class="ri-play-circle-line"></i> Process CSV Files';
+      }
+    }
+    
+    async function checkDatabase() {
+      try {
+        const statusDiv = document.getElementById('db-status');
+        statusDiv.innerHTML = '<div class="loading show"><i class="ri-loader-4-line" style="font-size: 2rem; animation: spin 1s linear infinite;"></i><p>Checking database...</p></div>';
+        
+        // Get deals count from database
+        const deals = await window.supabaseClient.getAllDeals();
+        
+        let html = '<div class="file-info">';
+        html += `<strong>Database Status:</strong><br>`;
+        html += `Total deals in database: ${deals.length}<br><br>`;
+        
+        if (deals.length > 0) {
+          // Group by cruise line
+          const cruiseLines = {};
+          deals.forEach(deal => {
+            const line = deal.cruise_line || 'Unknown';
+            cruiseLines[line] = (cruiseLines[line] || 0) + 1;
+          });
+          
+          html += `<strong>Deals by Cruise Line:</strong><br>`;
+          Object.entries(cruiseLines).forEach(([line, count]) => {
+            html += `${line}: ${count} deals<br>`;
+          });
+          
+          html += `<br><strong>Latest deal:</strong><br>`;
+          const latestDeal = deals[0];
+          html += `${latestDeal.cruise_line} - ${latestDeal.cruise_name}<br>`;
+          html += `Price: $${latestDeal.price}<br>`;
+          html += `Updated: ${new Date(latestDeal.updated_at).toLocaleString()}<br>`;
+        }
+        
+        html += '</div>';
+        
+        if (deals.length > 0) {
+          html += '<div class="status success">✅ Database contains cruise deals and is ready</div>';
+        } else {
+          html += '<div class="status error">❌ No deals found in database. Process CSV files to populate data.</div>';
+        }
+        
+        statusDiv.innerHTML = html;
+        
+      } catch (error) {
+        console.error('Error checking database:', error);
+        document.getElementById('db-status').innerHTML = `<div class="status error">Error checking database: ${error.message}</div>`;
+      }
+    }
+    
+    function showStatus(type, message) {
+      // Helper function to show status messages
+      console.log(`${type.toUpperCase()}: ${message}`);
+    }
+    
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', initializeAdmin);
+  </script>
+  
+  <style>
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</body>
+</html>

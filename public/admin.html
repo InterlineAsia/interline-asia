@@ -278,17 +278,19 @@
   <script src="/js/loadPartials.js" defer></script>
   <script>
     // Require admin authentication
-    window.addEventListener('load', async () => {
-      // Wait for Supabase client to initialize
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      if (!window.supabaseClient.requireAdmin()) {
-        return; // Will redirect to login if not admin
+    async function initializeAdminPage() {
+      try {
+        await window.supabaseClient.readyPromise;
+        if (!window.supabaseClient.isAdmin()) {
+          window.location.href = 'login.html'; // Redirect if not an admin
+          return;
+        }
+        await loadAdminDashboard();
+      } catch (error) {
+        showError('Failed to initialize admin panel: ' + error.message);
       }
-      
-      // Load admin dashboard
-      await loadAdminDashboard();
-    });
+    }
+    document.addEventListener('DOMContentLoaded', initializeAdminPage);
 
     async function loadAdminDashboard() {
       try {

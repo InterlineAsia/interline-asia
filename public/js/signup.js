@@ -116,26 +116,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await window.supabaseClient.signUp(userData);
             console.log('Supabase signup result:', result); // For debugging
 
-            if (result && result.user) {
-                // Wait for user to be properly authenticated before upload
-                console.log('Waiting for authentication to complete...');
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                
+            if (result && result.user) {                
                 // --- File Upload ---
                 console.log('Uploading verification document...');
                 let uploadSuccess = false;
                 try {
-                    // Ensure we have the user session before uploading
-                    if (result.session) {
-                        window.supabaseClient.currentSession = result.session;
-                        await window.supabaseClient._setCurrentUserWithMetadata(result.user);
-                    }
-                    
-                    // Wait a bit more for the session to be fully established
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                    
                     console.log('Attempting file upload with user ID:', result.user.id);
-                    const uploadResult = await window.supabaseClient.uploadFile(documentFile, result.user.id);
+                    const uploadResult = await window.supabaseClient.uploadFile(documentFile, result.user.id, result.session);
                     console.log('File uploaded successfully:', uploadResult);
                     uploadSuccess = true;
                     

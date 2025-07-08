@@ -206,30 +206,62 @@ class SupabaseClient {
 
   async uploadFile(file, userId) {
     await this.readyPromise;
-    if (!userId) throw new Error('User ID is required for upload');
     
-    const fileName = `${userId}/${Date.now()}-${file.name}`;
-    const { data, error } = await this.supabase.storage
-      .from('uploads')
-      .upload(fileName, file);
+    // Verify user is authenticated
+    if (!this.currentSession) {
+      throw new Error('User must be authenticated to upload files');
+    }
+    
+    if (!userId) {
+      userId = this.currentUser?.id;
+    }
+    
+    if (!userId) {
+      throw new Error('User ID is required for upload');
+    }
+    
+    console.log('Starting file upload for user:', userId, 'file:', file.name);
+    
+    // Use proper file path format
+    const fileName = `user-uploads/${userId}/${Date.now()}-${file.name}`;
+    
+    try {
+      const { data, error } = await this.supabase.storage
+        .from('verification-uploads')
+        .upload(fileName, file);
 
-    if (error) throw error;
+      if (error) {
+        console.error('Supabase storage upload error:', error);
+        throw new Error(`Upload failed: ${error.message}`);
+      }
+      
+      console.log('File uploaded successfully to storage:', data.path);
 
-    const { data: dbData, error: dbError } = await this.supabase
-      .from('uploads')
-      .insert({
-        user_id: userId,
-        file_name: file.name,
-        file_path: data.path,
-        file_type: file.type,
-        file_size: file.size,
-        upload_status: 'pending'
-      })
-      .select()
-      .single();
+      const { data: dbData, error: dbError } = await this.supabase
+        .from('uploads')
+        .insert({
+          user_id: userId,
+          file_name: file.name,
+          file_path: data.path,
+          file_type: file.type,
+          file_size: file.size,
+          upload_status: 'pending'
+        })
+        .select()
+        .single();
 
-    if (dbError) throw dbError;
-    return dbData;
+      if (dbError) {
+        console.error('Database insert error:', dbError);
+        throw new Error(`Database error: ${dbError.message}`);
+      }
+      
+      console.log('Upload record created in database:', dbData);
+      return dbData;
+      
+    } catch (uploadError) {
+      console.error('Complete upload process failed:', uploadError);
+      throw uploadError;
+    }
   }
 
   async resetPasswordForEmail(email) {
@@ -286,7 +318,7 @@ class SupabaseClient {
   async getFileUrl(filePath) {
     await this.readyPromise;
     const { data } = await this.supabase.storage
-      .from('uploads')
+      .from('verification-uploads')
       .createSignedUrl(filePath, 3600); // 1 hour expiry
     
     return data?.signedUrl;

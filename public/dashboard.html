@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interline Asia Member Dashboard - Manage your profile and access exclusive deals">
+  <title>Member Dashboard - Interline Asia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="auth.css">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+</head>
+<body>
+  <div class="dashboard-container">
+    <div class="dashboard-header">
+      <div>
+        <h1 id="welcome-message">Welcome to Interline Asia</h1>
+        <p>Manage your profile and access exclusive deals</p>
+      </div>
+      <div>
+        <button class="btn btn-secondary" onclick="window.supabaseClient.signOut()">Sign Out</button>
+      </div>
+    </div>
+
+    <div id="error-message" class="error-message"></div>
+    <div id="success-message" class="success-message"></div>
+
+    <div class="dashboard-grid">
+      <!-- Profile Information -->
+      <div class="dashboard-card">
+        <h2>Profile Information</h2>
+        <div class="profile-info" id="profile-info">
+          <!-- Profile data will be loaded here -->
+        </div>
+      </div>
+
+      <!-- Document Upload -->
+      <div class="dashboard-card">
+        <h2>Verification Documents</h2>
+        <p style="color: #666; margin-bottom: 1.5rem;">
+          Upload your business card or employment letter to verify your industry status and access exclusive pricing.
+        </p>
+
+        <div class="upload-area" id="upload-area" role="button" tabindex="0">
+          <div style="margin-bottom: 1rem;">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7,10 12,15 17,10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+          </div>
+          <p><strong>Click to upload</strong> or drag and drop</p>
+          <p style="font-size: 0.875rem; color: #666;">
+            Business Card, Employment Letter, or ID<br>
+            Supported: PDF, PNG, JPG (max 10MB)
+          </p>
+          <input type="file" id="file-input" class="file-input" accept=".pdf,.png,.jpg,.jpeg" multiple>
+        </div>
+
+        <button class="btn btn-primary" onclick="document.getElementById('file-input').click()">
+          Choose Files
+        </button>
+
+        <div class="upload-list" id="upload-list">
+          <!-- Uploaded files will appear here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Access Status -->
+    <div class="dashboard-card" style="margin-top: 2rem;">
+      <h2>Access Status</h2>
+      <div class="info-row">
+        <span class="info-label">Account Status:</span>
+        <span class="info-value">
+          <span class="status-badge" id="account-status">Loading...</span>
+        </span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Pricing Access:</span>
+        <span class="info-value" id="pricing-access">Pending verification</span>
+      </div>
+      <div style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 6px;">
+        <p style="margin: 0; font-size: 0.875rem; color: #666;">
+          <strong>Note:</strong> Upload your business card or employment letter to verify your industry status. 
+          Once verified, you'll gain access to exclusive interline pricing and VIP deals.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Require authentication
+    window.addEventListener('load', async () => {
+      // Wait for Supabase client to initialize
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      if (!window.supabaseClient.requireAuth()) {
+        return; // Will redirect to login if not authenticated
+      }
+      
+      // Load dashboard data
+      loadDashboard();
+    });
+
+    // Load user data and populate dashboard
+    async function loadDashboard() {
+      const user = window.supabaseClient.currentUser;
+      if (!user) return;
+
+      // Update welcome message with proper fallback
+      const displayName = user.full_name || user.email?.split('@')[0] || 'User';
+      document.getElementById('welcome-message').textContent = `Welcome, ${displayName}`;
+
+      // Determine user status and role
+      const isAdmin = user.is_admin || user.is_super_admin || user.role === 'admin';
+      const verificationStatus = isAdmin ? 'verified' : (user.verification_status || 'pending');
+
+      // Populate profile info with admin indicators
+      const profileInfo = document.getElementById('profile-info');
+      profileInfo.innerHTML = `
+        <div class="info-row">
+          <span class="info-label">Full Name:</span>
+          <span class="info-value">${displayName}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Email:</span>
+          <span class="info-value">${user.email}</span>
+        </div>
+        ${isAdmin ? `
+        <div class="info-row">
+          <span class="info-label">Role:</span>
+          <span class="info-value">
+            <span class="status-badge" style="background: #dc3545; color: white;">Administrator</span>
+            ${user.is_super_admin ? '<span class="status-badge" style="background: #6f42c1; color: white; margin-left: 0.5rem;">Super Admin</span>' : ''}
+          </span>
+        </div>
+        ` : ''}
+        <div class="info-row">
+          <span class="info-label">Member Since:</span>
+          <span class="info-value">${user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Verification Status:</span>
+          <span class="info-value">
+            <span class="status-badge status-${verificationStatus}">${verificationStatus}</span>
+          </span>
+        </div>
+      `;
+
+      // Add admin panel if user is admin
+      if (isAdmin) {
+        const adminPanel = document.createElement('div');
+        adminPanel.className = 'dashboard-card';
+        adminPanel.style.marginTop = '2rem';
+        adminPanel.style.background = 'linear-gradient(135deg, #dc3545, #c82333)';
+        adminPanel.style.color = 'white';
+        adminPanel.innerHTML = `
+          <h2 style="color: white;">Admin Panel</h2>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+            <a href="public/admin.html" class="view-deal-btn" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);">
+              Manage Users
+            </a>
+            <a href="public/admin-deals.html" class="view-deal-btn" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);">
+              Manage Deals
+            </a>
+            <a href="public/admin-verifications.html" class="view-deal-btn" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);">
+              Verifications
+            </a>
+            <a href="public/deals.html" class="view-deal-btn" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);">
+              View Deals
+            </a>
+          </div>
+        `;
+        
+        // Insert admin panel after profile section
+        const dashboardGrid = document.querySelector('.dashboard-grid');
+        dashboardGrid.parentNode.insertBefore(adminPanel, dashboardGrid.nextSibling);
+      }
+
+      // Update account status
+      const statusEl = document.getElementById('account-status');
+      statusEl.textContent = verificationStatus;
+      statusEl.className = `status-badge status-${verificationStatus}`;
+
+      // Update pricing access - admins get automatic access
+      const pricingEl = document.getElementById('pricing-access');
+      const hasPricingAccess = user?.is_admin || user?.verification_status === 'verified';
+      
+      if (hasPricingAccess) {
+        if (user?.is_admin) {
+          pricingEl.innerHTML = '<span style="color: #155724; font-weight: 600;">Admin Access - Full Privileges</span>';
+        } else {
+          pricingEl.innerHTML = '<span style="color: #155724; font-weight: 600;">Full Access Granted</span>';
+        }
+      } else if (user.verification_status === 'pending') {
+        pricingEl.innerHTML = '<span style="color: #856404;">Pending Review</span>';
+      } else {
+        pricingEl.innerHTML = '<span style="color: #721c24;">Verification Required</span>';
+      }
+
+      // Load uploads
+      await loadUploads();
+    }
+
+    // Load and display uploads
+    async function loadUploads() {
+      const user = window.supabaseClient.currentUser;
+      if (!user) return;
+
+      try {
+        const uploads = await window.supabaseClient.getUserUploads(user.id);
+        const uploadList = document.getElementById('upload-list');
+        
+        if (uploads.length === 0) {
+          uploadList.innerHTML = '<p style="color: #666; font-style: italic;">No documents uploaded yet</p>';
+          return;
+        }
+
+        uploadList.innerHTML = uploads.map(upload => `
+          <div class="upload-item">
+            <div class="upload-item-info">
+              <div class="upload-item-name">${upload.file_name}</div>
+              <div class="upload-item-date">Uploaded ${new Date(upload.uploaded_at).toLocaleDateString()}</div>
+              ${upload.admin_notes ? `<div style="font-size: 0.875rem; color: #666; margin-top: 0.25rem;">Note: ${upload.admin_notes}</div>` : ''}
+            </div>
+            <span class="status-badge status-${upload.upload_status}">${upload.upload_status}</span>
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error('Error loading uploads:', error);
+        document.getElementById('upload-list').innerHTML = '<p style="color: #d32f2f;">Error loading uploads</p>';
+      }
+    }
+
+    // Initialize dashboard
+    loadDashboard();
+  </script>
+</body>
+</html>

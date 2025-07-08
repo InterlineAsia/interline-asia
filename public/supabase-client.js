@@ -233,22 +233,72 @@ class SupabaseClient {
     }
     
     console.log('Starting file upload for user:', userId, 'file:', file.name);
+    console.log('Current session:', !!this.currentSession);
+    console.log('File details:', { name: file.name, size: file.size, type: file.type });
     
     // Use proper file path format
     const fileName = `user-uploads/${userId}/${Date.now()}-${file.name}`;
     
     try {
+      // First, check if the bucket exists and is accessible
+      console.log('Checking bucket access...');
+      const { data: buckets, error: bucketError } = await this.supabase.storage.listBuckets();
+      console.log('Available buckets:', buckets?.map(b => b.name));
+      
+      if (bucketError) {
+        console.warn('Could not list buckets:', bucketError);
+      }
+      
+      // Try to upload to the verification-uploads bucket
+      console.log('Attempting upload to verification-uploads bucket...');
       const { data, error } = await this.supabase.storage
         .from('verification-uploads')
-        .upload(fileName, file);
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
 
       if (error) {
         console.error('Supabase storage upload error:', error);
-        throw new Error(`Upload failed: ${error.message}`);
+        console.error('Error details:', JSON.stringify(error, null, 2));
+        
+        // If bucket doesn't exist, try to create it
+        if (error.message?.includes('Bucket not found') || error.message?.includes('bucket does not exist')) {
+          console.log('Bucket not found, attempting to create...');
+          const { error: createError } = await this.supabase.storage.createBucket('verification-uploads', {
+            public: false,
+            allowedMimeTypes: ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf'],
+            fileSizeLimit: 10485760 // 10MB
+          });
+          
+          if (createError) {
+            console.error('Failed to create bucket:', createError);
+            throw new Error(`Storage bucket not available: ${createError.message}`);
+          }
+          
+          // Retry upload after creating bucket
+          console.log('Retrying upload after bucket creation...');
+          const { data: retryData, error: retryError } = await this.supabase.storage
+            .from('verification-uploads')
+            .upload(fileName, file, {
+              cacheControl: '3600',
+              upsert: false
+            });
+            
+          if (retryError) {
+            throw new Error(`Upload failed after bucket creation: ${retryError.message}`);
+          }
+          
+          data = retryData;
+        } else {
+          throw new Error(`Upload failed: ${error.message}`);
+        }
       }
       
-      console.log('File uploaded successfully to storage:', data.path);
+      console.log('File uploaded successfully to storage:', data?.path);
 
+      // Create database record
+      console.log('Creating database record...');
       const { data: dbData, error: dbError } = await this.supabase
         .from('uploads')
         .insert({
@@ -257,14 +307,19 @@ class SupabaseClient {
           file_path: data.path,
           file_type: file.type,
           file_size: file.size,
-          upload_status: 'pending'
+          upload_status: 'pending',
+          uploaded_at: new Date().toISOString()
         })
         .select()
         .single();
 
       if (dbError) {
         console.error('Database insert error:', dbError);
-        throw new Error(`Database error: ${dbError.message}`);
+        console.error('Database error details:', JSON.stringify(dbError, null, 2));
+        
+        // Even if DB insert fails, the file was uploaded successfully
+        console.warn('File uploaded but database record creation failed. File path:', data.path);
+        throw new Error(`File uploaded but database error: ${dbError.message}`);
       }
       
       console.log('Upload record created in database:', dbData);
@@ -272,6 +327,7 @@ class SupabaseClient {
       
     } catch (uploadError) {
       console.error('Complete upload process failed:', uploadError);
+      console.error('Upload error stack:', uploadError.stack);
       throw uploadError;
     }
   }

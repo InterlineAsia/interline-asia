@@ -118,12 +118,14 @@
         let errorMessage = 'Invalid email or password. Please check your credentials and try again.'; // Default message
 
         // Check for specific Supabase auth errors
-        if (error.message.includes('Email not confirmed')) {
+        if (error.message.includes('Email not confirmed') || error.message.includes('email_not_confirmed')) {
           const email = document.getElementById('email').value;
           errorMessage = `Please verify your email before signing in. <a href="#" onclick="resendVerification('${email}')" style="color: inherit; font-weight: bold;">Resend verification link</a>`;
           showError(errorMessage, 'error-message', true); // Pass true to allow HTML
-        } else if (error.message.includes('Invalid login credentials')) {
+        } else if (error.message.includes('Invalid login credentials') || error.message.includes('invalid_credentials')) {
           showError(errorMessage);
+        } else if (error.message.includes('Too many requests')) {
+          showError('Too many login attempts. Please wait a moment and try again.');
         } else {
           showError(errorMessage);
         }

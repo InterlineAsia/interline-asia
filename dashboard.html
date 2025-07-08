@@ -3,138 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Interline Asia Member Dashboard - Manage your profile and upload verification documents">
+  <meta name="description" content="Interline Asia Member Dashboard - Manage your profile and access exclusive deals">
   <title>Member Dashboard - Interline Asia</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="auth.css">
-  <style>
-    .upload-success-card {
-      background: linear-gradient(135deg, #dcfce7, #bbf7d0);
-      border: 1px solid #22c55e;
-      border-radius: 12px;
-      padding: 1.5rem;
-      margin: 1rem 0;
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-      color: #166534;
-      animation: slideIn 0.3s ease-out;
-    }
-    
-    .success-icon {
-      font-size: 2rem;
-      flex-shrink: 0;
-    }
-    
-    .success-content h3 {
-      margin: 0 0 0.5rem 0;
-      color: #166534;
-      font-size: 1.2rem;
-    }
-    
-    .success-content p {
-      margin: 0.25rem 0;
-      color: #166534;
-    }
-    
-    .success-content small {
-      color: #15803d;
-      font-style: italic;
-    }
-    
-    .files-received-banner {
-      background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-      border: 1px solid #3b82f6;
-      border-radius: 12px;
-      margin-bottom: 2rem;
-      overflow: hidden;
-      animation: slideDown 0.4s ease-out;
-    }
-    
-    .banner-content {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 1.5rem;
-      position: relative;
-    }
-    
-    .banner-icon {
-      font-size: 2.5rem;
-      flex-shrink: 0;
-    }
-    
-    .banner-text {
-      flex: 1;
-      color: #1e40af;
-    }
-    
-    .banner-text h3 {
-      margin: 0 0 0.5rem 0;
-      color: #1e40af;
-      font-size: 1.3rem;
-    }
-    
-    .banner-text p {
-      margin: 0;
-      color: #1d4ed8;
-      line-height: 1.5;
-    }
-    
-    .banner-close {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      color: #1e40af;
-      cursor: pointer;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .banner-close:hover {
-      background: rgba(59, 130, 246, 0.1);
-    }
-    
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateX(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-    
-    @keyframes slideDown {
-      from {
-        opacity: 0;
-        transform: translateY(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-  </style>
   
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FYGT92WCXC"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-FYGT92WCXC');
-  </script>
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="supabase-client.js"></script>
@@ -237,45 +110,95 @@
       const user = window.supabaseClient.currentUser;
       if (!user) return;
 
-      // Update welcome message
-      document.getElementById('welcome-message').textContent = `Welcome, ${user.full_name}`;
+      // Update welcome message with proper fallback
+      const displayName = user.full_name || user.email?.split('@')[0] || 'User';
+      document.getElementById('welcome-message').textContent = `Welcome, ${displayName}`;
 
-      // Populate profile info
+      // Determine user status and role
+      const isAdmin = user.is_admin || user.is_super_admin || user.role === 'admin';
+      const verificationStatus = isAdmin ? 'verified' : (user.verification_status || 'pending');
+
+      // Populate profile info with admin indicators
       const profileInfo = document.getElementById('profile-info');
       profileInfo.innerHTML = `
         <div class="info-row">
           <span class="info-label">Full Name:</span>
-          <span class="info-value">${user.full_name}</span>
+          <span class="info-value">${displayName}</span>
         </div>
         <div class="info-row">
           <span class="info-label">Email:</span>
           <span class="info-value">${user.email}</span>
         </div>
+        ${isAdmin ? `
+        <div class="info-row">
+          <span class="info-label">Role:</span>
+          <span class="info-value">
+            <span class="status-badge" style="background: #dc3545; color: white;">Administrator</span>
+            ${user.is_super_admin ? '<span class="status-badge" style="background: #6f42c1; color: white; margin-left: 0.5rem;">Super Admin</span>' : ''}
+          </span>
+        </div>
+        ` : ''}
         <div class="info-row">
           <span class="info-label">Member Since:</span>
-          <span class="info-value">${new Date(user.created_at).toLocaleDateString()}</span>
+          <span class="info-value">${user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</span>
         </div>
         <div class="info-row">
           <span class="info-label">Verification Status:</span>
           <span class="info-value">
-            <span class="status-badge status-${user.verification_status}">${user.verification_status}</span>
+            <span class="status-badge status-${verificationStatus}">${verificationStatus}</span>
           </span>
         </div>
       `;
 
+      // Add admin panel if user is admin
+      if (isAdmin) {
+        const adminPanel = document.createElement('div');
+        adminPanel.className = 'dashboard-card';
+        adminPanel.style.marginTop = '2rem';
+        adminPanel.style.background = 'linear-gradient(135deg, #dc3545, #c82333)';
+        adminPanel.style.color = 'white';
+        adminPanel.innerHTML = `
+          <h2 style="color: white;">Admin Panel</h2>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+            <a href="public/admin.html" class="view-deal-btn" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);">
+              Manage Users
+            </a>
+            <a href="public/admin-deals.html" class="view-deal-btn" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);">
+              Manage Deals
+            </a>
+            <a href="public/admin-verifications.html" class="view-deal-btn" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);">
+              Verifications
+            </a>
+            <a href="public/deals.html" class="view-deal-btn" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);">
+              View Deals
+            </a>
+          </div>
+        `;
+        
+        // Insert admin panel after profile section
+        const dashboardGrid = document.querySelector('.dashboard-grid');
+        dashboardGrid.parentNode.insertBefore(adminPanel, dashboardGrid.nextSibling);
+      }
+
       // Update account status
       const statusEl = document.getElementById('account-status');
-      statusEl.textContent = user.verification_status;
-      statusEl.className = `status-badge status-${user.verification_status}`;
+      statusEl.textContent = verificationStatus;
+      statusEl.className = `status-badge status-${verificationStatus}`;
 
-      // Update pricing access
+      // Update pricing access - admins get automatic access
       const pricingEl = document.getElementById('pricing-access');
-      if (user.verification_status === 'verified') {
-        pricingEl.innerHTML = '<span style="color: #155724; font-weight: 600;">✓ Full Access Granted</span>';
+      const hasPricingAccess = user?.is_admin || user?.verification_status === 'verified';
+      
+      if (hasPricingAccess) {
+        if (user?.is_admin) {
+          pricingEl.innerHTML = '<span style="color: #155724; font-weight: 600;">Admin Access - Full Privileges</span>';
+        } else {
+          pricingEl.innerHTML = '<span style="color: #155724; font-weight: 600;">Full Access Granted</span>';
+        }
       } else if (user.verification_status === 'pending') {
-        pricingEl.innerHTML = '<span style="color: #856404;">⏳ Pending Review</span>';
+        pricingEl.innerHTML = '<span style="color: #856404;">Pending Review</span>';
       } else {
-        pricingEl.innerHTML = '<span style="color: #721c24;">❌ Verification Required</span>';
+        pricingEl.innerHTML = '<span style="color: #721c24;">Verification Required</span>';
       }
 
       // Load uploads
@@ -310,160 +233,6 @@
         console.error('Error loading uploads:', error);
         document.getElementById('upload-list').innerHTML = '<p style="color: #d32f2f;">Error loading uploads</p>';
       }
-    }
-
-    // File upload handling
-    const uploadArea = document.getElementById('upload-area');
-    const fileInput = document.getElementById('file-input');
-
-    // Click to upload
-    uploadArea.addEventListener('click', () => {
-      fileInput.click();
-    });
-
-    // Keyboard accessibility for upload area
-    uploadArea.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        fileInput.click();
-      }
-    });
-
-    // Drag and drop
-    uploadArea.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      uploadArea.classList.add('dragover');
-    });
-
-    uploadArea.addEventListener('dragleave', () => {
-      uploadArea.classList.remove('dragover');
-    });
-
-    uploadArea.addEventListener('drop', (e) => {
-      e.preventDefault();
-      uploadArea.classList.remove('dragover');
-      handleFiles(e.dataTransfer.files);
-    });
-
-    // File input change
-    fileInput.addEventListener('change', (e) => {
-      handleFiles(e.target.files);
-    });
-
-    // Handle file uploads
-    async function handleFiles(files) {
-      const user = window.supabaseClient.currentUser;
-      if (!user) {
-        showError('Please log in to upload files');
-        return;
-      }
-
-      for (const file of files) {
-        try {
-          // Validate file size
-          if (file.size > window.FILE_CONFIG.maxSize) {
-            showError(`File "${file.name}" is too large. Maximum size is 10MB.`);
-            continue;
-          }
-
-          // Validate file type
-          if (!window.FILE_CONFIG.allowedTypes.includes(file.type)) {
-            showError(`File "${file.name}" is not supported. Please upload PDF, PNG, or JPG files.`);
-            continue;
-          }
-
-          // Show uploading state
-          showSuccess(`Uploading "${file.name}"...`);
-
-          // Upload with reCAPTCHA protection
-          const recaptchaToken = await grecaptcha.execute(window.RECAPTCHA_SITE_KEY, {
-            action: 'upload'
-          });
-
-          if (!recaptchaToken) {
-            showError('reCAPTCHA verification failed. Please try again.');
-            continue;
-          }
-
-          // Upload file
-          const upload = await window.supabaseClient.uploadFile(file, user.id);
-
-          // Track file upload
-          gtag('event', 'file_upload', {
-            file_type: file.type,
-            file_size: file.size
-          });
-
-          // Show immediate success feedback
-          showUploadSuccess(file.name, upload);
-          
-          // Refresh the uploads display
-          await loadUploads();
-          
-          // Clear the file input
-          fileInput.value = '';
-          
-          // Show files received confirmation
-          showFilesReceivedMessage();
-
-        } catch (error) {
-          console.error('Upload error:', error);
-          showError(`Error uploading "${file.name}": ${error.message}`);
-        }
-      }
-    }
-
-    // Show upload success with details
-    function showUploadSuccess(fileName, uploadData) {
-      const successDiv = document.createElement('div');
-      successDiv.className = 'upload-success-card';
-      successDiv.innerHTML = `
-        <div class="success-icon">✅</div>
-        <div class="success-content">
-          <h3>Upload Successful!</h3>
-          <p><strong>File:</strong> ${fileName}</p>
-          <p><strong>Status:</strong> Pending Review</p>
-          <p><strong>Uploaded:</strong> ${new Date().toLocaleString()}</p>
-          <small>Our team will review your document within 24-48 hours.</small>
-        </div>
-      `;
-      
-      // Insert after upload section
-      const uploadSection = document.querySelector('.upload-section');
-      uploadSection.parentNode.insertBefore(successDiv, uploadSection.nextSibling);
-      
-      // Auto-remove after 10 seconds
-      setTimeout(() => {
-        if (successDiv.parentNode) {
-          successDiv.remove();
-        }
-      }, 10000);
-    }
-    
-    // Show files received confirmation
-    function showFilesReceivedMessage() {
-      const existingMessage = document.getElementById('files-received-banner');
-      if (existingMessage) {
-        existingMessage.remove();
-      }
-      
-      const banner = document.createElement('div');
-      banner.id = 'files-received-banner';
-      banner.className = 'files-received-banner';
-      banner.innerHTML = `
-        <div class="banner-content">
-          <div class="banner-icon">📄</div>
-          <div class="banner-text">
-            <h3>Files Received ✅</h3>
-            <p>Your documents have been securely uploaded and our admin team has been notified. You'll receive an email update within 24-48 hours.</p>
-          </div>
-          <button class="banner-close" onclick="this.parentElement.parentElement.remove()">×</button>
-        </div>
-      `;
-      
-      // Insert at top of dashboard
-      const dashboard = document.querySelector('.dashboard-container');
-      dashboard.insertBefore(banner, dashboard.firstChild);
     }
 
     // Initialize dashboard

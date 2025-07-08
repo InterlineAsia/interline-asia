@@ -198,8 +198,19 @@
   
   <div class="container">
     <div class="header">
-      <h1>Exclusive Cruise Deals</h1>
-      <p>Discover luxury cruise experiences with insider rates and VIP access</p>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <h1>Exclusive Cruise Deals</h1>
+          <p>Discover luxury cruise experiences with insider rates and VIP access</p>
+        </div>
+        <!-- User info and sign out section -->
+        <div id="user-info-section" style="display: none; align-items: center; gap: 15px;">
+          <span id="user-display-name" style="color: #19273A; font-weight: 500;"></span>
+          <button onclick="handleSignOut()" style="background: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; transition: background 0.3s;" onmouseover="this.style.background='#c82333'" onmouseout="this.style.background='#dc3545'">
+            Sign Out
+          </button>
+        </div>
+      </div>
     </div>
     
     <!-- Filter Section -->
@@ -489,8 +500,50 @@
       }
     }
     
+    // Handle sign out functionality
+    function handleSignOut() {
+      if (window.supabaseClient) {
+        window.supabaseClient.signOut();
+      } else {
+        // Fallback
+        window.location.href = '/login';
+      }
+    }
+    
+    // Update user info section
+    function updateUserInfo() {
+      try {
+        if (window.supabaseClient && window.supabaseClient.isLoggedIn()) {
+          const user = window.supabaseClient.currentUser;
+          const displayName = user?.full_name || user?.email?.split('@')[0] || 'User';
+          const isAdmin = user?.is_admin || user?.is_super_admin || user?.role === 'admin';
+          
+          document.getElementById('user-display-name').textContent = `${displayName}${isAdmin ? ' (Admin)' : ''}`;
+          document.getElementById('user-info-section').style.display = 'flex';
+        } else {
+          document.getElementById('user-info-section').style.display = 'none';
+        }
+      } catch (error) {
+        console.log('User info update skipped:', error.message);
+      }
+    }
+    
     // Load deals when page loads
-    document.addEventListener('DOMContentLoaded', loadDeals);
+    document.addEventListener('DOMContentLoaded', async function() {
+      await loadDeals();
+      
+      // Update user info after a short delay to ensure supabase client is ready
+      setTimeout(async () => {
+        try {
+          if (window.supabaseClient) {
+            await window.supabaseClient.readyPromise;
+            updateUserInfo();
+          }
+        } catch (error) {
+          console.log('User info initialization skipped:', error.message);
+        }
+      }, 500);
+    });
   </script>
 </body>
 </html>

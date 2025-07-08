@@ -35,3 +35,5 @@ Thumbs.db
 .vercel.env
 env.interlineasia.local
 interline-backup-*.zip
+.env.local
+.env.local

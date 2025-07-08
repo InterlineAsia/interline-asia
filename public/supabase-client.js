@@ -83,7 +83,7 @@ class SupabaseClient {
         data: {
           full_name: userData.fullName
         },
-        captchaToken: userData.recaptchaToken // For Turnstile/reCAPTCHA
+        captchaToken: userData.turnstileToken // For Cloudflare Turnstile
       }
     });
     

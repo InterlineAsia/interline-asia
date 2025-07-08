@@ -104,8 +104,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 throw new Error('Security verification failed. Please try submitting again.');
             }
-            // Supabase expects the captcha token under the key 'recaptchaToken'
-            userData.recaptchaToken = turnstileToken;
+            // Supabase expects the captcha token under the key 'turnstileToken'
+            userData.turnstileToken = turnstileToken;
 
             // Ensure the Supabase client is fully initialized before making an auth call
             console.log('Waiting for Supabase client to be ready...');

@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 let uploadSuccess = false;
                 try {
                     console.log('Attempting file upload with user ID:', result.user.id);
-                    const uploadResult = await window.supabaseClient.uploadFile(documentFile, result.user.id, result.session);
+                    const uploadResult = await window.supabaseClient.uploadFile(documentFile, result.user.id);
                     console.log('File uploaded successfully:', uploadResult);
                     uploadSuccess = true;
                     

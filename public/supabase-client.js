@@ -347,6 +347,112 @@ class SupabaseClient {
     
     return usersWithUploads;
   }
+
+  // Cruise deals methods
+  async getAllDeals(filters = {}) {
+    await this.readyPromise;
+    
+    let query = this.supabase
+      .from('deals_dashboard')
+      .select('*');
+    
+    // Apply filters
+    if (filters.cruise_line) {
+      query = query.eq('cruise_line', filters.cruise_line);
+    }
+    
+    if (filters.region) {
+      query = query.eq('region', filters.region);
+    }
+    
+    if (filters.category) {
+      query = query.eq('category', filters.category);
+    }
+    
+    if (filters.month) {
+      query = query.gte('departure_date', `2024-${filters.month}-01`)
+                   .lt('departure_date', `2024-${String(parseInt(filters.month) + 1).padStart(2, '0')}-01`);
+    }
+    
+    if (filters.price_min) {
+      query = query.gte('price', filters.price_min);
+    }
+    
+    if (filters.price_max) {
+      query = query.lte('price', filters.price_max);
+    }
+    
+    if (filters.duration_min) {
+      query = query.gte('duration', filters.duration_min);
+    }
+    
+    if (filters.duration_max) {
+      query = query.lte('duration', filters.duration_max);
+    }
+    
+    if (filters.search) {
+      // Search across multiple fields
+      const searchTerm = `%${filters.search.toLowerCase()}%`;
+      query = query.or(`cruise_name.ilike.${searchTerm},ship_name.ilike.${searchTerm},cruise_line.ilike.${searchTerm},region.ilike.${searchTerm},itinerary.ilike.${searchTerm}`);
+    }
+    
+    // Order by departure date, then price
+    query = query.order('departure_date', { ascending: true, nullsFirst: false })
+                 .order('price', { ascending: true });
+    
+    const { data, error } = await query;
+    
+    if (error) {
+      console.error('Error fetching deals:', error);
+      throw error;
+    }
+    
+    return data || [];
+  }
+
+  async processCsvDeals() {
+    await this.readyPromise;
+    
+    if (!this.isAdmin()) {
+      throw new Error('Admin access required');
+    }
+    
+    try {
+      const response = await fetch('/api/process-csv-deals', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.currentSession?.access_token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      return result;
+      
+    } catch (error) {
+      console.error('Error processing CSV deals:', error);
+      throw error;
+    }
+  }
+
+  async triggerCsvProcessing() {
+    await this.readyPromise;
+    
+    // This method can be called when new CSV files are uploaded
+    // It will automatically process the CSV files and update the deals table
+    try {
+      const result = await this.processCsvDeals();
+      console.log('CSV processing completed:', result);
+      return result;
+    } catch (error) {
+      console.error('CSV processing failed:', error);
+      throw error;
+    }
+  }
 }
 
 // Global instance

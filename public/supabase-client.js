@@ -174,6 +174,90 @@ class SupabaseClient {
     if (dbError) throw dbError;
     return dbData;
   }
+
+  async resetPasswordForEmail(email) {
+    await this.readyPromise;
+    const { data, error } = await this.supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password.html`
+    });
+    if (error) throw error;
+    return data;
+  }
+
+  async updateUserStatus(userId, status, notes = '') {
+    await this.readyPromise;
+    if (!this.isAdmin()) {
+      throw new Error('Admin access required');
+    }
+    
+    const { data, error } = await this.supabase
+      .from('profiles')
+      .update({
+        verification_status: status,
+        admin_notes: notes,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', userId)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
+
+  async updateUploadStatus(uploadId, status, notes = '') {
+    await this.readyPromise;
+    if (!this.isAdmin()) {
+      throw new Error('Admin access required');
+    }
+    
+    const { data, error } = await this.supabase
+      .from('uploads')
+      .update({
+        upload_status: status,
+        admin_notes: notes,
+        reviewed_at: new Date().toISOString()
+      })
+      .eq('id', uploadId)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
+
+  async getFileUrl(filePath) {
+    await this.readyPromise;
+    const { data } = await this.supabase.storage
+      .from('uploads')
+      .createSignedUrl(filePath, 3600); // 1 hour expiry
+    
+    return data?.signedUrl;
+  }
+
+  async getAllUsers() {
+    await this.readyPromise;
+    if (!this.isAdmin()) {
+      throw new Error('Admin access required');
+    }
+    
+    const { data: profiles, error: profilesError } = await this.supabase
+      .from('profiles')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (profilesError) throw profilesError;
+    
+    // Get uploads for each user
+    const usersWithUploads = await Promise.all(
+      profiles.map(async (profile) => {
+        const uploads = await this.getUserUploads(profile.id);
+        return { ...profile, uploads };
+      })
+    );
+    
+    return usersWithUploads;
+  }
 }
 
 // Global instance

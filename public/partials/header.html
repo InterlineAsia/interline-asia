@@ -47,17 +47,19 @@
                 const isAdmin = user?.is_admin || user?.is_super_admin || user?.role === 'admin';
                 
                 authSection.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
                         <a href="/dashboard.html" style="color: #ccc; text-decoration: none; font-size: 14px; transition: color 0.3s;" onmouseover="this.style.color='#FF7F41'" onmouseout="this.style.color='#ccc'">
-                            Dashboard
+                            <i class="ri-dashboard-line" style="margin-right: 4px;"></i>Dashboard
                         </a>
-                        ${isAdmin ? '<a href="/public/deals.html" style="color: #ccc; text-decoration: none; font-size: 14px; transition: color 0.3s;" onmouseover="this.style.color=\'#FF7F41\'" onmouseout="this.style.color=\'#ccc\'">Deals</a>' : ''}
-                        ${isAdmin ? '<a href="/public/admin.html" style="color: #ccc; text-decoration: none; font-size: 14px; transition: color 0.3s;" onmouseover="this.style.color=\'#FF7F41\'" onmouseout="this.style.color=\'#ccc\'">Admin</a>' : ''}
-                        <span style="color: #FF7F41; font-size: 14px; font-weight: 500;">
-                            ${displayName}${isAdmin ? ' (Admin)' : ''}
+                        ${isAdmin ? '<a href="/public/deals.html" style="color: #ccc; text-decoration: none; font-size: 14px; transition: color 0.3s;" onmouseover="this.style.color=\'#FF7F41\'" onmouseout="this.style.color=\'#ccc\'"><i class="ri-ship-line" style="margin-right: 4px;"></i>Deals</a>' : ''}
+                        ${!isAdmin ? '<a href="/public/deals.html" style="color: #ccc; text-decoration: none; font-size: 14px; transition: color 0.3s;" onmouseover="this.style.color=\'#FF7F41\'" onmouseout="this.style.color=\'#ccc\'"><i class="ri-ship-line" style="margin-right: 4px;"></i>Browse Deals</a>' : ''}
+                        ${isAdmin ? '<a href="/public/admin.html" style="color: #ccc; text-decoration: none; font-size: 14px; transition: color 0.3s;" onmouseover="this.style.color=\'#FF7F41\'" onmouseout="this.style.color=\'#ccc\'"><i class="ri-settings-line" style="margin-right: 4px;"></i>Admin</a>' : ''}
+                        <span style="color: #FF7F41; font-size: 14px; font-weight: 500; display: flex; align-items: center;">
+                            <i class="ri-user-line" style="margin-right: 4px;"></i>
+                            ${displayName}${isAdmin ? ' (Admin)' : ' (Member)'}
                         </span>
-                        <button onclick="handleSignOut()" style="background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-size: 12px; cursor: pointer; transition: background 0.3s;" onmouseover="this.style.background='#c82333'" onmouseout="this.style.background='#dc3545'">
-                            Sign Out
+                        <button onclick="handleSignOut()" style="background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center;" onmouseover="this.style.background='#c82333'; this.style.transform='scale(1.05)'" onmouseout="this.style.background='#dc3545'; this.style.transform='scale(1)'">
+                            <i class="ri-logout-box-line" style="margin-right: 4px;"></i>Sign Out
                         </button>
                     </div>
                 `;

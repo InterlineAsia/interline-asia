@@ -123,6 +123,9 @@
         
         <!-- User info and sign out section -->
         <div id="user-info-section" class="hidden lg:flex items-center gap-4 bg-white/80 backdrop-blur-sm rounded-full px-6 py-3 shadow-lg">
+          <a href="/dashboard.html" class="text-slate-600 hover:text-orange-500 text-sm font-medium transition-colors duration-200">
+            <i class="ri-dashboard-line mr-1"></i> Dashboard
+          </a>
           <span id="user-display-name" class="text-slate-700 font-medium"></span>
           <button onclick="handleSignOut()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200">
             <i class="ri-logout-box-line mr-1"></i> Sign Out
@@ -562,7 +565,7 @@
           const displayName = user?.full_name || user?.email?.split('@')[0] || 'User';
           const isAdmin = user?.is_admin || user?.is_super_admin || user?.role === 'admin';
           
-          document.getElementById('user-display-name').textContent = `${displayName}${isAdmin ? ' (Admin)' : ''}`;
+          document.getElementById('user-display-name').textContent = `${displayName}${isAdmin ? ' (Admin)' : ' (Member)'}`;
           document.getElementById('user-info-section').classList.remove('hidden');
           document.getElementById('user-info-section').classList.add('flex');
         } else {

@@ -250,15 +250,13 @@
         await window.supabaseClient.readyPromise;
         
         if (!window.supabaseClient.isLoggedIn()) {
-          window.location.href = '/login';
+          window.location.href = 'login.html'; // Use relative path for consistency
           return;
         }
         
-        const user = window.supabaseClient.currentUser;
-        const isAdmin = user?.is_admin || user?.is_super_admin || user?.role === 'admin';
-        
-        if (!isAdmin) {
-          showError();
+        // Use the centralized isAdmin() method for consistency and reliability
+        if (!window.supabaseClient.isAdmin()) {
+          showError(); // This shows the "Access Denied" message
           return;
         }
         

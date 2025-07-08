@@ -1,645 +1,533 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verification Management - Interline Asia Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="auth.css">
-    <link rel="stylesheet" href="/css/main.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Admin Panel - Manage User Verifications">
+  <title>Pending Verifications - Interline Asia Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="auth.css">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Remix Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+  
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      min-height: 100vh;
+    }
     
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="config.js"></script>
-    <script src="supabase-client.js"></script>
-    <script src="member-gate.js"></script>
+    .admin-card {
+      background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      border: 1px solid rgba(226, 232, 240, 0.5);
+    }
     
-    <style>
-        .verifications-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-        
-        .verifications-header {
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
-            margin-bottom: 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        
-        .stat-card {
-            background: #ffffff;
-            border-radius: 8px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-        
-        .stat-pending { color: #f59e0b; }
-        .stat-approved { color: #10b981; }
-        .stat-rejected { color: #ef4444; }
-        .stat-total { color: #3b82f6; }
-        
-        .stat-label {
-            color: #6b7280;
-            font-size: 0.9rem;
-        }
-        
-        .verifications-table-container {
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-        
-        .table-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid #e5e7eb;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .filter-controls {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-        
-        .filter-select {
-            padding: 0.5rem 1rem;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 0.9rem;
-        }
-        
-        .verifications-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .verifications-table th,
-        .verifications-table td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid #f3f4f6;
-        }
-        
-        .verifications-table th {
-            background: #f9fafb;
-            font-weight: 600;
-            color: #374151;
-        }
-        
-        .verifications-table tr:hover {
-            background: #f9fafb;
-        }
-        
-        .status-badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-        
-        .status-pending {
-            background: #fef3c7;
-            color: #92400e;
-        }
-        
-        .status-approved {
-            background: #d1fae5;
-            color: #065f46;
-        }
-        
-        .status-rejected {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
-        .btn-view {
-            padding: 0.25rem 0.75rem;
-            background: #6b7280;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            cursor: pointer;
-        }
-        
-        .btn-approve {
-            padding: 0.25rem 0.75rem;
-            background: #10b981;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            cursor: pointer;
-        }
-        
-        .btn-reject {
-            padding: 0.25rem 0.75rem;
-            background: #ef4444;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            cursor: pointer;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 3rem;
-            color: #6b7280;
-        }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-        
-        .modal-content {
-            background-color: #fefefe;
-            margin: 5% auto;
-            padding: 2rem;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 600px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        
-        .close {
-            color: #aaa;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        
-        .close:hover {
-            color: #000;
-        }
-        
-        .detail-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .detail-item {
-            padding: 1rem;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-        
-        .detail-label {
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 0.5rem;
-        }
-        
-        .detail-value {
-            color: #6b7280;
-        }
-        
-        .file-preview {
-            margin: 1.5rem 0;
-            padding: 1rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            text-align: center;
-        }
-        
-        .notes-section {
-            margin-top: 1.5rem;
-        }
-        
-        .notes-textarea {
-            width: 100%;
-            min-height: 100px;
-            padding: 0.75rem;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-family: inherit;
-            resize: vertical;
-        }
-        
-        .modal-actions {
-            display: flex;
-            gap: 1rem;
-            justify-content: flex-end;
-            margin-top: 1.5rem;
-            padding-top: 1rem;
-            border-top: 1px solid #e5e7eb;
-        }
-        
-        .btn-modal-approve {
-            padding: 0.75rem 1.5rem;
-            background: #10b981;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        
-        .btn-modal-reject {
-            padding: 0.75rem 1.5rem;
-            background: #ef4444;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        
-        .btn-modal-cancel {
-            padding: 0.75rem 1.5rem;
-            background: #6b7280;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-    </style>
+    .user-card {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .user-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      display: inline-block;
+    }
+    
+    .status-pending {
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #f59e0b;
+    }
+    
+    .status-verified {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #10b981;
+    }
+    
+    .status-rejected {
+      background: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #ef4444;
+    }
+    
+    .loading-shimmer {
+      background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+      background-size: 200% 100%;
+      animation: shimmer 2s infinite;
+    }
+    
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    
+    .document-link {
+      color: #3b82f6;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    
+    .document-link:hover {
+      color: #1d4ed8;
+      text-decoration: underline;
+    }
+  </style>
 </head>
-<body>
-    <div id="header-placeholder"></div>
+<body class="bg-gradient-to-br from-slate-50 to-slate-200 min-h-screen">
+  <div id="header-placeholder"></div>
+  
+  <!-- Main Container -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     
-    <div class="verifications-container">
-        <div class="verifications-header">
-            <div>
-                <h1>Verification Management</h1>
-                <p>Review and manage industry verification applications</p>
-            </div>
-            <div>
-                <button onclick="refreshVerifications()" class="btn btn-secondary">
-                    🔄 Refresh
-                </button>
-                <a href="admin-deals.html" class="btn btn-primary">
-                    📊 Manage Deals
-                </a>
-            </div>
+    <!-- Header Section -->
+    <div class="mb-8">
+      <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-6">
+        <div class="mb-4 lg:mb-0">
+          <h1 class="text-4xl font-bold text-slate-800 mb-2">
+            <i class="ri-shield-check-line mr-3 text-orange-500"></i>Pending Verifications
+          </h1>
+          <p class="text-lg text-slate-600">
+            Review and manage user verification requests
+          </p>
         </div>
         
-        <div class="stats-grid" id="statsGrid">
-            <div class="stat-card">
-                <div class="stat-number stat-pending" id="pendingCount">-</div>
-                <div class="stat-label">Pending Review</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number stat-approved" id="approvedCount">-</div>
-                <div class="stat-label">Approved</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number stat-rejected" id="rejectedCount">-</div>
-                <div class="stat-label">Rejected</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number stat-total" id="totalCount">-</div>
-                <div class="stat-label">Total Applications</div>
-            </div>
+        <!-- Stats Card -->
+        <div class="admin-card p-6">
+          <div class="text-center">
+            <div id="pending-count" class="text-3xl font-bold text-orange-500">-</div>
+            <div class="text-sm text-slate-600">Pending Reviews</div>
+          </div>
         </div>
+      </div>
+      
+      <!-- Navigation -->
+      <div class="flex flex-wrap gap-4 mb-6">
+        <a href="/dashboard.html" class="bg-slate-600 hover:bg-slate-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
+          <i class="ri-dashboard-line mr-2"></i>Dashboard
+        </a>
+        <a href="/public/admin.html" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
+          <i class="ri-settings-line mr-2"></i>Admin Panel
+        </a>
+        <a href="/public/deals.html" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
+          <i class="ri-ship-line mr-2"></i>Deals
+        </a>
+      </div>
+    </div>
+    
+    <!-- Search and Filter -->
+    <div class="admin-card p-6 mb-8">
+      <div class="flex flex-col md:flex-row gap-4">
+        <div class="flex-1">
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Search by name or email..." 
+            class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+          >
+        </div>
+        <div class="flex gap-2">
+          <select id="statusFilter" class="px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors">
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="rejected">Rejected</option>
+          </select>
+          <button onclick="refreshData()" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-medium transition-colors duration-200">
+            <i class="ri-refresh-line mr-2"></i>Refresh
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Loading State -->
+    <div id="loading" class="text-center py-16">
+      <div class="loading-shimmer w-16 h-16 rounded-full mx-auto mb-4"></div>
+      <p class="text-xl text-slate-600 font-medium">Loading pending verifications...</p>
+    </div>
+    
+    <!-- Error State -->
+    <div id="error" class="hidden text-center py-16">
+      <div class="w-24 h-24 mx-auto mb-6 bg-red-100 rounded-full flex items-center justify-center">
+        <i class="ri-error-warning-line text-4xl text-red-500"></i>
+      </div>
+      <h3 class="text-2xl font-bold text-red-600 mb-2">Access Denied</h3>
+      <p class="text-slate-600 mb-6">You don't have permission to access this admin panel.</p>
+      <a href="/dashboard.html" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-medium transition-colors">
+        <i class="ri-arrow-left-line mr-2"></i>Back to Dashboard
+      </a>
+    </div>
+    
+    <!-- Empty State -->
+    <div id="empty" class="hidden text-center py-16">
+      <div class="w-24 h-24 mx-auto mb-6 bg-green-100 rounded-full flex items-center justify-center">
+        <i class="ri-checkbox-circle-line text-4xl text-green-500"></i>
+      </div>
+      <h3 class="text-2xl font-bold text-slate-600 mb-2">All caught up!</h3>
+      <p class="text-slate-500 mb-6">No pending verifications at the moment.</p>
+    </div>
+    
+    <!-- Users Grid -->
+    <div id="users-container" class="hidden">
+      <div id="users-grid" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        <!-- User cards will be populated here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div id="confirmModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
+      <div class="text-center mb-6">
+        <div id="modalIcon" class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center">
+          <i id="modalIconClass" class="text-3xl"></i>
+        </div>
+        <h3 id="modalTitle" class="text-xl font-bold text-slate-800 mb-2"></h3>
+        <p id="modalMessage" class="text-slate-600"></p>
+      </div>
+      
+      <div id="reasonSection" class="hidden mb-6">
+        <label for="reasonInput" class="block text-sm font-semibold text-slate-700 mb-2">
+          Reason (optional):
+        </label>
+        <textarea 
+          id="reasonInput" 
+          rows="3" 
+          class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+          placeholder="Enter reason for rejection..."
+        ></textarea>
+      </div>
+      
+      <div class="flex gap-4">
+        <button onclick="closeModal()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 px-6 py-3 rounded-xl font-medium transition-colors">
+          Cancel
+        </button>
+        <button id="confirmButton" class="flex-1 px-6 py-3 rounded-xl font-medium transition-colors text-white">
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="/js/loadPartials.js" defer></script>
+  <script>
+    let allUsers = [];
+    let filteredUsers = [];
+    let currentAction = null;
+    let currentUserId = null;
+    
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', async function() {
+      // Check authentication and admin access
+      await checkAdminAccess();
+      
+      // Load data
+      await loadPendingVerifications();
+      
+      // Set up event listeners
+      setupEventListeners();
+    });
+    
+    async function checkAdminAccess() {
+      try {
+        await window.supabaseClient.readyPromise;
         
-        <div class="verifications-table-container">
-            <div class="table-header">
-                <h3>All Verification Applications</h3>
-                <div class="filter-controls">
-                    <select id="statusFilter" class="filter-select">
-                        <option value="">All Status</option>
-                        <option value="pending">Pending</option>
-                        <option value="verified">Approved</option>
-                        <option value="rejected">Rejected</option>
-                    </select>
-                    <select id="sortFilter" class="filter-select">
-                        <option value="newest">Newest First</option>
-                        <option value="oldest">Oldest First</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div id="tableContent">
-                <div class="loading">Loading verifications...</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Verification Detail Modal -->
-    <div id="verificationModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Verification Details</h2>
-                <span class="close" onclick="closeModal()">&times;</span>
-            </div>
-            
-            <div id="modalContent">
-                <!-- Content will be populated by JavaScript -->
-            </div>
-        </div>
-    </div>
-
-    <div id="footer-placeholder"></div>
-
-    <script src="/js/loadPartials.js" defer></script>
-    <script>
-        let allVerifications = [];
-        let currentVerification = null;
-
-        // Initialize page
-        window.addEventListener('load', async () => {
-            await initializeMemberGate();
-            await loadVerifications();
-            setupEventListeners();
+        if (!window.supabaseClient.isLoggedIn()) {
+          window.location.href = '/login';
+          return;
+        }
+        
+        const user = window.supabaseClient.currentUser;
+        const isAdmin = user?.is_admin || user?.is_super_admin || user?.role === 'admin';
+        
+        if (!isAdmin) {
+          showError();
+          return;
+        }
+        
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        showError();
+      }
+    }
+    
+    async function loadPendingVerifications() {
+      try {
+        showLoading();
+        
+        const session = window.supabaseClient.currentSession;
+        if (!session) {
+          throw new Error('No session found');
+        }
+        
+        const response = await fetch('/api/admin-verifications', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json'
+          }
         });
-
-        // Load verifications from Supabase
-        async function loadVerifications() {
-            try {
-                const { data: verifications, error } = await supabase
-                    .from('verifications')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-
-                if (error) throw error;
-
-                allVerifications = verifications;
-                updateStats();
-                renderTable();
-                
-            } catch (error) {
-                console.error('Error loading verifications:', error);
-                document.getElementById('tableContent').innerHTML = `
-                    <div class="loading">Error loading verifications: ${error.message}</div>
-                `;
-            }
+        
+        const data = await response.json();
+        
+        if (!data.success) {
+          throw new Error(data.error || 'Failed to load verifications');
         }
-
-        // Update statistics
-        function updateStats() {
-            const pending = allVerifications.filter(v => v.status === 'pending').length;
-            const approved = allVerifications.filter(v => v.status === 'verified').length;
-            const rejected = allVerifications.filter(v => v.status === 'rejected').length;
-            const total = allVerifications.length;
-
-            document.getElementById('pendingCount').textContent = pending;
-            document.getElementById('approvedCount').textContent = approved;
-            document.getElementById('rejectedCount').textContent = rejected;
-            document.getElementById('totalCount').textContent = total;
+        
+        allUsers = data.pendingUsers;
+        filteredUsers = [...allUsers];
+        
+        updatePendingCount(data.count);
+        renderUsers();
+        
+      } catch (error) {
+        console.error('Error loading verifications:', error);
+        showError();
+      }
+    }
+    
+    function setupEventListeners() {
+      // Search functionality
+      document.getElementById('searchInput').addEventListener('input', filterUsers);
+      document.getElementById('statusFilter').addEventListener('change', filterUsers);
+    }
+    
+    function filterUsers() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const statusFilter = document.getElementById('statusFilter').value;
+      
+      filteredUsers = allUsers.filter(user => {
+        const matchesSearch = !searchTerm || 
+          user.full_name.toLowerCase().includes(searchTerm) ||
+          user.email.toLowerCase().includes(searchTerm);
+          
+        const matchesStatus = !statusFilter || user.verification_status === statusFilter;
+        
+        return matchesSearch && matchesStatus;
+      });
+      
+      renderUsers();
+    }
+    
+    function renderUsers() {
+      const container = document.getElementById('users-container');
+      const grid = document.getElementById('users-grid');
+      
+      hideAllStates();
+      
+      if (filteredUsers.length === 0) {
+        document.getElementById('empty').classList.remove('hidden');
+        return;
+      }
+      
+      container.classList.remove('hidden');
+      
+      grid.innerHTML = filteredUsers.map(user => createUserCard(user)).join('');
+    }
+    
+    function createUserCard(user) {
+      const createdDate = new Date(user.created_at).toLocaleDateString();
+      const statusClass = `status-${user.verification_status}`;
+      
+      const documentsHtml = user.uploads.length > 0 ? 
+        user.uploads.map(upload => `
+          <div class="flex items-center justify-between py-2 px-3 bg-slate-50 rounded-lg">
+            <span class="text-sm font-medium text-slate-700">${upload.file_name}</span>
+            <a href="#" onclick="viewDocument('${upload.file_path}')" class="document-link text-xs">
+              <i class="ri-eye-line mr-1"></i>View
+            </a>
+          </div>
+        `).join('') :
+        '<p class="text-sm text-slate-500 italic">No documents uploaded</p>';
+      
+      return `
+        <div class="admin-card user-card p-6">
+          <!-- User Header -->
+          <div class="flex items-start justify-between mb-4">
+            <div class="flex-1">
+              <h3 class="text-lg font-semibold text-slate-800 mb-1">${user.full_name}</h3>
+              <p class="text-sm text-slate-600 mb-2">${user.email}</p>
+              <span class="status-badge ${statusClass}">${user.verification_status}</span>
+            </div>
+            <div class="text-right text-xs text-slate-500">
+              <div>Joined: ${createdDate}</div>
+            </div>
+          </div>
+          
+          <!-- Documents Section -->
+          <div class="mb-4">
+            <h4 class="text-sm font-semibold text-slate-700 mb-2">
+              <i class="ri-file-list-line mr-1"></i>Documents (${user.uploads.length})
+            </h4>
+            <div class="space-y-2">
+              ${documentsHtml}
+            </div>
+          </div>
+          
+          <!-- Notes Section -->
+          ${user.notes ? `
+          <div class="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <h4 class="text-sm font-semibold text-yellow-800 mb-1">Notes:</h4>
+            <p class="text-sm text-yellow-700">${user.notes}</p>
+          </div>
+          ` : ''}
+          
+          <!-- Action Buttons -->
+          <div class="flex gap-2">
+            <button 
+              onclick="showConfirmModal('approve', '${user.id}', '${user.full_name}', '${user.email}')"
+              class="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
+              ${user.verification_status === 'verified' ? 'disabled' : ''}
+            >
+              <i class="ri-check-line mr-1"></i>Approve
+            </button>
+            <button 
+              onclick="showConfirmModal('reject', '${user.id}', '${user.full_name}', '${user.email}')"
+              class="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
+            >
+              <i class="ri-close-line mr-1"></i>Reject
+            </button>
+          </div>
+        </div>
+      `;
+    }
+    
+    function showConfirmModal(action, userId, userName, userEmail) {
+      currentAction = action;
+      currentUserId = userId;
+      
+      const modal = document.getElementById('confirmModal');
+      const modalIcon = document.getElementById('modalIcon');
+      const modalIconClass = document.getElementById('modalIconClass');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalMessage = document.getElementById('modalMessage');
+      const reasonSection = document.getElementById('reasonSection');
+      const confirmButton = document.getElementById('confirmButton');
+      
+      if (action === 'approve') {
+        modalIcon.className = 'w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center';
+        modalIconClass.className = 'ri-check-line text-3xl text-green-500';
+        modalTitle.textContent = 'Approve Verification';
+        modalMessage.textContent = `Approve ${userName} (${userEmail}) for membership?`;
+        reasonSection.classList.add('hidden');
+        confirmButton.className = 'flex-1 bg-green-500 hover:bg-green-600 px-6 py-3 rounded-xl font-medium transition-colors text-white';
+        confirmButton.textContent = 'Approve';
+      } else {
+        modalIcon.className = 'w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center';
+        modalIconClass.className = 'ri-close-line text-3xl text-red-500';
+        modalTitle.textContent = 'Reject Verification';
+        modalMessage.textContent = `Reject ${userName} (${userEmail}) verification?`;
+        reasonSection.classList.remove('hidden');
+        confirmButton.className = 'flex-1 bg-red-500 hover:bg-red-600 px-6 py-3 rounded-xl font-medium transition-colors text-white';
+        confirmButton.textContent = 'Reject';
+      }
+      
+      confirmButton.onclick = () => executeAction();
+      modal.classList.remove('hidden');
+    }
+    
+    function closeModal() {
+      document.getElementById('confirmModal').classList.add('hidden');
+      document.getElementById('reasonInput').value = '';
+      currentAction = null;
+      currentUserId = null;
+    }
+    
+    async function executeAction() {
+      if (!currentAction || !currentUserId) return;
+      
+      const confirmButton = document.getElementById('confirmButton');
+      const originalText = confirmButton.textContent;
+      
+      try {
+        confirmButton.textContent = 'Processing...';
+        confirmButton.disabled = true;
+        
+        const reason = document.getElementById('reasonInput').value.trim();
+        
+        const session = window.supabaseClient.currentSession;
+        const response = await fetch('/api/admin-verifications', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            action: currentAction,
+            userId: currentUserId,
+            reason: reason
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (!data.success) {
+          throw new Error(data.error || 'Action failed');
         }
-
-        // Render verifications table
-        function renderTable() {
-            let filteredVerifications = [...allVerifications];
-            
-            // Apply status filter
-            const statusFilter = document.getElementById('statusFilter').value;
-            if (statusFilter) {
-                filteredVerifications = filteredVerifications.filter(v => v.status === statusFilter);
-            }
-            
-            // Apply sort
-            const sortFilter = document.getElementById('sortFilter').value;
-            if (sortFilter === 'oldest') {
-                filteredVerifications.reverse();
-            }
-
-            const tableHTML = `
-                <table class="verifications-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Employer</th>
-                            <th>Submitted</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${filteredVerifications.map(verification => `
-                            <tr>
-                                <td>${verification.first_name} ${verification.surname}</td>
-                                <td>${verification.email}</td>
-                                <td>${verification.employer}</td>
-                                <td>${new Date(verification.created_at).toLocaleDateString()}</td>
-                                <td>
-                                    <span class="status-badge status-${verification.status}">
-                                        ${verification.status.charAt(0).toUpperCase() + verification.status.slice(1)}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn-view" onclick="viewVerification('${verification.id}')">View</button>
-                                        ${verification.status === 'pending' ? `
-                                            <button class="btn-approve" onclick="updateStatus('${verification.id}', 'verified')">Approve</button>
-                                            <button class="btn-reject" onclick="updateStatus('${verification.id}', 'rejected')">Reject</button>
-                                        ` : ''}
-                                    </div>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-
-            document.getElementById('tableContent').innerHTML = tableHTML;
-        }
-
-        // View verification details
-        function viewVerification(verificationId) {
-            const verification = allVerifications.find(v => v.id === verificationId);
-            if (!verification) return;
-
-            currentVerification = verification;
-            
-            const modalContent = `
-                <div class="detail-grid">
-                    <div class="detail-item">
-                        <div class="detail-label">First Name</div>
-                        <div class="detail-value">${verification.first_name}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Surname</div>
-                        <div class="detail-value">${verification.surname}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Email</div>
-                        <div class="detail-value">${verification.email}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Phone</div>
-                        <div class="detail-value">${verification.phone}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Date of Birth</div>
-                        <div class="detail-value">${new Date(verification.date_of_birth).toLocaleDateString()}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Employer</div>
-                        <div class="detail-value">${verification.employer}</div>
-                    </div>
-                </div>
-                
-                <div class="file-preview">
-                    <div class="detail-label">Uploaded Document</div>
-                    <a href="${verification.file_url}" target="_blank" class="btn btn-secondary">
-                        📄 View Document
-                    </a>
-                </div>
-                
-                <div class="notes-section">
-                    <div class="detail-label">Admin Notes</div>
-                    <textarea id="adminNotes" class="notes-textarea" placeholder="Add notes about this application...">${verification.admin_notes || ''}</textarea>
-                </div>
-                
-                ${verification.status === 'pending' ? `
-                    <div class="modal-actions">
-                        <button class="btn-modal-cancel" onclick="closeModal()">Cancel</button>
-                        <button class="btn-modal-reject" onclick="updateStatusWithNotes('${verification.id}', 'rejected')">Reject</button>
-                        <button class="btn-modal-approve" onclick="updateStatusWithNotes('${verification.id}', 'verified')">Approve</button>
-                    </div>
-                ` : `
-                    <div class="modal-actions">
-                        <button class="btn-modal-cancel" onclick="closeModal()">Close</button>
-                    </div>
-                `}
-            `;
-            
-            document.getElementById('modalContent').innerHTML = modalContent;
-            document.getElementById('verificationModal').style.display = 'block';
-        }
-
-        // Update verification status
-        async function updateStatus(verificationId, newStatus) {
-            if (!confirm(`Are you sure you want to ${newStatus === 'verified' ? 'approve' : 'reject'} this application?`)) {
-                return;
-            }
-            
-            try {
-                const { error } = await supabase
-                    .from('verifications')
-                    .update({ 
-                        status: newStatus,
-                        reviewed_at: new Date().toISOString()
-                    })
-                    .eq('id', verificationId);
-
-                if (error) throw error;
-
-                // Update local data
-                const verification = allVerifications.find(v => v.id === verificationId);
-                if (verification) {
-                    verification.status = newStatus;
-                    verification.reviewed_at = new Date().toISOString();
-                }
-
-                updateStats();
-                renderTable();
-                
-            } catch (error) {
-                console.error('Error updating status:', error);
-                alert('Failed to update verification status');
-            }
-        }
-
-        // Update status with notes from modal
-        async function updateStatusWithNotes(verificationId, newStatus) {
-            const notes = document.getElementById('adminNotes').value.trim();
-            
-            try {
-                const { error } = await supabase
-                    .from('verifications')
-                    .update({ 
-                        status: newStatus,
-                        reviewed_at: new Date().toISOString(),
-                        admin_notes: notes
-                    })
-                    .eq('id', verificationId);
-
-                if (error) throw error;
-
-                // Update local data
-                const verification = allVerifications.find(v => v.id === verificationId);
-                if (verification) {
-                    verification.status = newStatus;
-                    verification.reviewed_at = new Date().toISOString();
-                    verification.admin_notes = notes;
-                }
-
-                closeModal();
-                updateStats();
-                renderTable();
-                
-            } catch (error) {
-                console.error('Error updating status:', error);
-                alert('Failed to update verification status');
-            }
-        }
-
-        // Close modal
-        function closeModal() {
-            document.getElementById('verificationModal').style.display = 'none';
-            currentVerification = null;
-        }
-
-        // Refresh verifications
-        async function refreshVerifications() {
-            document.getElementById('tableContent').innerHTML = '<div class="loading">Refreshing verifications...</div>';
-            await loadVerifications();
-        }
-
-        // Setup event listeners
-        function setupEventListeners() {
-            document.getElementById('statusFilter').addEventListener('change', renderTable);
-            document.getElementById('sortFilter').addEventListener('change', renderTable);
-            
-            // Close modal when clicking outside
-            window.addEventListener('click', function(event) {
-                const modal = document.getElementById('verificationModal');
-                if (event.target === modal) {
-                    closeModal();
-                }
-            });
-        }
-    </script>
+        
+        // Show success message
+        alert(`User ${currentAction}ed successfully! Email notification sent.`);
+        
+        // Refresh data
+        await loadPendingVerifications();
+        
+        closeModal();
+        
+      } catch (error) {
+        console.error('Action failed:', error);
+        alert(`Failed to ${currentAction} user: ${error.message}`);
+      } finally {
+        confirmButton.textContent = originalText;
+        confirmButton.disabled = false;
+      }
+    }
+    
+    function viewDocument(filePath) {
+      // In a real implementation, you'd generate a signed URL for the document
+      alert(`Document viewing not implemented yet. File path: ${filePath}`);
+    }
+    
+    function updatePendingCount(count) {
+      document.getElementById('pending-count').textContent = count;
+    }
+    
+    function showLoading() {
+      hideAllStates();
+      document.getElementById('loading').classList.remove('hidden');
+    }
+    
+    function showError() {
+      hideAllStates();
+      document.getElementById('error').classList.remove('hidden');
+    }
+    
+    function hideAllStates() {
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('error').classList.add('hidden');
+      document.getElementById('empty').classList.add('hidden');
+      document.getElementById('users-container').classList.add('hidden');
+    }
+    
+    async function refreshData() {
+      await loadPendingVerifications();
+    }
+  </script>
 </body>
 </html>

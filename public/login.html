@@ -18,7 +18,7 @@
 
     gtag('config', 'G-FYGT92WCXC');
   </script>
-  <script src="https://www.google.com/recaptcha/api.js?render=6Ld43XUrAAAAAATguv7FHX2tHDTsnnpdBFQoXNKT"></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="supabase-client.js"></script>
@@ -48,7 +48,11 @@
         </div>
 
 
-        <button type="submit" class="btn btn-primary">Sign In</button>
+        <!-- Cloudflare Turnstile -->
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAABkLNMf0cRO37SRL" data-callback="onTurnstileSuccess" style="margin: 1rem 0;"></div>
+        <input type="hidden" id="cf-turnstile-response" name="cf-turnstile-response" />
+
+        <button type="submit" class="btn btn-primary" id="login-btn" disabled>Sign In</button>
       </form>
 
       <div class="auth-links">
@@ -83,13 +87,11 @@
           throw new Error('Please enter both email and password');
         }
         
-        // reCAPTCHA v3 validation
-        const recaptchaToken = await grecaptcha.execute(window.RECAPTCHA_SITE_KEY, {
-          action: 'login'
-        });
+        // Cloudflare Turnstile validation
+        const turnstileToken = document.getElementById('cf-turnstile-response').value;
         
-        if (!recaptchaToken) {
-          throw new Error('reCAPTCHA verification failed. Please try again.');
+        if (!turnstileToken) {
+          throw new Error('Security verification failed. Please complete the verification and try again.');
         }
         
         // Sign in with Supabase
@@ -189,12 +191,15 @@
       alert('Password reset functionality will be available soon. Please contact admin@interlineasia.com for assistance.');
     }
 
-    // Initialize reCAPTCHA v3
-    window.addEventListener('load', () => {
-      grecaptcha.ready(() => {
-        console.log('reCAPTCHA v3 ready');
-      });
-    });
+    // Cloudflare Turnstile callback
+    function onTurnstileSuccess(token) {
+      const hiddenInput = document.getElementById('cf-turnstile-response');
+      if (hiddenInput) {
+        hiddenInput.value = token;
+        document.getElementById('login-btn').disabled = false;
+        console.log('Turnstile verification successful');
+      }
+    }
   </script>
 </body>
 </html><--disable-extensions Vercel redeploy trigger -->

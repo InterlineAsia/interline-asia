@@ -4,7 +4,7 @@
 class MemberGate {
   constructor() {
     this.currentUser = null;
-    this.userDocuments = null;
+    this.userProfile = null; // Will hold profile data like verification_status
     this.isLoggedIn = false;
     this.init();
   }
@@ -26,33 +26,16 @@ class MemberGate {
         if (user) {
           this.currentUser = user;
           this.isLoggedIn = true;
-          
-          // Check document upload status
-          await this.checkDocumentStatus();
+
+          // Fetch user profile to get verification status
+          if (window.supabaseClient && window.supabaseClient.getProfile) {
+            this.userProfile = await window.supabaseClient.getProfile();
+          }
         }
       }
     } catch (error) {
       console.error('Auth check failed:', error);
       this.isLoggedIn = false;
-    }
-  }
-
-  async checkDocumentStatus() {
-    try {
-      if (window.supabaseClient) {
-        const uploads = await window.supabaseClient.getUserUploads();
-        this.userDocuments = {
-          hasPassport: uploads.some(upload => upload.fileName.toLowerCase().includes('passport')),
-          hasEmployment: uploads.some(upload => 
-            upload.fileName.toLowerCase().includes('employment') || 
-            upload.fileName.toLowerCase().includes('proof') ||
-            upload.fileName.toLowerCase().includes('retirement')
-          )
-        };
-      }
-    } catch (error) {
-      console.error('Document check failed:', error);
-      this.userDocuments = { hasPassport: false, hasEmployment: false };
     }
   }
 
@@ -90,29 +73,21 @@ class MemberGate {
           e.preventDefault();
           this.redirectToLogin();
         };
-      } else if (!this.hasRequiredDocuments()) {
-        button.textContent = '📄 Upload Documents to Book';
+      } else if (!this.isVerified()) {
+        button.textContent = '⏳ Verification Pending';
+        button.disabled = true; // Disable the button
+        button.style.cursor = 'not-allowed';
         button.onclick = (e) => {
           e.preventDefault();
-          this.showDocumentReminder();
+          alert('Your account is pending verification. You will be notified via email once you have full booking access.');
         };
       }
     });
   }
 
-  hasRequiredDocuments() {
-    if (!this.userDocuments) return false;
-    return this.userDocuments.hasPassport && this.userDocuments.hasEmployment;
-  }
-
-  showAccessMessages() {
-    // Add access status banner
-    this.addAccessBanner();
-    
-    // Show document reminder if needed
-    if (this.isLoggedIn && !this.hasRequiredDocuments()) {
-      this.addDocumentReminder();
-    }
+  isVerified() {
+    // Check for admin-approved status instead of document presence
+    return this.userProfile && this.userProfile.verification_status === 'verified';
   }
 
   addAccessBanner() {
@@ -137,16 +112,16 @@ class MemberGate {
           </button>
         </div>
       `;
-    } else if (!this.hasRequiredDocuments()) {
+    } else if (!this.isVerified()) {
       banner.innerHTML = `
         <div class="banner-content verification-banner">
-          <div class="banner-icon">📄</div>
+          <div class="banner-icon">⏳</div>
           <div class="banner-text">
-            <h3>Document Verification Pending</h3>
-            <p>Upload your industry credentials to unlock full booking access</p>
+            <h3>Account Verification Pending</h3>
+            <p>Our team is reviewing your credentials. You'll be notified once you have full booking access.</p>
           </div>
           <button class="banner-btn" onclick="memberGate.redirectToDashboard()">
-            Upload Documents
+            My Dashboard
           </button>
         </div>
       `;
@@ -169,42 +144,6 @@ class MemberGate {
     const container = document.querySelector('.container') || document.body;
     const firstChild = container.firstElementChild;
     container.insertBefore(banner, firstChild);
-  }
-
-  addDocumentReminder() {
-    const reminder = document.createElement('div');
-    reminder.className = 'document-reminder';
-    reminder.innerHTML = `
-      <div class="reminder-content">
-        <h4>📋 Complete Your Verification</h4>
-        <div class="document-checklist">
-          <div class="checklist-item ${this.userDocuments?.hasPassport ? 'completed' : 'pending'}">
-            <span class="check-icon">${this.userDocuments?.hasPassport ? '✅' : '⏳'}</span>
-            <span>Passport Copy</span>
-          </div>
-          <div class="checklist-item ${this.userDocuments?.hasEmployment ? 'completed' : 'pending'}">
-            <span class="check-icon">${this.userDocuments?.hasEmployment ? '✅' : '⏳'}</span>
-            <span>Employment/Retirement Proof</span>
-          </div>
-        </div>
-        <button class="reminder-btn" onclick="memberGate.redirectToDashboard()">
-          Complete Verification
-        </button>
-      </div>
-    `;
-
-    // Insert after access banner
-    const accessBanner = document.getElementById('access-banner');
-    if (accessBanner) {
-      accessBanner.parentNode.insertBefore(reminder, accessBanner.nextSibling);
-    }
-  }
-
-  showDocumentReminder() {
-    // Show modal or redirect to dashboard
-    if (confirm('You need to upload industry credentials to book cruises. Go to dashboard now?')) {
-      this.redirectToDashboard();
-    }
   }
 
   redirectToLogin() {

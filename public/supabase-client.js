@@ -48,27 +48,48 @@ class SupabaseClient {
     const { data: { session } } = await this.supabase.auth.getSession();
     if (session) {
       this.currentSession = session;
-      const { data: profile } = await this.supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', session.user.id)
-        .single();
-      this.currentUser = { ...session.user, ...profile };
+      await this._setCurrentUserWithMetadata(session.user);
     }
     this.authReady = true;
 
     this.supabase.auth.onAuthStateChange(async (_event, session) => {
       this.currentSession = session;
       if (session) {
-        const { data: profile } = await this.supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-        this.currentUser = { ...session.user, ...profile };
+        await this._setCurrentUserWithMetadata(session.user);
       } else {
         this.currentUser = null;
       }
+    });
+  }
+
+  async _setCurrentUserWithMetadata(authUser) {
+    // Get profile from database
+    const { data: profile } = await this.supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', authUser.id)
+      .single();
+    
+    // Merge auth user data with profile data and extract metadata
+    this.currentUser = {
+      ...authUser,
+      ...profile,
+      // Extract metadata for easier access
+      full_name: authUser.user_metadata?.full_name || profile?.full_name || authUser.email?.split('@')[0],
+      role: authUser.app_metadata?.role || authUser.user_metadata?.role || profile?.role || 'user',
+      is_super_admin: authUser.app_metadata?.is_super_admin || authUser.user_metadata?.is_super_admin || false,
+      is_admin: authUser.app_metadata?.role === 'admin' || authUser.user_metadata?.role === 'admin' || profile?.is_admin || false,
+      verification_status: profile?.verification_status || 'pending'
+    };
+    
+    console.log('User set with metadata:', {
+      id: this.currentUser.id,
+      email: this.currentUser.email,
+      full_name: this.currentUser.full_name,
+      role: this.currentUser.role,
+      is_admin: this.currentUser.is_admin,
+      is_super_admin: this.currentUser.is_super_admin,
+      verification_status: this.currentUser.verification_status
     });
   }
 
@@ -147,19 +168,8 @@ class SupabaseClient {
     }
     
     if (data.user) {
-      // Get user profile from database
-      const { data: profile, error: profileError } = await this.supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', data.user.id)
-        .single();
-      
-      if (profileError) {
-        console.warn('Profile fetch error (user may not have profile yet):', profileError);
-      }
-      
-      this.currentUser = { ...data.user, ...profile };
       this.currentSession = data.session;
+      await this._setCurrentUserWithMetadata(data.user);
       console.log('Login successful, user set:', this.currentUser);
     }
     
@@ -177,7 +187,9 @@ class SupabaseClient {
   }
 
   isAdmin() {
-    return this.currentUser?.is_admin === true;
+    return this.currentUser?.is_admin === true || 
+           this.currentUser?.is_super_admin === true || 
+           this.currentUser?.role === 'admin';
   }
 
   requireAuth() {

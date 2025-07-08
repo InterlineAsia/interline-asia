@@ -117,6 +117,9 @@
         console.error('Login error:', error);
         let errorMessage = 'Invalid email or password. Please check your credentials and try again.'; // Default message
 
+        // Log the full error for debugging
+        console.error('Full Supabase auth error:', error);
+        
         // Check for specific Supabase auth errors
         if (error.message.includes('Email not confirmed') || error.message.includes('email_not_confirmed')) {
           const email = document.getElementById('email').value;
@@ -126,8 +129,13 @@
           showError(errorMessage);
         } else if (error.message.includes('Too many requests')) {
           showError('Too many login attempts. Please wait a moment and try again.');
+        } else if (error.message.includes('Email link is invalid or has expired')) {
+          showError('Your email verification link has expired. Please request a new one.');
+        } else if (error.message.includes('User not found')) {
+          showError('No account found with this email address. Please check your email or sign up for a new account.');
         } else {
-          showError(errorMessage);
+          // Show the actual error message for debugging
+          showError(`Login failed: ${error.message}`);
         }
       } finally {
         submitButton.textContent = originalText;

@@ -216,11 +216,13 @@ class SupabaseClient {
     return data;
   }
 
-  async uploadFile(file, userId) {
+  async uploadFile(file, userId, session = null) {
     await this.readyPromise;
     
+    const activeSession = session || this.currentSession;
+
     // Verify user is authenticated
-    if (!this.currentSession) {
+    if (!activeSession) {
       throw new Error('User must be authenticated to upload files');
     }
     
@@ -233,7 +235,7 @@ class SupabaseClient {
     }
     
     console.log('Starting file upload for user:', userId, 'file:', file.name);
-    console.log('Current session:', !!this.currentSession);
+    console.log('Using session for upload:', !!activeSession);
     console.log('File details:', { name: file.name, size: file.size, type: file.type });
     
     // Use proper file path format

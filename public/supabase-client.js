@@ -216,97 +216,64 @@ class SupabaseClient {
     return data;
   }
 
-  async uploadFile(file, userId, session = null) {
+  async uploadFile(file, userId) {
     await this.readyPromise;
     
-    const activeSession = session || this.currentSession;
-
     // Verify user is authenticated
-    if (!activeSession) {
+    if (!this.currentSession) {
       throw new Error('User must be authenticated to upload files');
     }
     
     if (!userId) {
       userId = this.currentUser?.id;
     }
-    
     if (!userId) {
       throw new Error('User ID is required for upload');
     }
     
     console.log('Starting file upload for user:', userId, 'file:', file.name);
-    console.log('Using session for upload:', !!activeSession);
-    console.log('File details:', { name: file.name, size: file.size, type: file.type });
-    
-    // Use proper file path format
-    const fileName = `user-uploads/${userId}/${Date.now()}-${file.name}`;
     
     try {
-      // First, check if the bucket exists and is accessible
-      console.log('Checking bucket access...');
-      const { data: buckets, error: bucketError } = await this.supabase.storage.listBuckets();
-      console.log('Available buckets:', buckets?.map(b => b.name));
-      
-      if (bucketError) {
-        console.warn('Could not list buckets:', bucketError);
-      }
-      
-      // Try to upload to the verification-uploads bucket
-      console.log('Attempting upload to verification-uploads bucket...');
-      const { data, error } = await this.supabase.storage
-        .from('verification-uploads')
-        .upload(fileName, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
-
-      if (error) {
-        console.error('Supabase storage upload error:', error);
-        console.error('Error details:', JSON.stringify(error, null, 2));
-        
-        // If bucket doesn't exist, try to create it
-        if (error.message?.includes('Bucket not found') || error.message?.includes('bucket does not exist')) {
-          console.log('Bucket not found, attempting to create...');
-          const { error: createError } = await this.supabase.storage.createBucket('verification-uploads', {
-            public: false,
-            allowedMimeTypes: ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf'],
-            fileSizeLimit: 10485760 // 10MB
-          });
-          
-          if (createError) {
-            console.error('Failed to create bucket:', createError);
-            throw new Error(`Storage bucket not available: ${createError.message}`);
-          }
-          
-          // Retry upload after creating bucket
-          console.log('Retrying upload after bucket creation...');
-          const { data: retryData, error: retryError } = await this.supabase.storage
-            .from('verification-uploads')
-            .upload(fileName, file, {
-              cacheControl: '3600',
-              upsert: false
-            });
-            
-          if (retryError) {
-            throw new Error(`Upload failed after bucket creation: ${retryError.message}`);
-          }
-          
-          data = retryData;
-        } else {
-          throw new Error(`Upload failed: ${error.message}`);
+      // Step 1: Get a secure, one-time upload URL from our Edge Function.
+      // This is the modern, secure way to handle user uploads.
+      console.log('Requesting signed URL for upload...');
+      const { data: signedUrlData, error: signedUrlError } = await this.supabase.functions.invoke(
+        'generate-signed-upload-url',
+        {
+          body: { fileName: file.name },
         }
+      );
+
+      if (signedUrlError) {
+        throw new Error(`Could not get signed URL: ${signedUrlError.message}`);
       }
       
-      console.log('File uploaded successfully to storage:', data?.path);
+      const { signedURL, token, filePath } = signedUrlData;
+      if (!signedURL) {
+          throw new Error('Failed to retrieve a signed upload URL from the server.');
+      }
 
-      // Create database record
-      console.log('Creating database record...');
+      // Step 2: Upload the file directly to Supabase Storage using the signed URL.
+      // This bypasses the need for the client to have broad storage permissions.
+      console.log('Uploading file to storage via signed URL...');
+      const { error: uploadError } = await this.supabase.storage
+        .from('verification-uploads')
+        .uploadToSignedUrl(filePath, token, file);
+
+      if (uploadError) {
+        throw new Error(`Storage upload failed: ${uploadError.message}`);
+      }
+
+      console.log('File uploaded successfully to storage:', filePath);
+
+      // Step 3: Create the database record for the upload.
+      console.log('Creating database record for the upload...');
       const { data: dbData, error: dbError } = await this.supabase
         .from('uploads')
         .insert({
           user_id: userId,
           file_name: file.name,
-          file_path: data.path,
+          file_path: filePath, // Use the secure path returned from the function
           file_type: file.type,
           file_size: file.size,
           upload_status: 'pending',
@@ -319,8 +286,8 @@ class SupabaseClient {
         console.error('Database insert error:', dbError);
         console.error('Database error details:', JSON.stringify(dbError, null, 2));
         
-        // Even if DB insert fails, the file was uploaded successfully
-        console.warn('File uploaded but database record creation failed. File path:', data.path);
+        // If DB insert fails, the file is an "orphan" but was uploaded.
+        console.warn('File uploaded but database record creation failed. File path:', filePath);
         throw new Error(`File uploaded but database error: ${dbError.message}`);
       }
       

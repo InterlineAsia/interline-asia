@@ -1,10 +1,8 @@
 // utils/admin-utils.ts
 
 // Assumes a shared Supabase admin client is exported from './supabase.ts'
-// For example:
-// import { createClient } from '@supabase/supabase-js';
-// export const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
 import { supabase } from './supabase';
+import SafeSentry from '../sentry.server';
 
 /**
  * Updates a user's verification status to 'verified'.
@@ -22,6 +20,7 @@ export async function promoteUserToVerified(userId: string) {
 
   if (error) {
     console.error(`Error promoting user ${userId} to verified:`, error);
+    SafeSentry.captureException(error);
     throw new Error(`Could not promote user: ${error.message}`);
   }
   return data;
@@ -43,6 +42,7 @@ export async function demoteUserToGuest(userId: string) {
 
   if (error) {
     console.error(`Error demoting user ${userId} to guest/pending:`, error);
+    SafeSentry.captureException(error);
     throw new Error(`Could not demote user: ${error.message}`);
   }
   return data;
@@ -66,6 +66,7 @@ export async function getUserRole(userId: string): Promise<string> {
       return 'user';
     }
     console.error(`Error fetching role for user ${userId}:`, error);
+    SafeSentry.captureException(error);
     throw new Error('Could not fetch user role.');
   }
 

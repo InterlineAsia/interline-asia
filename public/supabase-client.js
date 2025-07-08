@@ -74,6 +74,8 @@ class SupabaseClient {
 
   async signUp(userData) {
     await this.readyPromise;
+    console.log('Attempting signup for:', userData.email);
+    
     const { data, error } = await this.supabase.auth.signUp({
       email: userData.email,
       password: userData.password,
@@ -84,7 +86,37 @@ class SupabaseClient {
         captchaToken: userData.recaptchaToken // For Turnstile/reCAPTCHA
       }
     });
-    if (error) throw error;
+    
+    console.log('Supabase signup response:', { data, error });
+    
+    if (error) {
+      console.error('Supabase signup error details:', error);
+      throw error;
+    }
+    
+    // If signup successful, create profile record
+    if (data.user && !error) {
+      try {
+        const { error: profileError } = await this.supabase
+          .from('profiles')
+          .insert({
+            id: data.user.id,
+            full_name: userData.fullName,
+            email: userData.email,
+            verification_status: 'pending',
+            created_at: new Date().toISOString()
+          });
+        
+        if (profileError) {
+          console.warn('Profile creation error (may already exist):', profileError);
+        } else {
+          console.log('Profile created successfully');
+        }
+      } catch (profileErr) {
+        console.warn('Profile creation failed:', profileErr);
+      }
+    }
+    
     return data;
   }
 
@@ -100,12 +132,37 @@ class SupabaseClient {
 
   async signIn(email, password) {
     await this.readyPromise;
+    console.log('Attempting login for:', email);
+    
     const { data, error } = await this.supabase.auth.signInWithPassword({
       email,
       password,
     });
-    if (error) throw error;
-    this.currentUser = { ...data.user, ...data.profile };
+    
+    console.log('Supabase auth response:', { data, error });
+    
+    if (error) {
+      console.error('Supabase auth error details:', error);
+      throw error;
+    }
+    
+    if (data.user) {
+      // Get user profile from database
+      const { data: profile, error: profileError } = await this.supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', data.user.id)
+        .single();
+      
+      if (profileError) {
+        console.warn('Profile fetch error (user may not have profile yet):', profileError);
+      }
+      
+      this.currentUser = { ...data.user, ...profile };
+      this.currentSession = data.session;
+      console.log('Login successful, user set:', this.currentUser);
+    }
+    
     return data;
   }
 

@@ -114,8 +114,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // --- Supabase Signup ---
             console.log('Creating account with Supabase...');
             const result = await window.supabaseClient.signUp(userData);
+            console.log('Supabase signup result:', result); // For debugging
 
-            if (result.user) {
+            if (result && result.user) {
                 // --- File Upload ---
                 console.log('Uploading verification document...');
                 try {
@@ -127,18 +128,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 // --- Success Feedback ---
-                showSuccess('Account created successfully! Please check your email to verify your account, then log in.');
+                if (result.user.identities && result.user.identities.length === 0) {
+                    showError('Account created, but requires manual verification. Please contact support.');
+                } else {
+                    showSuccess('Account created successfully! Please check your email to verify your account, then log in.');
+                }
+
                 this.reset();
                 submitButton.disabled = true; // Keep disabled after success
 
                 setTimeout(() => {
                     window.location.href = 'login.html?registered=true';
                 }, 4000);
+            } else {
+                // This case handles a successful API call that didn't return a user object.
+                console.error('Signup succeeded but no user object was returned.', result);
+                throw new Error('An unexpected error occurred during signup. Please try again.');
             }
 
         } catch (error) {
             console.error('Signup error:', error);
-            showError(error.message || 'An unknown error occurred during signup.');
+            let errorMessage = error.message || 'An unknown error occurred during signup.';
+            if (error.message.includes('User already registered')) {
+                errorMessage = 'This email address is already registered. Please <a href="login.html">sign in</a> or use a different email.';
+                showError(errorMessage, 'error-message', true);
+            } else if (error.message.includes('rate limit')) {
+                errorMessage = 'You are trying to sign up too frequently. Please wait a moment and try again.';
+                showError(errorMessage);
+            } else {
+                showError(errorMessage);
+            }
             // Re-enable the button on error
             validateFile();
         } finally {

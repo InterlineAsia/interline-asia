@@ -20,12 +20,12 @@ document.addEventListener('DOMContentLoaded', function() {
         let errorMessage = '';
 
         if (file) {
-            const maxSize = 5 * 1024 * 1024; // 5MB
-            const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
+            const maxSize = window.FILE_CONFIG?.maxSize || 5 * 1024 * 1024; // 5MB fallback
+            const allowedTypes = window.FILE_CONFIG?.allowedTypes || ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
 
             if (file.size > maxSize) {
-                errorMessage = 'File size must be less than 5MB.';
-            } else if (!allowedTypes.includes(file.type)) {
+                errorMessage = `File size must be less than ${maxSize / 1024 / 1024}MB.`;
+            } else if (!allowedTypes.includes(file.type.toLowerCase())) {
                 errorMessage = 'File must be a PDF, PNG, or JPG.';
             } else {
                 isValid = true;

@@ -88,6 +88,16 @@ class SupabaseClient {
     return data;
   }
 
+  async resendConfirmationEmail(email) {
+    await this.readyPromise;
+    const { data, error } = await this.supabase.auth.resend({
+      type: 'signup',
+      email: email,
+    });
+    if (error) throw error;
+    return data;
+  }
+
   async signIn(email, password) {
     await this.readyPromise;
     const { data, error } = await this.supabase.auth.signInWithPassword({
@@ -170,10 +180,14 @@ class SupabaseClient {
 window.supabaseClient = new SupabaseClient();
 
 // Global utility functions for user feedback
-function showError(message, elementId = 'error-message') {
+function showError(message, elementId = 'error-message', allowHtml = false) {
   const errorEl = document.getElementById(elementId);
   if (errorEl) {
-    errorEl.textContent = message;
+    if (allowHtml) {
+      errorEl.innerHTML = message;
+    } else {
+      errorEl.textContent = message;
+    }
     errorEl.style.display = 'block';
   }
 }

@@ -7,5 +7,15 @@
     "@supabase/supabase-js": "^2.50.3",
     "dotenv": "^17.1.0",
     "sib-api-v3-sdk": "^8.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.10",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.7.0",
+    "typescript": "^5.8.3"
+  },
+  "scripts": {
+    "setup-triggers": "tsx scripts/setup-db-triggers.ts",
+    "setup-triggers-node": "node --loader ts-node/esm scripts/setup-db-triggers.ts"
   }
 }

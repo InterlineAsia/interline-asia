@@ -70,15 +70,28 @@ class SupabaseClient {
       .eq('id', authUser.id)
       .single();
     
+    // --- Define Super Admins by email for security ---
+    // This is a secure way to grant top-level access without relying on database fields that could be misconfigured.
+    const SUPER_ADMIN_EMAILS = [
+      'rodney@telenational.com.au',
+      'admin@interlineasia.com' // Generic admin email
+    ];
+
+    const isSuperAdminByEmail = SUPER_ADMIN_EMAILS.includes(authUser.email.toLowerCase());
+
+    // Determine role from various sources, with a clear hierarchy.
+    const roleFromSources = authUser.app_metadata?.role || authUser.user_metadata?.role || profile?.role || 'user';
+    const finalRole = isSuperAdminByEmail ? 'super_admin' : roleFromSources;
+
     // Merge auth user data with profile data and extract metadata
     this.currentUser = {
       ...authUser,
       ...profile,
       // Extract metadata for easier access
       full_name: authUser.user_metadata?.full_name || profile?.full_name || authUser.email?.split('@')[0],
-      role: authUser.app_metadata?.role || authUser.user_metadata?.role || profile?.role || 'user',
-      is_super_admin: authUser.app_metadata?.is_super_admin || authUser.user_metadata?.is_super_admin || false,
-      is_admin: authUser.app_metadata?.role === 'admin' || authUser.user_metadata?.role === 'admin' || profile?.is_admin || false,
+      role: finalRole,
+      is_super_admin: finalRole === 'super_admin',
+      is_admin: finalRole === 'admin' || finalRole === 'super_admin' || profile?.is_admin === true,
       verification_status: profile?.verification_status || 'pending'
     };
     
@@ -187,9 +200,9 @@ class SupabaseClient {
   }
 
   isAdmin() {
-    return this.currentUser?.is_admin === true || 
-           this.currentUser?.is_super_admin === true || 
-           this.currentUser?.role === 'admin';
+    // A user is considered an admin if the is_admin flag is true.
+    // This flag is now set reliably in _setCurrentUserWithMetadata.
+    return this.currentUser?.is_admin === true;
   }
 
   requireAuth() {

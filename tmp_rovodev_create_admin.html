@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Admin User - Interline Asia</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 2rem;
+      background-color: #f5f5f5;
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    h1 {
+      color: #0C1E36;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    
+    .btn {
+      background-color: #FF7F41;
+      color: white;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      width: 100%;
+      margin: 1rem 0;
+    }
+    
+    .btn:hover {
+      background-color: #e66a2e;
+    }
+    
+    .btn:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    
+    .status {
+      padding: 1rem;
+      border-radius: 6px;
+      margin: 1rem 0;
+    }
+    
+    .status.success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .status.error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    
+    .status.info {
+      background-color: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 2rem;
+    }
+  </style>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>🔑 Create Admin User</h1>
+    
+    <div id="status"></div>
+    
+    <button class="btn" onclick="createAdminUser()" id="create-btn">
+      Create Rodney Pattison as Admin
+    </button>
+    
+    <div style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 6px;">
+      <h3>Admin User Details:</h3>
+      <p><strong>Email:</strong> rodney@telenational.com.au</p>
+      <p><strong>Role:</strong> admin</p>
+      <p><strong>Super Admin:</strong> true</p>
+      <p><strong>Email Confirmed:</strong> true</p>
+    </div>
+  </div>
+
+  <script>
+    // Initialize Supabase with service role key
+    const supabaseUrl = 'https://nxreyxbuwxjfmvdkji.supabase.co';
+    const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im54cmV5eXhidXd4amZtdHZka2ppIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MTQ1ODg0NCwiZXhwIjoyMDY3MDM0ODQ0fQ.w9RToxvdgkLc1vD23tNu7_mosR6Q7_zScMV6grKCT-o';
+    
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    });
+    
+    async function createAdminUser() {
+      const statusDiv = document.getElementById('status');
+      const createBtn = document.getElementById('create-btn');
+      
+      try {
+        createBtn.disabled = true;
+        createBtn.textContent = 'Creating Admin User...';
+        
+        statusDiv.innerHTML = '<div class="status info">🔍 Checking for existing user...</div>';
+        
+        const adminEmail = 'rodney@telenational.com.au';
+        const adminPassword = 'InterlineAdmin2024!'; // Temporary password
+        
+        // Check if user already exists
+        const { data: existingUsers, error: searchError } = await supabase.auth.admin.listUsers();
+        
+        if (searchError) {
+          throw new Error(`Failed to search users: ${searchError.message}`);
+        }
+        
+        const existingUser = existingUsers.users.find(user => user.email === adminEmail);
+        
+        let userId;
+        let userCreated = false;
+        
+        if (existingUser) {
+          statusDiv.innerHTML = '<div class="status info">✅ User exists, updating to admin...</div>';
+          userId = existingUser.id;
+          
+          // Update existing user
+          const { data: updatedUser, error: updateError } = await supabase.auth.admin.updateUserById(
+            userId,
+            {
+              email_confirm: true,
+              user_metadata: {
+                role: 'admin',
+                is_super_admin: true,
+                full_name: 'Rodney Pattison'
+              },
+              app_metadata: {
+                role: 'admin',
+                is_super_admin: true
+              }
+            }
+          );
+          
+          if (updateError) {
+            throw new Error(`Failed to update user: ${updateError.message}`);
+          }
+          
+        } else {
+          statusDiv.innerHTML = '<div class="status info">🆕 Creating new admin user...</div>';
+          
+          // Create new user
+          const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
+            email: adminEmail,
+            password: adminPassword,
+            email_confirm: true,
+            user_metadata: {
+              role: 'admin',
+              is_super_admin: true,
+              full_name: 'Rodney Pattison'
+            },
+            app_metadata: {
+              role: 'admin',
+              is_super_admin: true
+            }
+          });
+          
+          if (createError) {
+            throw new Error(`Failed to create user: ${createError.message}`);
+          }
+          
+          userId = newUser.user.id;
+          userCreated = true;
+        }
+        
+        // Create/update profile
+        statusDiv.innerHTML = '<div class="status info">📝 Creating/updating profile...</div>';
+        
+        const profileData = {
+          id: userId,
+          email: adminEmail,
+          full_name: 'Rodney Pattison',
+          role: 'admin',
+          is_super_admin: true,
+          verification_status: 'approved',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .upsert(profileData, { 
+            onConflict: 'id',
+            ignoreDuplicates: false 
+          })
+          .select()
+          .single();
+        
+        if (profileError) {
+          console.warn('Profile creation failed:', profileError);
+        }
+        
+        // Verify user
+        const { data: verifyUser, error: verifyError } = await supabase.auth.admin.getUserById(userId);
+        
+        if (verifyError) {
+          throw new Error(`User verification failed: ${verifyError.message}`);
+        }
+        
+        // Success!
+        let successMessage = `
+          <div class="status success">
+            <h3>🎉 Admin User ${userCreated ? 'Created' : 'Updated'} Successfully!</h3>
+            <p><strong>Email:</strong> ${adminEmail}</p>
+            <p><strong>User ID:</strong> ${userId}</p>
+            <p><strong>Email Confirmed:</strong> ✅ Yes</p>
+            <p><strong>Role:</strong> admin</p>
+            <p><strong>Super Admin:</strong> ✅ Yes</p>
+        `;
+        
+        if (userCreated) {
+          successMessage += `
+            <p><strong>Temporary Password:</strong> ${adminPassword}</p>
+            <p style="color: #856404; background: #fff3cd; padding: 0.5rem; border-radius: 4px; margin-top: 1rem;">
+              ⚠️ Please ask Rodney to change this password on first login
+            </p>
+          `;
+        }
+        
+        successMessage += `
+            <p style="margin-top: 1rem;">
+              🚀 <strong>Rodney can now log in at:</strong><br>
+              <a href="https://www.interlineasia.com/login" target="_blank">https://www.interlineasia.com/login</a>
+            </p>
+          </div>
+        `;
+        
+        statusDiv.innerHTML = successMessage;
+        
+      } catch (error) {
+        console.error('Error creating admin user:', error);
+        statusDiv.innerHTML = `
+          <div class="status error">
+            <h3>❌ Error Creating Admin User</h3>
+            <p>${error.message}</p>
+          </div>
+        `;
+      } finally {
+        createBtn.disabled = false;
+        createBtn.textContent = 'Create Rodney Pattison as Admin';
+      }
+    }
+  </script>
+</body>
+</html>

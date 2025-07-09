@@ -313,6 +313,13 @@
               component: 'test_page'
             });
           }
+          
+          // Trigger the exact error Sentry is waiting for
+          setTimeout(() => {
+            console.log('Triggering Sentry test error...');
+            myUndefinedFunction(); // This will send the error to Sentry
+          }, 2000);
+          
         } else {
           updateStatus('❌ Sentry not loaded - check console for errors', 'error');
         }

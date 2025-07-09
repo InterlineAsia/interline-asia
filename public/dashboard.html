@@ -1,9 +1,10 @@
 
-    // Send test email function
+// Send test email function
     async function sendTestEmail() {
       const user = window.supabaseClient.currentUser;
       if (!user) {
-        alert("Please log in to send test email");
+        showError("Please log in to send test email");
+        Sentry.captureException(new Error("User not logged in when attempting to send test email"));
         return;
       }
       
@@ -28,7 +29,7 @@
         const result = await response.json();
         
         if (result.success) {
-          alert(`Test email sent successfully to ${user.email}!`);
+          showError('Test email sent successfully!', 'success');
           console.log("Email sent:", result);
         } else {
           throw new Error(result.error || "Failed to send email");
@@ -36,7 +37,9 @@
         
       } catch (error) {
         console.error("Error sending test email:", error);
-        alert(`Failed to send test email: ${error.message}`);
+        Sentry.captureException(error);
+        showError(`Failed to send test email: ${error.message}`);
+        Sentry.captureException(error);
       } finally {
         button.textContent = originalText;
         button.disabled = false;

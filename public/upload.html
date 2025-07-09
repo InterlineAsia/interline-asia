@@ -285,10 +285,12 @@
     function handleFile(file) {
       // Validate file type and size
       if (!file.name.toLowerCase().endsWith('.csv')) {
-        alert('Please select a CSV file');
-        return;
-      }
-      
+        try {
+          throw new Error('Invalid file type: Not a CSV file.');
+        } catch (error) {
+          console.error('Invalid file type. Please upload a CSV file:', error);
+          Sentry.captureException(error);
+          showError('Invalid file type. Please upload a CSV file.');
       if (file.size > 10 * 1024 * 1024) { // 10MB limit
         alert('File size must be less than 10MB');
         return;
@@ -337,6 +339,8 @@
         
       } catch (error) {
         console.error('Validation error:', error);
+          Sentry.captureException(error);
+          showError('Failed to validate CSV. Please ensure the file format is correct.');
         showValidationResults({
           valid: false,
           error: 'Failed to validate file: ' + error.message
@@ -442,6 +446,8 @@
         
       } catch (error) {
         console.error('Processing error:', error);
+        Sentry.captureException(error);
+        showError('Failed to process CSV. Please try again later.');
         showProgress(0, 'Error: ' + error.message);
         alert('Processing failed: ' + error.message);
       } finally {

@@ -72,7 +72,6 @@ export default async function handler(req, res) {
       details: error.message 
     });
   }
-}
 
 function parseCSV(csvContent) {
   const lines = csvContent.split('\n').filter(line => line.trim());
@@ -93,6 +92,8 @@ function parseCSV(csvContent) {
   }
 
   return rows;
+}
+
 }
 
 function parseCSVLine(line) {
@@ -120,56 +121,74 @@ function parseCSVLine(line) {
 async function processWithGemini(batch, apiKey) {
   const prompt = createGeminiPrompt(batch);
   
-  try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: prompt
-          }]
-        }],
-        generationConfig: {
-          temperature: 0.1,
-          topK: 1,
-          topP: 1,
-          maxOutputTokens: 4096,
-        }
-      })
-    });
+  const MAX_RETRIES = 1;
+  const RETRY_DELAY_MS = 2000; // 2 seconds
 
-    if (!response.ok) {
-      throw new Error(`Gemini API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    
-    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
-      throw new Error('Invalid response from Gemini API');
-    }
-
-    const generatedText = data.candidates[0].content.parts[0].text;
-    
-    // Parse the JSON response from Gemini
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     try {
-      const jsonMatch = generatedText.match(/\[[\s\S]*\]/);
-      if (jsonMatch) {
-        return JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error('No valid JSON found in Gemini response');
-      }
-    } catch (parseError) {
-      console.error('Error parsing Gemini response:', parseError);
-      console.error('Gemini response:', generatedText);
-      throw new Error('Failed to parse Gemini response as JSON');
-    }
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: prompt
+            }]
+          }],
+          generationConfig: {
+            temperature: 0.1,
+            topK: 1,
+            topP: 1,
+            maxOutputTokens: 4096,
+          }
+        })
+      });
 
-  } catch (error) {
-    console.error('Error calling Gemini API:', error);
-    throw error;
+      if (!response.ok) {
+        if (response.status === 429 && attempt < MAX_RETRIES) {
+          console.warn(`Gemini API rate limit hit (429). Retrying in ${RETRY_DELAY_MS}ms...`);
+          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+          continue; // Retry the request
+        } else if (response.status >= 500 && attempt < MAX_RETRIES) {
+          console.warn(`Gemini API server error (${response.status}). Retrying in ${RETRY_DELAY_MS}ms...`);
+          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+          continue; // Retry the request
+        } else {
+          throw new Error(`Gemini API error: ${response.status} - ${response.statusText}`);
+        }
+      }
+
+      const data = await response.json();
+
+      if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
+        throw new Error('Invalid response from Gemini API');
+      }
+
+      const generatedText = data.candidates[0].content.parts[0].text;
+
+      // Parse the JSON response from Gemini
+      try {
+        const jsonMatch = generatedText.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+          return JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error('No valid JSON found in Gemini response');
+        }
+      } catch (parseError) {
+        console.error('Error parsing Gemini response:', parseError);
+        console.error('Gemini response:', generatedText);
+        throw new Error('Failed to parse Gemini response as JSON');
+      }
+    } catch (error) {
+      console.error(`Error calling Gemini API (attempt ${attempt + 1}/${MAX_RETRIES + 1}):`, error);
+      if (attempt < MAX_RETRIES) {
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+      } else {
+        throw error; // Re-throw error after all retries are exhausted
+      }
+    }
   }
 }
 

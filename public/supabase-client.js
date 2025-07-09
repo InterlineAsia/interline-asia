@@ -329,10 +329,13 @@ class SupabaseClient {
       throw new Error('Admin access required');
     }
     
+    // Convert status to boolean for verified field
+    const verified = status === 'verified' || status === true;
+    
     const { data, error } = await this.supabase
       .from('profiles')
       .update({
-        verification_status: status,
+        verified: verified,
         admin_notes: notes,
         updated_at: new Date().toISOString()
       })

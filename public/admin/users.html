@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Admin Dashboard - Manage Unverified Users">
+  <title>Admin: Unverified Users - Interline Asia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../auth.css">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Remix Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../config.js"></script>
+  <script src="../supabase-client.js"></script>
+  
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      min-height: 100vh;
+    }
+    
+    .admin-card {
+      background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      border: 1px solid rgba(226, 232, 240, 0.5);
+    }
+    
+    .user-card {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-left: 4px solid #ef4444;
+    }
+    
+    .user-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    
+    .verified-card {
+      border-left: 4px solid #10b981;
+      opacity: 0.7;
+    }
+    
+    .status-badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .status-unverified {
+      background: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+    }
+    
+    .status-verified {
+      background: #f0fdf4;
+      color: #16a34a;
+      border: 1px solid #bbf7d0;
+    }
+    
+    .verify-btn {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .verify-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+    
+    .verify-btn:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 500;
+      z-index: 1000;
+      transform: translateX(400px);
+      transition: transform 0.3s ease;
+    }
+    
+    .toast.show {
+      transform: translateX(0);
+    }
+    
+    .toast.success {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+    
+    .toast.error {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    }
+    
+    .stats-card {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      color: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    
+    .stats-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #6b7280;
+    }
+    
+    .empty-state i {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+          <div class="flex items-center">
+            <h1 class="text-xl font-semibold text-gray-900">
+              <i class="ri-admin-line mr-2"></i>
+              Admin Dashboard
+            </h1>
+          </div>
+          <div class="flex items-center space-x-4">
+            <span class="text-sm text-gray-600" id="admin-name">Loading...</span>
+            <button onclick="signOut()" class="text-sm text-red-600 hover:text-red-800">
+              <i class="ri-logout-box-line mr-1"></i>
+              Sign Out
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Navigation -->
+      <nav class="mb-8">
+        <div class="flex space-x-4">
+          <a href="../admin.html" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg">
+            <i class="ri-dashboard-line mr-2"></i>Dashboard
+          </a>
+          <a href="users.html" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg">
+            <i class="ri-user-line mr-2"></i>Unverified Users
+          </a>
+          <a href="../admin-verifications.html" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg">
+            <i class="ri-file-list-line mr-2"></i>All Verifications
+          </a>
+        </div>
+      </nav>
+
+      <!-- Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="stats-card">
+          <div class="stats-number" id="unverified-count">0</div>
+          <div class="text-blue-100">Unverified Users</div>
+        </div>
+        <div class="admin-card p-6 text-center">
+          <div class="text-2xl font-bold text-gray-900" id="total-users">0</div>
+          <div class="text-gray-600">Total Users</div>
+        </div>
+        <div class="admin-card p-6 text-center">
+          <div class="text-2xl font-bold text-green-600" id="verified-count">0</div>
+          <div class="text-gray-600">Verified Users</div>
+        </div>
+      </div>
+
+      <!-- Users List -->
+      <div class="admin-card p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-lg font-semibold text-gray-900">
+            <i class="ri-user-settings-line mr-2"></i>
+            Unverified Users
+          </h2>
+          <button onclick="refreshUsers()" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg">
+            <i class="ri-refresh-line mr-2"></i>Refresh
+          </button>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading-state" class="text-center py-8">
+          <i class="ri-loader-4-line text-4xl text-gray-400 animate-spin"></i>
+          <p class="text-gray-600 mt-2">Loading users...</p>
+        </div>
+
+        <!-- Users Grid -->
+        <div id="users-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 hidden">
+          <!-- Users will be populated here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="empty-state hidden">
+          <i class="ri-user-check-line"></i>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">All users are verified!</h3>
+          <p class="text-gray-600">There are no unverified users at the moment.</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <script>
+    let users = [];
+    let isLoading = false;
+
+    // Initialize the page
+    async function initializePage() {
+      try {
+        // Wait for Supabase client to be ready
+        await window.supabaseClient.readyPromise;
+        
+        // Check if user is logged in
+        if (!window.supabaseClient.isLoggedIn()) {
+          window.location.href = '../login.html';
+          return;
+        }
+        
+        // Check if user is admin
+        if (!window.supabaseClient.isAdmin()) {
+          showToast('Access denied. Admin privileges required.', 'error');
+          setTimeout(() => {
+            window.location.href = '../index.html';
+          }, 2000);
+          return;
+        }
+        
+        // Set admin name
+        const currentUser = window.supabaseClient.currentUser;
+        document.getElementById('admin-name').textContent = currentUser.full_name || currentUser.email;
+        
+        // Load users
+        await loadUsers();
+        
+      } catch (error) {
+        console.error('Error initializing page:', error);
+        showToast('Error loading page: ' + error.message, 'error');
+      }
+    }
+
+    // Load all users and filter unverified ones
+    async function loadUsers() {
+      if (isLoading) return;
+      
+      isLoading = true;
+      document.getElementById('loading-state').classList.remove('hidden');
+      document.getElementById('users-grid').classList.add('hidden');
+      document.getElementById('empty-state').classList.add('hidden');
+      
+      try {
+        // Get all users from Supabase
+        const { data: allUsers, error } = await window.supabaseClient.supabase
+          .from('profiles')
+          .select('id, full_name, email, verified, role, created_at')
+          .order('created_at', { ascending: false });
+        
+        if (error) {
+          throw error;
+        }
+        
+        users = allUsers || [];
+        
+        // Update stats
+        const unverifiedUsers = users.filter(user => !user.verified);
+        const verifiedUsers = users.filter(user => user.verified);
+        
+        document.getElementById('total-users').textContent = users.length;
+        document.getElementById('unverified-count').textContent = unverifiedUsers.length;
+        document.getElementById('verified-count').textContent = verifiedUsers.length;
+        
+        // Render users
+        renderUsers(unverifiedUsers);
+        
+      } catch (error) {
+        console.error('Error loading users:', error);
+        showToast('Error loading users: ' + error.message, 'error');
+      } finally {
+        isLoading = false;
+        document.getElementById('loading-state').classList.add('hidden');
+      }
+    }
+
+    // Render users in the grid
+    function renderUsers(usersToRender) {
+      const grid = document.getElementById('users-grid');
+      const emptyState = document.getElementById('empty-state');
+      
+      if (usersToRender.length === 0) {
+        grid.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+        return;
+      }
+      
+      grid.classList.remove('hidden');
+      emptyState.classList.add('hidden');
+      
+      grid.innerHTML = usersToRender.map(user => `
+        <div class="user-card admin-card p-6 ${user.verified ? 'verified-card' : ''}">
+          <div class="flex justify-between items-start mb-4">
+            <div class="flex-1">
+              <h3 class="font-semibold text-gray-900 mb-1">${escapeHtml(user.full_name || 'No name')}</h3>
+              <p class="text-sm text-gray-600 mb-2">${escapeHtml(user.email)}</p>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="status-badge ${user.verified ? 'status-verified' : 'status-unverified'}">
+                  <i class="ri-${user.verified ? 'check' : 'time'}-line"></i>
+                  ${user.verified ? 'Verified' : 'Unverified'}
+                </span>
+                ${user.role === 'admin' ? '<span class="status-badge" style="background: #fef3c7; color: #d97706; border: 1px solid #fed7aa;"><i class="ri-vip-crown-line"></i>Admin</span>' : ''}
+              </div>
+              <p class="text-xs text-gray-500">
+                <i class="ri-calendar-line mr-1"></i>
+                Joined ${formatDate(user.created_at)}
+              </p>
+            </div>
+          </div>
+          
+          <div class="flex justify-end">
+            ${!user.verified ? `
+              <button 
+                onclick="verifyUser('${user.id}', '${escapeHtml(user.full_name)}', '${escapeHtml(user.email)}')" 
+                class="verify-btn"
+                id="verify-btn-${user.id}"
+              >
+                <i class="ri-check-line"></i>
+                Mark as Verified
+              </button>
+            ` : `
+              <span class="text-sm text-green-600 font-medium">
+                <i class="ri-check-double-line mr-1"></i>
+                Already Verified
+              </span>
+            `}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Verify a user
+    async function verifyUser(userId, userName, userEmail) {
+      if (isLoading) return;
+      
+      const confirmMessage = `Are you sure you want to verify ${userName} (${userEmail})?\n\nThis will:\n• Mark them as verified\n• Send an email notification to admin@interlineasia.com\n• Grant them access to member features`;
+      
+      if (!confirm(confirmMessage)) {
+        return;
+      }
+      
+      const button = document.getElementById(`verify-btn-${userId}`);
+      const originalContent = button.innerHTML;
+      
+      try {
+        // Update button state
+        button.disabled = true;
+        button.innerHTML = '<i class="ri-loader-4-line animate-spin"></i> Verifying...';
+        
+        // Update user in Supabase
+        const { error } = await window.supabaseClient.supabase
+          .from('profiles')
+          .update({ verified: true })
+          .eq('id', userId);
+        
+        if (error) {
+          throw error;
+        }
+        
+        // Show success message
+        showToast(`${userName} has been verified successfully! Admin notification sent.`, 'success');
+        
+        // Reload users to reflect changes
+        await loadUsers();
+        
+      } catch (error) {
+        console.error('Error verifying user:', error);
+        showToast('Error verifying user: ' + error.message, 'error');
+        
+        // Reset button
+        button.disabled = false;
+        button.innerHTML = originalContent;
+      }
+    }
+
+    // Refresh users list
+    async function refreshUsers() {
+      await loadUsers();
+      showToast('Users list refreshed', 'success');
+    }
+
+    // Sign out
+    async function signOut() {
+      try {
+        await window.supabaseClient.signOut();
+        window.location.href = '../login.html';
+      } catch (error) {
+        console.error('Error signing out:', error);
+        showToast('Error signing out: ' + error.message, 'error');
+      }
+    }
+
+    // Utility functions
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `
+        <i class="ri-${type === 'success' ? 'check' : 'error-warning'}-line mr-2"></i>
+        ${message}
+      `;
+      
+      container.appendChild(toast);
+      
+      // Show toast
+      setTimeout(() => toast.classList.add('show'), 100);
+      
+      // Hide and remove toast
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => container.removeChild(toast), 300);
+      }, 4000);
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', initializePage);
+  </script>
+</body>
+</html>

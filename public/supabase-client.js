@@ -74,7 +74,8 @@ class SupabaseClient {
     // This is a secure way to grant top-level access without relying on database fields that could be misconfigured.
     const SUPER_ADMIN_EMAILS = [
       'rodney@telenational.com.au',
-      'admin@interlineasia.com' // Generic admin email
+      'admin@interlineasia.com', // Generic admin email
+      'admin@telenational.com.au' // Additional admin email
     ];
 
     const isSuperAdminByEmail = SUPER_ADMIN_EMAILS.includes(authUser.email.toLowerCase());

@@ -497,9 +497,28 @@
       }
     }
     
-    function viewDocument(filePath) {
-      // In a real implementation, you'd generate a signed URL for the document
-      alert(`Document viewing not implemented yet. File path: ${filePath}`);
+    async function viewDocument(filePath) {
+      try {
+        // Extract the file name from the file path
+        const fileName = filePath.split('/').pop();
+        
+        // Get the signed URL for the file
+        const url = await window.supabaseClient.getFileUrl(filePath);
+        
+        if (url) {
+          // Create a link element and simulate a click to download the file
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = fileName;
+          link.target = '_blank';
+          link.click();
+        } else {
+          alert('Unable to generate download link');
+        }
+      } catch (error) {
+        console.error('Error downloading file:', error);
+        alert('Error downloading file: ' + error.message);
+      }
     }
     
     function updatePendingCount(count) {

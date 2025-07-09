@@ -19,6 +19,10 @@
     gtag('config', 'G-FYGT92WCXC');
   </script>
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <!-- Sentry Error Tracking -->
+  <script src="https://browser.sentry-cdn.com/7.114.0/bundle.tracing.replay.min.js" crossorigin="anonymous"></script>
+  <script src="/js/sentry-init.js"></script>
+  
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="supabase-client.js"></script>
@@ -94,8 +98,36 @@
           throw new Error('Security verification failed. Please complete the verification and try again.');
         }
         
-        // Sign in with Supabase
-        const result = await window.supabaseClient.signIn(email, password);
+        // Sign in with Supabase - wrapped in Sentry span for performance tracking
+        const result = await Sentry.startSpan(
+          {
+            op: "auth.login",
+            name: "User Login",
+          },
+          async (span) => {
+            span.setAttribute("email", email);
+            span.setAttribute("method", "email_password");
+            
+            const loginResult = await window.supabaseClient.signIn(email, password);
+            
+            if (loginResult.user) {
+              span.setAttribute("success", true);
+              span.setAttribute("user_id", loginResult.user.id);
+              span.setAttribute("is_admin", window.supabaseClient.isAdmin());
+              
+              // Log successful login
+              if (window.sentryLogger) {
+                window.sentryLogger.info("User login successful", {
+                  userId: loginResult.user.id,
+                  email: email,
+                  isAdmin: window.supabaseClient.isAdmin()
+                });
+              }
+            }
+            
+            return loginResult;
+          }
+        );
         
         if (result.user) {
           // Track successful login
@@ -110,14 +142,33 @@
             if (window.supabaseClient.isAdmin()) {
               window.location.href = 'admin.html';
             } else {
-          Sentry.captureException(error);
-          showError(`Login failed: ${error.message}`);
               window.location.href = 'dashboard.html';
             }
           }, 1000);
         }
         
       } catch (error) {
+        // Capture exception in Sentry with context
+        Sentry.captureException(error, {
+          tags: {
+            action: 'login',
+            component: 'auth'
+          },
+          extra: {
+            email: email,
+            errorType: error.name || 'Unknown'
+          }
+        });
+        
+        // Log error with structured logging
+        if (window.sentryLogger) {
+          window.sentryLogger.error("Login failed", {
+            email: email,
+            errorMessage: error.message,
+            errorType: error.name || 'Unknown'
+          });
+        }
+        
         console.error('Login error:', error);
         let errorMessage = 'Invalid email or password. Please check your credentials and try again.'; // Default message
 

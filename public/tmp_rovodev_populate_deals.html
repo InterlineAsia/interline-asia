@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Populate Deals Table - Manual CSV Processing</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .result { background: #f5f5f5; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .error { background: #ffe6e6; border: 1px solid #ff9999; }
+        .success { background: #e6ffe6; border: 1px solid #99ff99; }
+        .info { background: #e6f3ff; border: 1px solid #99ccff; }
+        .warning { background: #fff3cd; border: 1px solid #ffeaa7; }
+        button { padding: 10px 20px; font-size: 16px; background: #007cba; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+        button:hover { background: #005a8b; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+    <h1>🚀 Manual Deals Population Tool</h1>
+    <p>This tool will manually populate the deals table with sample cruise data.</p>
+    
+    <div class="result warning">
+        ⚠️ <strong>Note:</strong> This will add sample deals to your database. Use only if the table is empty.
+    </div>
+    
+    <button onclick="checkCurrentData()" id="checkBtn">🔍 Check Current Data</button>
+    <button onclick="populateDeals()" id="populateBtn">📊 Populate Sample Deals</button>
+    <button onclick="clearDeals()" id="clearBtn">🗑️ Clear All Deals</button>
+    
+    <div id="results"></div>
+
+    <script>
+        async function getSupabaseClient() {
+            const supabaseUrl = window.SUPABASE_URL;
+            const supabaseAnonKey = window.SUPABASE_ANON_KEY;
+            
+            if (!supabaseUrl || !supabaseAnonKey) {
+                throw new Error('Supabase configuration missing');
+            }
+            
+            const { createClient } = supabase;
+            return createClient(supabaseUrl, supabaseAnonKey);
+        }
+
+        async function checkCurrentData() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="result info">🔄 Checking current data...</div>';
+            
+            try {
+                const supabaseClient = await getSupabaseClient();
+                
+                // Check deals table
+                const { data: deals, error: dealsError, count } = await supabaseClient
+                    .from('deals')
+                    .select('*', { count: 'exact' })
+                    .limit(10);
+                
+                let html = '';
+                
+                if (dealsError) {
+                    html += `<div class="result error">❌ Error accessing deals table: ${dealsError.message}</div>`;
+                } else {
+                    html += `<div class="result success">✅ Deals table accessible</div>`;
+                    html += `<div class="result info">📊 Total deals: ${count || 0}</div>`;
+                    
+                    if (deals && deals.length > 0) {
+                        html += `<div class="result info">📋 Sample deals (first ${deals.length}):</div>`;
+                        html += `<div class="result"><pre>${JSON.stringify(deals, null, 2)}</pre></div>`;
+                    } else {
+                        html += `<div class="result warning">📭 Deals table is empty</div>`;
+                    }
+                }
+                
+                // Check deals_dashboard view
+                const { data: dashboardDeals, error: dashboardError } = await supabaseClient
+                    .from('deals_dashboard')
+                    .select('*')
+                    .limit(5);
+                
+                if (dashboardError) {
+                    html += `<div class="result error">❌ Error accessing deals_dashboard view: ${dashboardError.message}</div>`;
+                } else {
+                    html += `<div class="result success">✅ Deals_dashboard view accessible</div>`;
+                    html += `<div class="result info">📊 Dashboard deals: ${dashboardDeals?.length || 0}</div>`;
+                }
+                
+                resultsDiv.innerHTML = html;
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="result error">❌ Check failed: ${error.message}</div>`;
+            }
+        }
+
+        async function populateDeals() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="result info">🔄 Populating sample deals...</div>';
+            
+            try {
+                const supabaseClient = await getSupabaseClient();
+                
+                // Sample cruise deals data
+                const sampleDeals = [
+                    {
+                        cruise_line: 'Royal Caribbean',
+                        ship_name: 'Symphony of the Seas',
+                        cruise_name: 'Caribbean Adventure',
+                        departure_date: '2024-12-15',
+                        return_date: '2024-12-22',
+                        price: 1299,
+                        cabin_type: 'Interior',
+                        category: 'standard',
+                        itinerary: 'Miami - Cozumel - Jamaica - Miami',
+                        region: 'Caribbean',
+                        duration: 7,
+                        description: 'Explore the beautiful Caribbean islands with Royal Caribbean'
+                    },
+                    {
+                        cruise_line: 'Norwegian',
+                        ship_name: 'Norwegian Escape',
+                        cruise_name: 'Mediterranean Explorer',
+                        departure_date: '2024-12-20',
+                        return_date: '2024-12-30',
+                        price: 1899,
+                        cabin_type: 'Balcony',
+                        category: 'premium',
+                        itinerary: 'Barcelona - Rome - Naples - Barcelona',
+                        region: 'Mediterranean',
+                        duration: 10,
+                        description: 'Discover the Mediterranean with Norwegian Cruise Line'
+                    },
+                    {
+                        cruise_line: 'Celebrity',
+                        ship_name: 'Celebrity Eclipse',
+                        cruise_name: 'Alaska Glacier Bay',
+                        departure_date: '2025-01-10',
+                        return_date: '2025-01-17',
+                        price: 2299,
+                        cabin_type: 'Suite',
+                        category: 'luxury',
+                        itinerary: 'Seattle - Juneau - Glacier Bay - Seattle',
+                        region: 'Alaska',
+                        duration: 7,
+                        description: 'Experience the majesty of Alaska with Celebrity Cruises'
+                    },
+                    {
+                        cruise_line: 'Princess',
+                        ship_name: 'Crown Princess',
+                        cruise_name: 'Asia Discovery',
+                        departure_date: '2025-01-15',
+                        return_date: '2025-01-29',
+                        price: 3299,
+                        cabin_type: 'Balcony',
+                        category: 'premium',
+                        itinerary: 'Singapore - Hong Kong - Tokyo - Singapore',
+                        region: 'Asia',
+                        duration: 14,
+                        description: 'Explore exotic Asia with Princess Cruises'
+                    },
+                    {
+                        cruise_line: 'MSC',
+                        ship_name: 'MSC Seaside',
+                        cruise_name: 'Caribbean Paradise',
+                        departure_date: '2025-02-01',
+                        return_date: '2025-02-08',
+                        price: 999,
+                        cabin_type: 'Interior',
+                        category: 'standard',
+                        itinerary: 'Miami - Barbados - St. Lucia - Miami',
+                        region: 'Caribbean',
+                        duration: 7,
+                        description: 'Affordable Caribbean cruise with MSC'
+                    }
+                ];
+                
+                // Insert sample deals
+                const { data: insertedDeals, error: insertError } = await supabaseClient
+                    .from('deals')
+                    .insert(sampleDeals)
+                    .select();
+                
+                if (insertError) {
+                    resultsDiv.innerHTML = `<div class="result error">❌ Failed to insert deals: ${insertError.message}</div>`;
+                } else {
+                    let html = `<div class="result success">✅ Successfully inserted ${insertedDeals.length} sample deals!</div>`;
+                    html += `<div class="result info">📋 Inserted deals:</div>`;
+                    html += `<div class="result"><pre>${JSON.stringify(insertedDeals, null, 2)}</pre></div>`;
+                    html += `<div class="result success">🎉 You can now visit /deals to see the cruise deals!</div>`;
+                    resultsDiv.innerHTML = html;
+                }
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="result error">❌ Population failed: ${error.message}</div>`;
+            }
+        }
+
+        async function clearDeals() {
+            if (!confirm('Are you sure you want to delete ALL deals? This cannot be undone.')) {
+                return;
+            }
+            
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="result info">🔄 Clearing all deals...</div>';
+            
+            try {
+                const supabaseClient = await getSupabaseClient();
+                
+                const { error: deleteError } = await supabaseClient
+                    .from('deals')
+                    .delete()
+                    .neq('id', 0); // Delete all rows
+                
+                if (deleteError) {
+                    resultsDiv.innerHTML = `<div class="result error">❌ Failed to clear deals: ${deleteError.message}</div>`;
+                } else {
+                    resultsDiv.innerHTML = `<div class="result success">✅ All deals cleared successfully!</div>`;
+                }
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="result error">❌ Clear failed: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

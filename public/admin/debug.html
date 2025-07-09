@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Debug - Interline Asia</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../config.js"></script>
+  <script src="../supabase-client.js"></script>
+</head>
+<body>
+  <h1>Admin Dashboard Debug</h1>
+  <div id="debug-output"></div>
+  
+  <script>
+    async function debugAdmin() {
+      const output = document.getElementById('debug-output');
+      
+      try {
+        output.innerHTML += '<p>🔍 Starting debug...</p>';
+        
+        // Wait for Supabase client
+        output.innerHTML += '<p>⏳ Waiting for Supabase client...</p>';
+        await window.supabaseClient.readyPromise;
+        output.innerHTML += '<p>✅ Supabase client ready</p>';
+        
+        // Check if logged in
+        const isLoggedIn = window.supabaseClient.isLoggedIn();
+        output.innerHTML += `<p>🔑 Logged in: ${isLoggedIn}</p>`;
+        
+        if (!isLoggedIn) {
+          output.innerHTML += '<p>❌ Not logged in - redirecting to login</p>';
+          window.location.href = '../login.html';
+          return;
+        }
+        
+        // Check if admin
+        const isAdmin = window.supabaseClient.isAdmin();
+        output.innerHTML += `<p>👑 Is Admin: ${isAdmin}</p>`;
+        
+        if (!isAdmin) {
+          output.innerHTML += '<p>❌ Not admin - access denied</p>';
+          return;
+        }
+        
+        // Get current user
+        const currentUser = window.supabaseClient.currentUser;
+        output.innerHTML += `<p>👤 Current user: ${currentUser?.full_name} (${currentUser?.email})</p>`;
+        
+        // Test database query
+        output.innerHTML += '<p>📊 Testing database query...</p>';
+        
+        const { data: allUsers, error } = await window.supabaseClient.supabase
+          .from('profiles')
+          .select('id, full_name, email, verified, role, created_at')
+          .order('created_at', { ascending: false });
+        
+        if (error) {
+          output.innerHTML += `<p>❌ Database error: ${error.message}</p>`;
+          return;
+        }
+        
+        output.innerHTML += `<p>✅ Found ${allUsers.length} users:</p>`;
+        allUsers.forEach(user => {
+          output.innerHTML += `<p>   - ${user.full_name} (${user.email}) - Verified: ${user.verified}</p>`;
+        });
+        
+        // Calculate stats
+        const unverifiedUsers = allUsers.filter(u => !u.verified);
+        const verifiedUsers = allUsers.filter(u => u.verified);
+        
+        output.innerHTML += `<p>📈 Stats:</p>`;
+        output.innerHTML += `<p>   Total: ${allUsers.length}</p>`;
+        output.innerHTML += `<p>   Unverified: ${unverifiedUsers.length}</p>`;
+        output.innerHTML += `<p>   Verified: ${verifiedUsers.length}</p>`;
+        
+        output.innerHTML += '<p>🎉 All checks passed! Admin dashboard should work.</p>';
+        
+      } catch (error) {
+        output.innerHTML += `<p>💥 Error: ${error.message}</p>`;
+        console.error('Debug error:', error);
+      }
+    }
+    
+    // Run debug when page loads
+    document.addEventListener('DOMContentLoaded', debugAdmin);
+  </script>
+</body>
+</html>

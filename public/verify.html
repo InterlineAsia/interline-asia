@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Upload verification documents - Interline Asia">
+  <title>Verify Your Account - Interline Asia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="auth.css">
+  <link rel="stylesheet" href="/css/main.css">
+  
+  <style>
+    .verify-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .verify-card {
+      background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      border: 1px solid rgba(226, 232, 240, 0.5);
+      padding: 2rem;
+    }
+    
+    .verify-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .verify-header h1 {
+      color: #1e293b;
+      margin-bottom: 0.5rem;
+    }
+    
+    .verify-header p {
+      color: #64748b;
+      font-size: 1.1rem;
+    }
+    
+    .requirements-section {
+      background: #f0f9ff;
+      border: 1px solid #0ea5e9;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+    }
+    
+    .requirements-title {
+      color: #0c4a6e;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .requirements-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .requirements-list li {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 0;
+      color: #1e40af;
+    }
+    
+    .requirements-list li i {
+      color: #059669;
+      font-size: 1.2rem;
+    }
+    
+    .upload-section {
+      margin: 2rem 0;
+    }
+    
+    .upload-area {
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      background: #f8fafc;
+    }
+    
+    .upload-area:hover {
+      border-color: #3b82f6;
+      background: #f0f9ff;
+    }
+    
+    .upload-area.dragover {
+      border-color: #3b82f6;
+      background: #dbeafe;
+      transform: scale(1.02);
+    }
+    
+    .upload-icon {
+      font-size: 3rem;
+      color: #64748b;
+      margin-bottom: 1rem;
+    }
+    
+    .upload-text {
+      color: #374151;
+      margin-bottom: 0.5rem;
+    }
+    
+    .upload-hint {
+      color: #6b7280;
+      font-size: 0.875rem;
+    }
+    
+    .file-input {
+      display: none;
+    }
+    
+    .file-preview {
+      background: #f0fdf4;
+      border: 1px solid #16a34a;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1rem;
+      display: none;
+    }
+    
+    .file-preview.show {
+      display: block;
+    }
+    
+    .file-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .file-icon {
+      font-size: 2rem;
+      color: #16a34a;
+    }
+    
+    .file-details h4 {
+      margin: 0 0 0.25rem 0;
+      color: #166534;
+    }
+    
+    .file-details p {
+      margin: 0;
+      color: #15803d;
+      font-size: 0.875rem;
+    }
+    
+    .remove-file {
+      background: #ef4444;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-size: 0.875rem;
+      margin-left: auto;
+    }
+    
+    .remove-file:hover {
+      background: #dc2626;
+    }
+    
+    .submit-btn {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 2rem;
+      transition: all 0.2s;
+    }
+    
+    .submit-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+    
+    .submit-btn:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    
+    .success-message {
+      background: #f0fdf4;
+      border: 1px solid #16a34a;
+      color: #166534;
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+      display: none;
+    }
+    
+    .error-message {
+      background: #fef2f2;
+      border: 1px solid #ef4444;
+      color: #dc2626;
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+      display: none;
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #e5e7eb;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 1rem 0;
+      display: none;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+  </style>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+  
+  <div class="verify-container">
+    <div class="verify-card">
+      <div class="verify-header">
+        <h1><i class="ri-shield-check-line mr-2"></i>Verify Your Account</h1>
+        <p>Upload a verification document to access exclusive cruise deals</p>
+      </div>
+      
+      <div class="requirements-section">
+        <div class="requirements-title">
+          <i class="ri-information-line"></i>
+          Required Documentation
+        </div>
+        <p style="color: #1e40af; margin-bottom: 1rem;">
+          To verify your industry status, please upload <strong>one</strong> of the following documents:
+        </p>
+        <ul class="requirements-list">
+          <li>
+            <i class="ri-check-line"></i>
+            <strong>Staff ID Card</strong> - Current employee identification
+          </li>
+          <li>
+            <i class="ri-check-line"></i>
+            <strong>Business Card</strong> - Your professional business card
+          </li>
+          <li>
+            <i class="ri-check-line"></i>
+            <strong>Official Letterhead</strong> - Letter from your employer on company letterhead
+          </li>
+          <li>
+            <i class="ri-check-line"></i>
+            <strong>Retirement Proof</strong> - Documentation showing industry retirement status
+          </li>
+        </ul>
+      </div>
+      
+      <div class="upload-section">
+        <div class="upload-area" id="upload-area" onclick="document.getElementById('file-input').click()">
+          <div class="upload-icon">
+            <i class="ri-upload-cloud-2-line"></i>
+          </div>
+          <div class="upload-text">
+            <strong>Click to upload</strong> or drag and drop your document
+          </div>
+          <div class="upload-hint">
+            JPG, PNG, or PDF (max 5MB)
+          </div>
+        </div>
+        
+        <input type="file" id="file-input" class="file-input" accept=".jpg,.jpeg,.png,.pdf" />
+        
+        <div class="file-preview" id="file-preview">
+          <div class="file-info">
+            <div class="file-icon">
+              <i class="ri-file-line" id="file-icon"></i>
+            </div>
+            <div class="file-details">
+              <h4 id="file-name">Document.pdf</h4>
+              <p id="file-size">2.3 MB</p>
+            </div>
+            <button class="remove-file" onclick="removeFile()">
+              <i class="ri-delete-bin-line mr-1"></i>Remove
+            </button>
+          </div>
+        </div>
+        
+        <div class="progress-bar" id="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+      </div>
+      
+      <div id="error-message" class="error-message"></div>
+      <div id="success-message" class="success-message"></div>
+      
+      <button class="submit-btn" id="submit-btn" onclick="uploadDocument()" disabled>
+        <i class="ri-upload-line mr-2"></i>
+        Upload Document
+      </button>
+      
+      <div style="text-align: center; margin-top: 2rem;">
+        <p style="color: #6b7280; font-size: 0.875rem;">
+          <i class="ri-lock-line mr-1"></i>
+          Your documents are securely stored and only viewed by our verification team
+        </p>
+        <p style="margin-top: 1rem;">
+          <a href="dashboard.html" style="color: #3b82f6; text-decoration: none;">
+            <i class="ri-arrow-left-line mr-1"></i>Back to Dashboard
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+  
+  <div id="footer-placeholder"></div>
+  
+  <script>
+    let selectedFile = null;
+    let isUploading = false;
+
+    // Initialize page
+    async function initializePage() {
+      try {
+        await window.supabaseClient.readyPromise;
+        
+        // Check if user is logged in
+        if (!window.supabaseClient.isLoggedIn()) {
+          window.location.href = 'login.html';
+          return;
+        }
+        
+        // Check if user is already verified
+        const currentUser = window.supabaseClient.currentUser;
+        if (currentUser && currentUser.verified === true) {
+          showSuccess('Your account is already verified! You have access to all member features.');
+          document.getElementById('submit-btn').style.display = 'none';
+          document.getElementById('upload-area').style.display = 'none';
+          return;
+        }
+        
+        setupDragAndDrop();
+        setupFileInput();
+        
+      } catch (error) {
+        console.error('Error initializing page:', error);
+        showError('Error loading page: ' + error.message);
+      }
+    }
+
+    // Set up drag and drop functionality
+    function setupDragAndDrop() {
+      const uploadArea = document.getElementById('upload-area');
+      
+      uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('dragover');
+      });
+      
+      uploadArea.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+      });
+      
+      uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          handleFileSelection(files[0]);
+        }
+      });
+    }
+
+    // Set up file input
+    function setupFileInput() {
+      const fileInput = document.getElementById('file-input');
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+          handleFileSelection(e.target.files[0]);
+        }
+      });
+    }
+
+    // Handle file selection
+    function handleFileSelection(file) {
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+      if (!allowedTypes.includes(file.type)) {
+        showError('Please select a JPG, PNG, or PDF file.');
+        return;
+      }
+      
+      // Validate file size (5MB max)
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        showError('File size must be less than 5MB.');
+        return;
+      }
+      
+      selectedFile = file;
+      showFilePreview(file);
+      document.getElementById('submit-btn').disabled = false;
+      hideError();
+    }
+
+    // Show file preview
+    function showFilePreview(file) {
+      const preview = document.getElementById('file-preview');
+      const fileName = document.getElementById('file-name');
+      const fileSize = document.getElementById('file-size');
+      const fileIcon = document.getElementById('file-icon');
+      
+      fileName.textContent = file.name;
+      fileSize.textContent = formatFileSize(file.size);
+      
+      // Set appropriate icon
+      if (file.type === 'application/pdf') {
+        fileIcon.className = 'ri-file-pdf-line';
+      } else if (file.type.startsWith('image/')) {
+        fileIcon.className = 'ri-image-line';
+      } else {
+        fileIcon.className = 'ri-file-line';
+      }
+      
+      preview.classList.add('show');
+    }
+
+    // Remove selected file
+    function removeFile() {
+      selectedFile = null;
+      document.getElementById('file-preview').classList.remove('show');
+      document.getElementById('file-input').value = '';
+      document.getElementById('submit-btn').disabled = true;
+    }
+
+    // Upload document
+    async function uploadDocument() {
+      if (!selectedFile || isUploading) return;
+      
+      isUploading = true;
+      const submitBtn = document.getElementById('submit-btn');
+      const progressBar = document.getElementById('progress-bar');
+      const progressFill = document.getElementById('progress-fill');
+      
+      try {
+        // Update UI
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="ri-loader-4-line animate-spin mr-2"></i>Uploading...';
+        progressBar.style.display = 'block';
+        document.querySelector('.verify-card').classList.add('loading');
+        
+        hideError();
+        hideSuccess();
+        
+        // Simulate progress
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+          progress += Math.random() * 30;
+          if (progress > 90) progress = 90;
+          progressFill.style.width = progress + '%';
+        }, 200);
+        
+        // Upload file to Supabase
+        const currentUser = window.supabaseClient.currentUser;
+        const uploadResult = await window.supabaseClient.uploadFile(selectedFile, currentUser.id);
+        
+        // Complete progress
+        clearInterval(progressInterval);
+        progressFill.style.width = '100%';
+        
+        // Update user profile with verification document URL
+        const { error: updateError } = await window.supabaseClient.supabase
+          .from('profiles')
+          .update({ 
+            verification_document_url: uploadResult.file_path,
+            verification_document_name: selectedFile.name,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', currentUser.id);
+        
+        if (updateError) {
+          throw updateError;
+        }
+        
+        // Show success message
+        showSuccess(`
+          <strong>Document uploaded successfully!</strong><br>
+          Your verification document has been submitted for review. 
+          Our team will review it within 24-48 hours and you'll receive an email notification once approved.
+          <br><br>
+          <a href="dashboard.html" style="color: #166534; text-decoration: underline;">
+            <i class="ri-arrow-right-line mr-1"></i>Continue to Dashboard
+          </a>
+        `);
+        
+        // Hide upload section
+        document.getElementById('upload-area').style.display = 'none';
+        document.getElementById('file-preview').style.display = 'none';
+        submitBtn.style.display = 'none';
+        
+      } catch (error) {
+        console.error('Error uploading document:', error);
+        showError('Error uploading document: ' + error.message);
+        
+        // Reset button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="ri-upload-line mr-2"></i>Upload Document';
+        
+      } finally {
+        isUploading = false;
+        progressBar.style.display = 'none';
+        progressFill.style.width = '0%';
+        document.querySelector('.verify-card').classList.remove('loading');
+      }
+    }
+
+    // Utility functions
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function showError(message) {
+      const errorEl = document.getElementById('error-message');
+      errorEl.innerHTML = message;
+      errorEl.style.display = 'block';
+    }
+
+    function hideError() {
+      document.getElementById('error-message').style.display = 'none';
+    }
+
+    function showSuccess(message) {
+      const successEl = document.getElementById('success-message');
+      successEl.innerHTML = message;
+      successEl.style.display = 'block';
+    }
+
+    function hideSuccess() {
+      document.getElementById('success-message').style.display = 'none';
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', initializePage);
+  </script>
+  
+  <script src="/js/loadPartials.js" defer></script>
+</body>
+</html>

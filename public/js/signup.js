@@ -127,7 +127,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     uploadSuccess = true;
                     
                     // Show success message with upload confirmation
-                    showSuccess('Account created successfully! Your verification document has been uploaded. Please check your email to verify your account, then log in.');
+                    showSuccess('Account created successfully! Please check your email to verify your account, then upload your verification document.');
+                    
+                    // Redirect to verification page after a short delay
+                    setTimeout(() => {
+                        window.location.href = 'verify.html';
+                    }, 2000);
                     
                 } catch (uploadError) {
                     console.error('File upload failed after signup:', uploadError);

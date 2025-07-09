@@ -92,7 +92,10 @@ class SupabaseClient {
       role: finalRole,
       is_super_admin: finalRole === 'super_admin',
       is_admin: finalRole === 'admin' || finalRole === 'super_admin' || profile?.is_admin === true,
-      verification_status: profile?.verification_status || 'pending'
+      verification_status: profile?.verification_status || 'pending',
+      verified: profile?.verified || false,
+      verification_document_url: profile?.verification_document_url,
+      verification_document_name: profile?.verification_document_name
     };
     
     console.log('User set with metadata:', {

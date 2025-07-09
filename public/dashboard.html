@@ -147,41 +147,19 @@
         </a>
       </div>
       
-      <div class="feature-card">
-        <div class="feature-icon">
-          <i class="ri-calendar-check-line"></i>
-        </div>
-        <h3>Book a Cruise</h3>
-        <p>Book your next cruise adventure with our exclusive member pricing.</p>
-        <a href="booking.html" class="btn">
-          <i class="ri-calendar-line"></i>
-          Book Now
-        </a>
-      </div>
       
-      <div class="feature-card">
+      <div class="feature-card" style="opacity: 0.6;">
         <div class="feature-icon">
           <i class="ri-user-settings-line"></i>
         </div>
         <h3>Account Settings</h3>
-        <p>Manage your profile, preferences, and account information.</p>
-        <button onclick="showAccountSettings()" class="btn btn-secondary">
+        <p>Coming soon: Manage your profile and preferences.</p>
+        <button disabled class="btn btn-secondary" style="cursor: not-allowed; opacity: 0.5;">
           <i class="ri-settings-line"></i>
-          Settings
+          Coming Soon
         </button>
       </div>
       
-      <div class="feature-card">
-        <div class="feature-icon">
-          <i class="ri-customer-service-line"></i>
-        </div>
-        <h3>Support</h3>
-        <p>Get help with your bookings or account questions.</p>
-        <a href="mailto:admin@interlineasia.com" class="btn btn-secondary">
-          <i class="ri-mail-line"></i>
-          Contact Support
-        </a>
-      </div>
     </div>
     
     <!-- Member Info -->
@@ -260,8 +238,31 @@
       }
     }
     
+    // Check authentication before initializing dashboard
+    async function checkAuthAndInitialize() {
+      try {
+        // Wait for Supabase client
+        if (window.supabaseClient) {
+          await window.supabaseClient.readyPromise;
+        }
+        
+        // Check if user is logged in
+        if (!window.supabaseClient || !window.supabaseClient.isLoggedIn()) {
+          window.location.href = '/login.html';
+          return;
+        }
+        
+        // User is authenticated, proceed with dashboard initialization
+        await initializeDashboard();
+        
+      } catch (error) {
+        console.error('Authentication check failed:', error);
+        window.location.href = '/login.html';
+      }
+    }
+
     // Initialize when page loads
-    document.addEventListener('DOMContentLoaded', initializeDashboard);
+    document.addEventListener('DOMContentLoaded', checkAuthAndInitialize);
   </script>
   
   <script src="/js/loadPartials.js" defer></script>

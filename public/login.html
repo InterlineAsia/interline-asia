@@ -140,17 +140,11 @@
           
           showSuccess('Login successful! Redirecting...');
           
-          // Wait a moment for user metadata to be set, then redirect
+          // Simple redirect - all users go to dashboard unless they're super admin
           setTimeout(() => {
-            console.log('About to redirect. Is admin?', window.supabaseClient.isAdmin());
-            if (window.supabaseClient.isAdmin()) {
-              console.log('Redirecting to admin panel');
-              window.location.href = 'admin.html';
-            } else {
-              console.log('Redirecting to dashboard');
-              window.location.href = 'dashboard.html';
-            }
-          }, 1000);
+            console.log('Redirecting to dashboard for user:', result.user.email);
+            window.location.href = 'dashboard.html';
+          }, 500);
         }
         
       } catch (error) {

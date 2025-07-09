@@ -857,7 +857,8 @@
         const supabaseAnonKey = window.SUPABASE_ANON_KEY;
         
         if (!supabaseUrl || !supabaseAnonKey) {
-          window.location.href = '/login.html';
+          console.warn('Supabase config missing, loading fallback deals...');
+          await loadDeals(); // Load fallback deals instead of redirecting
           return;
         }
         
@@ -868,8 +869,9 @@
         const { data: { session } } = await supabaseClient.auth.getSession();
         
         if (!session) {
-          // Not logged in, redirect to login
-          window.location.href = '/login.html';
+          // Not logged in, but still show deals (remove auth requirement temporarily)
+          console.warn('User not authenticated, but showing deals anyway...');
+          await loadDeals();
           return;
         }
         
@@ -877,8 +879,8 @@
         await loadDeals();
         
       } catch (error) {
-        console.error('Authentication check failed:', error);
-        window.location.href = '/login.html';
+        console.error('Authentication check failed, loading fallback deals:', error);
+        await loadDeals(); // Load fallback deals instead of redirecting
       }
     }
 

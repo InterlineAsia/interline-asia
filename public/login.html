@@ -203,11 +203,8 @@
       try {
         await window.supabaseClient.readyPromise;
         if (window.supabaseClient.isLoggedIn()) {
-          if (window.supabaseClient.isAdmin()) {
-            window.location.href = 'admin.html';
-          } else {
-            window.location.href = 'dashboard.html';
-          }
+          // All users go to dashboard - only super admins can access admin panel directly
+          window.location.href = 'dashboard.html';
         }
       } catch (error) {
         console.error('Login page initialization failed:', error);

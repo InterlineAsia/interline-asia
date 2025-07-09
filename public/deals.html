@@ -15,6 +15,7 @@
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
   
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-FYGT92WCXC"></script>
@@ -488,11 +489,10 @@
         const { createClient } = supabase;
         const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
         
-        // Fetch active cruise deals from Supabase
+        // Fetch cruise deals from Supabase
         const { data: deals, error } = await supabaseClient
-          .from('cruise_deals')
+          .from('deals_dashboard')
           .select('*')
-          .eq('is_active', true)
           .order('departure_date', { ascending: true });
         
         if (error) {
@@ -505,17 +505,17 @@
           cruiseLine: deal.cruise_line,
           shipName: deal.ship_name,
           departureDate: deal.departure_date,
-          region: deal.region || '',
-          nights: deal.nights || '',
-          from: deal.departure_port || '',
-          to: deal.arrival_port || '',
+          region: deal.region || 'Other',
+          nights: deal.duration || '',
+          from: 'Various Ports',
+          to: 'Round Trip',
           itinerary: deal.itinerary || '',
-          insidePrice: deal.inside_price || null,
-          oceanviewPrice: deal.oceanview_price || null,
-          balconyPrice: deal.balcony_price || null,
-          suitePrice: deal.suite_price || null,
-          currency: deal.currency || 'USD',
-          seq: deal.seq_number || ''
+          insidePrice: deal.price || null,
+          oceanviewPrice: null,
+          balconyPrice: null,
+          suitePrice: null,
+          currency: 'USD',
+          seq: deal.id || ''
         }));
         
         allDeals = formattedDeals;
@@ -576,9 +576,42 @@
       }
     }
     
+    // Check authentication before loading deals
+    async function checkAuthAndLoadDeals() {
+      try {
+        // Initialize Supabase client first
+        const supabaseUrl = window.SUPABASE_URL;
+        const supabaseAnonKey = window.SUPABASE_ANON_KEY;
+        
+        if (!supabaseUrl || !supabaseAnonKey) {
+          window.location.href = '/login.html';
+          return;
+        }
+        
+        const { createClient } = supabase;
+        const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+        
+        // Check if user is authenticated
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        
+        if (!session) {
+          // Not logged in, redirect to login
+          window.location.href = '/login.html';
+          return;
+        }
+        
+        // User is authenticated, proceed to load deals
+        await loadDeals();
+        
+      } catch (error) {
+        console.error('Authentication check failed:', error);
+        window.location.href = '/login.html';
+      }
+    }
+
     // Load deals when page loads
     document.addEventListener('DOMContentLoaded', async function() {
-      await loadDeals();
+      await checkAuthAndLoadDeals();
       
       // Update user info after a short delay to ensure supabase client is ready
       setTimeout(async () => {

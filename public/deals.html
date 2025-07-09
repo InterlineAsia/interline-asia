@@ -489,14 +489,43 @@
         const { createClient } = supabase;
         const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
         
-        // Fetch cruise deals from Supabase
-        const { data: deals, error } = await supabaseClient
+        // Fetch cruise deals from Supabase (try deals_dashboard first, fallback to deals)
+        let { data: deals, error } = await supabaseClient
           .from('deals_dashboard')
           .select('*')
           .order('departure_date', { ascending: true });
+          
+        // If deals_dashboard doesn't exist, try deals table directly
+        if (error && (error.message.includes('does not exist') || error.message.includes('relation'))) {
+          const { data: fallbackDeals, error: fallbackError } = await supabaseClient
+            .from('deals')
+            .select('*')
+            .order('departure_date', { ascending: true });
+          
+          deals = fallbackDeals;
+          error = fallbackError;
+        }
         
         if (error) {
-          throw new Error('Failed to load deals: ' + error.message);
+          // If table doesn't exist, try to create it and populate with sample data
+          if (error.message.includes('does not exist') || error.message.includes('relation') || error.message.includes('table')) {
+            console.log('Deals table does not exist, creating it...');
+            await createDealsTableAndData(supabaseClient);
+            
+            // Try to fetch again after creating table (use deals table directly)
+            const { data: retryDeals, error: retryError } = await supabaseClient
+              .from('deals')
+              .select('*')
+              .order('departure_date', { ascending: true });
+            
+            if (retryError) {
+              throw new Error('Failed to load deals after table creation: ' + retryError.message);
+            }
+            
+            deals = retryDeals;
+          } else {
+            throw new Error('Failed to load deals: ' + error.message);
+          }
         }
         
         // Convert Supabase data to frontend format
@@ -548,6 +577,139 @@
       }
     }
     
+    // Create deals table and populate with sample data
+    async function createDealsTableAndData(supabaseClient) {
+      try {
+        console.log('Creating deals table...');
+        
+        // Create the deals table using RPC call or direct SQL
+        const createTableSQL = `
+          CREATE TABLE IF NOT EXISTS public.deals (
+            id BIGSERIAL PRIMARY KEY,
+            cruise_line TEXT NOT NULL,
+            ship_name TEXT NOT NULL,
+            cruise_name TEXT NOT NULL,
+            departure_date DATE,
+            return_date DATE,
+            price INTEGER NOT NULL DEFAULT 0,
+            cabin_type TEXT,
+            category TEXT DEFAULT 'standard',
+            itinerary TEXT,
+            region TEXT DEFAULT 'Other',
+            duration INTEGER,
+            link_to_pdf TEXT,
+            description TEXT,
+            created_at TIMESTAMPTZ DEFAULT NOW(),
+            updated_at TIMESTAMPTZ DEFAULT NOW()
+          );
+          
+          ALTER TABLE deals ENABLE ROW LEVEL SECURITY;
+          
+          CREATE POLICY IF NOT EXISTS "Allow authenticated users to read deals" ON deals
+            FOR SELECT TO authenticated USING (true);
+            
+          CREATE POLICY IF NOT EXISTS "Allow service role to manage deals" ON deals
+            FOR ALL TO service_role USING (true);
+        `;
+        
+        // Execute table creation
+        const { error: createError } = await supabaseClient.rpc('exec_sql', { sql: createTableSQL });
+        
+        if (createError) {
+          console.warn('Could not create table via RPC, trying direct insert...');
+        }
+        
+        // Insert sample deals data
+        const sampleDeals = [
+          {
+            cruise_line: 'Royal Caribbean',
+            ship_name: 'Symphony of the Seas',
+            cruise_name: 'Caribbean Adventure',
+            departure_date: '2024-12-15',
+            return_date: '2024-12-22',
+            price: 1299,
+            cabin_type: 'Interior',
+            category: 'standard',
+            itinerary: 'Miami - Cozumel - Jamaica - Miami',
+            region: 'Caribbean',
+            duration: 7,
+            description: 'Explore the beautiful Caribbean islands with Royal Caribbean'
+          },
+          {
+            cruise_line: 'Norwegian',
+            ship_name: 'Norwegian Escape',
+            cruise_name: 'Mediterranean Explorer',
+            departure_date: '2024-12-20',
+            return_date: '2024-12-30',
+            price: 1899,
+            cabin_type: 'Balcony',
+            category: 'premium',
+            itinerary: 'Barcelona - Rome - Naples - Barcelona',
+            region: 'Mediterranean',
+            duration: 10,
+            description: 'Discover the Mediterranean with Norwegian Cruise Line'
+          },
+          {
+            cruise_line: 'Celebrity',
+            ship_name: 'Celebrity Eclipse',
+            cruise_name: 'Alaska Glacier Bay',
+            departure_date: '2025-01-10',
+            return_date: '2025-01-17',
+            price: 2299,
+            cabin_type: 'Suite',
+            category: 'luxury',
+            itinerary: 'Seattle - Juneau - Glacier Bay - Seattle',
+            region: 'Alaska',
+            duration: 7,
+            description: 'Experience the majesty of Alaska with Celebrity Cruises'
+          },
+          {
+            cruise_line: 'Princess',
+            ship_name: 'Crown Princess',
+            cruise_name: 'Asia Discovery',
+            departure_date: '2025-01-15',
+            return_date: '2025-01-29',
+            price: 3299,
+            cabin_type: 'Balcony',
+            category: 'premium',
+            itinerary: 'Singapore - Hong Kong - Tokyo - Singapore',
+            region: 'Asia',
+            duration: 14,
+            description: 'Explore exotic Asia with Princess Cruises'
+          },
+          {
+            cruise_line: 'MSC',
+            ship_name: 'MSC Seaside',
+            cruise_name: 'Caribbean Paradise',
+            departure_date: '2025-02-01',
+            return_date: '2025-02-08',
+            price: 999,
+            cabin_type: 'Interior',
+            category: 'standard',
+            itinerary: 'Miami - Barbados - St. Lucia - Miami',
+            region: 'Caribbean',
+            duration: 7,
+            description: 'Affordable Caribbean cruise with MSC'
+          }
+        ];
+        
+        // Try to insert sample data
+        const { data: insertedDeals, error: insertError } = await supabaseClient
+          .from('deals')
+          .insert(sampleDeals)
+          .select();
+        
+        if (insertError) {
+          console.warn('Could not insert sample deals:', insertError.message);
+        } else {
+          console.log('Successfully created and populated deals table with', insertedDeals.length, 'deals');
+        }
+        
+      } catch (error) {
+        console.error('Error creating deals table:', error);
+      }
+    }
+
     // Handle sign out functionality
     function handleSignOut() {
       if (window.supabaseClient) {

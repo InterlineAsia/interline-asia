@@ -73,7 +73,7 @@ class SupabaseClient {
     // --- Define Super Admins by email for security ---
     // This is a secure way to grant top-level access without relying on database fields that could be misconfigured.
     const SUPER_ADMIN_EMAILS = [
-      'rodney@telenational.com.au',
+      'admin@telenational.com.au',
       'admin@interlineasia.com' // Generic admin email
     ];
 

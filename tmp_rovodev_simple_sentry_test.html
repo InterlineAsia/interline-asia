@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Sentry Test</title>
+    <!-- Sentry Error Tracking -->
+    <script src="https://browser.sentry-cdn.com/7.114.0/bundle.tracing.replay.min.js" crossorigin="anonymous"></script>
+    <script>
+        Sentry.init({
+            dsn: 'https://0d303493dda99798ec54797ed93d27fa@o4509632867598336.ingest.de.sentry.io/4509632880967760',
+            environment: 'test'
+        });
+    </script>
+</head>
+<body>
+    <h1>Simple Sentry Test</h1>
+    <button onclick="triggerError()">Trigger Test Error</button>
+    <button onclick="triggerUndefined()">Trigger Undefined Function</button>
+    
+    <script>
+        function triggerError() {
+            try {
+                throw new Error('Test error from simple page');
+            } catch (error) {
+                Sentry.captureException(error);
+                alert('Error sent to Sentry!');
+            }
+        }
+        
+        function triggerUndefined() {
+            // This will trigger the undefined function error Sentry wants
+            myUndefinedFunction();
+        }
+    </script>
+</body>
+</html>

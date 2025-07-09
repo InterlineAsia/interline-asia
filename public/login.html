@@ -129,22 +129,10 @@
         }
         
         if (result && result.user) {
-              
-              // Log successful login
-              if (window.sentryLogger) {
-                window.sentryLogger.info("User login successful", {
-                  userId: loginResult.user.id,
-                  email: email,
-                  isAdmin: window.supabaseClient.isAdmin()
-                });
-              }
-            }
-            
-            return loginResult;
-          }
-        );
-        
-        if (result.user) {
+          console.log('Login successful, user data:', result.user);
+          console.log('Current user after login:', window.supabaseClient.currentUser);
+          console.log('Is admin check:', window.supabaseClient.isAdmin());
+          
           // Track successful login
           gtag('event', 'login', {
             method: 'email'
@@ -152,11 +140,14 @@
           
           showSuccess('Login successful! Redirecting...');
           
-          // Redirect based on user role
+          // Wait a moment for user metadata to be set, then redirect
           setTimeout(() => {
+            console.log('About to redirect. Is admin?', window.supabaseClient.isAdmin());
             if (window.supabaseClient.isAdmin()) {
+              console.log('Redirecting to admin panel');
               window.location.href = 'admin.html';
             } else {
+              console.log('Redirecting to dashboard');
               window.location.href = 'dashboard.html';
             }
           }, 1000);

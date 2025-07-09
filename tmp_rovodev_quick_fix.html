@@ -1,0 +1,21 @@
+<!-- Quick test to see the filtering issue -->
+<script>
+// Test the filtering logic
+const testUsers = [
+  { name: 'Admin User', email: 'admin@telenational.com.au', verified: false },
+  { name: 'Rodney Pattison', email: 'rodney@telenational.com.au', verified: true }
+];
+
+console.log('Test users:', testUsers);
+
+// Test current logic (might be wrong)
+const unverified1 = testUsers.filter(user => !user.verified);
+console.log('Using !user.verified:', unverified1);
+
+// Test correct logic
+const unverified2 = testUsers.filter(user => user.verified === false);
+console.log('Using user.verified === false:', unverified2);
+
+// The issue is likely that the dashboard is using !user.verified
+// which doesn't work properly with boolean false values
+</script>

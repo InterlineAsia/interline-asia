@@ -1,50 +1,265 @@
-
-// Send test email function
-    async function sendTestEmail() {
-      const user = window.supabaseClient.currentUser;
-      if (!user) {
-        showError("Please log in to send test email");
-        Sentry.captureException(new Error("User not logged in when attempting to send test email"));
-        return;
-      }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Member Dashboard - Interline Asia">
+  <title>Member Dashboard - Interline Asia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="auth.css">
+  <link rel="stylesheet" href="/css/main.css">
+  
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .dashboard-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .dashboard-header {
+      background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    
+    .welcome-card {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .feature-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .feature-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: #3b82f6;
+    }
+    
+    .btn {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+    
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+    
+    .btn-secondary {
+      background: #6b7280;
+    }
+    
+    .btn-secondary:hover {
+      background: #4b5563;
+      box-shadow: 0 4px 12px rgba(107, 114, 128, 0.4);
+    }
+    
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      background: #f0fdf4;
+      color: #16a34a;
+      border: 1px solid #bbf7d0;
+    }
+  </style>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+  
+  <div class="dashboard-container">
+    <!-- Welcome Section -->
+    <div class="welcome-card">
+      <h1><i class="ri-dashboard-line mr-2"></i>Welcome to Your Member Dashboard</h1>
+      <p id="welcome-message">Loading...</p>
+      <div class="status-badge">
+        <i class="ri-check-line"></i>
+        Verified Member
+      </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="ri-ship-line"></i>
+        </div>
+        <h3>Browse Cruise Deals</h3>
+        <p>Explore exclusive cruise deals available only to verified members.</p>
+        <a href="deals.html" class="btn">
+          <i class="ri-search-line"></i>
+          View Deals
+        </a>
+      </div>
       
-      const button = event.target;
-      const originalText = button.textContent;
-      button.textContent = "Sending...";
-      button.disabled = true;
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="ri-calendar-check-line"></i>
+        </div>
+        <h3>Book a Cruise</h3>
+        <p>Book your next cruise adventure with our exclusive member pricing.</p>
+        <a href="booking.html" class="btn">
+          <i class="ri-calendar-line"></i>
+          Book Now
+        </a>
+      </div>
       
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="ri-user-settings-line"></i>
+        </div>
+        <h3>Account Settings</h3>
+        <p>Manage your profile, preferences, and account information.</p>
+        <button onclick="showAccountSettings()" class="btn btn-secondary">
+          <i class="ri-settings-line"></i>
+          Settings
+        </button>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="ri-customer-service-line"></i>
+        </div>
+        <h3>Support</h3>
+        <p>Get help with your bookings or account questions.</p>
+        <a href="mailto:admin@interlineasia.com" class="btn btn-secondary">
+          <i class="ri-mail-line"></i>
+          Contact Support
+        </a>
+      </div>
+    </div>
+    
+    <!-- Member Info -->
+    <div class="dashboard-header">
+      <h2>Member Information</h2>
+      <div id="member-info">
+        <p><strong>Name:</strong> <span id="member-name">Loading...</span></p>
+        <p><strong>Email:</strong> <span id="member-email">Loading...</span></p>
+        <p><strong>Member Since:</strong> <span id="member-since">Loading...</span></p>
+        <p><strong>Status:</strong> <span class="status-badge"><i class="ri-check-line"></i>Verified Member</span></p>
+      </div>
+      
+      <div style="margin-top: 2rem;">
+        <button onclick="signOut()" class="btn btn-secondary">
+          <i class="ri-logout-box-line"></i>
+          Sign Out
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <div id="footer-placeholder"></div>
+  
+  <script>
+    // Initialize dashboard
+    async function initializeDashboard() {
       try {
-        const response = await fetch("/api/send-test-email", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            toEmail: user.email,
-            toName: user.full_name || user.email.split("@")[0],
-            emailType: "test"
-          })
-        });
+        // Wait for Supabase client
+        await window.supabaseClient.readyPromise;
         
-        const result = await response.json();
-        
-        if (result.success) {
-          showError('Test email sent successfully!', 'success');
-          console.log("Email sent:", result);
-        } else {
-          throw new Error(result.error || "Failed to send email");
+        // Check if user is logged in
+        if (!window.supabaseClient.isLoggedIn()) {
+          window.location.href = 'login.html';
+          return;
         }
         
+        // Get current user
+        const user = window.supabaseClient.currentUser;
+        
+        // Update welcome message
+        const displayName = user.full_name || user.email.split('@')[0];
+        document.getElementById('welcome-message').textContent = `Hello ${displayName}! You have access to exclusive cruise deals and member-only features.`;
+        
+        // Update member info
+        document.getElementById('member-name').textContent = user.full_name || 'Not provided';
+        document.getElementById('member-email').textContent = user.email;
+        
+        // Format member since date
+        const memberSince = new Date(user.created_at || Date.now()).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+        document.getElementById('member-since').textContent = memberSince;
+        
       } catch (error) {
-        console.error("Error sending test email:", error);
-        Sentry.captureException(error);
-        showError(`Failed to send test email: ${error.message}`);
-        Sentry.captureException(error);
-      } finally {
-        button.textContent = originalText;
-        button.disabled = false;
+        console.error('Error initializing dashboard:', error);
+        document.getElementById('welcome-message').textContent = 'Welcome to your member dashboard!';
       }
     }
+    
+    // Account settings
+    function showAccountSettings() {
+      alert('Account settings feature coming soon! For now, please contact admin@interlineasia.com for any account changes.');
+    }
+    
+    // Sign out
+    async function signOut() {
+      if (confirm('Are you sure you want to sign out?')) {
+        try {
+          await window.supabaseClient.signOut();
+        } catch (error) {
+          console.error('Error signing out:', error);
+          window.location.href = 'login.html';
+        }
+      }
+    }
+    
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', initializeDashboard);
   </script>
+  
+  <script src="/js/loadPartials.js" defer></script>
 </body>
 </html>

@@ -28,7 +28,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey, {
 
 async function createAdminUser() {
   try {
-    const adminEmail = 'rodney@telenational.com.au';
+    const adminEmail = 'admin@telenational.com.au';
     const adminPassword = 'InterlineAdmin2024!'; // Temporary password
     
     console.log('🔍 Checking for existing user:', adminEmail);

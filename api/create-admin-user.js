@@ -22,7 +22,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const adminEmail = 'rodney@telenational.com.au';
+    const adminEmail = 'admin@telenational.com.au';
     const adminPassword = 'TempPassword123!'; // Temporary password - user should reset
     
     console.log('Creating admin user:', adminEmail);

@@ -98,22 +98,37 @@
           throw new Error('Security verification failed. Please complete the verification and try again.');
         }
         
-        // Sign in with Supabase - wrapped in Sentry span for performance tracking
-        const result = await Sentry.startSpan(
-          {
-            op: "auth.login",
-            name: "User Login",
-          },
-          async (span) => {
-            span.setAttribute("email", email);
-            span.setAttribute("method", "email_password");
-            
-            const loginResult = await window.supabaseClient.signIn(email, password);
-            
-            if (loginResult.user) {
-              span.setAttribute("success", true);
-              span.setAttribute("user_id", loginResult.user.id);
-              span.setAttribute("is_admin", window.supabaseClient.isAdmin());
+        // Sign in with Supabase - with safe Sentry tracking
+        let result;
+        try {
+          result = await Sentry.startSpan(
+            {
+              op: "auth.login",
+              name: "User Login",
+            },
+            async (span) => {
+              if (span && span.setAttribute) {
+                span.setAttribute("email", email);
+                span.setAttribute("method", "email_password");
+              }
+              
+              const loginResult = await window.supabaseClient.signIn(email, password, turnstileToken);
+              
+              if (loginResult.user && span && span.setAttribute) {
+                span.setAttribute("success", true);
+                span.setAttribute("user_id", loginResult.user.id);
+                span.setAttribute("is_admin", window.supabaseClient.isAdmin());
+              }
+              
+              return loginResult;
+            }
+          );
+        } catch (sentryError) {
+          console.warn('Sentry tracking failed, proceeding with login:', sentryError);
+          result = await window.supabaseClient.signIn(email, password, turnstileToken);
+        }
+        
+        if (result && result.user) {
               
               // Log successful login
               if (window.sentryLogger) {

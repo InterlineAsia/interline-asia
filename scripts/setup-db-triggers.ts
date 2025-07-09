@@ -1,6 +1,7 @@
 // ✅ Database triggers setup script for Supabase
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
+import Sentry from '../sentry.server.js';
 
 // Load environment variables from .env.local
 dotenv.config({ path: '.env.local' });
@@ -73,6 +74,7 @@ async function main() {
     process.exit(0);
   } catch (err: any) {
     console.error(err.message || err);
+    Sentry.captureException(err);
     process.exit(1);
   }
 }

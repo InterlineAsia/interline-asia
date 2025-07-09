@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deals Debug - Step by Step</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="supabase-client.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .step { background: #f5f5f5; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .error { background: #ffe6e6; border: 1px solid #ff9999; }
+        .success { background: #e6ffe6; border: 1px solid #99ff99; }
+        .info { background: #e6f3ff; border: 1px solid #99ccff; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+        button { padding: 10px 20px; font-size: 16px; background: #007cba; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Deals Loading Debug - Step by Step</h1>
+    
+    <button onclick="runFullDebug()">🚀 Run Full Debug</button>
+    <button onclick="testFallbackOnly()">📊 Test Fallback Data Only</button>
+    
+    <div id="debug-output"></div>
+
+    <script>
+        function log(message, type = 'info') {
+            const output = document.getElementById('debug-output');
+            const div = document.createElement('div');
+            div.className = `step ${type}`;
+            div.innerHTML = `<strong>[${new Date().toLocaleTimeString()}]</strong> ${message}`;
+            output.appendChild(div);
+            console.log(message);
+        }
+
+        async function runFullDebug() {
+            const output = document.getElementById('debug-output');
+            output.innerHTML = '';
+            
+            log('🔄 Starting full debug process...', 'info');
+            
+            try {
+                // Step 1: Check authentication
+                log('Step 1: Checking authentication...', 'info');
+                
+                if (!window.supabaseClient) {
+                    log('❌ window.supabaseClient not found', 'error');
+                    return;
+                }
+                
+                await window.supabaseClient.readyPromise;
+                
+                if (!window.supabaseClient.isLoggedIn()) {
+                    log('❌ User not logged in', 'error');
+                    return;
+                }
+                
+                log('✅ User is authenticated', 'success');
+                
+                // Step 2: Check Supabase config
+                log('Step 2: Checking Supabase configuration...', 'info');
+                
+                const supabaseUrl = window.SUPABASE_URL;
+                const supabaseAnonKey = window.SUPABASE_ANON_KEY;
+                
+                if (!supabaseUrl || !supabaseAnonKey) {
+                    log('❌ Supabase configuration missing', 'error');
+                    log(`URL: ${supabaseUrl ? 'Present' : 'Missing'}`, 'info');
+                    log(`Key: ${supabaseAnonKey ? 'Present' : 'Missing'}`, 'info');
+                    return;
+                }
+                
+                log('✅ Supabase configuration present', 'success');
+                
+                // Step 3: Create Supabase client
+                log('Step 3: Creating Supabase client...', 'info');
+                
+                const { createClient } = supabase;
+                const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+                
+                log('✅ Supabase client created', 'success');
+                
+                // Step 4: Test different table queries
+                const tablesToTest = ['deals_dashboard', 'deals', 'cruise_deals'];
+                
+                for (const tableName of tablesToTest) {
+                    log(`Step 4.${tablesToTest.indexOf(tableName) + 1}: Testing table "${tableName}"...`, 'info');
+                    
+                    try {
+                        const { data, error, count } = await supabaseClient
+                            .from(tableName)
+                            .select('*', { count: 'exact' })
+                            .limit(3);
+                        
+                        if (error) {
+                            log(`❌ Table "${tableName}": ${error.message}`, 'error');
+                        } else {
+                            log(`✅ Table "${tableName}" accessible! Rows: ${count || 0}`, 'success');
+                            if (data && data.length > 0) {
+                                log(`📋 Sample data from "${tableName}":`, 'info');
+                                log(`<pre>${JSON.stringify(data, null, 2)}</pre>`, 'info');
+                            }
+                        }
+                    } catch (tableError) {
+                        log(`❌ Exception testing "${tableName}": ${tableError.message}`, 'error');
+                    }
+                }
+                
+                // Step 5: Test fallback data
+                log('Step 5: Testing fallback data rendering...', 'info');
+                await testFallbackOnly();
+                
+            } catch (error) {
+                log(`❌ Debug failed: ${error.message}`, 'error');
+                log(`Stack: ${error.stack}`, 'error');
+            }
+        }
+
+        async function testFallbackOnly() {
+            log('🎯 Testing fallback data only...', 'info');
+            
+            try {
+                const fallbackDeals = [
+                    {
+                        id: 1,
+                        cruise_line: 'Royal Caribbean',
+                        ship_name: 'Symphony of the Seas',
+                        cruise_name: 'Caribbean Adventure',
+                        departure_date: '2024-12-15',
+                        price: 1299,
+                        region: 'Caribbean',
+                        duration: 7,
+                        itinerary: 'Miami - Cozumel - Jamaica - Miami'
+                    },
+                    {
+                        id: 2,
+                        cruise_line: 'Norwegian',
+                        ship_name: 'Norwegian Escape',
+                        cruise_name: 'Mediterranean Explorer',
+                        departure_date: '2024-12-20',
+                        price: 1899,
+                        region: 'Mediterranean',
+                        duration: 10,
+                        itinerary: 'Barcelona - Rome - Naples - Barcelona'
+                    }
+                ];
+                
+                log(`✅ Fallback data created: ${fallbackDeals.length} deals`, 'success');
+                
+                // Test data conversion
+                const formattedDeals = fallbackDeals.map(deal => ({
+                    id: deal.id,
+                    cruiseLine: deal.cruise_line,
+                    shipName: deal.ship_name,
+                    departureDate: deal.departure_date,
+                    region: deal.region || 'Other',
+                    nights: deal.duration || '',
+                    from: 'Various Ports',
+                    to: 'Round Trip',
+                    itinerary: deal.itinerary || '',
+                    insidePrice: deal.price || null,
+                    oceanviewPrice: null,
+                    balconyPrice: null,
+                    suitePrice: null,
+                    currency: 'USD'
+                }));
+                
+                log(`✅ Data formatted successfully`, 'success');
+                log(`📋 Formatted data:`, 'info');
+                log(`<pre>${JSON.stringify(formattedDeals, null, 2)}</pre>`, 'info');
+                
+                // Test if we can create deal tiles
+                const testTile = createTestDealTile(formattedDeals[0]);
+                log(`✅ Deal tile HTML generated: ${testTile.length} characters`, 'success');
+                
+                // Show a sample tile
+                const sampleDiv = document.createElement('div');
+                sampleDiv.innerHTML = `<h3>Sample Deal Tile:</h3>${testTile}`;
+                sampleDiv.style.border = '2px solid #007cba';
+                sampleDiv.style.padding = '15px';
+                sampleDiv.style.margin = '15px 0';
+                sampleDiv.style.borderRadius = '8px';
+                document.getElementById('debug-output').appendChild(sampleDiv);
+                
+            } catch (error) {
+                log(`❌ Fallback test failed: ${error.message}`, 'error');
+            }
+        }
+
+        function createTestDealTile(deal) {
+            return `
+                <div style="border: 1px solid #ccc; padding: 15px; border-radius: 8px; background: white; max-width: 300px;">
+                    <h4>${deal.cruiseLine}</h4>
+                    <p><strong>${deal.shipName}</strong></p>
+                    <p>📍 ${deal.region}</p>
+                    <p>📅 ${deal.departureDate}</p>
+                    <p>🌙 ${deal.nights} nights</p>
+                    <p>💰 $${deal.insidePrice}</p>
+                    <p><small>${deal.itinerary}</small></p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

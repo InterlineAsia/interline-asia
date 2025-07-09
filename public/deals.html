@@ -204,11 +204,16 @@
       'Carnival': '/logos/cruiselines/carnival.png',
       'Cunard': '/logos/cruiselines/cunard.png',
       'Oceania': '/logos/cruiselines/oceania.png',
-      'Regent': '/logos/cruiselines/regent.png',
-      'Seabourn': '/logos/cruiselines/seabourn.png',
-      'Silversea': '/logos/cruiselines/silversea.png',
+      'Regent': '/logos/cruiselines/placeholder.png', // Missing logo
+      'Seabourn': '/logos/cruiselines/placeholder.png', // Missing logo
+      'Silversea': '/logos/cruiselines/placeholder.png', // Missing logo
       'Crystal': '/logos/cruiselines/crystal.png',
-      'Azamara': '/logos/cruiselines/azamara.png'
+      'Azamara': '/logos/cruiselines/azamara.png',
+      'Atlas': '/logos/cruiselines/atlas.png',
+      'Coral Expeditions': '/logos/cruiselines/coral-expeditions.png',
+      'Explora Journeys': '/logos/cruiselines/explora-journeys.png',
+      'Heritage Expeditions': '/logos/cruiselines/heritage-expeditions.png',
+      'HX Hurtigruten Expeditions': '/logos/cruiselines/hx-hurtigruten-expeditions.png'
     };
     
     // Format price with currency symbol
@@ -563,7 +568,7 @@
         console.error('Error loading deals:', error);
         console.log('Loading fallback deals data...');
         
-        // Use fallback static deals data
+        // Use fallback static deals data - 19 cruise lines
         const fallbackDeals = [
           {
             id: 1,
@@ -639,6 +644,216 @@
             region: 'Caribbean',
             duration: 7,
             description: 'Affordable Caribbean cruise with MSC'
+          },
+          {
+            id: 6,
+            cruise_line: 'Carnival',
+            ship_name: 'Carnival Vista',
+            cruise_name: 'Western Caribbean',
+            departure_date: '2025-02-10',
+            return_date: '2025-02-17',
+            price: 899,
+            cabin_type: 'Interior',
+            category: 'standard',
+            itinerary: 'Miami - Cozumel - Belize - Miami',
+            region: 'Caribbean',
+            duration: 7,
+            description: 'Fun-filled Caribbean adventure with Carnival'
+          },
+          {
+            id: 7,
+            cruise_line: 'Holland America',
+            ship_name: 'Nieuw Amsterdam',
+            cruise_name: 'Northern Capitals',
+            departure_date: '2025-02-15',
+            return_date: '2025-02-29',
+            price: 2799,
+            cabin_type: 'Balcony',
+            category: 'premium',
+            itinerary: 'Amsterdam - Copenhagen - Stockholm - Helsinki',
+            region: 'Northern Europe',
+            duration: 14,
+            description: 'Elegant Northern European capitals cruise'
+          },
+          {
+            id: 8,
+            cruise_line: 'Cunard',
+            ship_name: 'Queen Mary 2',
+            cruise_name: 'Transatlantic Crossing',
+            departure_date: '2025-03-01',
+            return_date: '2025-03-08',
+            price: 1999,
+            cabin_type: 'Balcony',
+            category: 'luxury',
+            itinerary: 'Southampton - New York',
+            region: 'Transatlantic',
+            duration: 7,
+            description: 'Classic transatlantic voyage aboard the legendary Queen Mary 2'
+          },
+          {
+            id: 9,
+            cruise_line: 'Oceania',
+            ship_name: 'Marina',
+            cruise_name: 'Greek Isles Odyssey',
+            departure_date: '2025-03-10',
+            return_date: '2025-03-20',
+            price: 3599,
+            cabin_type: 'Suite',
+            category: 'luxury',
+            itinerary: 'Athens - Santorini - Mykonos - Rhodes',
+            region: 'Mediterranean',
+            duration: 10,
+            description: 'Luxury Greek Islands exploration with Oceania'
+          },
+          {
+            id: 10,
+            cruise_line: 'Crystal',
+            ship_name: 'Crystal Serenity',
+            cruise_name: 'Baltic Capitals',
+            departure_date: '2025-03-15',
+            return_date: '2025-03-29',
+            price: 4999,
+            cabin_type: 'Suite',
+            category: 'ultra-luxury',
+            itinerary: 'Stockholm - Helsinki - St. Petersburg - Copenhagen',
+            region: 'Northern Europe',
+            duration: 14,
+            description: 'Ultra-luxury Baltic Sea cruise with Crystal'
+          },
+          {
+            id: 11,
+            cruise_line: 'Azamara',
+            ship_name: 'Azamara Quest',
+            cruise_name: 'Adriatic Explorer',
+            departure_date: '2025-03-20',
+            return_date: '2025-03-27',
+            price: 2899,
+            cabin_type: 'Balcony',
+            category: 'premium',
+            itinerary: 'Venice - Dubrovnik - Split - Trieste',
+            region: 'Mediterranean',
+            duration: 7,
+            description: 'Intimate Adriatic coastal cruise with Azamara'
+          },
+          {
+            id: 12,
+            cruise_line: 'Atlas',
+            ship_name: 'World Navigator',
+            cruise_name: 'Antarctic Peninsula',
+            departure_date: '2025-04-01',
+            return_date: '2025-04-11',
+            price: 8999,
+            cabin_type: 'Balcony',
+            category: 'expedition',
+            itinerary: 'Ushuaia - Antarctic Peninsula - Drake Passage',
+            region: 'Antarctica',
+            duration: 10,
+            description: 'Epic Antarctic expedition with Atlas Ocean Voyages'
+          },
+          {
+            id: 13,
+            cruise_line: 'Coral Expeditions',
+            ship_name: 'Coral Discoverer',
+            cruise_name: 'Kimberley Coast',
+            departure_date: '2025-04-05',
+            return_date: '2025-04-15',
+            price: 6999,
+            cabin_type: 'Balcony',
+            category: 'expedition',
+            itinerary: 'Broome - Kimberley Coast - Darwin',
+            region: 'Australia',
+            duration: 10,
+            description: 'Remote Australian wilderness expedition'
+          },
+          {
+            id: 14,
+            cruise_line: 'Explora Journeys',
+            ship_name: 'Explora I',
+            cruise_name: 'Norwegian Fjords',
+            departure_date: '2025-04-10',
+            return_date: '2025-04-17',
+            price: 3999,
+            cabin_type: 'Suite',
+            category: 'luxury',
+            itinerary: 'Bergen - Geiranger - Flam - Stavanger',
+            region: 'Northern Europe',
+            duration: 7,
+            description: 'Luxury Norwegian fjords discovery'
+          },
+          {
+            id: 15,
+            cruise_line: 'Heritage Expeditions',
+            ship_name: 'Heritage Adventurer',
+            cruise_name: 'Sub-Antarctic Islands',
+            departure_date: '2025-04-15',
+            return_date: '2025-04-29',
+            price: 12999,
+            cabin_type: 'Balcony',
+            category: 'expedition',
+            itinerary: 'Bluff - Macquarie Island - Campbell Island',
+            region: 'Sub-Antarctic',
+            duration: 14,
+            description: 'Rare sub-Antarctic wildlife expedition'
+          },
+          {
+            id: 16,
+            cruise_line: 'HX Hurtigruten Expeditions',
+            ship_name: 'MS Roald Amundsen',
+            cruise_name: 'Greenland Explorer',
+            departure_date: '2025-04-20',
+            return_date: '2025-05-02',
+            price: 7999,
+            cabin_type: 'Balcony',
+            category: 'expedition',
+            itinerary: 'Reykjavik - Scoresby Sound - Ittoqqortoormiit',
+            region: 'Arctic',
+            duration: 12,
+            description: 'Arctic Greenland expedition cruise'
+          },
+          {
+            id: 17,
+            cruise_line: 'Regent',
+            ship_name: 'Seven Seas Explorer',
+            cruise_name: 'Mediterranean Grand Voyage',
+            departure_date: '2025-05-01',
+            return_date: '2025-05-15',
+            price: 8999,
+            cabin_type: 'Suite',
+            category: 'ultra-luxury',
+            itinerary: 'Monte Carlo - Barcelona - Rome - Venice',
+            region: 'Mediterranean',
+            duration: 14,
+            description: 'All-inclusive ultra-luxury Mediterranean cruise'
+          },
+          {
+            id: 18,
+            cruise_line: 'Seabourn',
+            ship_name: 'Seabourn Ovation',
+            cruise_name: 'Baltic Capitals',
+            departure_date: '2025-05-05',
+            return_date: '2025-05-15',
+            price: 6999,
+            cabin_type: 'Suite',
+            category: 'ultra-luxury',
+            itinerary: 'Copenhagen - Stockholm - Helsinki - St. Petersburg',
+            region: 'Northern Europe',
+            duration: 10,
+            description: 'Intimate luxury Baltic cruise with Seabourn'
+          },
+          {
+            id: 19,
+            cruise_line: 'Silversea',
+            ship_name: 'Silver Wind',
+            cruise_name: 'Arctic Svalbard',
+            departure_date: '2025-05-10',
+            return_date: '2025-05-20',
+            price: 9999,
+            cabin_type: 'Suite',
+            category: 'ultra-luxury',
+            itinerary: 'Longyearbyen - Svalbard - Arctic Ocean',
+            region: 'Arctic',
+            duration: 10,
+            description: 'Ultra-luxury Arctic expedition to Svalbard'
           }
         ];
         

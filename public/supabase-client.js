@@ -197,10 +197,19 @@ class SupabaseClient {
   async signOut() {
     await this.readyPromise;
     console.log('Signing out user...');
+    
+    // Clear local state immediately
     this.currentUser = null;
     this.currentSession = null;
+    
+    // Sign out from Supabase
     await this.supabase.auth.signOut();
-    // Force redirect to login page
+    
+    // Clear any local storage that might persist session
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // Force redirect with no history
     window.location.replace('/login.html');
   }
 

@@ -71,19 +71,10 @@
 
   <script src="/js/loadPartials.js" defer></script>
   <script>
-    // Clear any existing session on page load to prevent auto-login
+    // Clear form fields and focus on email - NO session clearing to prevent loops
     document.addEventListener('DOMContentLoaded', async function() {
       try {
-        if (window.supabaseClient) {
-          await window.supabaseClient.readyPromise;
-          // Check if user is already logged in and clear session
-          if (window.supabaseClient.isLoggedIn()) {
-            console.log('Existing session found, clearing for fresh login');
-            await window.supabaseClient.signOut();
-          }
-        }
-        
-        // Clear form fields to prevent auto-fill
+        // Just clear form fields and focus - don't touch sessions
         setTimeout(() => {
           document.getElementById('email').value = '';
           document.getElementById('password').value = '';
@@ -91,7 +82,7 @@
         }, 100);
         
       } catch (error) {
-        console.log('Session clear error (expected):', error);
+        console.log('Form clear error:', error);
       }
     });
     

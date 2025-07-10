@@ -59,10 +59,7 @@ class SupabaseClient {
         await this._setCurrentUserWithMetadata(session.user);
       } else {
         this.currentUser = null;
-        // Only redirect on explicit sign out, not on page load
-        if (event === 'SIGNED_OUT') {
-          window.location.href = '/login.html';
-        }
+        // Do NOT auto-redirect on sign out - let the signOut() method handle it
       }
     });
   }
@@ -199,10 +196,12 @@ class SupabaseClient {
 
   async signOut() {
     await this.readyPromise;
-    await this.supabase.auth.signOut();
+    console.log('Signing out user...');
     this.currentUser = null;
     this.currentSession = null;
-    window.location.href = '/login.html';
+    await this.supabase.auth.signOut();
+    // Force redirect to login page
+    window.location.replace('/login.html');
   }
 
   isLoggedIn() {

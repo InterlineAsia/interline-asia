@@ -202,10 +202,22 @@ class SupabaseClient {
     return !!this.currentSession;
   }
 
-  isAdmin() {
-    // A user is considered an admin if the is_admin flag is true.
-    // This flag is now set reliably in _setCurrentUserWithMetadata.
-    return this.currentUser?.is_admin === true;
+  isAdmin(email = null) {
+    // Check by email parameter first (for external calls)
+    if (email) {
+      return email === 'admin@telenational.com.au' || email === 'admin@interlineasia.com';
+    }
+    
+    // Check current user
+    if (!this.currentUser) return false;
+    
+    // Check by email first (most reliable)
+    if (this.currentUser.email === 'admin@telenational.com.au' || this.currentUser.email === 'admin@interlineasia.com') {
+      return true;
+    }
+    
+    // Then check flags
+    return this.currentUser.is_admin === true || this.currentUser.is_super_admin === true;
   }
 
   requireAuth() {

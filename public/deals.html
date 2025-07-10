@@ -114,7 +114,7 @@
     
     <!-- Filter Section -->
     <div class="filter-card rounded-2xl p-6 mb-8 shadow-lg">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         <div class="space-y-2">
           <label for="cruiseLineFilter" class="block text-sm font-semibold text-slate-700">
             <i class="ri-ship-line mr-1"></i> Cruise Line
@@ -134,6 +134,16 @@
         </div>
         
         <div class="space-y-2">
+          <label for="dateFilter" class="block text-sm font-semibold text-slate-700">
+            <i class="ri-calendar-line mr-1"></i> Departure Date
+          </label>
+          <div class="space-y-2">
+            <input type="date" id="dateFromFilter" placeholder="From Date" class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors bg-white text-sm">
+            <input type="date" id="dateToFilter" placeholder="To Date" class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors bg-white text-sm">
+          </div>
+        </div>
+        
+        <div class="space-y-2">
           <label for="sortFilter" class="block text-sm font-semibold text-slate-700">
             <i class="ri-sort-asc mr-1"></i> Sort by Price
           </label>
@@ -141,6 +151,8 @@
             <option value="">Default Order</option>
             <option value="price-low">Price: Low to High</option>
             <option value="price-high">Price: High to Low</option>
+            <option value="date-earliest">Date: Earliest First</option>
+            <option value="date-latest">Date: Latest First</option>
           </select>
         </div>
         
@@ -262,6 +274,8 @@
         // Add event listeners
         document.getElementById('cruiseLineFilter').addEventListener('change', applyFilters);
         document.getElementById('regionFilter').addEventListener('change', applyFilters);
+        document.getElementById('dateFromFilter').addEventListener('change', applyFilters);
+        document.getElementById('dateToFilter').addEventListener('change', applyFilters);
         document.getElementById('sortFilter').addEventListener('change', applyFilters);
         document.getElementById('clearFilters').addEventListener('click', clearFilters);
         
@@ -387,15 +401,64 @@
       `;
     }
     
+    // Parse date from various formats (DD-MMM-YY, YYYY-MM-DD, etc.)
+    function parseDate(dateString) {
+      if (!dateString) return null;
+      
+      // Handle DD-MMM-YY format (e.g., "28-Jun-25")
+      const ddMmmYyMatch = dateString.match(/^(\d{1,2})-([A-Za-z]{3})-(\d{2})$/);
+      if (ddMmmYyMatch) {
+        const [, day, monthStr, year] = ddMmmYyMatch;
+        const monthMap = {
+          'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+          'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+        };
+        const fullYear = parseInt(year) + 2000; // Convert 25 to 2025
+        return new Date(fullYear, monthMap[monthStr], parseInt(day));
+      }
+      
+      // Handle standard date formats
+      const date = new Date(dateString);
+      return isNaN(date.getTime()) ? null : date;
+    }
+    
     // Apply filters
     function applyFilters() {
       const cruiseLineFilter = document.getElementById('cruiseLineFilter').value;
       const regionFilter = document.getElementById('regionFilter').value;
+      const dateFromFilter = document.getElementById('dateFromFilter').value;
+      const dateToFilter = document.getElementById('dateToFilter').value;
       const sortFilter = document.getElementById('sortFilter').value;
       
       filteredDeals = allDeals.filter(deal => {
-        return (!cruiseLineFilter || deal.cruiseLine === cruiseLineFilter) &&
-               (!regionFilter || deal.region === regionFilter);
+        let matchesCruiseLine = !cruiseLineFilter || deal.cruiseLine === cruiseLineFilter;
+        let matchesRegion = !regionFilter || deal.region === regionFilter;
+        let matchesDate = true;
+        
+        // Date range filtering
+        if (dateFromFilter || dateToFilter) {
+          const dealDate = parseDate(deal.departureDate);
+          
+          if (dealDate) {
+            if (dateFromFilter) {
+              const fromDate = new Date(dateFromFilter);
+              if (dealDate < fromDate) {
+                matchesDate = false;
+              }
+            }
+            
+            if (dateToFilter && matchesDate) {
+              const toDate = new Date(dateToFilter);
+              if (dealDate > toDate) {
+                matchesDate = false;
+              }
+            }
+          } else {
+            matchesDate = false;
+          }
+        }
+        
+        return matchesCruiseLine && matchesRegion && matchesDate;
       });
       
       // Apply sorting
@@ -411,6 +474,24 @@
           const priceB = parseFloat(String(b.insidePrice || b.oceanviewPrice || b.balconyPrice || b.suitePrice || '0').replace(/[^0-9.-]/g, ''));
           return priceB - priceA;
         });
+      } else if (sortFilter === 'date-earliest') {
+        filteredDeals.sort((a, b) => {
+          const dateA = parseDate(a.departureDate);
+          const dateB = parseDate(b.departureDate);
+          if (!dateA && !dateB) return 0;
+          if (!dateA) return 1;
+          if (!dateB) return -1;
+          return dateA - dateB;
+        });
+      } else if (sortFilter === 'date-latest') {
+        filteredDeals.sort((a, b) => {
+          const dateA = parseDate(a.departureDate);
+          const dateB = parseDate(b.departureDate);
+          if (!dateA && !dateB) return 0;
+          if (!dateA) return 1;
+          if (!dateB) return -1;
+          return dateB - dateA;
+        });
       }
       
       renderDeals(filteredDeals);
@@ -420,6 +501,8 @@
     function clearFilters() {
       document.getElementById('cruiseLineFilter').value = '';
       document.getElementById('regionFilter').value = '';
+      document.getElementById('dateFromFilter').value = '';
+      document.getElementById('dateToFilter').value = '';
       document.getElementById('sortFilter').value = '';
       filteredDeals = [...allDeals];
       renderDeals(filteredDeals);

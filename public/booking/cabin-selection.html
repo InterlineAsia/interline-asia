@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Select Cabin - Interline Asia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+  
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../config.js"></script>
+  <script src="../supabase-client.js"></script>
+  
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      min-height: 100vh;
+    }
+    
+    .cabin-card {
+      background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 2px solid transparent;
+    }
+    
+    .cabin-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .cabin-card.selected {
+      border-color: #FF7F41;
+      background: linear-gradient(145deg, #fff7ed 0%, #ffedd5 100%);
+    }
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+  
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Progress Bar -->
+    <div class="mb-8">
+      <div class="flex items-center justify-center space-x-4 mb-4">
+        <div class="flex items-center">
+          <div class="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-medium">1</div>
+          <span class="ml-2 text-sm font-medium text-orange-600">Choose Cabin</span>
+        </div>
+        <div class="w-16 h-1 bg-slate-200 rounded"></div>
+        <div class="flex items-center">
+          <div class="w-8 h-8 bg-slate-200 text-slate-500 rounded-full flex items-center justify-center text-sm font-medium">2</div>
+          <span class="ml-2 text-sm text-slate-500">Passenger Details</span>
+        </div>
+        <div class="w-16 h-1 bg-slate-200 rounded"></div>
+        <div class="flex items-center">
+          <div class="w-8 h-8 bg-slate-200 text-slate-500 rounded-full flex items-center justify-center text-sm font-medium">3</div>
+          <span class="ml-2 text-sm text-slate-500">Review & Submit</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Cruise Info -->
+    <div id="cruise-info" class="bg-white rounded-2xl p-6 mb-8 shadow-lg">
+      <!-- Will be populated by JavaScript -->
+    </div>
+    
+    <!-- Cabin Selection -->
+    <div class="bg-white rounded-2xl p-6 shadow-lg">
+      <h2 class="text-2xl font-bold text-slate-800 mb-6">
+        <i class="ri-hotel-bed-line mr-2 text-orange-500"></i>Choose Your Cabin
+      </h2>
+      
+      <div id="cabin-options" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Will be populated by JavaScript -->
+      </div>
+      
+      <div class="mt-8 flex justify-between">
+        <a href="/deals.html" class="px-6 py-3 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors">
+          <i class="ri-arrow-left-line mr-2"></i>Back to Deals
+        </a>
+        <button id="continue-btn" onclick="continueToPassengerDetails()" disabled class="px-6 py-3 bg-orange-500 text-white rounded-lg font-medium transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed">
+          Continue to Passenger Details
+          <i class="ri-arrow-right-line ml-2"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <div id="footer-placeholder"></div>
+  
+  <script src="../js/loadPartials.js" defer></script>
+  <script>
+    let selectedCruise = null;
+    let selectedCabin = null;
+    
+    // Authentication check
+    async function checkAuthentication() {
+      if (!window.supabaseClient || !window.supabaseClient.isLoggedIn()) {
+        const currentUrl = encodeURIComponent(window.location.href);
+        window.location.href = `/login.html?redirect=${currentUrl}`;
+        return false;
+      }
+      
+      const user = window.supabaseClient.currentUser;
+      if (!user.is_verified) {
+        alert('Your account must be verified to access booking. Please check your email or contact support.');
+        window.location.href = '/dashboard.html';
+        return false;
+      }
+      
+      return true;
+    }
+    
+    // Get cruise ID from URL
+    function getCruiseId() {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get('cruise');
+    }
+    
+    // Load cruise data
+    async function loadCruiseData() {
+      const cruiseId = getCruiseId();
+      if (!cruiseId) {
+        alert('No cruise selected');
+        window.location.href = '/deals.html';
+        return;
+      }
+      
+      try {
+        // Load deals data
+        const response = await fetch('/deals.json');
+        const deals = await response.json();
+        selectedCruise = deals.find(deal => deal.seq === cruiseId);
+        
+        if (!selectedCruise) {
+          alert('Cruise not found');
+          window.location.href = '/deals.html';
+          return;
+        }
+        
+        displayCruiseInfo();
+        displayCabinOptions();
+        
+      } catch (error) {
+        console.error('Error loading cruise data:', error);
+        alert('Error loading cruise information');
+      }
+    }
+    
+    // Display cruise information
+    function displayCruiseInfo() {
+      const cruiseInfo = document.getElementById('cruise-info');
+      cruiseInfo.innerHTML = `
+        <div class="flex items-start space-x-4">
+          <img src="/logos/cruiselines/${selectedCruise.cruiseLine.toLowerCase().replace(/\s+/g, '-')}.png" 
+               alt="${selectedCruise.cruiseLine}" 
+               class="w-16 h-12 object-contain bg-slate-100 rounded-lg p-2"
+               onerror="this.src='/logos/cruiselines/placeholder.png'">
+          <div class="flex-1">
+            <h1 class="text-2xl font-bold text-slate-800">${selectedCruise.cruiseLine} - ${selectedCruise.shipName}</h1>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 text-sm">
+              <div>
+                <span class="text-slate-500">Duration:</span>
+                <p class="font-medium">${selectedCruise.nights} nights</p>
+              </div>
+              <div>
+                <span class="text-slate-500">Departure:</span>
+                <p class="font-medium">${selectedCruise.departureDate}</p>
+              </div>
+              <div>
+                <span class="text-slate-500">Region:</span>
+                <p class="font-medium">${selectedCruise.region}</p>
+              </div>
+              <div>
+                <span class="text-slate-500">Route:</span>
+                <p class="font-medium">${selectedCruise.from} to ${selectedCruise.to}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    // Display cabin options
+    function displayCabinOptions() {
+      const cabinOptions = document.getElementById('cabin-options');
+      const cabins = [
+        {
+          type: 'Interior',
+          price: selectedCruise.insidePrice,
+          description: 'Comfortable interior stateroom with all essential amenities',
+          features: ['Queen bed or twin beds', 'Private bathroom', 'TV and phone', 'Room service'],
+          image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=300&h=200&fit=crop'
+        },
+        {
+          type: 'Ocean View',
+          price: selectedCruise.oceanviewPrice,
+          description: 'Stateroom with ocean view window',
+          features: ['Ocean view window', 'Queen bed or twin beds', 'Private bathroom', 'Sitting area'],
+          image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=300&h=200&fit=crop'
+        },
+        {
+          type: 'Balcony',
+          price: selectedCruise.balconyPrice,
+          description: 'Stateroom with private balcony',
+          features: ['Private balcony', 'Queen bed or twin beds', 'Sitting area', 'Premium amenities'],
+          image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=300&h=200&fit=crop'
+        },
+        {
+          type: 'Suite',
+          price: selectedCruise.suitePrice,
+          description: 'Luxury suite with premium amenities',
+          features: ['Separate living area', 'Large balcony', 'Premium bathroom', 'Concierge service'],
+          image: 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=300&h=200&fit=crop'
+        }
+      ];
+      
+      cabinOptions.innerHTML = cabins.map(cabin => {
+        const isAvailable = cabin.price && cabin.price !== 'Quote Available';
+        const priceDisplay = isAvailable ? `$${cabin.price}` : 'Quote Available';
+        
+        return `
+          <div class="cabin-card p-6 cursor-pointer ${!isAvailable ? 'opacity-75' : ''}" 
+               onclick="selectCabin('${cabin.type}', '${cabin.price}')">
+            <img src="${cabin.image}" alt="${cabin.type}" class="w-full h-32 object-cover rounded-lg mb-4">
+            <h3 class="text-lg font-semibold text-slate-800 mb-2">${cabin.type}</h3>
+            <p class="text-sm text-slate-600 mb-3">${cabin.description}</p>
+            <ul class="text-xs text-slate-500 mb-4 space-y-1">
+              ${cabin.features.map(feature => `<li><i class="ri-check-line text-green-500 mr-1"></i>${feature}</li>`).join('')}
+            </ul>
+            <div class="text-center">
+              <p class="text-2xl font-bold text-orange-600">${priceDisplay}</p>
+              <p class="text-xs text-slate-500">per person</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    // Select cabin
+    function selectCabin(type, price) {
+      // Remove previous selection
+      document.querySelectorAll('.cabin-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      
+      // Add selection to clicked card
+      event.currentTarget.classList.add('selected');
+      
+      selectedCabin = { type, price };
+      document.getElementById('continue-btn').disabled = false;
+    }
+    
+    // Continue to passenger details
+    function continueToPassengerDetails() {
+      if (!selectedCabin) return;
+      
+      // Store selection in sessionStorage
+      sessionStorage.setItem('selectedCruise', JSON.stringify(selectedCruise));
+      sessionStorage.setItem('selectedCabin', JSON.stringify(selectedCabin));
+      
+      window.location.href = '/booking/passenger-details.html';
+    }
+    
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', async function() {
+      if (await checkAuthentication()) {
+        await loadCruiseData();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -32,65 +32,27 @@ export default async function handler(req, res) {
 }
 
 // Bot Webhook Handler
+// Final error handling structure
 async function handleBotWebhook(req, res) {
+  console.log('GEMINI_API_KEY present:', !!process.env.GEMINI_API_KEY);
+  
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
     const { botType, action, data } = req.body;
+    if (!botType || !action || !data) return Error400();
 
-    if (!botType || !action || !data) {
-      return res.status(400).json({ 
-        error: 'Missing required fields: botType, action, data' 
-      });
-    }
-
-    // Use Gemini-powered BotManager for all bot requests
-    try {
-      const botManager = getBotManager();
-      
-      const requestData = {
-        type: action,
-        ...data,
-        triggeredAt: new Date().toISOString(),
-        source: 'webhook'
-      };
-
-      const result = await botManager.processRequest(botType, requestData);
-
-      return res.status(200).json({
-        success: true,
-        botType,
-        action,
-        result,
-        processedAt: new Date().toISOString()
-      });
-    } catch (botError) {
-      console.error('Bot manager error:', botError);
-      return res.status(200).json({
-        success: true,
-        result: {
-          response: "I'm currently experiencing technical difficulties..."
-        }
-      });
-    }
+    // Unified error handling
+    const result = await getBotManager().processRequest(req.body);
+    return SuccessResponse(result);
   } catch (error) {
-    console.error('Bot webhook processing error:', error);
-    return res.status(500).json({ 
+    console.error('API error:', error);
+    return res.status(500).json({
       error: 'Internal server error',
-      details: error.message 
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
-  }
-        });
-      }
-    } catch (error) {
-      console.error('Bot webhook processing error:', error);
-      return res.status(500).json({ 
-        error: 'Internal server error',
-        details: error.message 
-      });
-    }
   }
 }
 

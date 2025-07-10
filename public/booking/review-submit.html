@@ -391,7 +391,7 @@
         
         // Send confirmation emails via BookingBot
         try {
-          const botResponse = await fetch('/api/bot-webhook', {
+          const botResponse = await fetch('/api/unified-api?endpoint=bot-webhook', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -413,7 +413,7 @@
           console.error('BookingBot processing failed:', botError);
           // Fallback to direct email API
           try {
-            const emailResponse = await fetch('/api/send-booking-emails', {
+            const emailResponse = await fetch('/api/unified-api?endpoint=send-booking-emails', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json'

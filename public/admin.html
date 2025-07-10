@@ -328,7 +328,7 @@
                        user.is_admin === true || 
                        user.is_super_admin === true;
         
-        console.log('Admin check:', {
+        const debugInfo = {
           email: user.email,
           emailLowerCase: user.email?.toLowerCase(),
           is_admin: user.is_admin,
@@ -337,7 +337,12 @@
           finalIsAdmin: isAdmin,
           emailMatch1: user.email === 'admin@telenational.com.au',
           emailMatch2: user.email === 'admin@interlineasia.com'
-        });
+        };
+        
+        console.log('Admin check:', debugInfo);
+        
+        // Temporary debug alert
+        alert('Admin Debug Info:\n' + JSON.stringify(debugInfo, null, 2));
         
         document.getElementById('loading').style.display = 'none';
         

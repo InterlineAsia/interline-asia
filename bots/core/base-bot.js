@@ -3,6 +3,7 @@
 
 import { Client } from 'langsmith';
 import { createClient } from '@supabase/supabase-js';
+import GeminiClient from './gemini-client.js';
 
 export class BaseBot {
   constructor(botName, config = {}) {
@@ -10,6 +11,7 @@ export class BaseBot {
     this.config = config;
     this.langsmithClient = null;
     this.supabaseClient = null;
+    this.geminiClient = null;
     this.isInitialized = false;
     
     // Initialize all services
@@ -25,6 +27,9 @@ export class BaseBot {
       
       // Initialize Supabase
       await this.initializeSupabase();
+      
+      // Initialize Gemini AI
+      await this.initializeGemini();
       
       // Verify Brevo configuration
       this.verifyBrevoConfig();
@@ -101,6 +106,26 @@ export class BaseBot {
     } catch (error) {
       console.error('Supabase initialization failed:', error);
       throw new Error(`Supabase connection failed: ${error.message}`);
+    }
+  }
+
+  async initializeGemini() {
+    try {
+      this.geminiClient = new GeminiClient();
+      
+      // Test connection
+      const healthCheck = await this.geminiClient.healthCheck();
+      
+      if (!healthCheck.connected) {
+        throw new Error(`Gemini connection failed: ${healthCheck.error}`);
+      }
+      
+      console.log(`🧠 Gemini AI connected for ${this.botName} (${healthCheck.model})`);
+      
+    } catch (error) {
+      console.warn(`⚠️ Gemini AI initialization failed for ${this.botName}:`, error.message);
+      console.warn('Bot will continue without AI capabilities');
+      this.geminiClient = null;
     }
   }
 
@@ -286,6 +311,101 @@ export class BaseBot {
     });
   }
 
+  // AI-powered helper methods
+  async generateIntelligentResponse(prompt, context = {}) {
+    if (!this.geminiClient) {
+      throw new Error('Gemini AI not available - check configuration');
+    }
+
+    try {
+      const response = await this.geminiClient.generateContent(prompt, {
+        botName: this.botName,
+        ...context
+      });
+
+      await this.logToLangSmith('ai_response_generated', {
+        prompt: prompt.substring(0, 100) + '...',
+        responseLength: response.length,
+        context
+      });
+
+      return response;
+    } catch (error) {
+      await this.logToLangSmith('ai_response_failed', {
+        error: error.message,
+        prompt: prompt.substring(0, 100) + '...'
+      });
+      throw error;
+    }
+  }
+
+  async analyzeWithAI(analysisType, data) {
+    if (!this.geminiClient) {
+      console.warn('AI analysis not available - using fallback logic');
+      return { analysis: 'AI not available', confidence: 0 };
+    }
+
+    try {
+      let result;
+      switch (analysisType) {
+        case 'booking_request':
+          result = await this.geminiClient.analyzeBookingRequest(data);
+          break;
+        case 'lead_qualification':
+          result = await this.geminiClient.qualifyLead(data);
+          break;
+        case 'supplier_response':
+          result = await this.geminiClient.analyzeSupplierResponse(data);
+          break;
+        default:
+          throw new Error(`Unknown analysis type: ${analysisType}`);
+      }
+
+      await this.logToLangSmith('ai_analysis_completed', {
+        analysisType,
+        result,
+        dataKeys: Object.keys(data)
+      });
+
+      return result;
+    } catch (error) {
+      await this.logToLangSmith('ai_analysis_failed', {
+        analysisType,
+        error: error.message
+      });
+      throw error;
+    }
+  }
+
+  async generatePersonalizedContent(contentType, recipientData, additionalData = {}) {
+    if (!this.geminiClient) {
+      console.warn('AI content generation not available - using templates');
+      return null;
+    }
+
+    try {
+      const content = await this.geminiClient.generatePersonalizedEmail(
+        contentType,
+        recipientData,
+        additionalData
+      );
+
+      await this.logToLangSmith('ai_content_generated', {
+        contentType,
+        recipientEmail: recipientData.email,
+        contentLength: content.length
+      });
+
+      return content;
+    } catch (error) {
+      await this.logToLangSmith('ai_content_failed', {
+        contentType,
+        error: error.message
+      });
+      return null;
+    }
+  }
+
   // Health check
   async healthCheck() {
     const status = {
@@ -293,9 +413,20 @@ export class BaseBot {
       initialized: this.isInitialized,
       langsmith: !!this.langsmithClient,
       supabase: !!this.supabaseClient,
+      gemini: !!this.geminiClient,
       brevo: !!process.env.BREVO_API_KEY,
       timestamp: new Date().toISOString()
     };
+
+    // Test Gemini if available
+    if (this.geminiClient) {
+      try {
+        const geminiHealth = await this.geminiClient.healthCheck();
+        status.geminiHealth = geminiHealth;
+      } catch (error) {
+        status.geminiHealth = { connected: false, error: error.message };
+      }
+    }
 
     await this.logToLangSmith('health_check', status);
     return status;

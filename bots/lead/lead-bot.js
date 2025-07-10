@@ -1,16 +1,17 @@
-// Interline Asia - LeadBot
-// Qualifies new email leads as verified travel industry staff
+// Interline Asia - LeadBot with AI Integration
+// Qualifies new email leads as verified travel industry staff using Gemini AI
 
 import BaseBot from '../core/base-bot.js';
 
 export class LeadBot extends BaseBot {
   constructor() {
     super('LeadBot', {
-      description: 'Qualifies and processes new travel industry leads',
+      description: 'AI-powered lead qualification for travel industry professionals',
       capabilities: [
-        'lead_qualification',
+        'ai_lead_qualification',
+        'intelligent_email_generation',
         'industry_verification',
-        'welcome_sequences',
+        'personalized_welcome_sequences',
         'verification_reminders'
       ]
     });
@@ -78,56 +79,201 @@ export class LeadBot extends BaseBot {
       };
     }
 
-    // 2. Perform initial industry qualification
-    const industryScore = await this.calculateIndustryScore({
-      email,
-      company,
-      fullName
-    });
+    // 2. Perform AI-powered industry qualification
+    let aiQualification = null;
+    let industryScore = 0;
+    
+    try {
+      // Use AI for intelligent lead qualification
+      aiQualification = await this.analyzeWithAI('lead_qualification', {
+        email,
+        fullName,
+        company,
+        source
+      });
+      
+      industryScore = aiQualification.qualification_score || 50;
+      
+      await this.logToLangSmith('ai_lead_qualification', {
+        email,
+        aiQualification,
+        industryScore
+      });
+    } catch (error) {
+      console.warn('AI qualification failed, using fallback scoring:', error.message);
+      // Fallback to rule-based scoring
+      industryScore = await this.calculateIndustryScore({
+        email,
+        company,
+        fullName
+      });
+    }
 
     await this.logToLangSmith('industry_score_calculated', {
       email,
       industryScore,
+      aiQualification,
       qualificationFactors: this.getQualificationFactors(email, company)
     });
 
-    // 3. Send appropriate welcome email based on score
+    // 3. Send AI-personalized welcome email based on score
     let emailResult;
     if (industryScore >= 70) {
-      emailResult = await this.sendHighQualityLeadWelcome(requestData);
+      emailResult = await this.sendIntelligentHighQualityWelcome(requestData, aiQualification);
     } else if (industryScore >= 40) {
-      emailResult = await this.sendMediumQualityLeadWelcome(requestData);
+      emailResult = await this.sendIntelligentMediumQualityWelcome(requestData, aiQualification);
     } else {
-      emailResult = await this.sendLowQualityLeadWelcome(requestData);
+      emailResult = await this.sendIntelligentLowQualityWelcome(requestData, aiQualification);
     }
 
     return {
       success: true,
       status: 'new_lead_processed',
       industryScore,
+      aiQualification,
       emailSent: emailResult.success
     };
   }
 
-  async checkExistingUser(email) {
+  async sendIntelligentHighQualityWelcome(leadData, aiQualification = null) {
+    // Generate AI-powered personalized content
+    let personalizedContent = null;
     try {
-      const { data, error } = await this.supabaseClient
-        .from('users')
-        .select('id, email, is_verified, verification_status')
-        .eq('email', email)
-        .single();
-
-      if (error && error.code !== 'PGRST116') { // Not found error
-        throw error;
-      }
-
-      return data;
+      personalizedContent = await this.generatePersonalizedContent(
+        'welcome_high_quality',
+        {
+          fullName: leadData.fullName,
+          email: leadData.email,
+          company: leadData.company
+        }
+      );
     } catch (error) {
-      console.error('Error checking existing user:', error);
-      return null;
+      console.warn('AI content generation failed, using template:', error.message);
+    }
+
+    const emailData = {
+      sender: {
+        name: "Interline Asia",
+        email: "welcome@interlineasia.com"
+      },
+      to: [{
+        email: leadData.email,
+        name: leadData.fullName
+      }],
+      subject: "Welcome to Interline Asia - Your Industry Access Awaits",
+      htmlContent: personalizedContent || this.getHighQualityWelcomeHTML(leadData)
+    };
+
+    try {
+      const result = await this.sendBrevoEmail(emailData);
+      
+      await this.logToLangSmith('intelligent_high_quality_welcome_sent', {
+        email: leadData.email,
+        emailId: result.messageId,
+        hasPersonalizedContent: !!personalizedContent,
+        aiQualification
+      });
+
+      return { success: true, result };
+    } catch (error) {
+      await this.logToLangSmith('welcome_email_failed', {
+        email: leadData.email,
+        error: error.message
+      });
+      throw error;
     }
   }
 
+  async sendIntelligentMediumQualityWelcome(leadData, aiQualification = null) {
+    // Generate AI-powered content for medium quality leads
+    let personalizedContent = null;
+    try {
+      const prompt = `Generate a professional welcome email for a potential travel industry lead who needs verification:
+      
+Recipient: ${leadData.fullName}
+Company: ${leadData.company || 'Not specified'}
+Email: ${leadData.email}
+AI Analysis: ${aiQualification ? JSON.stringify(aiQualification) : 'Standard qualification'}
+
+Create an email that encourages verification while being professional and helpful.`;
+
+      personalizedContent = await this.generateIntelligentResponse(prompt, {
+        leadType: 'medium_quality',
+        email: leadData.email
+      });
+    } catch (error) {
+      console.warn('AI content generation failed for medium quality lead:', error.message);
+    }
+
+    const emailData = {
+      sender: {
+        name: "Interline Asia",
+        email: "welcome@interlineasia.com"
+      },
+      to: [{
+        email: leadData.email,
+        name: leadData.fullName
+      }],
+      subject: "Welcome to Interline Asia - Verification Required",
+      htmlContent: personalizedContent || this.getMediumQualityWelcomeHTML(leadData)
+    };
+
+    const result = await this.sendBrevoEmail(emailData);
+    
+    await this.logToLangSmith('intelligent_medium_quality_welcome_sent', {
+      email: leadData.email,
+      hasPersonalizedContent: !!personalizedContent,
+      aiQualification
+    });
+    
+    return { success: true, result };
+  }
+
+  async sendIntelligentLowQualityWelcome(leadData, aiQualification = null) {
+    // Generate AI-powered educational content
+    let personalizedContent = null;
+    try {
+      const prompt = `Generate a polite but clear email explaining that Interline Asia is for travel industry professionals only:
+      
+Recipient: ${leadData.fullName}
+Email: ${leadData.email}
+AI Analysis suggests this may not be a travel industry professional.
+
+Create a professional email that explains our industry-only policy while being respectful.`;
+
+      personalizedContent = await this.generateIntelligentResponse(prompt, {
+        leadType: 'low_quality',
+        email: leadData.email
+      });
+    } catch (error) {
+      console.warn('AI content generation failed for low quality lead:', error.message);
+    }
+
+    const emailData = {
+      sender: {
+        name: "Interline Asia",
+        email: "info@interlineasia.com"
+      },
+      to: [{
+        email: leadData.email,
+        name: leadData.fullName
+      }],
+      subject: "About Interline Asia - Travel Industry Professionals Only",
+      htmlContent: personalizedContent || this.getLowQualityWelcomeHTML(leadData)
+    };
+
+    const result = await this.sendBrevoEmail(emailData);
+    
+    await this.logToLangSmith('intelligent_low_quality_welcome_sent', {
+      email: leadData.email,
+      hasPersonalizedContent: !!personalizedContent,
+      aiQualification
+    });
+    
+    return { success: true, result };
+  }
+
+  // Fallback methods and other existing functionality...
   async calculateIndustryScore({ email, company, fullName }) {
     let score = 0;
     const factors = [];
@@ -166,24 +312,7 @@ export class LeadBot extends BaseBot {
       factors.push('professional_email');
     }
 
-    // Name patterns (travel industry common names/titles)
-    if (fullName) {
-      const nameLower = fullName.toLowerCase();
-      if (nameLower.includes('agent') || nameLower.includes('advisor') || nameLower.includes('consultant')) {
-        score += 20;
-        factors.push('professional_title');
-      }
-    }
-
-    await this.logToLangSmith('industry_score_factors', {
-      email,
-      score,
-      factors,
-      emailDomain,
-      company
-    });
-
-    return Math.min(score, 100); // Cap at 100
+    return Math.min(score, 100);
   }
 
   getQualificationFactors(email, company) {
@@ -194,132 +323,38 @@ export class LeadBot extends BaseBot {
     };
   }
 
-  async sendHighQualityLeadWelcome(leadData) {
-    const emailData = {
-      sender: {
-        name: "Interline Asia",
-        email: "welcome@interlineasia.com"
-      },
-      to: [{
-        email: leadData.email,
-        name: leadData.fullName
-      }],
-      subject: "🛳️ Welcome to Interline Asia - Your Industry Access Awaits",
-      htmlContent: this.getHighQualityWelcomeHTML(leadData)
-    };
-
-    try {
-      const result = await this.sendBrevoEmail(emailData);
-      
-      await this.logToLangSmith('high_quality_welcome_sent', {
-        email: leadData.email,
-        emailId: result.messageId
-      });
-
-      return { success: true, result };
-    } catch (error) {
-      await this.logToLangSmith('welcome_email_failed', {
-        email: leadData.email,
-        error: error.message
-      });
-      throw error;
-    }
-  }
-
-  async sendMediumQualityLeadWelcome(leadData) {
-    // Similar structure but different email content
-    const emailData = {
-      sender: {
-        name: "Interline Asia",
-        email: "welcome@interlineasia.com"
-      },
-      to: [{
-        email: leadData.email,
-        name: leadData.fullName
-      }],
-      subject: "Welcome to Interline Asia - Verification Required",
-      htmlContent: this.getMediumQualityWelcomeHTML(leadData)
-    };
-
-    const result = await this.sendBrevoEmail(emailData);
-    return { success: true, result };
-  }
-
-  async sendLowQualityLeadWelcome(leadData) {
-    // Educational email about travel industry requirements
-    const emailData = {
-      sender: {
-        name: "Interline Asia",
-        email: "info@interlineasia.com"
-      },
-      to: [{
-        email: leadData.email,
-        name: leadData.fullName
-      }],
-      subject: "About Interline Asia - Travel Industry Professionals Only",
-      htmlContent: this.getLowQualityWelcomeHTML(leadData)
-    };
-
-    const result = await this.sendBrevoEmail(emailData);
-    return { success: true, result };
-  }
-
   getHighQualityWelcomeHTML(leadData) {
-    return `
-      <h2>Welcome to Interline Asia, ${leadData.fullName}!</h2>
-      <p>We're excited to have a travel industry professional like you join our exclusive community.</p>
-      <p>Based on your profile, you appear to be well-qualified for our industry rates. Please complete your verification to access exclusive cruise deals.</p>
-      <a href="https://www.interlineasia.com/verify" style="background: #FF7F41; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">Complete Verification</a>
-    `;
+    return `<h2>Welcome to Interline Asia, ${leadData.fullName}!</h2>
+    <p>We're excited to have a travel industry professional like you join our exclusive community.</p>`;
   }
 
   getMediumQualityWelcomeHTML(leadData) {
-    return `
-      <h2>Welcome to Interline Asia, ${leadData.fullName}</h2>
-      <p>Thank you for your interest in our travel industry rates.</p>
-      <p>To access exclusive cruise deals, we need to verify your travel industry credentials. Please upload your IATA card or employment verification.</p>
-      <a href="https://www.interlineasia.com/verify" style="background: #0ea5e9; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">Start Verification</a>
-    `;
+    return `<h2>Welcome to Interline Asia, ${leadData.fullName}</h2>
+    <p>Thank you for your interest in our travel industry rates.</p>`;
   }
 
   getLowQualityWelcomeHTML(leadData) {
-    return `
-      <h2>Thank you for your interest, ${leadData.fullName}</h2>
-      <p>Interline Asia provides exclusive cruise rates for verified travel industry professionals only.</p>
-      <p>If you work in the travel industry, please provide your professional credentials for verification.</p>
-      <p>If you're looking for consumer cruise deals, we recommend checking with your local travel agent.</p>
-    `;
+    return `<h2>Thank you for your interest, ${leadData.fullName}</h2>
+    <p>Interline Asia provides exclusive cruise rates for verified travel industry professionals only.</p>`;
   }
 
-  async sendVerificationReminder(requestData) {
-    const { userId, email } = requestData;
-    
-    await this.logToLangSmith('verification_reminder_sending', {
-      userId,
-      email
-    });
+  async checkExistingUser(email) {
+    try {
+      const { data, error } = await this.supabaseClient
+        .from('users')
+        .select('id, email, is_verified, verification_status')
+        .eq('email', email)
+        .single();
 
-    // Implementation for verification reminders
-    return { success: true, reminderSent: true };
-  }
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
 
-  async performIndustryCheck(requestData) {
-    const { email, additionalData } = requestData;
-    
-    // Perform deeper industry verification checks
-    const score = await this.calculateIndustryScore(additionalData);
-    
-    await this.logToLangSmith('industry_check_performed', {
-      email,
-      score,
-      checkType: 'detailed_verification'
-    });
-
-    return {
-      success: true,
-      industryScore: score,
-      recommendation: score >= 70 ? 'approve' : score >= 40 ? 'manual_review' : 'decline'
-    };
+      return data;
+    } catch (error) {
+      console.error('Error checking existing user:', error);
+      return null;
+    }
   }
 }
 

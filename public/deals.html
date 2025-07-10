@@ -670,10 +670,8 @@
       }
       
       const user = window.supabaseClient.currentUser;
-      if (!user.is_verified) {
-        alert('Your account must be verified to request cruise rates. Please check your email or contact support.');
-        return;
-      }
+      // Allow all logged-in users to request rates - verification will be checked server-side
+      console.log('User requesting cruise rate:', user.email);
       
       // Redirect to booking flow with cruise ID
       window.location.href = `/booking/cabin-selection.html?cruise=${dealId}`;

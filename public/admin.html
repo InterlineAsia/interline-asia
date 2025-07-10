@@ -301,16 +301,32 @@
   <script>
     // Admin Dashboard Initialization
     async function initializeAdminDashboard() {
+      console.log('Starting admin dashboard initialization...');
+      
       try {
+        // Simple timeout to prevent infinite loading
+        setTimeout(() => {
+          if (document.getElementById('loading').style.display !== 'none') {
+            console.error('Admin dashboard initialization timeout');
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('access-denied').style.display = 'block';
+          }
+        }, 10000); // 10 second timeout
+        
         // Wait for Supabase client to be fully ready
         if (window.supabaseClient) {
+          console.log('Waiting for Supabase client...');
           await window.supabaseClient.readyPromise;
+          console.log('Supabase client ready');
           // Give extra time for auth state to settle
-          await new Promise(resolve => setTimeout(resolve, 200));
+          await new Promise(resolve => setTimeout(resolve, 500));
+        } else {
+          console.error('Supabase client not found');
+          throw new Error('Supabase client not available');
         }
         
         // Check if user is logged in
-        if (!window.supabaseClient || !window.supabaseClient.isLoggedIn()) {
+        if (!window.supabaseClient.isLoggedIn()) {
           console.log('User not logged in, redirecting to login');
           window.location.href = '/login.html';
           return;
@@ -318,9 +334,7 @@
         
         // Get current user
         const user = window.supabaseClient.getCurrentUser();
-        
-        // Debug user object
-        console.log('Current user object:', user);
+        console.log('Current user:', user);
         
         if (!user) {
           console.log('No user found, redirecting to login');
@@ -328,38 +342,19 @@
           return;
         }
         
-        // Check if user is admin - use email check for admin@telenational.com.au
-        const isAdmin = user.email === 'admin@telenational.com.au' || 
-                       user.email === 'admin@interlineasia.com' || 
-                       user.is_admin === true || 
-                       user.is_super_admin === true;
-        
-        const debugInfo = {
-          email: user.email,
-          emailLowerCase: user.email?.toLowerCase(),
-          is_admin: user.is_admin,
-          is_super_admin: user.is_super_admin,
-          role: user.role,
-          finalIsAdmin: isAdmin,
-          emailMatch1: user.email === 'admin@telenational.com.au',
-          emailMatch2: user.email === 'admin@interlineasia.com'
-        };
-        
-        console.log('Admin check:', debugInfo);
+        // Simple admin check - just check email
+        const isAdmin = user.email === 'admin@telenational.com.au';
+        console.log('Admin check result:', isAdmin, 'for email:', user.email);
         
         document.getElementById('loading').style.display = 'none';
         
         if (isAdmin) {
           console.log('Admin access granted');
-          // Show admin content
           document.getElementById('admin-content').style.display = 'block';
           document.getElementById('admin-email').textContent = user.email;
         } else {
-          console.log('Admin access denied, redirecting to dashboard');
-          // Show access denied
+          console.log('Admin access denied');
           document.getElementById('access-denied').style.display = 'block';
-          
-          // Redirect to regular dashboard after 3 seconds
           setTimeout(() => {
             window.location.href = '/dashboard.html';
           }, 3000);
@@ -452,8 +447,6 @@
         console.log('Bot response status:', response.status);
         const result = await response.json();
         console.log('Bot response data:', result);
-        
-        const result = await response.json();
         
         // Remove thinking indicator
         chatMessages.removeChild(thinkingDiv);

@@ -12,15 +12,33 @@
     "declaration": false,
     "outDir": "./dist",
     "rootDir": "./",
-    "types": ["node"]
+    "types": [
+      "node"
+    ],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "noEmit": true,
+    "incremental": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "ts-node": {
     "esm": true
   },
   "include": [
-    "scripts/**/*",
     "api/**/*",
-    "public/**/*.ts"
+    "public/**/*.ts",
+    "scripts/**/*",
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

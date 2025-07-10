@@ -252,6 +252,13 @@
           return;
         }
         
+        // Check if user is admin and redirect to admin dashboard
+        const user = window.supabaseClient.getCurrentUser();
+        if (user && await window.supabaseClient.isAdmin(user.email)) {
+          window.location.href = '/admin.html';
+          return;
+        }
+        
         // User is authenticated, proceed with dashboard initialization
         await initializeDashboard();
         

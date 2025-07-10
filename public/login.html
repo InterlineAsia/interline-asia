@@ -86,6 +86,13 @@
       }
     });
     
+    // Turnstile callback function to enable login button
+    function onTurnstileSuccess(token) {
+      console.log('Turnstile verification successful');
+      document.getElementById('cf-turnstile-response').value = token;
+      document.getElementById('login-btn').disabled = false;
+    }
+    
   </script>
   <script>
     document.getElementById('login-form').addEventListener('submit', async function(e) {
@@ -113,12 +120,17 @@
           throw new Error('Security verification failed. Please complete the verification and try again.');
         }
         
-        // Single sign-in call with turnstile token
-        result = await window.supabaseClient.signIn(email, password, turnstileToken);
-        
         // Sign in with Supabase - with safe Sentry tracking
         let result;
         try {
+          // Get Turnstile token from hidden field
+          const turnstileToken = document.getElementById('cf-turnstile-response').value;
+          console.log('Turnstile token available:', !!turnstileToken);
+          
+          if (!turnstileToken) {
+            throw new Error('Please complete the security verification');
+          }
+          
           result = await Sentry.startSpan(
             {
               op: "auth.login",
@@ -130,7 +142,22 @@
                 span.setAttribute("method", "email_password");
               }
               
+              console.log('Attempting login with Turnstile verification');
               const loginResult = await window.supabaseClient.signIn(email, password, turnstileToken);
+              
+              // Log login data
+              console.log('Login successful:', {
+                user: {
+                  // Detailed user info for debugging
+                  id: loginResult.user.id,
+                  email: loginResult.user.email,
+                  role: loginResult.user.role,
+                  is_admin: loginResult.user.is_admin,
+                  is_super_admin: loginResult.user.is_super_admin,
+                  app_metadata: loginResult.user.app_metadata,
+                  user_metadata: loginResult.user.user_metadata,
+                },
+              });
               
               if (loginResult.user && span && span.setAttribute) {
                 span.setAttribute("success", true);
@@ -142,7 +169,15 @@
             }
           );
         } catch (sentryError) {
-          console.warn('Sentry tracking failed, proceeding with login:', sentryError);
+          console.error('Login error (Sentry):', sentryError);
+          
+          if (sentryError.message === 'Please complete the security verification') {
+            showError(sentryError.message);
+            throw sentryError; // Re-throw to prevent continuing
+          }
+          
+          console.warn('Sentry tracking failed, proceeding with login');
+          const turnstileToken = document.getElementById('cf-turnstile-response').value;
           result = await window.supabaseClient.signIn(email, password, turnstileToken);
         }
         
@@ -156,8 +191,20 @@
             method: 'email'
           });
           
+          // Diagnostic for 'admin' users
+          if (result.user.email.toLowerCase() === 'edvin.lovic@povio.com') {
+            console.log('Admin user detected based on email:', result.user.email);
+            console.log('Admin metadata:', {
+              app_metadata: result.user.app_metadata,
+              user_metadata: result.user.user_metadata,
+              email_confirmed_at: result.user.email_confirmed_at,
+              confirmed_at: result.user.confirmed_at,
+            });
+          }
+          
           // Show success message with manual continue button
-          const isAdmin = result.user.email === 'admin@telenational.com.au';
+          const isAdmin = window.supabaseClient.isAdmin();
+          console.log('Is this user an admin?', isAdmin);
           
           if (isAdmin) {
             showSuccess('Login successful! Choose your dashboard:');
@@ -206,6 +253,12 @@
           errorMessage = `Please verify your email before signing in. <a href="#" onclick="resendVerification('${email}')" style="color: inherit; font-weight: bold;">Resend verification link</a>`;
           showError(errorMessage, 'error-message', true); // Pass true to allow HTML
         } else if (error.message.includes('Invalid login credentials') || error.message.includes('invalid_credentials')) {
+          // Enhanced logging for credential errors
+          console.error('Auth details for failed login:', { 
+            email: document.getElementById('email').value,
+            passwordLength: document.getElementById('password').value?.length || 0,
+            hasToken: !!document.getElementById('cf-turnstile-response').value
+          });
           showError(errorMessage);
         } else if (error.message.includes('Too many requests')) {
           showError('Too many login attempts. Please wait a moment and try again.');
@@ -213,8 +266,11 @@
           showError('Your email verification link has expired. Please request a new one.');
         } else if (error.message.includes('User not found')) {
           showError('No account found with this email address. Please check your email or sign up for a new account.');
+        } else if (error.message.includes('captcha')) {
+          showError('Security verification failed or expired. Please refresh the page and try again.');
         } else {
           // Show the actual error message for debugging
+          console.error('Unhandled login error:', error);
           showError(`Login failed: ${error.message}`);
         }
       } finally {

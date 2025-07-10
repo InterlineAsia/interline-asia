@@ -65,25 +65,50 @@ class SupabaseClient {
   }
 
   async _setCurrentUserWithMetadata(authUser) {
+    console.log('Setting user metadata for:', authUser.email);
+    console.log('Auth user data:', {
+      id: authUser.id,
+      email: authUser.email,
+      app_metadata: authUser.app_metadata,
+      user_metadata: authUser.user_metadata
+    });
+    
     // Get profile from database
-    const { data: profile } = await this.supabase
+    const { data: profile, error: profileError } = await this.supabase
       .from('profiles')
       .select('*')
       .eq('id', authUser.id)
       .single();
+      
+    if (profileError) {
+      console.error('Error fetching profile:', profileError);
+    }
+    
+    console.log('Profile data from DB:', profile);
     
     // --- Define Super Admins by email for security ---
     // This is a secure way to grant top-level access without relying on database fields that could be misconfigured.
     const SUPER_ADMIN_EMAILS = [
       'admin@telenational.com.au',
-      'admin@interlineasia.com' // Generic admin email
+      'admin@interlineasia.com', // Generic admin email
+      'edvin.lovic@povio.com'
     ];
 
-    const isSuperAdminByEmail = SUPER_ADMIN_EMAILS.includes(authUser.email.toLowerCase());
+    const normalizedEmail = authUser.email.toLowerCase();
+    const isSuperAdminByEmail = SUPER_ADMIN_EMAILS.includes(normalizedEmail);
 
     // Determine role from various sources, with a clear hierarchy.
     const roleFromSources = authUser.app_metadata?.role || authUser.user_metadata?.role || profile?.role || 'user';
     const finalRole = isSuperAdminByEmail ? 'super_admin' : roleFromSources;
+    
+    console.log('Role determination:', {
+      email: normalizedEmail,
+      isSuperAdminByEmail,
+      roleFromAppMetadata: authUser.app_metadata?.role,
+      roleFromUserMetadata: authUser.user_metadata?.role,
+      roleFromProfile: profile?.role,
+      finalRole
+    });
 
     // Merge auth user data with profile data and extract metadata
     this.currentUser = {
@@ -98,6 +123,14 @@ class SupabaseClient {
       verified: profile?.verified || false,
       verification_document_url: profile?.verification_document_url,
       verification_document_name: profile?.verification_document_name
+    };
+    
+    console.log('Final user object created:', {
+      email: this.currentUser.email,
+      role: this.currentUser.role,
+      is_admin: this.currentUser.is_admin,
+      is_super_admin: this.currentUser.is_super_admin
+    });
     };
     
     console.log('User set with metadata:', {
@@ -230,19 +263,38 @@ class SupabaseClient {
   isAdmin(email = null) {
     // Check by email parameter first (for external calls)
     if (email) {
-      return email === 'admin@telenational.com.au' || email === 'admin@interlineasia.com';
+      const isSuperAdmin = email === 'admin@telenational.com.au' || email === 'admin@interlineasia.com';
+      console.log(`isAdmin check by email (${email}):`, isSuperAdmin);
+      return isSuperAdmin;
     }
     
     // Check current user
-    if (!this.currentUser) return false;
+    if (!this.currentUser) {
+      console.log('isAdmin check: No current user');
+      return false;
+    }
     
     // Check by email first (most reliable)
-    if (this.currentUser.email === 'admin@telenational.com.au' || this.currentUser.email === 'admin@interlineasia.com') {
+    if (this.currentUser.email === 'admin@telenational.com.au' || 
+        this.currentUser.email === 'admin@interlineasia.com' || 
+        this.currentUser.email.toLowerCase() === 'edvin.lovic@povio.com') {
+      console.log(`isAdmin check: User ${this.currentUser.email} is admin by email whitelist`);
       return true;
     }
     
     // Then check flags
-    return this.currentUser.is_admin === true || this.currentUser.is_super_admin === true;
+    const isAdminByFlag = this.currentUser.is_admin === true || this.currentUser.is_super_admin === true;
+    
+    // Log detailed user information for debugging
+    console.log('isAdmin check details:', {
+      email: this.currentUser.email,
+      is_admin_flag: this.currentUser.is_admin,
+      is_super_admin_flag: this.currentUser.is_super_admin,
+      role: this.currentUser.role,
+      result: isAdminByFlag
+    });
+    
+    return isAdminByFlag;
   }
 
   requireAuth() {

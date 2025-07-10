@@ -40,15 +40,15 @@
       <div id="error-message" class="error-message"></div>
       <div id="success-message" class="success-message"></div>
 
-      <form id="login-form">
+      <form id="login-form" autocomplete="off">
         <div class="form-group">
           <label for="email">Email Address</label>
-          <input type="email" id="email" name="email" required>
+          <input type="email" id="email" name="email" required autocomplete="off" value="" placeholder="Enter your email address">
         </div>
 
         <div class="form-group">
           <label for="password">Password</label>
-          <input type="password" id="password" name="password" required>
+          <input type="password" id="password" name="password" required autocomplete="off" value="" placeholder="Enter your password">
         </div>
 
 
@@ -70,6 +70,32 @@
   <div id="footer-placeholder"></div>
 
   <script src="/js/loadPartials.js" defer></script>
+  <script>
+    // Clear any existing session on page load to prevent auto-login
+    document.addEventListener('DOMContentLoaded', async function() {
+      try {
+        if (window.supabaseClient) {
+          await window.supabaseClient.readyPromise;
+          // Check if user is already logged in and clear session
+          if (window.supabaseClient.isLoggedIn()) {
+            console.log('Existing session found, clearing for fresh login');
+            await window.supabaseClient.signOut();
+          }
+        }
+        
+        // Clear form fields to prevent auto-fill
+        setTimeout(() => {
+          document.getElementById('email').value = '';
+          document.getElementById('password').value = '';
+          document.getElementById('email').focus();
+        }, 100);
+        
+      } catch (error) {
+        console.log('Session clear error (expected):', error);
+      }
+    });
+    
+  </script>
   <script>
     document.getElementById('login-form').addEventListener('submit', async function(e) {
       e.preventDefault();

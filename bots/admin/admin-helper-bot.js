@@ -541,11 +541,41 @@ Return JSON with: intent, confidence (0-100), extractedData object`;
   generateFallbackResponse(query) {
     return {
       type: 'fallback_response',
-      message: "I can help you with:\n• 🔍 Search users, bookings, documents\n• ✅ Approve/verify actions\n• 📧 Send emails\n• 🏥 Check system health\n• ❓ Explain workflows\n\nTry asking: 'Where is John's passport?' or 'Check bot health'",
+      message: `🤖 **Admin Helper Bot - Interline Asia**
+
+**📁 EMPLOYMENT DOCUMENTS LOCATION:**
+When people upload employment verification documents, you can find them at:
+• **Go to:** /admin-verifications.html
+• **View:** All users and their uploaded documents
+• **Access:** Click "View Document" to see employment letters, passports, etc.
+• **Actions:** Approve/reject users and add admin notes
+
+**🛠️ ADMIN TOOLS:**
+• **User Management:** /admin-verifications.html (review documents, verify users)
+• **Cruise Deals:** /admin-deals.html (manage inventory)
+• **CSV Upload:** /admin-csv-processor.html (bulk upload deals)
+• **Database:** /admin/debug.html (direct access)
+• **Main Dashboard:** /admin.html
+
+**💾 SYSTEM INFO:**
+• **Database:** Supabase with profiles, uploads, deals_dashboard tables
+• **Storage:** Documents in "verification-uploads" bucket
+• **Email:** Brevo API for notifications
+• **Admin:** admin@telenational.com.au (super admin)
+
+**🔍 I CAN HELP WITH:**
+• Finding user documents and verification status
+• Explaining admin processes and workflows
+• System health checks and troubleshooting
+• Database queries and user management
+• Email automation and notifications
+
+**Try asking:** "How do I approve a user?" or "Where are the cruise deals?" or "Check system health"`,
       suggestions: [
-        'Search for a user',
-        'Check system status',
-        'View recent bookings'
+        'How do I find employment documents?',
+        'How do I approve a user?',
+        'Where are the cruise deals?',
+        'Check system health'
       ]
     };
   }

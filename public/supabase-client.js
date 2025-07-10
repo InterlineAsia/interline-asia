@@ -217,6 +217,10 @@ class SupabaseClient {
     return !!this.currentSession;
   }
 
+  getCurrentUser() {
+    return this.currentUser;
+  }
+
   isAdmin(email = null) {
     // Check by email parameter first (for external calls)
     if (email) {

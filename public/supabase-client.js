@@ -169,13 +169,19 @@ class SupabaseClient {
     return data;
   }
 
-  async signIn(email, password) {
+  async signIn(email, password, turnstileToken = null) {
     await this.readyPromise;
     console.log('Attempting login for:', email);
+    
+    const options = {};
+    if (turnstileToken) {
+      options.captchaToken = turnstileToken;
+    }
     
     const { data, error } = await this.supabase.auth.signInWithPassword({
       email,
       password,
+      options
     });
     
     console.log('Supabase auth response:', { data, error });

@@ -103,17 +103,18 @@
         const formData = new FormData(this);
         const email = formData.get('email').trim().toLowerCase();
         const password = formData.get('password');
+        const turnstileToken = document.getElementById('cf-turnstile-response').value;
         
+        // Unified input validation
         if (!email || !password) {
           throw new Error('Please enter both email and password');
         }
-        
-        // Cloudflare Turnstile validation
-        const turnstileToken = document.getElementById('cf-turnstile-response').value;
-        
         if (!turnstileToken) {
           throw new Error('Security verification failed. Please complete the verification and try again.');
         }
+        
+        // Single sign-in call with turnstile token
+        result = await window.supabaseClient.signIn(email, password, turnstileToken);
         
         // Sign in with Supabase - with safe Sentry tracking
         let result;

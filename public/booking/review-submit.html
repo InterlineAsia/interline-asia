@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Review & Submit - Interline Asia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+  
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../config.js"></script>
+  <script src="../supabase-client.js"></script>
+  
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      min-height: 100vh;
+    }
+    
+    .review-card {
+      background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(226, 232, 240, 0.5);
+    }
+    
+    .success-animation {
+      animation: successPulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes successPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-slate-200 min-h-screen">
+  <div id="header-placeholder"></div>
+  
+  <!-- Main Container -->
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Progress Bar -->
+    <div class="mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <h1 class="text-3xl font-bold text-slate-800">
+          <i class="ri-ship-line mr-3 text-orange-500"></i>Book Your Cruise
+        </h1>
+        <a href="/booking/passenger-details.html" class="text-slate-600 hover:text-orange-500 transition-colors">
+          <i class="ri-arrow-left-line mr-1"></i>Back to Passenger Details
+        </a>
+      </div>
+      
+      <div class="bg-white rounded-lg p-4 shadow-sm">
+        <div class="flex items-center">
+          <div class="flex items-center text-green-500">
+            <div class="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-medium">✓</div>
+            <span class="ml-2 font-medium">Choose Cabin</span>
+          </div>
+          <div class="flex-1 h-1 bg-green-500 mx-4"></div>
+          <div class="flex items-center text-green-500">
+            <div class="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-medium">✓</div>
+            <span class="ml-2 font-medium">Passenger Details</span>
+          </div>
+          <div class="flex-1 h-1 bg-orange-500 mx-4"></div>
+          <div class="flex items-center text-orange-500">
+            <div class="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-medium">3</div>
+            <span class="ml-2 font-medium">Review & Submit</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Review Content -->
+    <div id="review-content" class="space-y-8">
+      
+      <!-- Cruise Details -->
+      <div class="review-card p-6">
+        <h2 class="text-2xl font-bold text-slate-800 mb-6">
+          <i class="ri-ship-line mr-2 text-orange-500"></i>Cruise Details
+        </h2>
+        <div id="cruise-details">
+          <!-- Will be populated by JavaScript -->
+        </div>
+      </div>
+      
+      <!-- Passenger Information -->
+      <div class="review-card p-6">
+        <h2 class="text-2xl font-bold text-slate-800 mb-6">
+          <i class="ri-user-line mr-2 text-orange-500"></i>Passenger Information
+        </h2>
+        <div id="passenger-details">
+          <!-- Will be populated by JavaScript -->
+        </div>
+      </div>
+      
+      <!-- Important Notice -->
+      <div class="bg-blue-50 border border-blue-200 rounded-xl p-6">
+        <div class="flex items-start">
+          <i class="ri-information-line text-blue-500 text-xl mr-3 mt-1"></i>
+          <div>
+            <h3 class="font-semibold text-blue-800 mb-2">Travel Industry Rate Request</h3>
+            <p class="text-blue-700 text-sm leading-relaxed">
+              This is a <strong>rate request</strong>, not a confirmed booking. Our team will review your request and contact you within 24-48 hours with availability and final pricing. 
+              You will receive a confirmation email with your request reference number shortly.
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Terms Agreement -->
+      <div class="review-card p-6">
+        <div class="flex items-start space-x-3">
+          <input type="checkbox" id="terms-agreement" class="mt-1 w-5 h-5 text-orange-500 border-slate-300 rounded focus:ring-orange-500">
+          <label for="terms-agreement" class="text-sm text-slate-700 leading-relaxed">
+            I agree to the <a href="/terms-and-conditions.html" target="_blank" class="text-orange-500 hover:text-orange-600 underline">Terms and Conditions</a> 
+            and <a href="/privacy-policy.html" target="_blank" class="text-orange-500 hover:text-orange-600 underline">Privacy Policy</a>. 
+            I understand this is a rate request and not a confirmed booking.
+          </label>
+        </div>
+      </div>
+      
+      <!-- Navigation -->
+      <div class="flex justify-between items-center">
+        <a href="/booking/passenger-details.html" class="px-6 py-3 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors">
+          <i class="ri-arrow-left-line mr-1"></i>Back to Passenger Details
+        </a>
+        <button id="submit-btn" onclick="submitRateRequest()" disabled class="px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed">
+          <i class="ri-send-plane-line mr-2"></i>Submit Rate Request
+        </button>
+      </div>
+    </div>
+    
+    <!-- Success Modal -->
+    <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl max-w-md w-full p-8 text-center">
+        <div class="success-animation mb-6">
+          <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto">
+            <i class="ri-check-line text-3xl text-white"></i>
+          </div>
+        </div>
+        <h2 class="text-2xl font-bold text-slate-800 mb-4">Request Submitted!</h2>
+        <p class="text-slate-600 mb-6">
+          Your cruise rate request has been submitted successfully. 
+          You'll receive a confirmation email with your reference number shortly.
+        </p>
+        <div id="reference-number" class="bg-slate-50 rounded-lg p-4 mb-6">
+          <!-- Reference number will be populated -->
+        </div>
+        <button onclick="goToDashboard()" class="w-full bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+          Go to Dashboard
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="../js/loadPartials.js" defer></script>
+  <script>
+    let bookingData = null;
+    let supabaseClient = null;
+    
+    // Check authentication and load booking data
+    async function checkAuthAndLoadData() {
+      try {
+        const supabaseUrl = window.SUPABASE_URL;
+        const supabaseAnonKey = window.SUPABASE_ANON_KEY;
+        
+        if (!supabaseUrl || !supabaseAnonKey) {
+          window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.href);
+          return false;
+        }
+        
+        const { createClient } = supabase;
+        supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+        
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        
+        if (!session) {
+          window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.href);
+          return false;
+        }
+        
+        // Load booking data from sessionStorage
+        const storedData = sessionStorage.getItem('bookingData');
+        if (!storedData) {
+          alert('Booking session expired. Please start again.');
+          window.location.href = '/deals.html';
+          return false;
+        }
+        
+        bookingData = JSON.parse(storedData);
+        displayReviewData();
+        
+        return true;
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.href);
+        return false;
+      }
+    }
+    
+    // Display review data
+    function displayReviewData() {
+      displayCruiseDetails();
+      displayPassengerDetails();
+    }
+    
+    // Display cruise details
+    function displayCruiseDetails() {
+      const cruiseDetailsDiv = document.getElementById('cruise-details');
+      const cruise = bookingData.cruiseData;
+      
+      cruiseDetailsDiv.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-3">
+            <div class="flex justify-between">
+              <span class="text-slate-600">Cruise Line:</span>
+              <span class="font-medium">${cruise.cruiseLine}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-600">Ship:</span>
+              <span class="font-medium">${cruise.shipName}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-600">Departure:</span>
+              <span class="font-medium">${cruise.departureDate}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-600">Duration:</span>
+              <span class="font-medium">${cruise.nights} nights</span>
+            </div>
+          </div>
+          <div class="space-y-3">
+            <div class="flex justify-between">
+              <span class="text-slate-600">Region:</span>
+              <span class="font-medium">${cruise.region}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-600">Route:</span>
+              <span class="font-medium">${cruise.from} to ${cruise.to}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-600">Cabin Type:</span>
+              <span class="font-medium">${bookingData.selectedCabin.charAt(0).toUpperCase() + bookingData.selectedCabin.slice(1)}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-600">Passengers:</span>
+              <span class="font-medium">2 Adults</span>
+            </div>
+          </div>
+        </div>
+        
+        ${cruise.itinerary ? `
+          <div class="mt-6 pt-6 border-t border-slate-200">
+            <h4 class="font-semibold text-slate-800 mb-3">Itinerary</h4>
+            <p class="text-sm text-slate-600">${cruise.itinerary}</p>
+          </div>
+        ` : ''}
+      `;
+    }
+    
+    // Display passenger details
+    function displayPassengerDetails() {
+      const passengerDetailsDiv = document.getElementById('passenger-details');
+      const passengers = bookingData.passengers;
+      
+      passengerDetailsDiv.innerHTML = passengers.map((passenger, index) => `
+        <div class="mb-6 ${index > 0 ? 'pt-6 border-t border-slate-200' : ''}">
+          <h4 class="font-semibold text-slate-800 mb-4">Passenger ${index + 1} ${index === 0 ? '(Primary)' : ''}</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div class="flex justify-between">
+              <span class="text-slate-600">Full Name:</span>
+              <span class="font-medium">${passenger.fullName}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-600">Date of Birth:</span>
+              <span class="font-medium">${passenger.dateOfBirth}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-600">Nationality:</span>
+              <span class="font-medium">${passenger.nationality}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-600">Email:</span>
+              <span class="font-medium">${passenger.email}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-600">Mobile:</span>
+              <span class="font-medium">${passenger.mobile}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-600">Documents:</span>
+              <span class="font-medium text-green-600">
+                <i class="ri-check-line mr-1"></i>Passport & Industry Proof Uploaded
+              </span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    // Enable submit button when terms are agreed
+    document.addEventListener('change', function(e) {
+      if (e.target.id === 'terms-agreement') {
+        document.getElementById('submit-btn').disabled = !e.target.checked;
+      }
+    });
+    
+    // Generate reference number
+    function generateReferenceNumber() {
+      const date = new Date();
+      const dateStr = date.getFullYear().toString() + 
+                     (date.getMonth() + 1).toString().padStart(2, '0') + 
+                     date.getDate().toString().padStart(2, '0');
+      const randomNum = Math.floor(Math.random() * 999) + 1;
+      return `CRUISE-REQ-${dateStr}-${randomNum.toString().padStart(3, '0')}`;
+    }
+    
+    // Submit rate request
+    async function submitRateRequest() {
+      const submitBtn = document.getElementById('submit-btn');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="ri-loader-4-line animate-spin mr-2"></i>Submitting...';
+      
+      try {
+        const referenceNumber = generateReferenceNumber();
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        
+        // Prepare booking data for database
+        const bookingRecord = {
+          reference_number: referenceNumber,
+          user_id: user.id,
+          cruise_id: bookingData.cruiseId,
+          cruise_line: bookingData.cruiseData.cruiseLine,
+          ship_name: bookingData.cruiseData.shipName,
+          departure_date: bookingData.cruiseData.departureDate,
+          nights: parseInt(bookingData.cruiseData.nights),
+          region: bookingData.cruiseData.region,
+          cabin_type: bookingData.selectedCabin,
+          status: 'pending',
+          created_at: new Date().toISOString()
+        };
+        
+        // Insert booking record
+        const { data: booking, error: bookingError } = await supabaseClient
+          .from('bookings')
+          .insert([bookingRecord])
+          .select()
+          .single();
+        
+        if (bookingError) throw bookingError;
+        
+        // Insert passenger records
+        const passengerRecords = bookingData.passengers.map((passenger, index) => ({
+          booking_id: booking.id,
+          passenger_number: index + 1,
+          full_name: passenger.fullName,
+          date_of_birth: passenger.dateOfBirth,
+          nationality: passenger.nationality,
+          email: passenger.email,
+          mobile: passenger.mobile,
+          is_primary: index === 0
+        }));
+        
+        const { error: passengersError } = await supabaseClient
+          .from('passengers')
+          .insert(passengerRecords);
+        
+        if (passengersError) throw passengersError;
+        
+        // TODO: Upload files to Supabase storage
+        // This would be implemented in a real scenario
+        
+        // Show success modal
+        document.getElementById('reference-number').innerHTML = `
+          <div class="text-center">
+            <p class="text-sm text-slate-600 mb-2">Reference Number:</p>
+            <p class="text-xl font-bold text-slate-800">${referenceNumber}</p>
+          </div>
+        `;
+        
+        document.getElementById('success-modal').classList.remove('hidden');
+        
+        // Clear session storage
+        sessionStorage.removeItem('bookingData');
+        
+        // TODO: Send confirmation emails
+        // This would be implemented with the email API
+        
+      } catch (error) {
+        console.error('Error submitting request:', error);
+        alert('Error submitting your request. Please try again.');
+        
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="ri-send-plane-line mr-2"></i>Submit Rate Request';
+      }
+    }
+    
+    // Go to dashboard
+    function goToDashboard() {
+      window.location.href = '/dashboard.html';
+    }
+    
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', async function() {
+      await checkAuthAndLoadData();
+    });
+  </script>
+</body>
+</html>

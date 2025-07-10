@@ -255,13 +255,7 @@
           return;
         }
         
-        // Check if user is admin and redirect to admin dashboard
-        const user = window.supabaseClient.getCurrentUser();
-        if (user && window.supabaseClient.isAdmin(user.email)) {
-          console.log('Admin user detected, redirecting to admin dashboard');
-          window.location.href = '/admin.html';
-          return;
-        }
+        // Note: Removed automatic admin redirect - admins can choose their dashboard at login
         
         console.log('Regular user authenticated, initializing dashboard');
         // User is authenticated, proceed with dashboard initialization

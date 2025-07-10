@@ -1,23 +1,14 @@
 {
-  "name": "interline-asia",
-  "version": "1.0.0",
-  "description": "",
-  "type": "module",
-  "dependencies": {
-    "@sentry/nextjs": "^9.35.0",
-    "@sentry/node": "^9.35.0",
-    "@supabase/supabase-js": "^2.50.3",
-    "dotenv": "^17.1.0",
-    "sib-api-v3-sdk": "^8.5.0"
+  "engines": {
+    "node": ">=18.0.0"
   },
-  "devDependencies": {
-    "@types/node": "^24.0.10",
-    "ts-node": "^10.9.2",
-    "tsx": "^4.7.0",
-    "typescript": "^5.8.3"
-  },
-  "scripts": {
-    "setup-triggers": "tsx scripts/setup-db-triggers.ts",
-    "setup-triggers-node": "node --loader ts-node/esm scripts/setup-db-triggers.ts"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/interline-asia"
   }
+}
+"scripts": {
+  "dev": "next dev",
+  "setup-triggers": "tsx scripts/setup-db-triggers.ts",
+  "setup-triggers-node": "node --loader ts-node/esm scripts/setup-db-triggers.ts"
 }

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Passenger Details - Interline Asia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+  
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../config.js"></script>
+  <script src="../supabase-client.js"></script>
+  
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      min-height: 100vh;
+    }
+    
+    .passenger-card {
+      background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(226, 232, 240, 0.5);
+    }
+    
+    .file-upload-area {
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+    
+    .file-upload-area:hover {
+      border-color: #FF7F41;
+      background-color: #fff7ed;
+    }
+    
+    .file-upload-area.dragover {
+      border-color: #FF7F41;
+      background-color: #fff7ed;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-slate-200 min-h-screen">
+  <div id="header-placeholder"></div>
+  
+  <!-- Main Container -->
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Progress Bar -->
+    <div class="mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <h1 class="text-3xl font-bold text-slate-800">
+          <i class="ri-ship-line mr-3 text-orange-500"></i>Book Your Cruise
+        </h1>
+        <a href="/booking/cabin-selection.html" class="text-slate-600 hover:text-orange-500 transition-colors">
+          <i class="ri-arrow-left-line mr-1"></i>Back to Cabin Selection
+        </a>
+      </div>
+      
+      <div class="bg-white rounded-lg p-4 shadow-sm">
+        <div class="flex items-center">
+          <div class="flex items-center text-green-500">
+            <div class="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-medium">✓</div>
+            <span class="ml-2 font-medium">Choose Cabin</span>
+          </div>
+          <div class="flex-1 h-1 bg-orange-500 mx-4"></div>
+          <div class="flex items-center text-orange-500">
+            <div class="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-medium">2</div>
+            <span class="ml-2 font-medium">Passenger Details</span>
+          </div>
+          <div class="flex-1 h-1 bg-slate-200 mx-4"></div>
+          <div class="flex items-center text-slate-400">
+            <div class="w-8 h-8 bg-slate-200 text-slate-500 rounded-full flex items-center justify-center text-sm font-medium">3</div>
+            <span class="ml-2">Review & Submit</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Cruise Summary -->
+    <div id="cruise-summary" class="bg-white rounded-2xl p-6 mb-8 shadow-lg">
+      <!-- Will be populated by JavaScript -->
+    </div>
+    
+    <!-- Passenger Forms -->
+    <div class="space-y-8">
+      <!-- Passenger 1 -->
+      <div class="passenger-card p-6">
+        <h2 class="text-2xl font-bold text-slate-800 mb-6">
+          <i class="ri-user-line mr-2 text-orange-500"></i>Passenger 1 (Primary)
+        </h2>
+        
+        <form id="passenger1-form" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-2">Full Name *</label>
+              <input type="text" name="fullName" required class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors">
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-2">Date of Birth *</label>
+              <input type="date" name="dateOfBirth" required class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors">
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-2">Nationality *</label>
+              <select name="nationality" required class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors">
+                <option value="">Select Nationality</option>
+                <option value="AU">Australia</option>
+                <option value="NZ">New Zealand</option>
+                <option value="US">United States</option>
+                <option value="CA">Canada</option>
+                <option value="GB">United Kingdom</option>
+                <option value="SG">Singapore</option>
+                <option value="MY">Malaysia</option>
+                <option value="TH">Thailand</option>
+                <option value="OTHER">Other</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-2">Email *</label>
+              <input type="email" name="email" required class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors">
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-2">Mobile Number *</label>
+              <input type="tel" name="mobile" required class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors">
+            </div>
+          </div>
+          
+          <!-- File Uploads -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-2">Passport Copy *</label>
+              <div class="file-upload-area p-6 text-center cursor-pointer" onclick="document.getElementById('passport1').click()">
+                <i class="ri-file-upload-line text-3xl text-slate-400 mb-2"></i>
+                <p class="text-sm text-slate-600">Click to upload or drag and drop</p>
+                <p class="text-xs text-slate-500">PDF, JPG, PNG (max 5MB)</p>
+                <input type="file" id="passport1" name="passport" accept=".pdf,.jpg,.jpeg,.png" class="hidden" onchange="handleFileUpload(this, 'passport1-status')">
+              </div>
+              <div id="passport1-status" class="mt-2 text-sm"></div>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-2">Travel Industry Proof *</label>
+              <div class="file-upload-area p-6 text-center cursor-pointer" onclick="document.getElementById('industry1').click()">
+                <i class="ri-file-upload-line text-3xl text-slate-400 mb-2"></i>
+                <p class="text-sm text-slate-600">Click to upload or drag and drop</p>
+                <p class="text-xs text-slate-500">IATA card, employment letter, etc.</p>
+                <input type="file" id="industry1" name="industryProof" accept=".pdf,.jpg,.jpeg,.png" class="hidden" onchange="handleFileUpload(this, 'industry1-status')">
+              </div>
+              <div id="industry1-status" class="mt-2 text-sm"></div>
+            </div>
+          </div>
+        </form>
+      </div>
+      
+      <!-- Passenger 2 -->
+      <div class="passenger-card p-6">
+        <h2 class="text-2xl font-bold text-slate-800 mb-6">
+          <i class="ri-user-line mr-2 text-orange-500"></i>Passenger 2
+        </h2>
+        
+        <form id="passenger2-form" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-2">Full Name *</label>
+              <input type="text" name="fullName" required class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors">
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-2">Date of Birth *</label>
+              <input type="date" name="dateOfBirth" required class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors">
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-2">Nationality *</label>
+              <select name="nationality" required class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors">
+                <option value="">Select Nationality</option>
+                <option value="AU">Australia</option>
+                <option value="NZ">New Zealand</option>
+                <option value="US">United States</option>
+                <option value="CA">Canada</option>
+                <option value="GB">United Kingdom</option>
+                <option value="SG">Singapore</option>
+                <option value="MY">Malaysia</option>
+                <option value="TH">Thailand</option>
+                <option value="OTHER">Other</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-2">Email *</label>
+              <input type="email" name="email" required class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors">
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-2">Mobile Number *</label>
+              <input type="tel" name="mobile" required class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors">
+            </div>
+          </div>
+          
+          <!-- File Uploads -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-2">Passport Copy *</label>
+              <div class="file-upload-area p-6 text-center cursor-pointer" onclick="document.getElementById('passport2').click()">
+                <i class="ri-file-upload-line text-3xl text-slate-400 mb-2"></i>
+                <p class="text-sm text-slate-600">Click to upload or drag and drop</p>
+                <p class="text-xs text-slate-500">PDF, JPG, PNG (max 5MB)</p>
+                <input type="file" id="passport2" name="passport" accept=".pdf,.jpg,.jpeg,.png" class="hidden" onchange="handleFileUpload(this, 'passport2-status')">
+              </div>
+              <div id="passport2-status" class="mt-2 text-sm"></div>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-2">Travel Industry Proof *</label>
+              <div class="file-upload-area p-6 text-center cursor-pointer" onclick="document.getElementById('industry2').click()">
+                <i class="ri-file-upload-line text-3xl text-slate-400 mb-2"></i>
+                <p class="text-sm text-slate-600">Click to upload or drag and drop</p>
+                <p class="text-xs text-slate-500">IATA card, employment letter, etc.</p>
+                <input type="file" id="industry2" name="industryProof" accept=".pdf,.jpg,.jpeg,.png" class="hidden" onchange="handleFileUpload(this, 'industry2-status')">
+              </div>
+              <div id="industry2-status" class="mt-2 text-sm"></div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Navigation -->
+    <div class="mt-8 flex justify-between items-center">
+      <a href="/booking/cabin-selection.html" class="px-6 py-3 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors">
+        <i class="ri-arrow-left-line mr-1"></i>Back to Cabin Selection
+      </a>
+      <button id="continue-btn" onclick="continueToReview()" class="px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium transition-colors">
+        Continue to Review
+        <i class="ri-arrow-right-line ml-1"></i>
+      </button>
+    </div>
+  </div>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="../js/loadPartials.js" defer></script>
+  <script>
+    let bookingData = null;
+    let uploadedFiles = {};
+    
+    // Check authentication and load booking data
+    async function checkAuthAndLoadData() {
+      try {
+        const supabaseUrl = window.SUPABASE_URL;
+        const supabaseAnonKey = window.SUPABASE_ANON_KEY;
+        
+        if (!supabaseUrl || !supabaseAnonKey) {
+          window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.href);
+          return false;
+        }
+        
+        const { createClient } = supabase;
+        const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+        
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        
+        if (!session) {
+          window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.href);
+          return false;
+        }
+        
+        // Load booking data from sessionStorage
+        const storedData = sessionStorage.getItem('bookingData');
+        if (!storedData) {
+          alert('Booking session expired. Please start again.');
+          window.location.href = '/deals.html';
+          return false;
+        }
+        
+        bookingData = JSON.parse(storedData);
+        displayCruiseSummary();
+        
+        return true;
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.href);
+        return false;
+      }
+    }
+    
+    // Display cruise summary
+    function displayCruiseSummary() {
+      const summaryDiv = document.getElementById('cruise-summary');
+      summaryDiv.innerHTML = `
+        <div class="flex items-start justify-between">
+          <div>
+            <h2 class="text-xl font-bold text-slate-800 mb-2">${bookingData.cruiseData.cruiseLine} - ${bookingData.cruiseData.shipName}</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm text-slate-600">
+              <p><i class="ri-calendar-line mr-1"></i><strong>Departure:</strong> ${bookingData.cruiseData.departureDate}</p>
+              <p><i class="ri-time-line mr-1"></i><strong>Duration:</strong> ${bookingData.cruiseData.nights} nights</p>
+              <p><i class="ri-map-pin-line mr-1"></i><strong>Region:</strong> ${bookingData.cruiseData.region}</p>
+              <p><i class="ri-hotel-bed-line mr-1"></i><strong>Cabin:</strong> ${bookingData.selectedCabin.charAt(0).toUpperCase() + bookingData.selectedCabin.slice(1)}</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <span class="inline-block bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-medium">
+              Travel Industry Rate Request
+            </span>
+          </div>
+        </div>
+      `;
+    }
+    
+    // Handle file upload
+    function handleFileUpload(input, statusId) {
+      const file = input.files[0];
+      const statusDiv = document.getElementById(statusId);
+      
+      if (!file) return;
+      
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        statusDiv.innerHTML = '<span class="text-red-500"><i class="ri-error-warning-line mr-1"></i>File too large (max 5MB)</span>';
+        input.value = '';
+        return;
+      }
+      
+      // Validate file type
+      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+      if (!allowedTypes.includes(file.type)) {
+        statusDiv.innerHTML = '<span class="text-red-500"><i class="ri-error-warning-line mr-1"></i>Invalid file type</span>';
+        input.value = '';
+        return;
+      }
+      
+      // Store file reference
+      uploadedFiles[input.name + '_' + input.closest('form').id] = file;
+      
+      statusDiv.innerHTML = `<span class="text-green-500"><i class="ri-check-line mr-1"></i>${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB)</span>`;
+    }
+    
+    // Validate forms
+    function validateForms() {
+      const form1 = document.getElementById('passenger1-form');
+      const form2 = document.getElementById('passenger2-form');
+      
+      // Check if all required fields are filled
+      const form1Valid = form1.checkValidity();
+      const form2Valid = form2.checkValidity();
+      
+      // Check if all files are uploaded
+      const requiredFiles = [
+        'passport_passenger1-form',
+        'industryProof_passenger1-form',
+        'passport_passenger2-form',
+        'industryProof_passenger2-form'
+      ];
+      
+      const allFilesUploaded = requiredFiles.every(fileKey => uploadedFiles[fileKey]);
+      
+      if (!form1Valid || !form2Valid) {
+        alert('Please fill in all required fields for both passengers.');
+        return false;
+      }
+      
+      if (!allFilesUploaded) {
+        alert('Please upload all required documents for both passengers.');
+        return false;
+      }
+      
+      return true;
+    }
+    
+    // Continue to review
+    function continueToReview() {
+      if (!validateForms()) return;
+      
+      // Collect form data
+      const form1Data = new FormData(document.getElementById('passenger1-form'));
+      const form2Data = new FormData(document.getElementById('passenger2-form'));
+      
+      const passenger1 = Object.fromEntries(form1Data.entries());
+      const passenger2 = Object.fromEntries(form2Data.entries());
+      
+      // Update booking data
+      bookingData.passengers = [passenger1, passenger2];
+      bookingData.uploadedFiles = uploadedFiles;
+      
+      // Store updated data
+      sessionStorage.setItem('bookingData', JSON.stringify(bookingData));
+      
+      // Navigate to review page
+      window.location.href = '/booking/review-submit.html';
+    }
+    
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', async function() {
+      await checkAuthAndLoadData();
+    });
+  </script>
+</body>
+</html>

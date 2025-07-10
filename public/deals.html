@@ -406,12 +406,10 @@
                   `}
                 </div>
                 <div class="flex gap-2">
-                  ${deal.cruiseOfferURL ? `
-                    <a href="${deal.cruiseOfferURL}" target="_blank" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg font-medium transition-colors text-xs">
-                      <i class="ri-external-link-line mr-1"></i>Book
-                    </a>
-                  ` : ''}
-                  <button onclick="showDealDetails('${deal.id}')" class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded-lg font-medium transition-colors text-xs">
+                  <button onclick="requestCruiseRate('${deal.id}')" class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded-lg font-medium transition-colors text-xs">
+                    <i class="ri-ship-line mr-1"></i>Request Rate
+                  </button>
+                  <button onclick="showDealDetails('${deal.id}')" class="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded-lg font-medium transition-colors text-xs">
                     <i class="ri-information-line mr-1"></i>Details
                   </button>
                 </div>
@@ -603,11 +601,9 @@
             
             <!-- Action Buttons -->
             <div class="flex gap-3">
-              ${deal.cruiseOfferURL ? `
-                <a href="${deal.cruiseOfferURL}" target="_blank" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg font-medium transition-colors text-center">
-                  <i class="ri-external-link-line mr-2"></i>Book Now
-                </a>
-              ` : ''}
+              <button onclick="requestCruiseRate('${deal.id}')" class="flex-1 bg-orange-500 hover:bg-orange-600 text-white px-4 py-3 rounded-lg font-medium transition-colors text-center">
+                <i class="ri-ship-line mr-2"></i>Request This Cruise Rate
+              </button>
               <button onclick="closeDealModal()" class="px-4 py-3 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors">
                 Close
               </button>
@@ -663,6 +659,25 @@
         closeDealModal();
       }
     });
+    
+    // Request cruise rate function (Phase 1)
+    function requestCruiseRate(dealId) {
+      // Check if user is logged in and verified
+      if (!window.supabaseClient || !window.supabaseClient.isLoggedIn()) {
+        alert('Please log in to request cruise rates');
+        window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.href);
+        return;
+      }
+      
+      const user = window.supabaseClient.currentUser;
+      if (!user.is_verified) {
+        alert('Your account must be verified to request cruise rates. Please check your email or contact support.');
+        return;
+      }
+      
+      // Redirect to booking flow with cruise ID
+      window.location.href = `/booking/cabin-selection.html?cruise=${dealId}`;
+    }
     
     // Load deals when page loads
     document.addEventListener('DOMContentLoaded', async function() {

@@ -46,33 +46,7 @@ async function handleBotWebhook(req, res) {
       });
     }
 
-    // Handle admin bot chat directly
-    if (botType === 'admin' && action === 'chat') {
-      const message = data.message;
-      
-      // Simple response for employment document location
-      if (message.toLowerCase().includes('document') || 
-          message.toLowerCase().includes('verification') || 
-          message.toLowerCase().includes('upload')) {
-        
-        return res.status(200).json({
-          success: true,
-          result: {
-            response: "EMPLOYMENT DOCUMENTS LOCATION:\n\nTo find client verification documents:\n\n1. Go to: /admin-verifications.html\n2. View: All users and their uploaded documents\n3. Access: Click 'View Document' to see employment letters, passports, etc.\n4. Actions: You can approve/reject users and add admin notes\n\nDocument Storage:\n• Stored in Supabase Storage bucket 'verification-uploads'\n• Secure access through admin verification page\n• Documents include employment letters, passports, business cards\n\nQuick Steps:\n1. Click 'User Management' from admin dashboard\n2. Find the user in the list\n3. Click 'View Document' to see their verification files\n4. Approve or reject with notes\n\nNeed help with anything else?"
-          }
-        });
-      }
-      
-      // Default helpful response
-      return res.status(200).json({
-        success: true,
-        result: {
-          response: "Admin Helper - Interline Asia\n\nEMPLOYMENT DOCUMENTS: Go to /admin-verifications.html\n\nADMIN TOOLS:\n• User Management: /admin-verifications.html\n• Cruise Deals: /admin-deals.html\n• CSV Upload: /admin-csv-processor.html\n• Database: /admin/debug.html\n\nCommon Tasks:\n• Review documents: /admin-verifications.html\n• Approve users: Click verify/reject buttons\n• Upload deals: /admin-csv-processor.html\n• Check system: /admin/debug.html\n\nAsk me about:\n• Finding user documents\n• Approving users\n• Managing cruise deals\n• System health checks\n\nWhat would you like help with?"
-        }
-      });
-    }
-
-    // For other bot types, try the bot manager
+    // Use Gemini-powered BotManager for all bot requests
     try {
       const botManager = getBotManager();
       
@@ -97,18 +71,26 @@ async function handleBotWebhook(req, res) {
       return res.status(200).json({
         success: true,
         result: {
-          response: "I'm currently experiencing technical difficulties with the advanced bot system. However, I can still help you with basic admin tasks. Try asking about finding documents, approving users, or managing cruise deals."
+          response: "I'm currently experiencing technical difficulties..."
         }
       });
     }
-
   } catch (error) {
-    console.error('Bot webhook error:', error);
-    return res.status(500).json({
-      success: false,
-      error: error.message,
-      timestamp: new Date().toISOString()
+    console.error('Bot webhook processing error:', error);
+    return res.status(500).json({ 
+      error: 'Internal server error',
+      details: error.message 
     });
+  }
+        });
+      }
+    } catch (error) {
+      console.error('Bot webhook processing error:', error);
+      return res.status(500).json({ 
+        error: 'Internal server error',
+        details: error.message 
+      });
+    }
   }
 }
 

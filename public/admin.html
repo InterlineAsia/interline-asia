@@ -342,8 +342,8 @@
           return;
         }
         
-        // Simple admin check - just check email
-        const isAdmin = user.email === 'admin@telenational.com.au';
+        // Proper admin check using supabase client
+        const isAdmin = window.supabaseClient.isAdmin();
         console.log('Admin check result:', isAdmin, 'for email:', user.email);
         
         document.getElementById('loading').style.display = 'none';

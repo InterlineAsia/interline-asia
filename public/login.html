@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sign in to Interline Asia - Access your exclusive cruise deals and VIP travel offers">
+  <title>Sign In - Interline Asia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="auth.css">
+  <link rel="stylesheet" href="/css/main.css">
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FYGT92WCXC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-FYGT92WCXC');
+  </script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <!-- Sentry Error Tracking -->
+  <script src="https://browser.sentry-cdn.com/7.114.0/bundle.tracing.replay.min.js" crossorigin="anonymous"></script>
+  <script src="/js/sentry-init.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+  
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1>Welcome Back</h1>
+        <p>Sign in to access your exclusive travel deals</p>
+      </div>
+
+      <div id="error-message" class="error-message"></div>
+      <div id="success-message" class="success-message"></div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required>
+        </div>
+
+
+        <!-- Cloudflare Turnstile -->
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAABkLNMf0cRO37SRL" data-callback="onTurnstileSuccess" style="margin: 1rem 0;"></div>
+        <input type="hidden" id="cf-turnstile-response" name="cf-turnstile-response" />
+
+        <button type="submit" class="btn btn-primary" id="login-btn" disabled>Sign In</button>
+      </form>
+
+      <div class="auth-links">
+        <p><a href="reset-password.html">Forgot your password?</a></p>
+        <p>Don't have an account? <a href="signup.html">Create one here</a></p>
+        <p><a href="index.html">Back to Home</a></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="/js/loadPartials.js" defer></script>
+  <script>
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      hideError();
+      hideSuccess();
+      
+      const submitButton = this.querySelector('button[type="submit"]');
+      const originalText = submitButton.textContent;
+      submitButton.textContent = 'Signing In...';
+      submitButton.disabled = true;
+      
+      try {
+        const formData = new FormData(this);
+        const email = formData.get('email').trim().toLowerCase();
+        const password = formData.get('password');
+        
+        if (!email || !password) {
+          throw new Error('Please enter both email and password');
+        }
+        
+        // Cloudflare Turnstile validation
+        const turnstileToken = document.getElementById('cf-turnstile-response').value;
+        
+        if (!turnstileToken) {
+          throw new Error('Security verification failed. Please complete the verification and try again.');
+        }
+        
+        // Sign in with Supabase - with safe Sentry tracking
+        let result;
+        try {
+          result = await Sentry.startSpan(
+            {
+              op: "auth.login",
+              name: "User Login",
+            },
+            async (span) => {
+              if (span && span.setAttribute) {
+                span.setAttribute("email", email);
+                span.setAttribute("method", "email_password");
+              }
+              
+              const loginResult = await window.supabaseClient.signIn(email, password, turnstileToken);
+              
+              if (loginResult.user && span && span.setAttribute) {
+                span.setAttribute("success", true);
+                span.setAttribute("user_id", loginResult.user.id);
+                span.setAttribute("is_admin", window.supabaseClient.isAdmin());
+              }
+              
+              return loginResult;
+            }
+          );
+        } catch (sentryError) {
+          console.warn('Sentry tracking failed, proceeding with login:', sentryError);
+          result = await window.supabaseClient.signIn(email, password, turnstileToken);
+        }
+        
+        if (result && result.user) {
+          console.log('Login successful, user data:', result.user);
+          console.log('Current user after login:', window.supabaseClient.currentUser);
+          console.log('Is admin check:', window.supabaseClient.isAdmin());
+          
+          // Track successful login
+          gtag('event', 'login', {
+            method: 'email'
+          });
+          
+          // Show success message with manual continue button
+          const isAdmin = result.user.email === 'admin@telenational.com.au';
+          
+          if (isAdmin) {
+            showSuccess('Login successful! Choose your dashboard:');
+            setTimeout(() => {
+              document.getElementById('login-form').innerHTML = '<div style="text-align: center; padding: 2rem;"><h3 style="color: #0070f3; margin-bottom: 1.5rem;">Welcome Admin!</h3><p style="margin-bottom: 2rem;">Choose which dashboard to access:</p><button onclick="window.location.href=\'/admin.html\'" class="auth-button" style="margin: 0.5rem; background: linear-gradient(135deg, #ef4444, #dc2626);">Admin Dashboard</button><button onclick="window.location.href=\'/dashboard.html\'" class="auth-button" style="margin: 0.5rem;">User Dashboard</button></div>';
+            }, 500);
+          } else {
+            showSuccess('Login successful! Click to continue:');
+            setTimeout(() => {
+              document.getElementById('login-form').innerHTML = '<div style="text-align: center; padding: 2rem;"><h3 style="color: #0070f3; margin-bottom: 1.5rem;">Welcome!</h3><button onclick="window.location.href=\'/dashboard.html\'" class="auth-button">Continue to Dashboard</button></div>';
+            }, 500);
+          }
+        }
+        
+      } catch (error) {
+        // Capture exception in Sentry with context
+        Sentry.captureException(error, {
+          tags: {
+            action: 'login',
+            component: 'auth'
+          },
+          extra: {
+            email: email,
+            errorType: error.name || 'Unknown'
+          }
+        });
+        
+        // Log error with structured logging
+        if (window.sentryLogger) {
+          window.sentryLogger.error("Login failed", {
+            email: email,
+            errorMessage: error.message,
+            errorType: error.name || 'Unknown'
+          });
+        }
+        
+        console.error('Login error:', error);
+        let errorMessage = 'Invalid email or password. Please check your credentials and try again.'; // Default message
+
+        // Log the full error for debugging
+        console.error('Full Supabase auth error:', error);
+        
+        // Check for specific Supabase auth errors
+        if (error.message.includes('Email not confirmed') || error.message.includes('email_not_confirmed')) {
+          const email = document.getElementById('email').value;
+          errorMessage = `Please verify your email before signing in. <a href="#" onclick="resendVerification('${email}')" style="color: inherit; font-weight: bold;">Resend verification link</a>`;
+          showError(errorMessage, 'error-message', true); // Pass true to allow HTML
+        } else if (error.message.includes('Invalid login credentials') || error.message.includes('invalid_credentials')) {
+          showError(errorMessage);
+        } else if (error.message.includes('Too many requests')) {
+          showError('Too many login attempts. Please wait a moment and try again.');
+        } else if (error.message.includes('Email link is invalid or has expired')) {
+          showError('Your email verification link has expired. Please request a new one.');
+        } else if (error.message.includes('User not found')) {
+          showError('No account found with this email address. Please check your email or sign up for a new account.');
+        } else {
+          // Show the actual error message for debugging
+          showError(`Login failed: ${error.message}`);
+        }
+      } finally {
+        submitButton.textContent = originalText;
+        submitButton.disabled = false;
+      }
+    });
+
+    // Check if user is already logged in
+    async function initializeLoginPage() {
+      try {
+        await window.supabaseClient.readyPromise;
+        if (window.supabaseClient.isLoggedIn()) {
+          // All users go to dashboard - only super admins can access admin panel directly
+          window.location.href = 'dashboard.html';
+        }
+      } catch (error) {
+        console.error('Login page initialization failed:', error);
+        Sentry.captureException(error);
+        showError('An error occurred during page initialization.');
+      }
+    }
+    initializeLoginPage();
+
+    // Function to handle resending the verification email
+    async function resendVerification(email) {
+      if (!email) {
+        showError('Please enter your email in the field above before resending.');
+        return;
+      }
+      try {
+        hideError();
+        showSuccess('Sending a new verification link...');
+        await window.supabaseClient.resendConfirmationEmail(email);
+        hideSuccess(); // Hide the "sending" message
+        showSuccess('A new verification link has been sent to your email address.');
+      } catch (error) {
+        console.error('Resend verification error:', error);
+        Sentry.captureException(error);
+        showError(error.message || 'Failed to resend verification link.');
+      }
+    }
+
+    // Show success message if coming from registration
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('registered') === 'true') {
+      showSuccess('Account created successfully! Please check your email to verify your account, then sign in.');
+    }
+
+    function showForgotPassword() {
+      // TODO: Implement password reset with Supabase
+      alert('Password reset functionality will be available soon. Please contact admin@interlineasia.com for assistance.');
+    }
+
+    // Cloudflare Turnstile callback
+    function onTurnstileSuccess(token) {
+      const hiddenInput = document.getElementById('cf-turnstile-response');
+      if (hiddenInput) {
+        hiddenInput.value = token;
+        document.getElementById('login-btn').disabled = false;
+        console.log('Turnstile verification successful');
+      }
+    }
+  </script>
+</body>
+</html><--disable-extensions Vercel redeploy trigger -->
+<--disable-extensions Redeploy after reconnect -->

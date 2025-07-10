@@ -679,9 +679,46 @@
       window.location.href = `/booking/cabin-selection.html?cruise=${dealId}`;
     }
     
+    // Check authentication before loading deals (Phase 2)
+    async function checkAuthAndRedirect() {
+      try {
+        const supabaseUrl = window.SUPABASE_URL;
+        const supabaseAnonKey = window.SUPABASE_ANON_KEY;
+        
+        if (!supabaseUrl || !supabaseAnonKey) {
+          console.warn('Supabase config missing, redirecting to login...');
+          window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.href);
+          return false;
+        }
+        
+        const { createClient } = supabase;
+        const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+        
+        // Check if user is authenticated
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        
+        if (!session) {
+          console.log('User not authenticated, redirecting to login...');
+          window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.href);
+          return false;
+        }
+        
+        // User is authenticated, proceed
+        return true;
+        
+      } catch (error) {
+        console.error('Authentication check failed, redirecting to login:', error);
+        window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.href);
+        return false;
+      }
+    }
+    
     // Load deals when page loads
     document.addEventListener('DOMContentLoaded', async function() {
-      await loadDeals();
+      const isAuthenticated = await checkAuthAndRedirect();
+      if (isAuthenticated) {
+        await loadDeals();
+      }
     });
   </script>
 </body>

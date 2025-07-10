@@ -176,6 +176,23 @@
 
   <div id="footer-placeholder"></div>
 
+  <!-- Deal Details Modal -->
+  <div id="dealModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <div class="flex justify-between items-start mb-4">
+          <h2 id="modalTitle" class="text-2xl font-bold text-slate-800"></h2>
+          <button onclick="closeDealModal()" class="text-slate-400 hover:text-slate-600">
+            <i class="ri-close-line text-2xl"></i>
+          </button>
+        </div>
+        <div id="modalContent">
+          <!-- Content will be populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="/js/loadPartials.js" defer></script>
   <script>
     // Global variables to store all deals and filtered deals
@@ -369,6 +386,9 @@
                 <div class="mb-4">
                   <p class="text-xs text-slate-500 mb-1">Itinerary:</p>
                   <p class="text-sm text-slate-600 line-clamp-2">${deal.itinerary}</p>
+                  <button onclick="showDealDetails('${deal.id}')" class="text-xs text-orange-500 hover:text-orange-600 mt-1">
+                    <i class="ri-eye-line mr-1"></i>View full details & map
+                  </button>
                 </div>
               ` : ''}
             </div>
@@ -385,9 +405,16 @@
                     <p class="text-lg font-semibold text-slate-600">Quote Available</p>
                   `}
                 </div>
-                <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
-                  <i class="ri-information-line mr-1"></i>Details
-                </button>
+                <div class="flex gap-2">
+                  ${deal.cruiseOfferURL ? `
+                    <a href="${deal.cruiseOfferURL}" target="_blank" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg font-medium transition-colors text-xs">
+                      <i class="ri-external-link-line mr-1"></i>Book
+                    </a>
+                  ` : ''}
+                  <button onclick="showDealDetails('${deal.id}')" class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded-lg font-medium transition-colors text-xs">
+                    <i class="ri-information-line mr-1"></i>Details
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -507,6 +534,135 @@
       filteredDeals = [...allDeals];
       renderDeals(filteredDeals);
     }
+    
+    // Show deal details in modal
+    function showDealDetails(dealId) {
+      const deal = allDeals.find(d => d.id === dealId);
+      if (!deal) return;
+      
+      const modal = document.getElementById('dealModal');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalContent = document.getElementById('modalContent');
+      
+      modalTitle.textContent = `${deal.cruiseLine} - ${deal.shipName}`;
+      
+      // Create detailed content
+      const ports = deal.itinerary ? deal.itinerary.split(' | ').map(port => port.trim()) : [];
+      
+      modalContent.innerHTML = `
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Left Column: Details -->
+          <div>
+            <div class="bg-slate-50 rounded-xl p-4 mb-4">
+              <h3 class="font-semibold text-slate-800 mb-3">Cruise Details</h3>
+              <div class="space-y-2 text-sm">
+                <p><span class="font-medium">Duration:</span> ${deal.nights} nights</p>
+                <p><span class="font-medium">Departure:</span> ${deal.departureDate}</p>
+                <p><span class="font-medium">Region:</span> ${deal.region}</p>
+                <p><span class="font-medium">Route:</span> ${deal.from} to ${deal.to}</p>
+                ${deal.maxPax ? `<p><span class="font-medium">Ship Capacity:</span> ${deal.maxPax} guests</p>` : ''}
+              </div>
+            </div>
+            
+            <!-- Pricing Information -->
+            <div class="bg-slate-50 rounded-xl p-4 mb-4">
+              <h3 class="font-semibold text-slate-800 mb-3">Pricing (per person)</h3>
+              <div class="grid grid-cols-2 gap-3">
+                ${deal.insidePrice && deal.insidePrice !== 'Quote Available' ? `
+                  <div class="bg-white p-3 rounded-lg">
+                    <p class="text-xs text-slate-500 mb-1">Interior</p>
+                    <p class="font-semibold text-slate-800">${formatPrice(deal.insidePrice)}</p>
+                  </div>
+                ` : ''}
+                ${deal.oceanviewPrice && deal.oceanviewPrice !== 'Quote Available' ? `
+                  <div class="bg-white p-3 rounded-lg">
+                    <p class="text-xs text-slate-500 mb-1">Ocean View</p>
+                    <p class="font-semibold text-slate-800">${formatPrice(deal.oceanviewPrice)}</p>
+                  </div>
+                ` : ''}
+                ${deal.balconyPrice && deal.balconyPrice !== 'Quote Available' ? `
+                  <div class="bg-white p-3 rounded-lg">
+                    <p class="text-xs text-slate-500 mb-1">Balcony</p>
+                    <p class="font-semibold text-slate-800">${formatPrice(deal.balconyPrice)}</p>
+                  </div>
+                ` : ''}
+                ${deal.suitePrice && deal.suitePrice !== 'Quote Available' ? `
+                  <div class="bg-white p-3 rounded-lg">
+                    <p class="text-xs text-slate-500 mb-1">Suite</p>
+                    <p class="font-semibold text-slate-800">${formatPrice(deal.suitePrice)}</p>
+                  </div>
+                ` : ''}
+              </div>
+              ${(!deal.insidePrice || deal.insidePrice === 'Quote Available') && 
+                (!deal.oceanviewPrice || deal.oceanviewPrice === 'Quote Available') && 
+                (!deal.balconyPrice || deal.balconyPrice === 'Quote Available') && 
+                (!deal.suitePrice || deal.suitePrice === 'Quote Available') ? `
+                <p class="text-center text-slate-600 py-4">Pricing available on request</p>
+              ` : ''}
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex gap-3">
+              ${deal.cruiseOfferURL ? `
+                <a href="${deal.cruiseOfferURL}" target="_blank" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg font-medium transition-colors text-center">
+                  <i class="ri-external-link-line mr-2"></i>Book on Cruise Line Website
+                </a>
+              ` : ''}
+              <button onclick="closeDealModal()" class="px-4 py-3 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors">
+                Close
+              </button>
+            </div>
+          </div>
+          
+          <!-- Right Column: Map & Itinerary -->
+          <div>
+            ${deal.shipmap ? `
+              <div class="mb-4">
+                <h3 class="font-semibold text-slate-800 mb-3">Route Map</h3>
+                <div class="bg-slate-100 rounded-xl overflow-hidden">
+                  <img src="${deal.shipmap}" alt="Cruise Route Map" class="w-full h-auto" onerror="this.parentElement.innerHTML='<div class=\\'p-8 text-center text-slate-500\\'>Map not available</div>'">
+                </div>
+              </div>
+            ` : ''}
+            
+            ${ports.length > 0 ? `
+              <div>
+                <h3 class="font-semibold text-slate-800 mb-3">Full Itinerary</h3>
+                <div class="bg-slate-50 rounded-xl p-4">
+                  <div class="space-y-3">
+                    ${ports.map((port, index) => `
+                      <div class="flex items-center">
+                        <div class="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-medium mr-3">
+                          ${index + 1}
+                        </div>
+                        <p class="text-sm text-slate-700">${port}</p>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `;
+      
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    // Close deal details modal
+    function closeDealModal() {
+      const modal = document.getElementById('dealModal');
+      modal.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    }
+    
+    // Close modal when clicking outside
+    document.getElementById('dealModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeDealModal();
+      }
+    });
     
     // Load deals when page loads
     document.addEventListener('DOMContentLoaded', async function() {

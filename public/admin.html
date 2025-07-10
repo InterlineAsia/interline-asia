@@ -423,6 +423,16 @@
       
       try {
         // Send to bot API
+        console.log('Sending bot request:', {
+          botType: 'admin',
+          action: 'chat',
+          data: {
+            message: message,
+            adminUserId: window.supabaseClient.getCurrentUser()?.id,
+            context: 'admin_dashboard'
+          }
+        });
+        
         const response = await fetch('/api/unified-api?endpoint=bot-webhook', {
           method: 'POST',
           headers: {
@@ -438,6 +448,10 @@
             }
           })
         });
+        
+        console.log('Bot response status:', response.status);
+        const result = await response.json();
+        console.log('Bot response data:', result);
         
         const result = await response.json();
         

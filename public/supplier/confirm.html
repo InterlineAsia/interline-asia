@@ -422,8 +422,34 @@
         
         if (error) throw error;
         
-        // Send notification emails
-        await sendNotificationEmails(selectedAction, updateData);
+        // Send notification emails via BookingBot
+        try {
+          await fetch('/api/bot-webhook', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              botType: 'booking',
+              action: 'supplier_response',
+              data: {
+                referenceNumber: referenceNumber,
+                action: selectedAction,
+                responseData: selectedAction === 'confirm' ? {
+                  cabinNumber: document.getElementById('cabin-number').value,
+                  bookingNumber: document.getElementById('booking-number').value,
+                  paymentAmount: document.getElementById('payment-amount').value,
+                  paymentInstructions: document.getElementById('payment-instructions').value
+                } : {
+                  reason: document.getElementById('decline-reason').value
+                }
+              }
+            })
+          });
+        } catch (error) {
+          console.error('BookingBot notification failed, using fallback:', error);
+          await sendNotificationEmails(selectedAction, updateData);
+        }
         
         // Show success state
         showSuccess(selectedAction, updateData);

@@ -389,24 +389,46 @@
         // Clear session storage
         sessionStorage.removeItem('bookingData');
         
-        // Send confirmation emails
+        // Send confirmation emails via BookingBot
         try {
-          const emailResponse = await fetch('/api/send-booking-emails', {
+          const botResponse = await fetch('/api/bot-webhook', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              bookingData: bookingData,
-              referenceNumber: referenceNumber
+              botType: 'booking',
+              action: 'new_booking_submitted',
+              data: {
+                bookingId: booking.id,
+                referenceNumber: referenceNumber,
+                userId: user.id
+              }
             })
           });
           
-          const emailResult = await emailResponse.json();
-          console.log('Email notifications sent:', emailResult);
-        } catch (emailError) {
-          console.error('Email notification failed:', emailError);
-          // Don't fail the booking if emails fail
+          const botResult = await botResponse.json();
+          console.log('BookingBot processed submission:', botResult);
+        } catch (botError) {
+          console.error('BookingBot processing failed:', botError);
+          // Fallback to direct email API
+          try {
+            const emailResponse = await fetch('/api/send-booking-emails', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                bookingData: bookingData,
+                referenceNumber: referenceNumber
+              })
+            });
+            
+            const emailResult = await emailResponse.json();
+            console.log('Fallback email notifications sent:', emailResult);
+          } catch (emailError) {
+            console.error('Email notification failed:', emailError);
+          }
         }
         
       } catch (error) {

@@ -40,12 +40,20 @@ async function handleBotWebhook(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  console.log('📮 Received webhook request headers:', req.headers);
+  console.log('📦 Raw request body:', req.body);
+  console.log('🔍 Content-Type:', req.headers['content-type']);
+
   try {
+    console.log('🔄 Attempting to parse request body...');
     const { botType, action, data } = req.body;
+    console.log('⚙️ Parsed fields:', { botType, action, data: data ? '<present>' : 'missing' });
     if (!botType || !action || !data) return Error400();
 
     // Unified error handling
+    console.log('🤖 Forwarding to bot manager...');
     const result = await getBotManager().processRequest(req.body);
+    console.log('✅ Successfully processed bot request');
     return SuccessResponse(result);
   } catch (error) {
     console.error('API error:', error);
@@ -223,3 +231,7 @@ async function handleLoginWithRecaptcha(req, res) {
     return res.status(500).json({ error: 'Login failed' });
   }
 }
+
+// Proposed logging additions
+console.log('🔍 Received webhook request headers:', req.headers);
+console.log('📦 Raw request body:', req.body);

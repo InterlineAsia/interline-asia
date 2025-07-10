@@ -935,6 +935,55 @@ Most cruise lines allow bookings for companions. We'll clearly state any restric
             });
         });
     </script>
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="supabase-client.js"></script>
+    
     <script src="/js/loadPartials.js" defer></script>
+    
+    <script>
+    // Check authentication before loading homepage
+    async function checkAuthAndRedirect() {
+      try {
+        const supabaseUrl = window.SUPABASE_URL;
+        const supabaseAnonKey = window.SUPABASE_ANON_KEY;
+        
+        if (!supabaseUrl || !supabaseAnonKey) {
+          console.warn('Supabase config missing, redirecting to login...');
+          window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.href);
+          return false;
+        }
+        
+        const { createClient } = supabase;
+        const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+        
+        // Check if user is authenticated
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        
+        if (!session) {
+          console.log('User not authenticated, redirecting to login...');
+          window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.href);
+          return false;
+        }
+        
+        // User is authenticated, proceed
+        return true;
+        
+      } catch (error) {
+        console.error('Authentication check failed, redirecting to login:', error);
+        window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.href);
+        return false;
+      }
+    }
+    
+    // Initialize page with auth check
+    document.addEventListener('DOMContentLoaded', async function() {
+        const isAuthenticated = await checkAuthAndRedirect();
+        if (isAuthenticated) {
+            console.log('Interline Asia homepage loaded for authenticated user');
+        }
+    });
+    </script>
 
 </body></html>

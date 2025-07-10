@@ -389,8 +389,25 @@
         // Clear session storage
         sessionStorage.removeItem('bookingData');
         
-        // TODO: Send confirmation emails
-        // This would be implemented with the email API
+        // Send confirmation emails
+        try {
+          const emailResponse = await fetch('/api/send-booking-emails', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              bookingData: bookingData,
+              referenceNumber: referenceNumber
+            })
+          });
+          
+          const emailResult = await emailResponse.json();
+          console.log('Email notifications sent:', emailResult);
+        } catch (emailError) {
+          console.error('Email notification failed:', emailError);
+          // Don't fail the booking if emails fail
+        }
         
       } catch (error) {
         console.error('Error submitting request:', error);

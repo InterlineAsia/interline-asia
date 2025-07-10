@@ -63,22 +63,36 @@ export class BookingBot extends BaseBot {
     // 1. Fetch booking details from Supabase
     const booking = await this.getBookingById(bookingId);
     
+    // 2. AI Analysis of booking request
+    let aiAnalysis = null;
+    try {
+      aiAnalysis = await this.analyzeWithAI('booking_request', booking);
+      await this.logToLangSmith('ai_booking_analysis', {
+        bookingId,
+        analysis: aiAnalysis,
+        riskLevel: aiAnalysis.risk_level
+      });
+    } catch (error) {
+      console.warn('AI analysis failed, continuing with standard processing:', error.message);
+    }
+    
     await this.logToLangSmith('booking_data_retrieved', {
       bookingId,
       cruiseLine: booking.cruise_line,
       shipName: booking.ship_name,
-      passengerCount: booking.passengers?.length || 0
+      passengerCount: booking.passengers?.length || 0,
+      aiAnalysis: aiAnalysis
     });
 
-    // 2. Validate user verification status
+    // 3. Validate user verification status
     const userVerified = await this.validateUserVerification(booking.user_id);
     
     if (!userVerified) {
       throw new Error('User not verified for industry rates');
     }
 
-    // 3. Send confirmation emails
-    const emailResults = await this.sendBookingConfirmationEmails(booking);
+    // 4. Generate personalized confirmation emails with AI
+    const emailResults = await this.sendIntelligentBookingConfirmationEmails(booking, aiAnalysis);
     
     await this.logToLangSmith('emails_sent', {
       bookingId,
@@ -88,10 +102,12 @@ export class BookingBot extends BaseBot {
       supplierEmail: emailResults.supplier
     });
 
-    // 4. Update booking status
+    // 5. Update booking status with AI insights
     await this.updateBookingStatus(bookingId, 'pending', {
       processed_by_bot: true,
-      processed_at: new Date().toISOString()
+      processed_at: new Date().toISOString(),
+      ai_analysis: aiAnalysis ? JSON.stringify(aiAnalysis) : null,
+      risk_level: aiAnalysis?.risk_level || 'medium'
     });
 
     return {
@@ -161,6 +177,26 @@ export class BookingBot extends BaseBot {
 
   async processSupplierConfirmation(booking, confirmationData) {
     const { cabinNumber, bookingNumber, paymentAmount, paymentInstructions } = confirmationData;
+    
+    // AI Analysis of supplier response
+    let supplierAnalysis = null;
+    try {
+      supplierAnalysis = await this.analyzeWithAI('supplier_response', {
+        action: 'confirm',
+        cabinNumber,
+        bookingNumber,
+        paymentAmount,
+        paymentInstructions
+      });
+      
+      await this.logToLangSmith('supplier_response_analyzed', {
+        bookingId: booking.id,
+        analysis: supplierAnalysis,
+        legitimacyScore: supplierAnalysis.legitimacy_score
+      });
+    } catch (error) {
+      console.warn('AI supplier analysis failed:', error.message);
+    }
     
     // Update booking with confirmation details
     const updatedBooking = await this.updateBookingStatus(booking.id, 'confirmed', {
@@ -235,7 +271,7 @@ export class BookingBot extends BaseBot {
     }
   }
 
-  async sendBookingConfirmationEmails(booking) {
+  async sendIntelligentBookingConfirmationEmails(booking, aiAnalysis = null) {
     const emailResults = {
       member: 'pending',
       admin: 'pending', 
@@ -243,7 +279,39 @@ export class BookingBot extends BaseBot {
     };
 
     try {
-      // Use existing email API
+      // Generate AI-powered personalized content for member email
+      const passenger1 = booking.passengers?.find(p => p.passenger_number === 1);
+      let personalizedContent = null;
+      
+      if (passenger1 && this.geminiClient) {
+        try {
+          personalizedContent = await this.generatePersonalizedContent(
+            'booking_confirmation',
+            {
+              fullName: passenger1.full_name,
+              email: passenger1.email
+            },
+            {
+              cruise_line: booking.cruise_line,
+              ship_name: booking.ship_name,
+              departure_date: booking.departure_date,
+              reference_number: booking.reference_number,
+              nights: booking.nights,
+              region: booking.region
+            }
+          );
+          
+          await this.logToLangSmith('personalized_email_generated', {
+            bookingId: booking.id,
+            emailType: 'booking_confirmation',
+            hasPersonalizedContent: !!personalizedContent
+          });
+        } catch (error) {
+          console.warn('AI email generation failed, using template:', error.message);
+        }
+      }
+
+      // Use existing email API with enhanced data
       const response = await fetch('/api/send-booking-emails', {
         method: 'POST',
         headers: {
@@ -261,7 +329,9 @@ export class BookingBot extends BaseBot {
               to: 'Round Trip'
             },
             selectedCabin: booking.cabin_type,
-            passengers: booking.passengers
+            passengers: booking.passengers,
+            aiAnalysis: aiAnalysis,
+            personalizedContent: personalizedContent
           },
           referenceNumber: booking.reference_number
         })
@@ -271,9 +341,14 @@ export class BookingBot extends BaseBot {
       return result.results || emailResults;
       
     } catch (error) {
-      console.error('Failed to send booking confirmation emails:', error);
+      console.error('Failed to send intelligent booking confirmation emails:', error);
       return emailResults;
     }
+  }
+
+  // Keep original method as fallback
+  async sendBookingConfirmationEmails(booking) {
+    return this.sendIntelligentBookingConfirmationEmails(booking, null);
   }
 
   async sendBookingConfirmedEmail(booking) {

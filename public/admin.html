@@ -304,7 +304,7 @@
         if (window.supabaseClient) {
           await window.supabaseClient.readyPromise;
           // Give extra time for auth state to settle
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise(resolve => setTimeout(resolve, 200));
         }
         
         // Check if user is logged in

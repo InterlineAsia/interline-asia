@@ -143,7 +143,10 @@
           // Simple redirect - all users go to dashboard unless they're super admin
           setTimeout(() => {
             console.log('Redirecting to dashboard for user:', result.user.email);
-            window.location.href = 'dashboard.html';
+            // Give time for auth state to settle before redirect
+            setTimeout(() => {
+              window.location.href = '/dashboard.html';
+            }, 1000);
           }, 500);
         }
         

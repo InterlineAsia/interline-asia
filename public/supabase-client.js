@@ -52,12 +52,17 @@ class SupabaseClient {
     }
     this.authReady = true;
 
-    this.supabase.auth.onAuthStateChange(async (_event, session) => {
+    this.supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state change:', event, session ? 'session exists' : 'no session');
       this.currentSession = session;
       if (session) {
         await this._setCurrentUserWithMetadata(session.user);
       } else {
         this.currentUser = null;
+        // Only redirect on explicit sign out, not on page load
+        if (event === 'SIGNED_OUT') {
+          window.location.href = '/login.html';
+        }
       }
     });
   }
@@ -195,7 +200,9 @@ class SupabaseClient {
   async signOut() {
     await this.readyPromise;
     await this.supabase.auth.signOut();
-    window.location.href = 'login.html';
+    this.currentUser = null;
+    this.currentSession = null;
+    window.location.href = '/login.html';
   }
 
   isLoggedIn() {

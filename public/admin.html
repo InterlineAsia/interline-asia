@@ -316,6 +316,16 @@
         
         // Get current user
         const user = window.supabaseClient.getCurrentUser();
+        
+        // Debug user object
+        console.log('Current user object:', user);
+        alert('User Debug:\n' + JSON.stringify({
+          userExists: !!user,
+          email: user?.email,
+          id: user?.id,
+          isLoggedIn: window.supabaseClient.isLoggedIn()
+        }, null, 2));
+        
         if (!user) {
           console.log('No user found, redirecting to login');
           window.location.href = '/login.html';

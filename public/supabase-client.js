@@ -90,8 +90,7 @@ class SupabaseClient {
     // This is a secure way to grant top-level access without relying on database fields that could be misconfigured.
     const SUPER_ADMIN_EMAILS = [
       'admin@telenational.com.au',
-      'admin@interlineasia.com', // Generic admin email
-      'edvin.lovic@povio.com'
+      'admin@interlineasia.com' // Generic admin email
     ];
 
     const normalizedEmail = authUser.email.toLowerCase();
@@ -131,7 +130,7 @@ class SupabaseClient {
       is_admin: this.currentUser.is_admin,
       is_super_admin: this.currentUser.is_super_admin
     });
-    };
+    }
     
     console.log('User set with metadata:', {
       id: this.currentUser.id,
@@ -276,8 +275,7 @@ class SupabaseClient {
     
     // Check by email first (most reliable)
     if (this.currentUser.email === 'admin@telenational.com.au' || 
-        this.currentUser.email === 'admin@interlineasia.com' || 
-        this.currentUser.email.toLowerCase() === 'edvin.lovic@povio.com') {
+        this.currentUser.email === 'admin@interlineasia.com') {
       console.log(`isAdmin check: User ${this.currentUser.email} is admin by email whitelist`);
       return true;
     }

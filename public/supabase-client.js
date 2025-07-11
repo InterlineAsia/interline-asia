@@ -78,7 +78,7 @@ class SupabaseClient {
       .from('profiles')
       .select('*')
       .eq('id', authUser.id)
-      .single();
+      .maybeSingle();
       
     if (profileError) {
       console.error('Error fetching profile:', profileError);

@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       throw new Error('GEMINI_API_KEY not found in environment');
     }
 
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${geminiApiKey}`;
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`;
     
     const geminiResponse = await fetch(geminiUrl, {
       method: 'POST',
@@ -128,19 +128,27 @@ export default async function handler(req, res) {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Test 1: Count users
-    const { data: userCount, error: userError } = await supabase
+    const { count: userCount, error: userError } = await supabase
       .from('profiles')
-      .select('id', { count: 'exact', head: true });
+      .select('*', { count: 'exact', head: true });
 
-    if (userError) {
-      throw new Error(`User count query failed: ${userError.message}`);
-    }
+    console.log('User count result:', { userCount, userError });
 
-    // Test 2: Get sample document
+    // Test 2: Get sample users
+    const { data: users, error: usersError } = await supabase
+      .from('profiles')
+      .select('id, email, full_name, created_at')
+      .limit(3);
+
+    console.log('Users query result:', { users, usersError });
+
+    // Test 3: Get sample document
     const { data: documents, error: docError } = await supabase
       .from('uploads')
       .select('id, filename, status')
       .limit(1);
+
+    console.log('Documents query result:', { documents, docError });
 
     if (docError) {
       console.warn('Document query warning:', docError.message);

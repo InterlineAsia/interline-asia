@@ -130,7 +130,6 @@ class SupabaseClient {
       is_admin: this.currentUser.is_admin,
       is_super_admin: this.currentUser.is_super_admin
     });
-    }
     
     console.log('User set with metadata:', {
       id: this.currentUser.id,

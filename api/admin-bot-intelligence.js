@@ -109,6 +109,75 @@ ${sortedDomains.map(([domain, count]) => `• ${domain}: ${count} members`).join
 
 For detailed analytics, check the monitoring dashboard.`;
     }
+
+    // Documents and uploads
+    if (msg.includes('document') || msg.includes('upload') || msg.includes('file')) {
+      const { data: uploads, error } = await supabaseClient
+        .from('uploads')
+        .select('id, user_id, filename, status, created_at')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      
+      const totalUploads = uploads.length;
+      const pendingUploads = uploads.filter(u => u.status === 'pending').length;
+      const approvedUploads = uploads.filter(u => u.status === 'approved').length;
+      
+      return `📁 **Document Management**
+
+**Total Documents**: ${totalUploads}
+**Pending Review**: ${pendingUploads}
+**Approved**: ${approvedUploads}
+
+**Storage Location**: Supabase Storage bucket \`uploads\`
+**Database Table**: \`uploads\` table tracks metadata
+
+**Admin Actions**:
+• Review documents: /admin-verifications.html
+• Find user docs: Search by email in admin panel
+• Manual verification: Update \`verification_status\` in profiles table`;
+    }
+
+    // Admin utilities and how-to guides
+    if (msg.includes('how to') || msg.includes('manually') || msg.includes('verify') || msg.includes('promote')) {
+      if (msg.includes('verify') || msg.includes('approve')) {
+        return `✅ **Manual User Verification**
+
+**Method 1 - Admin Panel**:
+1. Go to /admin-verifications.html
+2. Find the user in the list
+3. Click "Approve" or "Reject"
+
+**Method 2 - Direct Database**:
+\`\`\`sql
+UPDATE profiles 
+SET verification_status = 'verified' 
+WHERE email = 'user@example.com';
+\`\`\`
+
+**Method 3 - Find User Documents**:
+1. Search user email in admin panel
+2. Review uploaded documents
+3. Update status accordingly`;
+      }
+      
+      if (msg.includes('promote') || msg.includes('admin')) {
+        return `👑 **Promote User to Admin**
+
+**Database Method**:
+\`\`\`sql
+UPDATE profiles 
+SET is_admin = true 
+WHERE email = 'user@example.com';
+\`\`\`
+
+**Current Super Admins**:
+• admin@interlineasia.com
+• edvin@interlineasia.com
+
+**Admin Permissions**: Access to /admin dashboard, user management, system tools`;
+      }
+    }
     
     // Available deals
     if (msg.includes('deal') || msg.includes('cruise') || msg.includes('available')) {

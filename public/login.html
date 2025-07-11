@@ -100,13 +100,11 @@
           
           showSuccess('Login successful! Redirecting...');
           
-          // Redirect based on user role
+          // Show dashboard choice for logged-in users
           setTimeout(() => {
-            if (window.supabaseClient.isAdmin()) {
-              window.location.href = '/admin';
-            } else {
-              window.location.href = '/dashboard';
-            }
+            const isAdmin = window.supabaseClient.isAdmin();
+            showSuccess('Login successful! Choose your dashboard:');
+            addDashboardChoiceButtons(isAdmin);
           }, 1000);
         }
         
@@ -132,17 +130,20 @@
       }
     });
 
-    // Check if user is already logged in
+    // Check if user is already logged in - DISABLED to allow manual login choice
+    // Users can now choose between admin and member dashboards
     window.addEventListener('load', async () => {
       // Wait for Supabase client to initialize
       await new Promise(resolve => setTimeout(resolve, 500));
       
+      // Only show a notification if already logged in, don't auto-redirect
       if (window.supabaseClient.isLoggedIn()) {
-        if (window.supabaseClient.isAdmin()) {
-          window.location.href = '/admin';
-        } else {
-          window.location.href = '/dashboard';
-        }
+        const user = window.supabaseClient.currentUser;
+        const isAdmin = window.supabaseClient.isAdmin();
+        showSuccess(`Already logged in as ${user?.email}${isAdmin ? ' (Admin)' : ' (Member)'}. Choose your dashboard below.`);
+        
+        // Add dashboard choice buttons
+        addDashboardChoiceButtons(isAdmin);
       }
     });
 
@@ -155,6 +156,72 @@
     function showForgotPassword() {
       // TODO: Implement password reset with Supabase
       alert('Password reset functionality will be available soon. Please contact admin@interlineasia.com for assistance.');
+    }
+
+    // Dashboard choice buttons function
+    function addDashboardChoiceButtons(isAdmin) {
+      // Remove existing buttons if any
+      const existingButtons = document.getElementById('dashboard-choice-buttons');
+      if (existingButtons) {
+        existingButtons.remove();
+      }
+      
+      const buttonContainer = document.createElement('div');
+      buttonContainer.id = 'dashboard-choice-buttons';
+      buttonContainer.style.cssText = `
+        margin-top: 20px;
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+      `;
+      
+      // Member Dashboard Button
+      const memberBtn = document.createElement('button');
+      memberBtn.innerHTML = '<i class="ri-user-line"></i> Member Dashboard';
+      memberBtn.className = 'btn btn-secondary';
+      memberBtn.style.cssText = `
+        background: #6366f1;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      `;
+      memberBtn.onclick = () => window.location.href = '/dashboard';
+      
+      // Admin Dashboard Button (only for admins)
+      if (isAdmin) {
+        const adminBtn = document.createElement('button');
+        adminBtn.innerHTML = '<i class="ri-admin-line"></i> Admin Dashboard';
+        adminBtn.className = 'btn btn-primary';
+        adminBtn.style.cssText = `
+          background: #dc3545;
+          color: white;
+          border: none;
+          padding: 12px 24px;
+          border-radius: 8px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-weight: 500;
+          transition: all 0.3s ease;
+        `;
+        adminBtn.onclick = () => window.location.href = '/admin';
+        buttonContainer.appendChild(adminBtn);
+      }
+      
+      buttonContainer.appendChild(memberBtn);
+      
+      // Add buttons after the form
+      const form = document.getElementById('login-form');
+      form.parentNode.insertBefore(buttonContainer, form.nextSibling);
     }
 
     // reCAPTCHA migrated to Cloudflare Turnstile

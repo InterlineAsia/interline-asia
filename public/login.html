@@ -23,6 +23,8 @@
   <script src="supabase-client.js"></script>
 </head>
 <body>
+  <div id="header-placeholder"></div>
+  
   <div class="auth-container">
     <div class="auth-card">
       <div class="auth-header">
@@ -59,6 +61,9 @@
     </div>
   </div>
 
+  <div id="footer-placeholder"></div>
+
+  <script src="/js/loadPartials.js" defer></script>
   <script>
     document.getElementById('login-form').addEventListener('submit', async function(e) {
       e.preventDefault();

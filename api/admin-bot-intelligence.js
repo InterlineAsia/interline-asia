@@ -33,13 +33,13 @@ export async function getIntelligentResponse(message) {
     if (msg.includes('how many') && (msg.includes('member') || msg.includes('user'))) {
       const { data: users, error } = await supabaseClient
         .from('profiles')
-        .select('id, created_at, verified')
+        .select('id, created_at, verification_status, email, full_name')
         .order('created_at', { ascending: false });
       
       if (error) throw error;
       
       const totalUsers = users.length;
-      const verifiedUsers = users.filter(u => u.verified).length;
+      const verifiedUsers = users.filter(u => u.verification_status === 'verified').length;
       const unverifiedUsers = totalUsers - verifiedUsers;
       
       return `👥 **Member Statistics**
@@ -60,7 +60,7 @@ Use /admin-verifications.html to manage user verifications.`;
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
-      const { data: todayUsers, error } = await supabase
+      const { data: todayUsers, error } = await supabaseClient
         .from('profiles')
         .select('id, full_name, email, created_at')
         .gte('created_at', today.toISOString())

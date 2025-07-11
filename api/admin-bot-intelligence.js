@@ -31,7 +31,7 @@ export async function getIntelligentResponse(message) {
     const supabaseClient = await initSupabase();
     // Member statistics and analytics
     if (msg.includes('how many') && (msg.includes('member') || msg.includes('user'))) {
-      const { data: users, error } = await supabase
+      const { data: users, error } = await supabaseClient
         .from('profiles')
         .select('id, created_at, verified')
         .order('created_at', { ascending: false });

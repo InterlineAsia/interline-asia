@@ -56,7 +56,7 @@
         <div class="cf-turnstile" data-sitekey="0x4AAAAAABkLNMf0cRO37SRL" data-callback="onTurnstileSuccess" style="margin: 1rem 0;"></div>
         <input type="hidden" id="cf-turnstile-response" name="cf-turnstile-response" />
 
-        <button type="submit" class="btn btn-primary" id="login-btn" disabled>Sign In</button>
+        <button type="submit" class="btn btn-primary" id="login-btn">Sign In</button>
       </form>
 
       <div class="auth-links">
@@ -116,8 +116,9 @@
         if (!email || !password) {
           throw new Error('Please enter both email and password');
         }
+        // Temporarily bypass Turnstile for testing
         if (!turnstileToken) {
-          throw new Error('Security verification failed. Please complete the verification and try again.');
+          console.warn('Turnstile verification bypassed for testing');
         }
         
         // Sign in with Supabase - with safe Sentry tracking

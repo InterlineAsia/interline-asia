@@ -1,1 +1,236 @@
-<!-- Force deployment Fri Jul 11 11:31:30 +07 2025 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Interline Asia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      color: #f8fafc;
+    }
+    .admin-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    .admin-header {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .admin-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem 0;
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .admin-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    .admin-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+    .admin-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+    .admin-btn {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .chatbot-container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      margin-top: 2rem;
+    }
+    .chat-messages {
+      height: 300px;
+      overflow-y: auto;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    .chat-input-container {
+      display: flex;
+      gap: 1rem;
+    }
+    .chat-input {
+      flex: 1;
+      padding: 0.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+    .chat-input::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-container">
+    <div class="admin-header">
+      <h1 class="admin-title">Admin Dashboard</h1>
+      <p>Interline Asia Administration Panel</p>
+    </div>
+    
+    <div class="admin-grid">
+      <div class="admin-card">
+        <h3>User Management</h3>
+        <p>Manage user accounts, verifications, and permissions</p>
+        <a href="/admin-verifications.html" class="admin-btn">Manage Users</a>
+      </div>
+      
+      <div class="admin-card">
+        <h3>Cruise Deals</h3>
+        <p>Manage cruise deals, pricing, and availability</p>
+        <a href="/admin-deals.html" class="admin-btn">Manage Deals</a>
+      </div>
+      
+      <div class="admin-card">
+        <h3>CSV Processor</h3>
+        <p>Upload and process cruise deal CSV files</p>
+        <a href="/admin-csv-processor.html" class="admin-btn">Process CSV</a>
+      </div>
+      
+      <div class="admin-card">
+        <h3>System Health</h3>
+        <p>Monitor system status and performance</p>
+        <a href="/monitoring.html" class="admin-btn">View Monitoring</a>
+      </div>
+    </div>
+    
+    <div class="chatbot-container">
+      <h3>Admin Helper Bot</h3>
+      <p>Ask me anything about system administration, user management, or technical issues.</p>
+      
+      <div id="chat-messages" class="chat-messages">
+        <div style="opacity: 0.7; font-style: italic;">
+          Admin Helper Bot is ready. How can I assist you today?
+        </div>
+      </div>
+      
+      <div class="chat-input-container">
+        <input 
+          type="text" 
+          id="chat-input" 
+          class="chat-input" 
+          placeholder="Ask me about users, system status, or any admin tasks..."
+          onkeypress="handleChatKeyPress(event)"
+        >
+        <button onclick="sendChatMessage()" class="admin-btn">
+          Send
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+  <script>
+    async function sendChatMessage() {
+      const input = document.getElementById('chat-input');
+      const message = input.value.trim();
+      
+      if (!message) return;
+      
+      const chatMessages = document.getElementById('chat-messages');
+      
+      // Add user message
+      const userDiv = document.createElement('div');
+      userDiv.style.cssText = 'margin: 0.5rem 0; padding: 0.5rem; background: rgba(59, 130, 246, 0.2); border-radius: 8px; text-align: right;';
+      userDiv.innerHTML = `<strong>You:</strong> ${message}`;
+      chatMessages.appendChild(userDiv);
+      
+      input.value = '';
+      
+      // Add thinking indicator
+      const thinkingDiv = document.createElement('div');
+      thinkingDiv.style.cssText = 'margin: 0.5rem 0; padding: 0.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 8px; font-style: italic; opacity: 0.7;';
+      thinkingDiv.innerHTML = 'Admin Helper is thinking...';
+      chatMessages.appendChild(thinkingDiv);
+      
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      
+      try {
+        const response = await fetch('/api/unified-api?endpoint=bot-webhook', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            botType: 'admin',
+            action: 'chat',
+            data: {
+              message: message,
+              context: 'admin_dashboard'
+            }
+          })
+        });
+        
+        const result = await response.json();
+        
+        chatMessages.removeChild(thinkingDiv);
+        
+        const botDiv = document.createElement('div');
+        botDiv.style.cssText = 'margin: 0.5rem 0; padding: 0.5rem; background: rgba(16, 185, 129, 0.2); border-radius: 8px;';
+        botDiv.innerHTML = `<strong>Admin Helper:</strong> ${result.response || 'I apologize, but I encountered an issue processing your request. Please try again.'}`;
+        chatMessages.appendChild(botDiv);
+        
+      } catch (error) {
+        console.error('Chat error:', error);
+        
+        if (thinkingDiv.parentNode) {
+          chatMessages.removeChild(thinkingDiv);
+        }
+        
+        const errorDiv = document.createElement('div');
+        errorDiv.style.cssText = 'margin: 0.5rem 0; padding: 0.5rem; background: rgba(239, 68, 68, 0.2); border-radius: 8px;';
+        errorDiv.innerHTML = '<strong>Admin Helper:</strong> I apologize, but I am currently experiencing technical difficulties. Please try again later.';
+        chatMessages.appendChild(errorDiv);
+      }
+      
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    function handleChatKeyPress(event) {
+      if (event.key === 'Enter') {
+        sendChatMessage();
+      }
+    }
+  </script>
+</body>
+</html>

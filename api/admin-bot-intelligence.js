@@ -80,7 +80,7 @@ ${todayUsers.length > 0 ? 'Check /admin-verifications.html to review these new m
     
     // Member locations/demographics
     if (msg.includes('where') && (msg.includes('member') || msg.includes('from') || msg.includes('location'))) {
-      const { data: users, error } = await supabase
+      const { data: users, error } = await supabaseClient
         .from('profiles')
         .select('id, email')
         .not('email', 'is', null);

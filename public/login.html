@@ -121,6 +121,11 @@
         
       } catch (error) {
         console.error('Login error:', error);
+        console.error('Login error details:', {
+          message: error.message,
+          email: email,
+          passwordLength: password.length
+        });
         let errorMessage = 'Invalid email or password';
         
         if (error.message.includes('Email not confirmed')) {

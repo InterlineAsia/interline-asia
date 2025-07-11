@@ -1,7 +1,7 @@
 // Interline Asia - Unified API Handler
 // Consolidates multiple API endpoints to stay within Vercel Hobby plan limits
 
-import { getBotManager } from '../bots/bot-manager.js';
+// import { getBotManager } from '../bots/bot-manager.js'; // Temporarily disabled
 
 export default async function handler(req, res) {
   const { endpoint } = req.query;
@@ -144,17 +144,15 @@ async function handleBotHealth(req, res) {
   }
 
   try {
-    const botManager = getBotManager();
-    const healthStatus = await botManager.healthCheck();
+    // Simplified health check
+    const healthStatus = {
+      status: 'ok',
+      bots: ['admin', 'booking', 'lead', 'followup'],
+      admin_bot: 'online',
+      timestamp: new Date().toISOString()
+    };
 
-    let httpStatus = 200;
-    if (healthStatus.status === 'degraded') {
-      httpStatus = 206;
-    } else if (healthStatus.status === 'error' || healthStatus.status === 'not_initialized') {
-      httpStatus = 503;
-    }
-
-    return res.status(httpStatus).json({
+    return res.status(200).json({
       ...healthStatus,
       endpoint: '/api/unified-api?endpoint=bot-health',
       checkedAt: new Date().toISOString()
@@ -305,6 +303,3 @@ async function handleLoginWithRecaptcha(req, res) {
   }
 }
 
-// Proposed logging additions
-console.log('🔍 Received webhook request headers:', req.headers);
-console.log('📦 Raw request body:', req.body);

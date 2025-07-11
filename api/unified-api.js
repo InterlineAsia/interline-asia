@@ -48,12 +48,14 @@ async function handleBotWebhook(req, res) {
     console.log('🔄 Attempting to parse request body...');
     const { botType, action, data } = req.body;
     console.log('⚙️ Parsed fields:', { botType, action, data: data ? '<present>' : 'missing' });
-    if (!botType || !action || !data) return Error400();
+    if (!botType || !action || !data) {
+      return res.status(400).json({ error: 'Missing required fields: botType, action, data' });
+    }
 
     // Unified error handling
     console.log('🤖 Forwarding to bot manager...');
     try {
-      const result = await getBotManager().processRequest(req.body);
+      const result = await getBotManager().processRequest(botType, data);
       console.log('✅ Successfully processed bot request');
       return res.status(200).json({
         success: true,

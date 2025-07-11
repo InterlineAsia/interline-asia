@@ -1,16 +1,34 @@
 // Intelligent Admin Bot with Database Access
-import { createClient } from '@supabase/supabase-js';
+// Note: Using dynamic import to avoid module issues
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+let supabase = null;
 
-// Create admin client with service role for full access
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+async function initSupabase() {
+  if (!supabase) {
+    try {
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      
+      if (!supabaseUrl || !supabaseServiceKey) {
+        throw new Error('Missing Supabase credentials');
+      }
+      
+      supabase = createClient(supabaseUrl, supabaseServiceKey);
+    } catch (error) {
+      console.error('Supabase init error:', error);
+      throw error;
+    }
+  }
+  return supabase;
+}
+
 
 export async function getIntelligentResponse(message) {
   const msg = message.toLowerCase();
   
   try {
+    const supabaseClient = await initSupabase();
     // Member statistics and analytics
     if (msg.includes('how many') && (msg.includes('member') || msg.includes('user'))) {
       const { data: users, error } = await supabase

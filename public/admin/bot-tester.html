@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Tester - Admin Only</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.8;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .bot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .bot-card {
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .bot-card.active {
+            border-color: #007bff;
+            background: #e7f3ff;
+        }
+        
+        .bot-card h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .bot-card p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .access-level {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .access-admin { background: #dc3545; color: white; }
+        .access-member { background: #ffc107; color: #212529; }
+        .access-public { background: #28a745; color: white; }
+        
+        .test-form {
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .form-group select,
+        .form-group textarea,
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        .test-button:hover {
+            background: #0056b3;
+        }
+        
+        .test-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .response-area {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .response-area h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .response-content {
+            background: white;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        
+        .success {
+            color: #155724;
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+        
+        .test-scenarios {
+            margin-top: 30px;
+            padding: 20px;
+            background: #e9ecef;
+            border-radius: 8px;
+        }
+        
+        .scenario-button {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .scenario-button:hover {
+            background: #545b62;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Bot Testing Interface</h1>
+            <p>Admin-Only Tool for Testing All Bot Functions</p>
+        </div>
+        
+        <div class="content">
+            <div class="bot-grid">
+                <div class="bot-card" data-bot="admin">
+                    <span class="access-level access-admin">ADMIN ONLY</span>
+                    <h3>👨‍💼 Admin Helper Bot</h3>
+                    <p>Full system access: user management, booking analytics, email campaigns, verification stats</p>
+                </div>
+                
+                <div class="bot-card" data-bot="customer">
+                    <span class="access-level access-public">PUBLIC</span>
+                    <h3>🤖 Customer Bot</h3>
+                    <p>Cruise deals, booking process, verification steps. Blocks admin questions.</p>
+                </div>
+                
+                <div class="bot-card" data-bot="booking">
+                    <span class="access-level access-member">MEMBER</span>
+                    <h3>📧 Post-Booking Bot</h3>
+                    <p>Booking confirmations, travel documents, cruise preparation, countdown updates</p>
+                </div>
+                
+                <div class="bot-card" data-bot="newsletter">
+                    <span class="access-level access-public">PUBLIC</span>
+                    <h3>📬 Newsletter Bot</h3>
+                    <p>Email campaigns, subscription management, Brevo integration. Protects metrics.</p>
+                </div>
+            </div>
+            
+            <div class="test-form">
+                <div class="form-group">
+                    <label for="botType">Selected Bot:</label>
+                    <select id="botType">
+                        <option value="">Select a bot to test</option>
+                        <option value="admin">Admin Helper Bot</option>
+                        <option value="customer">Customer Bot</option>
+                        <option value="booking">Post-Booking Bot</option>
+                        <option value="newsletter">Newsletter Bot</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="testMessage">Test Message:</label>
+                    <textarea id="testMessage" placeholder="Enter your test message here..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="userContext">User Context:</label>
+                    <select id="userContext">
+                        <option value="admin">Admin User (isAdmin: true)</option>
+                        <option value="member">Member User (authenticated)</option>
+                        <option value="public">Public User (no auth)</option>
+                    </select>
+                </div>
+                
+                <button class="test-button" onclick="testBot()">🧪 Test Bot</button>
+                
+                <div id="responseArea" class="response-area" style="display: none;">
+                    <h4>Bot Response:</h4>
+                    <div id="responseContent" class="response-content"></div>
+                </div>
+            </div>
+            
+            <div class="test-scenarios">
+                <h3>🎯 Quick Test Scenarios</h3>
+                <p>Click to load common test cases:</p>
+                
+                <button class="scenario-button" onclick="loadScenario('admin', 'How many members do we have?', 'admin')">
+                    Admin: Member Count
+                </button>
+                <button class="scenario-button" onclick="loadScenario('customer', 'How many members do we have?', 'public')">
+                    Customer: Admin Block Test
+                </button>
+                <button class="scenario-button" onclick="loadScenario('customer', 'What cruise deals do you have?', 'public')">
+                    Customer: Cruise Deals
+                </button>
+                <button class="scenario-button" onclick="loadScenario('booking', 'Where is my booking confirmation?', 'member')">
+                    Booking: Confirmation Help
+                </button>
+                <button class="scenario-button" onclick="loadScenario('newsletter', 'How many people are subscribed?', 'public')">
+                    Newsletter: Metrics Block Test
+                </button>
+                <button class="scenario-button" onclick="loadScenario('admin', 'Show me booking analytics', 'public')">
+                    Admin: Access Denied Test
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Bot card selection
+        document.querySelectorAll('.bot-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.bot-card').forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+                document.getElementById('botType').value = card.dataset.bot;
+            });
+        });
+        
+        // Bot type selection
+        document.getElementById('botType').addEventListener('change', (e) => {
+            document.querySelectorAll('.bot-card').forEach(c => c.classList.remove('active'));
+            if (e.target.value) {
+                document.querySelector(`[data-bot="${e.target.value}"]`).classList.add('active');
+            }
+        });
+        
+        function loadScenario(botType, message, userContext) {
+            document.getElementById('botType').value = botType;
+            document.getElementById('testMessage').value = message;
+            document.getElementById('userContext').value = userContext;
+            
+            // Update visual selection
+            document.querySelectorAll('.bot-card').forEach(c => c.classList.remove('active'));
+            document.querySelector(`[data-bot="${botType}"]`).classList.add('active');
+        }
+        
+        async function testBot() {
+            const botType = document.getElementById('botType').value;
+            const message = document.getElementById('testMessage').value;
+            const userContext = document.getElementById('userContext').value;
+            
+            if (!botType || !message) {
+                alert('Please select a bot and enter a test message');
+                return;
+            }
+            
+            const responseArea = document.getElementById('responseArea');
+            const responseContent = document.getElementById('responseContent');
+            const testButton = document.querySelector('.test-button');
+            
+            // Show loading state
+            responseArea.style.display = 'block';
+            responseContent.className = 'response-content loading';
+            responseContent.textContent = 'Testing bot... Please wait.';
+            testButton.disabled = true;
+            
+            try {
+                const requestData = {
+                    botType: botType,
+                    action: 'test',
+                    data: {
+                        message: message,
+                        userId: userContext === 'admin' ? 'admin-test-user' : 'test-user'
+                    }
+                };
+                
+                // Add user context
+                if (userContext === 'admin') {
+                    requestData.data.isAdmin = true;
+                } else if (userContext === 'member') {
+                    requestData.data.isMember = true;
+                } else {
+                    requestData.data.isPublic = true;
+                }
+                
+                const response = await fetch('/api/unified-api?endpoint=bot-webhook', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                const result = await response.json();
+                
+                // Display response
+                responseContent.className = 'response-content ' + (result.success ? 'success' : 'error');
+                responseContent.textContent = JSON.stringify(result, null, 2);
+                
+                // Log performance
+                await logBotPerformance(botType, 'test', result.success);
+                
+            } catch (error) {
+                responseContent.className = 'response-content error';
+                responseContent.textContent = `Error: ${error.message}`;
+            } finally {
+                testButton.disabled = false;
+            }
+        }
+        
+        async function logBotPerformance(botName, eventType, success) {
+            try {
+                await fetch('/api/bot-performance-monitor', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        botName: botName,
+                        eventType: eventType,
+                        success: success,
+                        responseTime: Date.now()
+                    })
+                });
+            } catch (error) {
+                console.log('Performance logging failed:', error);
+            }
+        }
+        
+        // Check admin access on page load
+        window.addEventListener('load', () => {
+            // In a real implementation, you'd verify admin access here
+            console.log('Bot Tester loaded - Admin access required');
+        });
+    </script>
+</body>
+</html>

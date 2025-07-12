@@ -16,8 +16,14 @@ export default async function handler(req, res) {
         return await handleUpdateUploadStatus(req, res);
       case 'system-health-check':
         return await handleSystemHealthCheck(req, res);
-      case 'langchain-diagnostic':
-        return await handleLangChainDiagnostic(req, res);
+      case 'bot-automated-tests':
+        return await handleBotAutomatedTests(req, res);
+      case 'bot-performance-monitor':
+        return await handleBotPerformanceMonitor(req, res);
+      case 'support-bot':
+        return await handleSupportBot(req, res);
+      case 'cruise-data':
+        return await handleCruiseData(req, res);
       default:
         return res.status(404).json({ error: 'Endpoint not found' });
     }
@@ -42,40 +48,66 @@ async function handleBotWebhook(req, res) {
 
     const message = data.message || '';
     
-    // Intelligent admin bot response
-    if (botType === 'admin') {
-      console.log('Admin bot received message:', message);
+    // Route to appropriate trained bot
+    try {
+      let BotClass;
+      let botResponse;
       
-      try {
-        // Import and use the intelligent response system
-        const { getIntelligentResponse } = await import('./admin-bot-intelligence.js');
-        const intelligentResponse = await getIntelligentResponse(message);
-        
-        console.log('Admin bot generated response length:', intelligentResponse.length);
-        
-        return res.status(200).json({
-          success: true,
-          response: intelligentResponse
-        });
-      } catch (error) {
-        console.error('Admin bot intelligence error:', error);
-        
-        // Fallback response with error logging
-        return res.status(200).json({
-          success: true,
-          response: `Admin Helper Bot - Ready to assist!
-
-I can help you with:
-• User management and verifications
-• System health monitoring  
-• Database queries and reports
-• Admin workflow guidance
-
-Ask me about specific admin tasks!
-
-*Note: Advanced AI features temporarily unavailable - ${error.message}*`
-        });
+      switch (botType) {
+        case 'admin':
+          const { default: AdminHelperBot } = await import('../bots/admin/admin-helper-bot-trained.js');
+          BotClass = new AdminHelperBot();
+          botResponse = await BotClass.processRequest(data, { 
+            isAdmin: true, 
+            userId: data.userId 
+          });
+          break;
+          
+        case 'customer':
+          const { default: CustomerBot } = await import('../bots/customer/customer-bot-trained.js');
+          BotClass = new CustomerBot();
+          botResponse = await BotClass.processRequest(data, { 
+            isCustomer: true 
+          });
+          break;
+          
+        case 'booking':
+        case 'post-booking':
+          const { default: PostBookingBot } = await import('../bots/booking/booking-bot-trained.js');
+          BotClass = new PostBookingBot();
+          botResponse = await BotClass.processRequest(data, { 
+            isMember: true, 
+            userId: data.userId 
+          });
+          break;
+          
+        case 'newsletter':
+          const { default: NewsletterBot } = await import('../bots/newsletter/newsletter-bot-trained.js');
+          BotClass = new NewsletterBot();
+          botResponse = await BotClass.processRequest(data, { 
+            isPublic: true 
+          });
+          break;
+          
+        default:
+          // Default to customer bot for unknown types
+          const { default: DefaultCustomerBot } = await import('../bots/customer/customer-bot-trained.js');
+          BotClass = new DefaultCustomerBot();
+          botResponse = await BotClass.processRequest(data, { 
+            isCustomer: true 
+          });
       }
+      
+      return res.status(200).json(botResponse);
+      
+    } catch (error) {
+      console.error('Bot processing error:', error);
+      
+      return res.status(200).json({
+        success: true,
+        response: `I apologize, but I'm experiencing technical difficulties. Please try again later or contact support for assistance.`,
+        error: 'Bot service temporarily unavailable'
+      });
     }
     
     return res.status(200).json({
@@ -117,7 +149,47 @@ async function handleBotHealth(req, res) {
       timestamp: new Date().toISOString()
     });
   }
-}// Get pending uploads for admin review
+}// Bot Automated Tests Handler
+async function handleBotAutomatedTests(req, res) {
+  try {
+    const { default: testHandler } = await import('./bot-automated-tests.js');
+    return await testHandler(req, res);
+  } catch (error) {
+    return res.status(500).json({ error: 'Bot testing service unavailable' });
+  }
+}
+
+// Bot Performance Monitor Handler
+async function handleBotPerformanceMonitor(req, res) {
+  try {
+    const { default: monitorHandler } = await import('./bot-performance-monitor.js');
+    return await monitorHandler(req, res);
+  } catch (error) {
+    return res.status(500).json({ error: 'Performance monitoring service unavailable' });
+  }
+}
+
+// Support Bot Handler
+async function handleSupportBot(req, res) {
+  try {
+    const { default: supportHandler } = await import('./support-bot-handler.js');
+    return await supportHandler(req, res);
+  } catch (error) {
+    return res.status(500).json({ error: 'Support bot service unavailable' });
+  }
+}
+
+// Cruise Data Integration Handler
+async function handleCruiseData(req, res) {
+  try {
+    const { default: cruiseDataHandler } = await import('./cruise-data-integration.js');
+    return await cruiseDataHandler(req, res);
+  } catch (error) {
+    return res.status(500).json({ error: 'Cruise data service unavailable' });
+  }
+}
+
+// Get pending uploads for admin review
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });

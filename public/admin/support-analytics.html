@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Bot Analytics - Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .charts-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .chart-card h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .category-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .category-item:last-child {
+            border-bottom: none;
+        }
+        
+        .category-bar {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            flex: 1;
+            margin: 0 10px;
+        }
+        
+        .category-fill {
+            height: 100%;
+            background: #007bff;
+            transition: width 0.3s ease;
+        }
+        
+        .recent-interactions {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .interaction-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .interaction-item:last-child {
+            border-bottom: none;
+        }
+        
+        .interaction-time {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .interaction-category {
+            display: inline-block;
+            background: #e9ecef;
+            color: #495057;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin-left: 10px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        
+        .refresh-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        
+        .refresh-btn:hover {
+            background: #0056b3;
+        }
+        
+        @media (max-width: 768px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Support Bot Analytics</h1>
+            <p>Monitor support bot performance and user interactions</p>
+            <button class="refresh-btn" onclick="loadAnalytics()">🔄 Refresh Data</button>
+        </div>
+
+        <div id="loading" class="loading">
+            Loading analytics data...
+        </div>
+
+        <div id="error" class="error" style="display: none;"></div>
+
+        <div id="analytics-content" style="display: none;">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-interactions">0</div>
+                    <div class="stat-label">Total Interactions</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-number" id="satisfaction-rate">0%</div>
+                    <div class="stat-label">Satisfaction Rate</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-number" id="escalation-rate">0%</div>
+                    <div class="stat-label">Escalation Rate</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-number" id="helpful-responses">0</div>
+                    <div class="stat-label">Helpful Responses</div>
+                </div>
+            </div>
+
+            <div class="charts-section">
+                <div class="chart-card">
+                    <h3>📊 Questions by Category</h3>
+                    <div id="category-breakdown"></div>
+                </div>
+                
+                <div class="chart-card">
+                    <h3>🤖 Response Types</h3>
+                    <div id="response-type-breakdown"></div>
+                </div>
+            </div>
+
+            <div class="recent-interactions">
+                <h3>📝 Recent Support Interactions</h3>
+                <div id="recent-interactions-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let analyticsData = null;
+
+        async function loadAnalytics() {
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const content = document.getElementById('analytics-content');
+            
+            loading.style.display = 'block';
+            error.style.display = 'none';
+            content.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/unified-api?endpoint=support-bot', {
+                    method: 'GET'
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    analyticsData = result.analytics;
+                    displayAnalytics(analyticsData);
+                    loading.style.display = 'none';
+                    content.style.display = 'block';
+                } else {
+                    throw new Error(result.error || 'Failed to load analytics');
+                }
+
+            } catch (err) {
+                console.error('Analytics error:', err);
+                loading.style.display = 'none';
+                error.style.display = 'block';
+                error.textContent = `Error loading analytics: ${err.message}`;
+            }
+        }
+
+        function displayAnalytics(data) {
+            // Update stat cards
+            document.getElementById('total-interactions').textContent = data.totalInteractions || 0;
+            document.getElementById('satisfaction-rate').textContent = data.satisfactionRate || '0%';
+            document.getElementById('escalation-rate').textContent = data.escalationRate || '0%';
+            document.getElementById('helpful-responses').textContent = data.helpfulResponses || 0;
+
+            // Display category breakdown
+            displayCategoryBreakdown(data.categoryBreakdown || {});
+            
+            // Display response type breakdown
+            displayResponseTypeBreakdown(data.responseTypeBreakdown || {});
+            
+            // Display recent interactions (simulated for now)
+            displayRecentInteractions();
+        }
+
+        function displayCategoryBreakdown(categories) {
+            const container = document.getElementById('category-breakdown');
+            container.innerHTML = '';
+
+            const total = Object.values(categories).reduce((sum, count) => sum + count, 0);
+            
+            if (total === 0) {
+                container.innerHTML = '<p style="color: #666; text-align: center;">No data available</p>';
+                return;
+            }
+
+            const categoryNames = {
+                'login_issues': 'Login Issues',
+                'verification_process': 'Verification Process',
+                'document_upload': 'Document Upload',
+                'booking_problems': 'Booking Problems',
+                'technical_issues': 'Technical Issues',
+                'account_management': 'Account Management',
+                'general_support': 'General Support'
+            };
+
+            Object.entries(categories)
+                .sort(([,a], [,b]) => b - a)
+                .forEach(([category, count]) => {
+                    const percentage = Math.round((count / total) * 100);
+                    const displayName = categoryNames[category] || category;
+                    
+                    const item = document.createElement('div');
+                    item.className = 'category-item';
+                    item.innerHTML = `
+                        <span>${displayName}</span>
+                        <div class="category-bar">
+                            <div class="category-fill" style="width: ${percentage}%"></div>
+                        </div>
+                        <span>${count} (${percentage}%)</span>
+                    `;
+                    container.appendChild(item);
+                });
+        }
+
+        function displayResponseTypeBreakdown(responseTypes) {
+            const container = document.getElementById('response-type-breakdown');
+            container.innerHTML = '';
+
+            const total = Object.values(responseTypes).reduce((sum, count) => sum + count, 0);
+            
+            if (total === 0) {
+                container.innerHTML = '<p style="color: #666; text-align: center;">No data available</p>';
+                return;
+            }
+
+            const typeNames = {
+                'gemini': 'AI Generated',
+                'fallback': 'Static Fallback',
+                'static': 'Static Response',
+                'error': 'Error Response'
+            };
+
+            Object.entries(responseTypes)
+                .sort(([,a], [,b]) => b - a)
+                .forEach(([type, count]) => {
+                    const percentage = Math.round((count / total) * 100);
+                    const displayName = typeNames[type] || type;
+                    
+                    const item = document.createElement('div');
+                    item.className = 'category-item';
+                    item.innerHTML = `
+                        <span>${displayName}</span>
+                        <div class="category-bar">
+                            <div class="category-fill" style="width: ${percentage}%"></div>
+                        </div>
+                        <span>${count} (${percentage}%)</span>
+                    `;
+                    container.appendChild(item);
+                });
+        }
+
+        function displayRecentInteractions() {
+            const container = document.getElementById('recent-interactions-list');
+            
+            // Simulated recent interactions for demo
+            const sampleInteractions = [
+                {
+                    time: new Date(Date.now() - 1000 * 60 * 15).toLocaleString(),
+                    category: 'login_issues',
+                    message: 'I can\'t log in to my account'
+                },
+                {
+                    time: new Date(Date.now() - 1000 * 60 * 45).toLocaleString(),
+                    category: 'document_upload',
+                    message: 'My file is too big to upload'
+                },
+                {
+                    time: new Date(Date.now() - 1000 * 60 * 120).toLocaleString(),
+                    category: 'verification_process',
+                    message: 'How long does verification take?'
+                }
+            ];
+
+            container.innerHTML = '';
+            
+            if (sampleInteractions.length === 0) {
+                container.innerHTML = '<p style="color: #666; text-align: center;">No recent interactions</p>';
+                return;
+            }
+
+            sampleInteractions.forEach(interaction => {
+                const item = document.createElement('div');
+                item.className = 'interaction-item';
+                item.innerHTML = `
+                    <div>${interaction.message}</div>
+                    <div class="interaction-time">
+                        ${interaction.time}
+                        <span class="interaction-category">${interaction.category.replace('_', ' ')}</span>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // Load analytics when page loads
+        document.addEventListener('DOMContentLoaded', loadAnalytics);
+        
+        // Auto-refresh every 5 minutes
+        setInterval(loadAnalytics, 5 * 60 * 1000);
+    </script>
+</body>
+</html>

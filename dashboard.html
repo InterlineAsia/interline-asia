@@ -43,5 +43,18 @@
       }
     }
   </script>
+    <!-- Support Chat Widget -->
+    <div id="support-chat-container"></div>
+    <script src="js/support-chat-widget.js"></script>
+    <script>
+        // Enable support chat on dashboard
+        document.body.classList.add('support-chat-enabled');
+        
+        // Pass user email if available
+        const userEmailMeta = document.querySelector('meta[name="user-email"]');
+        if (userEmailMeta) {
+            window.userEmail = userEmailMeta.content;
+        }
+    </script>
 </body>
 </html>

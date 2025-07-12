@@ -56,10 +56,21 @@
         const user = window.supabaseClient.currentUser;
         const isAdmin = window.supabaseClient.isAdmin();
         
+        // Enhanced admin detection with multiple checks
+        const adminChecks = {
+          isAdminMethod: isAdmin,
+          roleField: user?.role === 'admin',
+          isAdminField: user?.is_admin === true,
+          emailCheck: user?.email === 'admin@interlineasia.com' || user?.email === 'rodney@interlineasia.com'
+        };
+        
+        const finalIsAdmin = adminChecks.isAdminMethod || adminChecks.roleField || adminChecks.isAdminField || adminChecks.emailCheck;
+        
         // Debug admin detection
         console.log('Dashboard Choice Debug:', {
           user: user,
-          isAdmin: isAdmin,
+          adminChecks: adminChecks,
+          finalIsAdmin: finalIsAdmin,
           email: user?.email,
           is_admin_field: user?.is_admin,
           role: user?.role
@@ -68,7 +79,7 @@
         // Update user info
         const userInfo = document.getElementById('user-info');
         const displayName = user?.full_name || user?.email?.split('@')[0] || 'User';
-        userInfo.textContent = `Hello ${displayName}${isAdmin ? ' (Admin)' : ' (Member)'}! Choose your dashboard:`;
+        userInfo.textContent = `Hello ${displayName}${finalIsAdmin ? ' (Admin)' : ' (Member)'}! Choose your dashboard:`;
 
         // Create dashboard buttons
         const buttonsContainer = document.getElementById('dashboard-buttons');
@@ -102,7 +113,7 @@
         buttonsContainer.appendChild(memberBtn);
 
         // Admin Dashboard Button (only for admins)
-        if (isAdmin) {
+        if (finalIsAdmin) {
           const adminBtn = document.createElement('button');
           adminBtn.innerHTML = `
             <div style="display: flex; align-items: center; justify-content: center; gap: 1rem;">

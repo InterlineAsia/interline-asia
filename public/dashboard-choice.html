@@ -63,7 +63,9 @@
           isAdminField: user?.is_admin === true,
           emailCheck: user?.email === 'admin@interlineasia.com' || 
                      user?.email === 'rodney@interlineasia.com' ||
-                     user?.email === 'admin@telenational.com.au'
+                     user?.email === 'admin@telenational.com.au' ||
+                     user?.email?.includes('admin') ||
+                     user?.email?.includes('telenational')
         };
         
         const finalIsAdmin = adminChecks.isAdminMethod || adminChecks.roleField || adminChecks.isAdminField || adminChecks.emailCheck;

@@ -27,7 +27,7 @@ function parseCSVLine(line) {
 function convertCSVToJSONChunks() {
   try {
     console.log('Reading CSV file...');
-    const csvData = fs.readFileSync('2906 Master Upload Twins.csv', 'utf8');
+    const csvData = fs.readFileSync('1007 Master Upload Twins.csv', 'utf8');
     const lines = csvData.trim().split('\n');
     
     // Get headers from first line

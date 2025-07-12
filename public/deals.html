@@ -144,6 +144,17 @@
         </div>
         
         <div class="space-y-2">
+          <label for="cruisingTypeFilter" class="block text-sm font-semibold text-slate-700">
+            <i class="ri-ship-line mr-1"></i> Cruising Types
+          </label>
+          <select id="cruisingTypeFilter" class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors bg-white">
+            <option value="">All</option>
+            <option value="Ocean">Ocean Cruises</option>
+            <option value="River">River Cruises</option>
+          </select>
+        </div>
+        
+        <div class="space-y-2">
           <label for="sortFilter" class="block text-sm font-semibold text-slate-700">
             <i class="ri-sort-asc mr-1"></i> Sort by Price
           </label>
@@ -157,7 +168,7 @@
         </div>
         
         <div class="flex items-end">
-          <button id="clearFilters" class="w-full bg-slate-600 hover:bg-slate-700 text-white px-6 py-3 rounded-xl font-medium transition-colors duration-200">
+          <button id="clearFilters" class="w-full bg-slate-600 hover:bg-slate-700 text-white px-6 py-3 rounded-xl font-medium transition-colors duration-200" onclick="clearFilters()">
             <i class="ri-refresh-line mr-1"></i> Clear Filters
           </button>
         </div>
@@ -194,8 +205,9 @@
   </div>
 
   <script src="/js/loadPartials.js" defer></script>
+  <script src="/js/unified-deals-loader.js"></script>
   <script>
-    // Global variables to store all deals and filtered deals
+    // Global variables to store all deals and filtered deals (now handled by unified loader)
     let allDeals = [];
     let filteredDeals = [];
     
@@ -293,6 +305,7 @@
         document.getElementById('regionFilter').addEventListener('change', applyFilters);
         document.getElementById('dateFromFilter').addEventListener('change', applyFilters);
         document.getElementById('dateToFilter').addEventListener('change', applyFilters);
+        document.getElementById('cruisingTypeFilter').addEventListener('change', applyFilters);
         document.getElementById('sortFilter').addEventListener('change', applyFilters);
         document.getElementById('clearFilters').addEventListener('click', clearFilters);
         
@@ -453,6 +466,7 @@
       const regionFilter = document.getElementById('regionFilter').value;
       const dateFromFilter = document.getElementById('dateFromFilter').value;
       const dateToFilter = document.getElementById('dateToFilter').value;
+      const cruisingTypeFilter = document.getElementById('cruisingTypeFilter').value;
       const sortFilter = document.getElementById('sortFilter').value;
       
       filteredDeals = allDeals.filter(deal => {
@@ -483,7 +497,20 @@
           }
         }
         
-        return matchesCruiseLine && matchesRegion && matchesDate;
+        // Cruising type filter
+        let matchesCruisingType = true;
+        if (cruisingTypeFilter) {
+          // Check if deal has cruiseType property (from unified system)
+          if (deal.cruiseType && deal.cruiseType !== cruisingTypeFilter) {
+            matchesCruisingType = false;
+          }
+          // For legacy deals, assume Ocean if no type specified
+          else if (!deal.cruiseType && cruisingTypeFilter === 'River') {
+            matchesCruisingType = false;
+          }
+        }
+        
+        return matchesCruiseLine && matchesRegion && matchesDate && matchesCruisingType;
       });
       
       // Apply sorting
@@ -528,6 +555,7 @@
       document.getElementById('regionFilter').value = '';
       document.getElementById('dateFromFilter').value = '';
       document.getElementById('dateToFilter').value = '';
+      document.getElementById('cruisingTypeFilter').value = '';
       document.getElementById('sortFilter').value = '';
       filteredDeals = [...allDeals];
       renderDeals(filteredDeals);

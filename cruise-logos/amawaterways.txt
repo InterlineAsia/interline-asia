@@ -1,0 +1,6 @@
+AmaWaterways
+River cruise specialist offering luxury river cruising experiences across Europe, Asia, and Africa.
+Logo: /logos/cruiselines/amawaterways.png
+Type: River Cruise Line
+Founded: 2002
+Specialty: Luxury river cruises with immersive cultural experiences

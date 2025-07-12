@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document Review - Interline Asia Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
+  
+  <!-- Header -->
+  <div class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center py-4">
+        <div class="flex items-center space-x-4">
+          <a href="/admin.html" class="text-slate-600 hover:text-slate-900">
+            <i class="ri-arrow-left-line text-xl"></i>
+          </a>
+          <h1 class="text-2xl font-bold text-slate-900">Document Review</h1>
+        </div>
+        <div class="flex items-center space-x-4">
+          <span id="upload-summary" class="text-sm text-slate-600"></span>
+          <button onclick="refreshUploads()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium">
+            <i class="ri-refresh-line mr-1"></i>Refresh
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Loading State -->
+    <div id="loading" class="text-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+      <p class="mt-4 text-slate-600">Loading uploads...</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="error" class="hidden bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+      <i class="ri-error-warning-line text-3xl text-red-500 mb-2"></i>
+      <h3 class="text-lg font-semibold text-red-800 mb-2">Error Loading Uploads</h3>
+      <p id="error-message" class="text-red-600"></p>
+      <button onclick="loadUploads()" class="mt-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg">
+        Try Again
+      </button>
+    </div>
+
+    <!-- Uploads Grid -->
+    <div id="uploads-container" class="hidden">
+      
+      <!-- Pending Uploads -->
+      <div class="mb-8">
+        <h2 class="text-xl font-semibold text-slate-900 mb-4 flex items-center">
+          <i class="ri-time-line text-yellow-500 mr-2"></i>
+          Pending Review (<span id="pending-count">0</span>)
+        </h2>
+        <div id="pending-uploads" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3"></div>
+      </div>
+
+      <!-- Approved Uploads -->
+      <div class="mb-8">
+        <h2 class="text-xl font-semibold text-slate-900 mb-4 flex items-center">
+          <i class="ri-check-line text-green-500 mr-2"></i>
+          Approved (<span id="approved-count">0</span>)
+        </h2>
+        <div id="approved-uploads" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3"></div>
+      </div>
+
+      <!-- Rejected Uploads -->
+      <div class="mb-8">
+        <h2 class="text-xl font-semibold text-slate-900 mb-4 flex items-center">
+          <i class="ri-close-line text-red-500 mr-2"></i>
+          Rejected (<span id="rejected-count">0</span>)
+        </h2>
+        <div id="rejected-uploads" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Action Modal -->
+  <div id="action-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+      <h3 id="modal-title" class="text-lg font-semibold mb-4"></h3>
+      <p id="modal-message" class="text-slate-600 mb-4"></p>
+      
+      <div id="notes-section" class="mb-4">
+        <label class="block text-sm font-medium text-slate-700 mb-2">Admin Notes (Optional)</label>
+        <textarea id="admin-notes" rows="3" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="Add notes about this decision..."></textarea>
+      </div>
+
+      <div class="flex space-x-3">
+        <button onclick="closeModal()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-800 px-4 py-2 rounded-lg font-medium">
+          Cancel
+        </button>
+        <button id="confirm-action" class="flex-1 px-4 py-2 rounded-lg font-medium text-white">
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentUploadId = null;
+    let currentAction = null;
+
+    async function loadUploads() {
+      try {
+        document.getElementById('loading').classList.remove('hidden');
+        document.getElementById('error').classList.add('hidden');
+        document.getElementById('uploads-container').classList.add('hidden');
+
+        const response = await fetch('/api/get-pending-uploads');
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.error || 'Failed to load uploads');
+        }
+
+        displayUploads(data);
+        updateSummary(data.summary);
+
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('uploads-container').classList.remove('hidden');
+
+      } catch (error) {
+        console.error('Load uploads error:', error);
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('error').classList.remove('hidden');
+        document.getElementById('error-message').textContent = error.message;
+      }
+    }
+
+    function displayUploads(data) {
+      const { grouped } = data;
+
+      // Update counts
+      document.getElementById('pending-count').textContent = grouped.pending.length;
+      document.getElementById('approved-count').textContent = grouped.approved.length;
+      document.getElementById('rejected-count').textContent = grouped.rejected.length;
+
+      // Display uploads by status
+      displayUploadGroup('pending-uploads', grouped.pending, 'pending');
+      displayUploadGroup('approved-uploads', grouped.approved, 'approved');
+      displayUploadGroup('rejected-uploads', grouped.rejected, 'rejected');
+    }
+
+    function displayUploadGroup(containerId, uploads, status) {
+      const container = document.getElementById(containerId);
+      
+      if (uploads.length === 0) {
+        container.innerHTML = '<p class="text-slate-500 text-center py-8 col-span-full">No uploads found</p>';
+        return;
+      }
+
+      container.innerHTML = uploads.map(upload => createUploadCard(upload, status)).join('');
+    }
+
+    function createUploadCard(upload, status) {
+      const statusColors = {
+        pending: 'border-yellow-200 bg-yellow-50',
+        approved: 'border-green-200 bg-green-50',
+        rejected: 'border-red-200 bg-red-50'
+      };
+
+      const statusIcons = {
+        pending: 'ri-time-line text-yellow-600',
+        approved: 'ri-check-line text-green-600',
+        rejected: 'ri-close-line text-red-600'
+      };
+
+      const actionButtons = status === 'pending' ? `
+        <div class="flex space-x-2 mt-4">
+          <button onclick="showActionModal('${upload.id}', 'approved', '${upload.filename}', '${upload.user.full_name}')" 
+                  class="flex-1 bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium">
+            <i class="ri-check-line mr-1"></i>Approve
+          </button>
+          <button onclick="showActionModal('${upload.id}', 'rejected', '${upload.filename}', '${upload.user.full_name}')" 
+                  class="flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-medium">
+            <i class="ri-close-line mr-1"></i>Reject
+          </button>
+        </div>
+      ` : '';
+
+      return `
+        <div class="border rounded-lg p-4 ${statusColors[status]}">
+          <div class="flex items-start justify-between mb-3">
+            <div class="flex items-center space-x-2">
+              <i class="ri-file-text-line text-lg text-slate-600"></i>
+              <span class="font-medium text-slate-900 truncate">${upload.filename}</span>
+            </div>
+            <i class="${statusIcons[status]} text-lg"></i>
+          </div>
+          
+          <div class="space-y-2 text-sm text-slate-600">
+            <div class="flex items-center space-x-2">
+              <i class="ri-user-line"></i>
+              <span>${upload.user.full_name}</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <i class="ri-mail-line"></i>
+              <span class="truncate">${upload.user.email}</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <i class="ri-calendar-line"></i>
+              <span>${new Date(upload.created_at).toLocaleDateString()}</span>
+            </div>
+          </div>
+
+          ${actionButtons}
+        </div>
+      `;
+    }
+
+    function updateSummary(summary) {
+      document.getElementById('upload-summary').textContent = 
+        `${summary.total} total • ${summary.pending} pending • ${summary.approved} approved • ${summary.rejected} rejected`;
+    }
+
+    function showActionModal(uploadId, action, filename, userName) {
+      currentUploadId = uploadId;
+      currentAction = action;
+
+      const modal = document.getElementById('action-modal');
+      const title = document.getElementById('modal-title');
+      const message = document.getElementById('modal-message');
+      const confirmBtn = document.getElementById('confirm-action');
+
+      if (action === 'approved') {
+        title.textContent = 'Approve Document';
+        message.textContent = `Approve "${filename}" from ${userName}?`;
+        confirmBtn.className = 'flex-1 bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg font-medium text-white';
+        confirmBtn.textContent = 'Approve';
+      } else {
+        title.textContent = 'Reject Document';
+        message.textContent = `Reject "${filename}" from ${userName}?`;
+        confirmBtn.className = 'flex-1 bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg font-medium text-white';
+        confirmBtn.textContent = 'Reject';
+      }
+
+      confirmBtn.onclick = executeAction;
+      modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('action-modal').classList.add('hidden');
+      document.getElementById('admin-notes').value = '';
+      currentUploadId = null;
+      currentAction = null;
+    }
+
+    async function executeAction() {
+      if (!currentUploadId || !currentAction) return;
+
+      const confirmBtn = document.getElementById('confirm-action');
+      const originalText = confirmBtn.textContent;
+
+      try {
+        confirmBtn.textContent = 'Processing...';
+        confirmBtn.disabled = true;
+
+        const adminNotes = document.getElementById('admin-notes').value.trim();
+
+        const response = await fetch('/api/update-upload-status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            uploadId: currentUploadId,
+            status: currentAction,
+            adminNotes: adminNotes
+          })
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.error || 'Action failed');
+        }
+
+        // Show success message
+        alert(`Document ${currentAction} successfully!`);
+
+        // Refresh uploads
+        await loadUploads();
+        closeModal();
+
+      } catch (error) {
+        console.error('Action failed:', error);
+        alert(`Failed to ${currentAction} document: ${error.message}`);
+      } finally {
+        confirmBtn.textContent = originalText;
+        confirmBtn.disabled = false;
+      }
+    }
+
+    function refreshUploads() {
+      loadUploads();
+    }
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', () => {
+      // Check authentication
+      if (!window.supabaseClient || !window.supabaseClient.isLoggedIn()) {
+        window.location.href = '/login.html';
+        return;
+      }
+
+      if (!window.supabaseClient.isAdmin()) {
+        alert('Access denied. Admin privileges required.');
+        window.location.href = '/dashboard.html';
+        return;
+      }
+
+      loadUploads();
+    });
+  </script>
+</body>
+</html>

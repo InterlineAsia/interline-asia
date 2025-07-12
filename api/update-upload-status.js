@@ -33,8 +33,7 @@ export default async function handler(req, res) {
         filename,
         status,
         user_id,
-        created_at,
-        reviewed_at
+        created_at
       `)
       .single();
 

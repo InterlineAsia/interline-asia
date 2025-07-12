@@ -19,9 +19,7 @@ export default async function handler(req, res) {
         filename,
         status,
         created_at,
-        user_id,
-        file_type,
-        file_size
+        user_id
       `)
       .order('created_at', { ascending: false });
 

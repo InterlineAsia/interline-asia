@@ -80,13 +80,18 @@ export default async function handler(req, res) {
       apiUrl: langchainEndpoint
     });
 
-    // Create a test run
-    const testRun = await langsmithClient.createRun({
-      name: 'admin_bot_connection_test',
-      run_type: 'chain',
-      inputs: { test: 'connection_verification' },
-      outputs: { status: 'connected', timestamp: new Date().toISOString() }
+    // Test LangSmith connection with a simple ping
+    const testResponse = await fetch(`${langchainEndpoint}/sessions`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${langchainApiKey}`,
+        'Content-Type': 'application/json'
+      }
     });
+
+    if (!testResponse.ok) {
+      throw new Error(`LangSmith API test failed: ${testResponse.status}`);
+    }
 
     results.langchain = {
       status: 'connected',
@@ -94,7 +99,7 @@ export default async function handler(req, res) {
         apiKeyPresent: true,
         endpoint: langchainEndpoint,
         usage: 'LangSmith logging only (not model calls)',
-        testRunId: testRun.id,
+        connectionTest: 'success',
         loggingEnabled: true
       }
     };

@@ -56,6 +56,15 @@
         const user = window.supabaseClient.currentUser;
         const isAdmin = window.supabaseClient.isAdmin();
         
+        // Debug admin detection
+        console.log('Dashboard Choice Debug:', {
+          user: user,
+          isAdmin: isAdmin,
+          email: user?.email,
+          is_admin_field: user?.is_admin,
+          role: user?.role
+        });
+        
         // Update user info
         const userInfo = document.getElementById('user-info');
         const displayName = user?.full_name || user?.email?.split('@')[0] || 'User';

@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     // Get all users to debug admin status
     const { data: users, error } = await supabase
       .from('profiles')
-      .select('id, full_name, email, is_admin, created_at')
+      .select('id, full_name, email, created_at')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -24,7 +24,12 @@ export default async function handler(req, res) {
     return res.status(200).json({
       success: true,
       users: users,
-      adminUsers: users.filter(u => u.is_admin),
+      adminUsers: users.filter(u => [
+        'admin@interlineasia.com',
+        'edvin@interlineasia.com', 
+        'nuch@interlineasia.com',
+        'rodney@interlineasia.com'
+      ].includes(u.email)),
       superAdminEmails: [
         'admin@interlineasia.com',
         'edvin@interlineasia.com',

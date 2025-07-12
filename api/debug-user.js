@@ -28,7 +28,9 @@ export default async function handler(req, res) {
         'admin@interlineasia.com',
         'edvin@interlineasia.com', 
         'nuch@interlineasia.com',
-        'rodney@interlineasia.com'
+        'rodney@interlineasia.com',
+        'admin@telenational.com.au',
+        'rodney@telenational.com.au'
       ].includes(u.email)),
       superAdminEmails: [
         'admin@interlineasia.com',

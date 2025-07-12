@@ -92,7 +92,9 @@ class SupabaseClient {
       'admin@interlineasia.com',
       'edvin@interlineasia.com',
       'nuch@interlineasia.com',
-      'rodney@interlineasia.com'
+      'rodney@interlineasia.com',
+      'admin@telenational.com.au',
+      'rodney@telenational.com.au'
     ];
 
     const normalizedEmail = authUser.email.toLowerCase();

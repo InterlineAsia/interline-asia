@@ -1,0 +1,4 @@
+Force Vercel deployment trigger
+Timestamp: ${new Date().toISOString()}
+Commit: Complete bot system and cruise data integration
+Status: Ready for deployment

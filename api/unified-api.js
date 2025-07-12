@@ -24,6 +24,8 @@ export default async function handler(req, res) {
         return await handleSupportBot(req, res);
       case 'cruise-data':
         return await handleCruiseData(req, res);
+      case 'csv-manager':
+        return await handleCSVManager(req, res);
       default:
         return res.status(404).json({ error: 'Endpoint not found' });
     }
@@ -186,6 +188,16 @@ async function handleCruiseData(req, res) {
     return await cruiseDataHandler(req, res);
   } catch (error) {
     return res.status(500).json({ error: 'Cruise data service unavailable' });
+  }
+}
+
+// CSV File Manager Handler
+async function handleCSVManager(req, res) {
+  try {
+    const { default: csvManagerHandler } = await import('./csv-file-manager.js');
+    return await csvManagerHandler(req, res);
+  } catch (error) {
+    return res.status(500).json({ error: 'CSV manager service unavailable' });
   }
 }
 

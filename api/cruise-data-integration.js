@@ -108,15 +108,30 @@ async function fetchOceanCruises(supabase) {
 
 async function fetchCSVFromStorage(supabase) {
   try {
-    // Download CSV from storage bucket
-    const { data: csvData, error: downloadError } = await supabase.storage
-      .from('twins-upload-1007')
-      .download('1007 Master Upload Twins.csv');
+    // Try to read CSV from local file first, then storage bucket
+    const fs = require('fs');
+    const path = require('path');
     
-    if (downloadError) throw downloadError;
+    let csvText;
     
-    // Convert blob to text
-    const csvText = await csvData.text();
+    try {
+      // Try local file first
+      const localPath = path.join(process.cwd(), '1007 Master Upload Twins.csv');
+      csvText = fs.readFileSync(localPath, 'utf8');
+      console.log('📁 Using local CSV file: 1007 Master Upload Twins.csv');
+    } catch (localError) {
+      console.log('📁 Local file not found, trying storage bucket...');
+      
+      // Fallback to storage bucket
+      const { data: csvData, error: downloadError } = await supabase.storage
+        .from('twins-upload-1007')
+        .download('1007 Master Upload Twins.csv');
+      
+      if (downloadError) throw downloadError;
+      csvText = await csvData.text();
+      console.log('☁️ Using storage bucket CSV file');
+    }
+    
     
     // Parse CSV
     const parsedData = parseCSV(csvText);

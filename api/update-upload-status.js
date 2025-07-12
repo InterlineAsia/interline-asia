@@ -25,9 +25,7 @@ export default async function handler(req, res) {
     const { data: updatedUpload, error: updateError } = await supabase
       .from('uploads')
       .update({
-        status: status,
-        reviewed_at: new Date().toISOString(),
-        admin_notes: adminNotes || null
+        status: status
       })
       .eq('id', uploadId)
       .select(`

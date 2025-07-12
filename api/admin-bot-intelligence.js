@@ -33,13 +33,13 @@ export async function getIntelligentResponse(message) {
     if (msg.includes('how many') && (msg.includes('member') || msg.includes('user'))) {
       const { data: users, error } = await supabaseClient
         .from('profiles')
-        .select('id, created_at, verification_status, email, full_name')
+        .select('id, created_at, email, full_name')
         .order('created_at', { ascending: false });
       
       if (error) throw error;
       
       const totalUsers = users.length;
-      const verifiedUsers = users.filter(u => u.verification_status === 'verified').length;
+      const verifiedUsers = users.filter(u => u.is_admin || u.email.includes('interlineasia')).length;
       const unverifiedUsers = totalUsers - verifiedUsers;
       
       return `👥 **Member Statistics**

@@ -202,7 +202,7 @@ async function handleCSVManager(req, res) {
 }
 
 // Get pending uploads for admin review
-export default async function handler(req, res) {
+async function handleGetPendingUploads(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Interline Asia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="auth.css">
+  
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Configuration -->
+  <script src="config.js"></script>
+  
+  <!-- Supabase Client -->
+  <script src="supabase-client.js"></script>
+  
+  <!-- Cloudflare Turnstile -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1>Welcome Back</h1>
+        <p>Sign in to access your Interline Asia account</p>
+      </div>
+      
+      <form id="loginForm" class="auth-form">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required>
+        </div>
+        
+        <!-- Cloudflare Turnstile CAPTCHA -->
+        <div class="form-group">
+          <div class="cf-turnstile" data-sitekey="0x4AAAAAABkLNMf0cRO37SRL" data-callback="onTurnstileSuccess"></div>
+          <input type="hidden" id="turnstile-token" name="turnstile-token">
+        </div>
+        
+        <button type="submit" class="auth-btn" id="loginBtn">
+          <span class="btn-text">Sign In</span>
+          <span class="btn-loading" style="display: none;">Signing in...</span>
+        </button>
+        
+        <div class="auth-links">
+          <a href="reset-password.html">Forgot your password?</a>
+          <span>•</span>
+          <a href="signup.html">Create an account</a>
+        </div>
+      </form>
+      
+      <div id="error-message" class="error-message" style="display: none;"></div>
+      <div id="success-message" class="success-message" style="display: none;"></div>
+    </div>
+  </div>
+
+  <script>
+    // Cloudflare Turnstile callback
+    function onTurnstileSuccess(token) {
+      console.log('Turnstile token received:', token ? 'Yes' : 'No');
+      document.getElementById('turnstile-token').value = token;
+    }
+
+    document.addEventListener('DOMContentLoaded', async function() {
+      // DISABLED: No auto-login - always show login form
+      // This prevents auto-login issues and Git state problems
+      console.log('Login page loaded - auto-login disabled for security');
+
+      const loginForm = document.getElementById('loginForm');
+      const loginBtn = document.getElementById('loginBtn');
+      const btnText = loginBtn.querySelector('.btn-text');
+      const btnLoading = loginBtn.querySelector('.btn-loading');
+
+      loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Clear previous messages
+        hideError();
+        hideSuccess();
+        
+        // Get form data
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const turnstileToken = document.getElementById('turnstile-token').value;
+        
+        console.log('LOGIN: Form submission started');
+        console.log('LOGIN: Email:', email);
+        console.log('LOGIN: Turnstile token present:', !!turnstileToken);
+        
+        // Validation
+        if (!email || !password) {
+          showError('Please fill in all fields');
+          return;
+        }
+        
+        if (!turnstileToken) {
+          showError('Please complete the security verification');
+          return;
+        }
+        
+        // Show loading state
+        loginBtn.disabled = true;
+        btnText.style.display = 'none';
+        btnLoading.style.display = 'inline';
+        
+        try {
+          // Sign in with Supabase
+          console.log('LOGIN: Attempting login for:', email);
+          const result = await window.supabaseClient.signIn(email, password, turnstileToken);
+          
+          console.log('LOGIN: Result received:', result);
+          console.log('LOGIN: User object:', result.user);
+          console.log('LOGIN: Session object:', result.session);
+          
+          if (result.user) {
+            // Track successful login
+            gtag('event', 'login', {
+              method: 'email'
+            });
+            
+            console.log('LOGIN: Success! User email:', result.user.email);
+            showSuccess('Login successful! Redirecting...');
+            
+            // Store user info temporarily for dashboard routing
+            sessionStorage.setItem('tempUser', JSON.stringify({
+              email: result.user.email,
+              id: result.user.id,
+              loginTime: Date.now()
+            }));
+            
+            // Determine redirect based on user role
+            const isAdmin = window.supabaseClient.isAdmin(result.user.email);
+            console.log('LOGIN: User is admin:', isAdmin);
+            
+            if (isAdmin) {
+              console.log('LOGIN: Redirecting admin to dashboard-choice...');
+              window.location.href = '/dashboard-choice.html';
+            } else {
+              console.log('LOGIN: Redirecting user to dashboard...');
+              window.location.href = '/dashboard.html';
+            }
+          } else {
+            console.error('LOGIN: Failed - No user returned');
+            throw new Error('Login failed - no user data received');
+          }
+        } catch (error) {
+          console.error('LOGIN: Error occurred:', error);
+          
+          // Show user-friendly error message
+          let errorMessage = 'Login failed. Please check your credentials and try again.';
+          
+          if (error.message.includes('Invalid login credentials')) {
+            errorMessage = 'Invalid email or password. Please try again.';
+          } else if (error.message.includes('Email not confirmed')) {
+            errorMessage = 'Please check your email and click the confirmation link before signing in.';
+          } else if (error.message.includes('Too many requests')) {
+            errorMessage = 'Too many login attempts. Please wait a moment and try again.';
+          } else if (error.message.includes('captcha')) {
+            errorMessage = 'Security verification failed. Please try again.';
+          }
+          
+          showError(errorMessage);
+          
+          // Reset Turnstile
+          if (window.turnstile) {
+            window.turnstile.reset();
+          }
+        } finally {
+          // Reset button state
+          loginBtn.disabled = false;
+          btnText.style.display = 'inline';
+          btnLoading.style.display = 'none';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

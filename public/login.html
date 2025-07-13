@@ -305,6 +305,7 @@
           
           // Simplified redirect function
           const performRedirect = function() {
+            console.log('AUTH_DEBUG: *** INSIDE performRedirect() - FUNCTION IS BEING CALLED ***');
             console.log('AUTH_DEBUG: Starting redirect...');
             
             try {
@@ -326,9 +327,11 @@
               // Perform redirect based on role
               if (isAdmin) {
                 console.log('AUTH_DEBUG: Redirecting admin to dashboard-choice...');
+                console.log('AUTH_DEBUG: *** SETTING window.location.href = /dashboard-choice.html ***');
                 window.location.href = '/dashboard-choice.html';
               } else {
                 console.log('AUTH_DEBUG: Redirecting user to dashboard...');
+                console.log('AUTH_DEBUG: *** SETTING window.location.href = /dashboard.html ***');
                 window.location.href = '/dashboard.html';
               }
               
@@ -337,12 +340,15 @@
               
               // Fallback redirect to dashboard for any user
               console.log('AUTH_DEBUG: Fallback redirect to dashboard...');
+              console.log('AUTH_DEBUG: *** FALLBACK - SETTING window.location.href = /dashboard.html ***');
               window.location.href = '/dashboard.html';
             }
           };
           
           // Wait 1000ms before redirect after successful login
+          console.log('AUTH_DEBUG: *** SETTING UP REDIRECT TIMEOUT - Will call performRedirect in 1000ms ***');
           setTimeout(function() {
+            console.log('AUTH_DEBUG: *** TIMEOUT FIRED - About to call performRedirect() ***');
             performRedirect();
           }, 1000);
           

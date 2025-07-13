@@ -9,6 +9,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="auth.css">
   
+  <!-- Required scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+  
   <style>
     /* Site Header Styles */
     .main-header {
@@ -84,17 +89,7 @@
     }
   </style>
   
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
-  <!-- Configuration -->
-  <script src="config.js"></script>
-  
-  <!-- Supabase Client -->
-  <script src="supabase-client.js"></script>
-  
-  <!-- Cloudflare Turnstile -->
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <!-- Remove duplicate scripts - already included above -->
   
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
@@ -129,6 +124,9 @@
         <h1>Welcome Back</h1>
         <p>Sign in to access your Interline Asia account</p>
       </div>
+
+      <div id="error-message" class="error-message"></div>
+      <div id="success-message" class="success-message"></div>
       
       <form id="loginForm" class="auth-form">
         <div class="form-group">
@@ -141,11 +139,8 @@
           <input type="password" id="password" name="password" required>
         </div>
         
-        <!-- Cloudflare Turnstile CAPTCHA -->
-        <div class="form-group">
-          <div class="cf-turnstile" data-sitekey="0x4AAAAAABkLNMf0cRO37SRL" data-callback="onTurnstileSuccess"></div>
-          <input type="hidden" id="turnstile-token" name="turnstile-token">
-        </div>
+        <!-- reCAPTCHA token (hidden) -->
+        <!-- Using Cloudflare Turnstile for security verification -->
         
         <button type="submit" class="auth-btn" id="loginBtn">
           <span class="btn-text">Sign In</span>

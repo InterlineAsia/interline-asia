@@ -104,14 +104,8 @@
           throw new Error('Please enter a valid email address');
         }
         
-        // reCAPTCHA v3 validation
-        const recaptchaToken = await grecaptcha.execute(window.RECAPTCHA_SITE_KEY, {
-          action: 'signup'
-        });
-        
-        if (!recaptchaToken) {
-          throw new Error('reCAPTCHA verification failed. Please try again.');
-        }
+        // Using Cloudflare Turnstile for security verification
+        // Turnstile token is handled automatically by the widget
         
         // Sign up with Supabase
         const result = await window.supabaseClient.signUp(userData);
@@ -152,12 +146,7 @@
       }
     });
 
-    // Initialize reCAPTCHA v3
-    window.addEventListener('load', () => {
-      grecaptcha.ready(() => {
-        console.log('reCAPTCHA v3 ready');
-      });
-    });
+    // Cloudflare Turnstile is initialized automatically
   </script>
 </body>
 </html>

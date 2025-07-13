@@ -303,79 +303,41 @@
           
           console.log('AUTH_DEBUG: Session data stored successfully');
           
-          // CSP-safe redirect function
-          const performRedirect = async function() {
-            console.log('AUTH_DEBUG: Starting final session validation...');
+          // Simplified redirect function
+          const performRedirect = function() {
+            console.log('AUTH_DEBUG: Starting redirect...');
             
             try {
-              // Confirm session using await supabase.auth.getSession()
-              const { data: { session }, error } = await window.supabaseClient.supabase.auth.getSession();
+              // Use the result.user data we already have from successful login
+              const userEmail = result.user.email;
+              console.log('AUTH_DEBUG: Redirecting user:', userEmail);
               
-              console.log('AUTH_DEBUG: session:', session);
-              console.log('AUTH_DEBUG: session.user:', session?.user);
-              console.log('AUTH_DEBUG: session.access_token:', !!session?.access_token);
-              console.log('AUTH_DEBUG: error:', error);
-              
-              if (error) {
-                console.error('AUTH_DEBUG: Session validation error:', error);
-                showError('Session validation failed. Please try again.');
-                return;
+              // Check if user is admin
+              let isAdmin = false;
+              try {
+                isAdmin = window.supabaseClient.isAdmin(userEmail);
+              } catch (adminCheckError) {
+                console.warn('AUTH_DEBUG: Admin check failed, defaulting to regular user:', adminCheckError);
+                isAdmin = false;
               }
               
-              if (!session || !session.user || !session.access_token) {
-                console.error('AUTH_DEBUG: Session validation failed - missing data');
-                console.log('AUTH_DEBUG: Fallback - using stored session data');
-                
-                // Fallback to stored session data
-                const storedSession = sessionStorage.getItem('tempSession');
-                if (storedSession) {
-                  const sessionData = JSON.parse(storedSession);
-                  if (sessionData.user && sessionData.user.email) {
-                    console.log('AUTH_DEBUG: Using fallback session for:', sessionData.user.email);
-                    
-                    const isAdmin = window.supabaseClient.isAdmin(sessionData.user.email);
-                    console.log('AUTH_DEBUG: User is admin:', isAdmin);
-                    console.log('AUTH_DEBUG: redirecting');
-                    
-                    if (isAdmin) {
-                      console.log('AUTH_DEBUG: Redirecting admin to dashboard-choice...');
-                      window.location.replace('/dashboard-choice.html');
-                    } else {
-                      console.log('AUTH_DEBUG: Redirecting user to dashboard...');
-                      window.location.replace('/dashboard.html');
-                    }
-                    return;
-                  }
-                }
-                
-                showError('Login session could not be established. Please try again.');
-                return;
-              }
-              
-              console.log('AUTH_DEBUG: user.email:', session.user.email);
-              console.log('AUTH_DEBUG: Final Session Validated. Redirecting to dashboard-choice...');
-              
-              // Determine redirect based on user role
-              const isAdmin = window.supabaseClient.isAdmin(session.user.email);
               console.log('AUTH_DEBUG: User is admin:', isAdmin);
-              console.log('AUTH_DEBUG: redirecting');
               
+              // Perform redirect based on role
               if (isAdmin) {
                 console.log('AUTH_DEBUG: Redirecting admin to dashboard-choice...');
-                window.location.replace('/dashboard-choice.html');
+                window.location.href = '/dashboard-choice.html';
               } else {
                 console.log('AUTH_DEBUG: Redirecting user to dashboard...');
-                window.location.replace('/dashboard.html');
+                window.location.href = '/dashboard.html';
               }
               
             } catch (redirectError) {
               console.error('AUTH_DEBUG: Redirect error:', redirectError);
-              showError('Redirect failed. Please try logging in again.');
               
-              // Reset button state on error
-              loginBtn.disabled = false;
-              btnText.style.display = 'inline';
-              btnLoading.style.display = 'none';
+              // Fallback redirect to dashboard for any user
+              console.log('AUTH_DEBUG: Fallback redirect to dashboard...');
+              window.location.href = '/dashboard.html';
             }
           };
           

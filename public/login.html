@@ -252,32 +252,47 @@
               supabaseSession: !!window.supabaseClient.currentSession
             });
             
-            // Wait for session to be fully established and verify
-            setTimeout(async () => {
-              console.log('LOGIN: Verifying session before redirect...');
+            // CSP-safe function-based setTimeout to avoid eval violations
+            const performRedirect = async function() {
+              console.log('AUTH_DEBUG: Starting final session validation...');
               
-              // Double-check user is available
-              const verifyUser = await window.supabaseClient.getCurrentUser();
-              console.log('LOGIN: Verification - user found:', !!verifyUser, verifyUser?.email);
-              
-              if (!verifyUser) {
-                console.error('LOGIN: Session verification failed - user not found after login');
-                showError('Login session could not be established. Please try again.');
-                return;
+              try {
+                // Use await supabase.auth.getSession() to confirm session
+                const { data: { session }, error } = await window.supabaseClient.supabase.auth.getSession();
+                console.log('AUTH_DEBUG: Final session check:', { 
+                  hasSession: !!session, 
+                  hasUser: !!session?.user,
+                  userEmail: session?.user?.email,
+                  error: error 
+                });
+                
+                if (!session || !session.user) {
+                  console.error('AUTH_DEBUG: Final session validation failed');
+                  showError('Login session could not be established. Please try again.');
+                  return;
+                }
+                
+                console.log('AUTH_DEBUG: Final Session Validated. Redirecting to dashboard-choice...');
+                
+                // Determine redirect based on user role
+                const isAdmin = window.supabaseClient.isAdmin(session.user.email);
+                console.log('AUTH_DEBUG: User is admin:', isAdmin);
+                
+                if (isAdmin) {
+                  console.log('AUTH_DEBUG: Redirecting admin to dashboard-choice...');
+                  window.location.replace('/dashboard-choice.html');
+                } else {
+                  console.log('AUTH_DEBUG: Redirecting user to dashboard...');
+                  window.location.replace('/dashboard.html');
+                }
+              } catch (redirectError) {
+                console.error('AUTH_DEBUG: Redirect error:', redirectError);
+                showError('Redirect failed. Please try logging in again.');
               }
-              
-              // Determine redirect based on user role
-              const isAdmin = window.supabaseClient.isAdmin(verifyUser.email);
-              console.log('LOGIN: User is admin:', isAdmin);
-              
-              if (isAdmin) {
-                console.log('LOGIN: Redirecting admin to dashboard-choice...');
-                window.location.replace('/dashboard-choice.html');
-              } else {
-                console.log('LOGIN: Redirecting user to dashboard...');
-                window.location.replace('/dashboard.html');
-              }
-            }, 1000);
+            };
+            
+            // Wait 1000ms before redirect after successful login
+            setTimeout(performRedirect, 1000);
           } else {
             console.error('LOGIN: Failed - No user returned');
             throw new Error('Login failed - no user data received');

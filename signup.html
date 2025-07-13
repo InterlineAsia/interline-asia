@@ -17,7 +17,18 @@
 
     gtag('config', 'G-FYGT92WCXC');
   </script>
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <!-- Cloudflare Turnstile - properly deferred without preloading -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" defer></script>
+  <script>
+    function onTurnstileSuccess(token) {
+      const hiddenInput = document.getElementById('cf-turnstile-response');
+      if (hiddenInput) {
+        hiddenInput.value = token;
+        document.getElementById('create-account-btn').disabled = false;
+        console.log('Turnstile verification successful');
+      }
+    }
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="supabase-client.js"></script>

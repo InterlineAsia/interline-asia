@@ -59,17 +59,62 @@
         }
         
         .filter-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            align-items: center;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            align-items: end;
         }
         
-        .filter-group select, .filter-group input {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .filter-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #374151;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .filter-select, .filter-input {
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
             font-size: 14px;
+            background: white;
+            transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 12px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+        
+        .filter-input {
+            background-image: none;
+            padding-right: 16px;
+        }
+        
+        .filter-select:focus, .filter-input:focus {
+            outline: none;
+            border-color: #FF7F41;
+            box-shadow: 0 0 0 3px rgba(255, 127, 65, 0.1);
+        }
+        
+        .filter-select:hover, .filter-input:hover {
+            border-color: #d1d5db;
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            grid-column: 1 / -1;
+            justify-content: center;
+            margin-top: 10px;
         }
         
         .btn-primary {
@@ -85,6 +130,21 @@
         
         .btn-primary:hover {
             background-color: #e66a2e;
+        }
+        
+        .btn-secondary {
+            background-color: #6b7280;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #4b5563;
         }
         
         .loading-spinner {
@@ -115,12 +175,7 @@
         
         @media (max-width: 768px) {
             .filter-group {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .filter-group select, .filter-group input {
-                width: 100%;
+                grid-template-columns: 1fr;
             }
             
             .stats-bar {
@@ -158,40 +213,65 @@
             
             <!-- Filters Section -->
             <div class="filters-section">
-                <h3 class="text-lg font-semibold mb-4">Filter Deals</h3>
+                <h3 class="text-lg font-semibold mb-4">Filter Cruise Deals</h3>
                 <div class="filter-group">
-                    <select id="destinationFilter">
-                        <option value="">All Destinations</option>
-                    </select>
+                    <div class="filter-item">
+                        <label for="destinationFilter" class="filter-label">Destination</label>
+                        <select id="destinationFilter" class="filter-select">
+                            <option value="">All Destinations</option>
+                        </select>
+                    </div>
                     
-                    <select id="cruiseLineFilter">
-                        <option value="">All Cruise Lines</option>
-                    </select>
+                    <div class="filter-item">
+                        <label for="cruiseLineFilter" class="filter-label">Cruise Line</label>
+                        <select id="cruiseLineFilter" class="filter-select">
+                            <option value="">All Cruise Lines</option>
+                        </select>
+                    </div>
                     
-                    <select id="monthFilter">
-                        <option value="">All Months</option>
-                        <option value="01">January</option>
-                        <option value="02">February</option>
-                        <option value="03">March</option>
-                        <option value="04">April</option>
-                        <option value="05">May</option>
-                        <option value="06">June</option>
-                        <option value="07">July</option>
-                        <option value="08">August</option>
-                        <option value="09">September</option>
-                        <option value="10">October</option>
-                        <option value="11">November</option>
-                        <option value="12">December</option>
-                    </select>
+                    <div class="filter-item">
+                        <label for="cruisingTypeFilter" class="filter-label">Cruise Type (Ocean or River)</label>
+                        <select id="cruisingTypeFilter" class="filter-select">
+                            <option value="">Select cruise type...</option>
+                            <option value="Ocean">Ocean Cruises</option>
+                            <option value="River">River Cruises</option>
+                            <option value="Expedition">Expedition</option>
+                        </select>
+                    </div>
                     
-                    <select id="cruisingTypeFilter">
-                        <option value="">All Types</option>
-                        <option value="Ocean">Ocean Cruises</option>
-                        <option value="River">River Cruises</option>
-                        <option value="Expedition">Expedition</option>
-                    </select>
+                    <div class="filter-item">
+                        <label for="monthFilter" class="filter-label">Departure Month</label>
+                        <select id="monthFilter" class="filter-select">
+                            <option value="">All Months</option>
+                            <option value="01">January</option>
+                            <option value="02">February</option>
+                            <option value="03">March</option>
+                            <option value="04">April</option>
+                            <option value="05">May</option>
+                            <option value="06">June</option>
+                            <option value="07">July</option>
+                            <option value="08">August</option>
+                            <option value="09">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                    </div>
                     
-                    <button onclick="clearAllFilters()" class="btn-primary">Clear Filters</button>
+                    <div class="filter-item">
+                        <label for="dateFromFilter" class="filter-label">From Date</label>
+                        <input type="date" id="dateFromFilter" class="filter-input" placeholder="Start date">
+                    </div>
+                    
+                    <div class="filter-item">
+                        <label for="dateToFilter" class="filter-label">To Date</label>
+                        <input type="date" id="dateToFilter" class="filter-input" placeholder="End date">
+                    </div>
+                    
+                    <div class="filter-actions">
+                        <button onclick="applyFilters()" class="btn-primary">Apply Filters</button>
+                        <button onclick="clearAllFilters()" class="btn-secondary">Clear All</button>
+                    </div>
                 </div>
             </div>
             
@@ -202,7 +282,7 @@
                     <span id="deals-count" class="font-semibold text-orange-600">0</span>
                     <span class="text-slate-600">cruise deals</span>
                 </div>
-                <div id="filter-status" class="text-sm text-slate-500"></div>
+                <div id="filter-status" class="text-sm text-slate-500">Loading...</div>
             </div>
             
             <!-- Deals Container -->
@@ -236,13 +316,208 @@
     <script src="/js/unified-deals-loader.js"></script>
     
     <script>
+        // Enhanced filter functions with live updates
+        let currentDeals = [];
+        let filteredDeals = [];
+        
+        window.applyFilters = function() {
+            console.log('Applying filters...');
+            
+            const filters = {
+                destination: document.getElementById('destinationFilter').value,
+                cruiseLine: document.getElementById('cruiseLineFilter').value,
+                month: document.getElementById('monthFilter').value,
+                cruiseType: document.getElementById('cruisingTypeFilter').value,
+                dateFrom: document.getElementById('dateFromFilter').value,
+                dateTo: document.getElementById('dateToFilter').value
+            };
+            
+            console.log('Filter values:', filters);
+            
+            // Apply filters to current deals
+            filteredDeals = currentDeals.filter(deal => {
+                // Destination filter
+                if (filters.destination && !deal.region?.toLowerCase().includes(filters.destination.toLowerCase())) {
+                    return false;
+                }
+                
+                // Cruise line filter
+                if (filters.cruiseLine && !deal.cruiseLine?.toLowerCase().includes(filters.cruiseLine.toLowerCase())) {
+                    return false;
+                }
+                
+                // Cruise type filter
+                if (filters.cruiseType && deal.cruiseType !== filters.cruiseType) {
+                    return false;
+                }
+                
+                // Month filter
+                if (filters.month && deal.departureDate) {
+                    const dealMonth = new Date(deal.departureDate).getMonth() + 1;
+                    if (dealMonth.toString().padStart(2, '0') !== filters.month) {
+                        return false;
+                    }
+                }
+                
+                // Date range filter
+                if (filters.dateFrom && deal.departureDate) {
+                    if (new Date(deal.departureDate) < new Date(filters.dateFrom)) {
+                        return false;
+                    }
+                }
+                
+                if (filters.dateTo && deal.departureDate) {
+                    if (new Date(deal.departureDate) > new Date(filters.dateTo)) {
+                        return false;
+                    }
+                }
+                
+                return true;
+            });
+            
+            // Update display
+            updateDealsDisplay();
+            updateFilterStatus(filters);
+            
+            // Log to UX bugs file
+            logToUXBugs('Filter applied', { filters, resultCount: filteredDeals.length });
+        };
+        
+        window.clearAllFilters = function() {
+            document.getElementById('destinationFilter').value = '';
+            document.getElementById('cruiseLineFilter').value = '';
+            document.getElementById('monthFilter').value = '';
+            document.getElementById('cruisingTypeFilter').value = '';
+            document.getElementById('dateFromFilter').value = '';
+            document.getElementById('dateToFilter').value = '';
+            
+            // Reset to show all deals
+            filteredDeals = [...currentDeals];
+            updateDealsDisplay();
+            updateFilterStatus({});
+            
+            if (window.dealsLoader && typeof window.dealsLoader.clearAllFilters === 'function') {
+                window.dealsLoader.clearAllFilters();
+            }
+        };
+        
+        function updateDealsDisplay() {
+            const container = document.getElementById('deals-container');
+            const countElement = document.getElementById('deals-count');
+            
+            // Update count
+            countElement.textContent = filteredDeals.length;
+            
+            if (filteredDeals.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <div class="text-gray-500 text-xl mb-4">No cruises match your filters</div>
+                        <p class="text-gray-600 mb-4">Try adjusting your search criteria</p>
+                        <button onclick="clearAllFilters()" class="btn-primary">Clear All Filters</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Render filtered deals
+            const dealsHTML = filteredDeals.map(deal => `
+                <div class="deal-card">
+                    <div class="deal-header">
+                        <h3>${deal.shipName || deal.ship}</h3>
+                        <p>${deal.cruiseLine}</p>
+                    </div>
+                    <div class="deal-content">
+                        <p><strong>Destination:</strong> ${deal.region || deal.destination}</p>
+                        <p><strong>Duration:</strong> ${deal.nights} nights</p>
+                        <p><strong>Departure:</strong> ${deal.departureDate}</p>
+                        <div class="price-grid">
+                            ${deal.insidePrice && deal.insidePrice !== 'Quote Available' ? `<div class="price-item"><span>Inside</span><br><strong>$${deal.insidePrice}</strong></div>` : ''}
+                            ${deal.oceanviewPrice && deal.oceanviewPrice !== 'Quote Available' ? `<div class="price-item"><span>Oceanview</span><br><strong>$${deal.oceanviewPrice}</strong></div>` : ''}
+                            ${deal.balconyPrice && deal.balconyPrice !== 'Quote Available' ? `<div class="price-item"><span>Balcony</span><br><strong>$${deal.balconyPrice}</strong></div>` : ''}
+                            ${deal.suitePrice && deal.suitePrice !== 'Quote Available' ? `<div class="price-item"><span>Suite</span><br><strong>$${deal.suitePrice}</strong></div>` : ''}
+                        </div>
+                        <button class="btn-primary" style="width: 100%; margin-top: 15px;">Request Quote</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = `<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px;">${dealsHTML}</div>`;
+        }
+        
+        function updateFilterStatus(filters) {
+            const statusElement = document.getElementById('filter-status');
+            const activeFilters = Object.values(filters).filter(v => v).length;
+            
+            if (activeFilters > 0) {
+                statusElement.textContent = `${activeFilters} filter${activeFilters > 1 ? 's' : ''} active`;
+            } else {
+                statusElement.textContent = 'No filters applied';
+            }
+        }
+        
+        function populateFilterOptions() {
+            if (currentDeals.length === 0) return;
+            
+            // Populate destinations
+            const destinations = [...new Set(currentDeals.map(deal => deal.region || deal.destination).filter(Boolean))].sort();
+            const destSelect = document.getElementById('destinationFilter');
+            destinations.forEach(dest => {
+                const option = document.createElement('option');
+                option.value = dest;
+                option.textContent = dest;
+                destSelect.appendChild(option);
+            });
+            
+            // Populate cruise lines
+            const cruiseLines = [...new Set(currentDeals.map(deal => deal.cruiseLine).filter(Boolean))].sort();
+            const lineSelect = document.getElementById('cruiseLineFilter');
+            cruiseLines.forEach(line => {
+                const option = document.createElement('option');
+                option.value = line;
+                option.textContent = line;
+                lineSelect.appendChild(option);
+            });
+        }
+        
+        function logToUXBugs(action, data) {
+            console.log(`UX Log: ${action}`, data);
+            // In production, this would send to /logs/ux-bugs.log
+        }
+        
+        // Auto-apply filters when selections change
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                // Add event listeners to all filter elements
+                ['destinationFilter', 'cruiseLineFilter', 'monthFilter', 'cruisingTypeFilter', 'dateFromFilter', 'dateToFilter'].forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        element.addEventListener('change', applyFilters);
+                    }
+                });
+                
+                // Load initial deals data from emergency fix
+                setTimeout(() => {
+                    if (window.allDeals && Array.isArray(window.allDeals)) {
+                        currentDeals = window.allDeals;
+                        filteredDeals = [...currentDeals];
+                        populateFilterOptions();
+                        updateDealsDisplay();
+                        updateFilterStatus({});
+                        console.log('Loaded', currentDeals.length, 'deals from emergency loader');
+                    } else {
+                        logToUXBugs('No deals loaded', { allDeals: window.allDeals });
+                    }
+                }, 3000);
+            }, 1000);
+        });
+        
         // Backup initialization if other scripts fail
         document.addEventListener('DOMContentLoaded', function() {
             // Give other scripts a chance to load first
             setTimeout(function() {
                 const container = document.getElementById('deals-container');
                 if (container && container.innerHTML.includes('Loading')) {
-                    console.log('🔄 Initializing backup deals loader...');
+                    console.log('Initializing backup deals loader...');
                     
                     // Try emergency fix first
                     if (typeof window.loadDealsEmergencyFix === 'function') {
@@ -254,7 +529,7 @@
                         // Last resort - show error with retry
                         container.innerHTML = `
                             <div class="text-center py-12">
-                                <div class="text-red-500 text-xl mb-4">⚠️ Unable to load cruise deals</div>
+                                <div class="text-red-500 text-xl mb-4">Unable to load cruise deals</div>
                                 <p class="text-slate-600 mb-4">Please try refreshing the page</p>
                                 <button onclick="location.reload()" class="btn-primary">
                                     Refresh Page
@@ -265,18 +540,6 @@
                 }
             }, 2000);
         });
-        
-        // Global filter functions
-        window.clearAllFilters = function() {
-            document.getElementById('destinationFilter').value = '';
-            document.getElementById('cruiseLineFilter').value = '';
-            document.getElementById('monthFilter').value = '';
-            document.getElementById('cruisingTypeFilter').value = '';
-            
-            if (window.dealsLoader && typeof window.dealsLoader.clearAllFilters === 'function') {
-                window.dealsLoader.clearAllFilters();
-            }
-        };
     </script>
 </body>
 </html>

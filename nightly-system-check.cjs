@@ -1,10 +1,89 @@
 #!/usr/bin/env node
-// 🔍 Nightly System Check - Comprehensive Health Monitoring
+// Nightly System Check - Comprehensive Health Monitoring with Gemini AI
 // Runs at 3:00 AM daily via schedule-nightly-check.js
 
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config({ path: '.env.local' });
+
+// Gemini AI Integration for system checks
+class GeminiSystemValidator {
+  constructor() {
+    this.apiKey = process.env.GEMINI_API_KEY;
+    this.model = 'gemini-1.5-flash';
+    this.baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models';
+  }
+
+  async validateWithAI(component, data, context) {
+    if (!this.apiKey) {
+      return {
+        status: 'skipped',
+        reason: 'Gemini API key not available'
+      };
+    }
+
+    try {
+      const prompt = this.buildValidationPrompt(component, data, context);
+      const response = await this.callGemini(prompt);
+      
+      return {
+        status: 'validated',
+        aiResponse: response,
+        confidence: this.parseConfidence(response)
+      };
+      
+    } catch (error) {
+      return {
+        status: 'error',
+        error: error.message,
+        fallback: 'Using standard validation'
+      };
+    }
+  }
+
+  buildValidationPrompt(component, data, context) {
+    return `System Health Check - ${component}
+
+Context: ${context}
+Data Sample: ${JSON.stringify(data).substring(0, 500)}
+
+Please analyze this system component and respond with:
+1. HEALTH_STATUS: HEALTHY/DEGRADED/CRITICAL
+2. CONFIDENCE: 0-100%
+3. ISSUES: List any problems found
+4. RECOMMENDATIONS: Suggested fixes
+
+Keep response concise and technical.`;
+  }
+
+  async callGemini(prompt) {
+    const url = `${this.baseUrl}/${this.model}:generateContent?key=${this.apiKey}`;
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{ text: prompt }]
+        }]
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response';
+  }
+
+  parseConfidence(response) {
+    const match = response.match(/CONFIDENCE:\s*(\d+)/i);
+    return match ? parseInt(match[1]) : 50;
+  }
+}
 
 class NightlySystemCheck {
   constructor() {
@@ -13,13 +92,16 @@ class NightlySystemCheck {
       checks: [],
       repairs: [],
       failures: [],
+      aiValidations: [],
       summary: {
         total: 0,
         passed: 0,
         failed: 0,
-        repaired: 0
+        repaired: 0,
+        aiValidated: 0
       }
     };
+    this.geminiValidator = new GeminiSystemValidator();
   }
 
   log(message) {
@@ -27,7 +109,7 @@ class NightlySystemCheck {
   }
 
   async runCheck(name, checkFunction) {
-    this.log(`🔍 Checking: ${name}`);
+    this.log(`Checking: ${name}`);
     this.results.summary.total++;
     
     try {
@@ -97,6 +179,28 @@ class NightlySystemCheck {
           status: 'fail',
           error: `Insufficient deals data: ${dealsData.length} deals`
         };
+      }
+
+      // AI validation of cruise data
+      const aiValidation = await this.geminiValidator.validateWithAI(
+        'Cruise Data Ingestion',
+        { 
+          csvFiles: csvFiles.length,
+          dealsCount: dealsData.length,
+          sampleDeal: dealsData[0]
+        },
+        'Validating cruise data ingestion pipeline and fallback systems'
+      );
+      
+      if (aiValidation.status === 'validated') {
+        this.results.summary.aiValidated++;
+        this.results.aiValidations.push({
+          component: 'Cruise Data',
+          confidence: aiValidation.confidence,
+          response: aiValidation.aiResponse.substring(0, 200)
+        });
+      } else if (aiValidation.status === 'error') {
+        this.log(`⚠️ Gemini validation error: ${aiValidation.error}`);
       }
       
       return {
@@ -184,6 +288,43 @@ class NightlySystemCheck {
         };
       }
       
+      // Test Gemini API connection
+      this.log('🤖 Testing Gemini API connection...');
+      try {
+        const testPrompt = 'System health check test. Respond with: GEMINI_OPERATIONAL';
+        const geminiResponse = await this.geminiValidator.callGemini(testPrompt);
+        
+        if (geminiResponse.includes('GEMINI_OPERATIONAL')) {
+          this.log('✅ Gemini API: Connected and responding');
+        } else {
+          this.log('⚠️ Gemini API: Connected but unexpected response');
+        }
+        
+        // AI validation of bot system
+        const aiValidation = await this.geminiValidator.validateWithAI(
+          'Bot Processing System',
+          { 
+            envVars: requiredEnvVars.length,
+            geminiModel: this.geminiValidator.model,
+            testResponse: geminiResponse.substring(0, 100)
+          },
+          'Nightly health check of AI bot processing capabilities'
+        );
+        
+        if (aiValidation.status === 'validated') {
+          this.results.summary.aiValidated++;
+          this.results.aiValidations.push({
+            component: 'Bot Processing',
+            confidence: aiValidation.confidence,
+            response: aiValidation.aiResponse.substring(0, 200)
+          });
+        }
+        
+      } catch (geminiError) {
+        this.log(`⚠️ Gemini API Error: ${geminiError.message}`);
+        // Continue with standard checks even if Gemini fails
+      }
+      
       // Check bot files exist
       const botFiles = [
         'bots/core/gemini-client.js',
@@ -207,7 +348,7 @@ class NightlySystemCheck {
       
       return {
         status: 'pass',
-        details: 'Environment variables and bot files present'
+        details: `Environment variables present, Gemini API tested, ${botFiles.length} bot files verified`
       };
       
     } catch (error) {
@@ -245,6 +386,7 @@ class NightlySystemCheck {
       if (fs.existsSync('public/verify.html')) {
         const verifyContent = fs.readFileSync('public/verify.html', 'utf8');
         if (verifyContent.trim().length === 0) {
+          fs.unlinkSync('public/verify.html');
           return {
             status: 'repaired',
             repair: 'Removed empty verify.html file',
@@ -404,6 +546,7 @@ class NightlySystemCheck {
   async run() {
     this.log('🌙 STARTING NIGHTLY SYSTEM CHECK');
     this.log(`Timestamp: ${this.results.timestamp}`);
+    this.log(`Gemini API: ${this.geminiValidator.apiKey ? 'Available' : 'Not configured'}`);
     this.log('─'.repeat(60));
     
     // Run all system checks
@@ -421,11 +564,19 @@ class NightlySystemCheck {
     this.log(`✅ Passed: ${this.results.summary.passed}`);
     this.log(`🔧 Repaired: ${this.results.summary.repaired}`);
     this.log(`❌ Failed: ${this.results.summary.failed}`);
+    this.log(`🤖 AI Validated: ${this.results.summary.aiValidated}`);
     
     if (this.results.repairs.length > 0) {
       this.log('\n🔧 AUTO-REPAIRS PERFORMED:');
       this.results.repairs.forEach(repair => {
         this.log(`  - ${repair.component}: ${repair.action}`);
+      });
+    }
+    
+    if (this.results.aiValidations.length > 0) {
+      this.log('\n🤖 AI VALIDATIONS:');
+      this.results.aiValidations.forEach(validation => {
+        this.log(`  - ${validation.component}: ${validation.confidence}% confidence`);
       });
     }
     

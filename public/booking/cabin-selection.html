@@ -131,14 +131,32 @@
       }
       
       try {
-        // Load deals data
-        const response = await fetch('/deals.json');
-        const deals = await response.json();
-        selectedCruise = deals.find(deal => deal.seq === cruiseId);
+        // First try to fetch from unified cruise data API
+        let response = await fetch('/api/unified-api?endpoint=cruise-data');
+        let data = await response.json();
+        
+        if (data.success && data.deals) {
+          selectedCruise = data.deals.find(deal => deal.id === cruiseId || deal.seq === cruiseId);
+        }
+        
+        // Fallback to deals.json if not found
+        if (!selectedCruise) {
+          response = await fetch('/deals.json');
+          const deals = await response.json();
+          selectedCruise = deals.find(deal => deal.seq === cruiseId);
+        }
         
         if (!selectedCruise) {
-          alert('Cruise not found');
-          window.location.href = '/deals.html';
+          document.getElementById('cruise-info').innerHTML = `
+            <div class="text-center py-8">
+              <i class="ri-error-warning-line text-4xl text-orange-500 mb-4"></i>
+              <h2 class="text-xl font-semibold text-slate-800 mb-2">Cruise not found or data missing</h2>
+              <p class="text-slate-600 mb-4">The requested cruise information could not be loaded.</p>
+              <a href="/deals.html" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
+                Return to Deals
+              </a>
+            </div>
+          `;
           return;
         }
         
@@ -147,37 +165,55 @@
         
       } catch (error) {
         console.error('Error loading cruise data:', error);
-        alert('Error loading cruise information');
+        document.getElementById('cruise-info').innerHTML = `
+          <div class="text-center py-8">
+            <i class="ri-error-warning-line text-4xl text-red-500 mb-4"></i>
+            <h2 class="text-xl font-semibold text-slate-800 mb-2">Error loading cruise information</h2>
+            <p class="text-slate-600 mb-4">Please try again or contact support if the problem persists.</p>
+            <a href="/deals.html" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
+              Return to Deals
+            </a>
+          </div>
+        `;
       }
     }
     
     // Display cruise information
     function displayCruiseInfo() {
       const cruiseInfo = document.getElementById('cruise-info');
+      
+      // Handle different data structures (unified API vs legacy)
+      const ship = selectedCruise.ship || selectedCruise.shipName || selectedCruise.Ship || 'Unknown Ship';
+      const cruiseLine = selectedCruise.cruiseLine || selectedCruise['Cruise Line'] || 'Unknown Line';
+      const nights = selectedCruise.duration || selectedCruise.nights || selectedCruise.Nights || 'N/A';
+      const departureDate = selectedCruise.departureDate || selectedCruise.Date || 'N/A';
+      const region = selectedCruise.destination || selectedCruise.region || selectedCruise.Region || 'N/A';
+      const itinerary = selectedCruise.itinerary || selectedCruise.Itinerary || 'N/A';
+      
       cruiseInfo.innerHTML = `
         <div class="flex items-start space-x-4">
-          <img src="/logos/cruiselines/${selectedCruise.cruiseLine.toLowerCase().replace(/\s+/g, '-')}.png" 
-               alt="${selectedCruise.cruiseLine}" 
+          <img src="/logos/cruiselines/${cruiseLine.toLowerCase().replace(/\s+/g, '-')}.png" 
+               alt="${cruiseLine}" 
                class="w-16 h-12 object-contain bg-slate-100 rounded-lg p-2"
                onerror="this.src='/logos/cruiselines/placeholder.png'">
           <div class="flex-1">
-            <h1 class="text-2xl font-bold text-slate-800">${selectedCruise.cruiseLine} - ${selectedCruise.shipName}</h1>
+            <h1 class="text-2xl font-bold text-slate-800">${cruiseLine} - ${ship}</h1>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 text-sm">
               <div>
                 <span class="text-slate-500">Duration:</span>
-                <p class="font-medium">${selectedCruise.nights} nights</p>
+                <p class="font-medium">${nights} nights</p>
               </div>
               <div>
                 <span class="text-slate-500">Departure:</span>
-                <p class="font-medium">${selectedCruise.departureDate}</p>
+                <p class="font-medium">${departureDate}</p>
               </div>
               <div>
                 <span class="text-slate-500">Region:</span>
-                <p class="font-medium">${selectedCruise.region}</p>
+                <p class="font-medium">${region}</p>
               </div>
               <div>
-                <span class="text-slate-500">Route:</span>
-                <p class="font-medium">${selectedCruise.from} to ${selectedCruise.to}</p>
+                <span class="text-slate-500">Itinerary:</span>
+                <p class="font-medium">${itinerary}</p>
               </div>
             </div>
           </div>
@@ -188,31 +224,57 @@
     // Display cabin options
     function displayCabinOptions() {
       const cabinOptions = document.getElementById('cabin-options');
+      
+      // Handle different pricing structures
+      const getPricing = (cabin) => {
+        if (selectedCruise.pricing && selectedCruise.pricing[cabin]) {
+          const pricing = selectedCruise.pricing[cabin];
+          if (pricing && typeof pricing === 'object' && pricing.quoteOnly) {
+            return 'Price on Request';
+          }
+          return pricing;
+        }
+        
+        // Legacy structure
+        const legacyMap = {
+          inside: selectedCruise.insidePrice || selectedCruise.Inside,
+          oceanview: selectedCruise.oceanviewPrice || selectedCruise.Oceanview,
+          balcony: selectedCruise.balconyPrice || selectedCruise.Balcony,
+          suite: selectedCruise.suitePrice || selectedCruise.Suite
+        };
+        
+        return legacyMap[cabin];
+      };
+      
       const cabins = [
         {
           type: 'Interior',
-          price: selectedCruise.insidePrice,
+          key: 'inside',
+          price: getPricing('inside'),
           description: 'Comfortable interior stateroom with all essential amenities',
           features: ['Queen bed or twin beds', 'Private bathroom', 'TV and phone', 'Room service'],
           image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=300&h=200&fit=crop'
         },
         {
           type: 'Ocean View',
-          price: selectedCruise.oceanviewPrice,
+          key: 'oceanview',
+          price: getPricing('oceanview'),
           description: 'Stateroom with ocean view window',
           features: ['Ocean view window', 'Queen bed or twin beds', 'Private bathroom', 'Sitting area'],
           image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=300&h=200&fit=crop'
         },
         {
           type: 'Balcony',
-          price: selectedCruise.balconyPrice,
+          key: 'balcony',
+          price: getPricing('balcony'),
           description: 'Stateroom with private balcony',
           features: ['Private balcony', 'Queen bed or twin beds', 'Sitting area', 'Premium amenities'],
           image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=300&h=200&fit=crop'
         },
         {
           type: 'Suite',
-          price: selectedCruise.suitePrice,
+          key: 'suite',
+          price: getPricing('suite'),
           description: 'Luxury suite with premium amenities',
           features: ['Separate living area', 'Large balcony', 'Premium bathroom', 'Concierge service'],
           image: 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=300&h=200&fit=crop'
@@ -220,12 +282,12 @@
       ];
       
       cabinOptions.innerHTML = cabins.map(cabin => {
-        const isAvailable = cabin.price && cabin.price !== 'Quote Available';
-        const priceDisplay = isAvailable ? `$${cabin.price}` : 'Quote Available';
+        const isQuoteOnly = cabin.price === 'Quote Available' || cabin.price === 'Price on Request' || !cabin.price;
+        const priceDisplay = isQuoteOnly ? 'Price on Request' : `$${cabin.price}`;
         
         return `
-          <div class="cabin-card p-6 cursor-pointer ${!isAvailable ? 'opacity-75' : ''}" 
-               onclick="selectCabin('${cabin.type}', '${cabin.price}')">
+          <div class="cabin-card p-6 cursor-pointer ${isQuoteOnly ? 'opacity-75' : ''}" 
+               onclick="selectCabin('${cabin.type}', '${cabin.price}', ${isQuoteOnly})">
             <img src="${cabin.image}" alt="${cabin.type}" class="w-full h-32 object-cover rounded-lg mb-4">
             <h3 class="text-lg font-semibold text-slate-800 mb-2">${cabin.type}</h3>
             <p class="text-sm text-slate-600 mb-3">${cabin.description}</p>
@@ -233,8 +295,9 @@
               ${cabin.features.map(feature => `<li><i class="ri-check-line text-green-500 mr-1"></i>${feature}</li>`).join('')}
             </ul>
             <div class="text-center">
-              <p class="text-2xl font-bold text-orange-600">${priceDisplay}</p>
+              <p class="text-2xl font-bold ${isQuoteOnly ? 'text-blue-600' : 'text-orange-600'}">${priceDisplay}</p>
               <p class="text-xs text-slate-500">per person</p>
+              ${isQuoteOnly ? '<p class="text-xs text-blue-500 mt-1">Contact for pricing</p>' : ''}
             </div>
           </div>
         `;
@@ -242,7 +305,7 @@
     }
     
     // Select cabin
-    function selectCabin(type, price) {
+    function selectCabin(type, price, isQuoteOnly) {
       // Remove previous selection
       document.querySelectorAll('.cabin-card').forEach(card => {
         card.classList.remove('selected');
@@ -251,7 +314,7 @@
       // Add selection to clicked card
       event.currentTarget.classList.add('selected');
       
-      selectedCabin = { type, price };
+      selectedCabin = { type, price, isQuoteOnly };
       document.getElementById('continue-btn').disabled = false;
     }
     

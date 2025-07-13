@@ -252,33 +252,38 @@ function normalizeRiverCruises(riverData, cabinTypes) {
 }
 
 function normalizeOceanCruises(oceanData, cabinTypes) {
-  return oceanData.map(cruise => {
+  let quoteOnlyCount = 0;
+  
+  const normalized = oceanData.map(cruise => {
     // Create cabin type mapping
     const cabinMapping = createCabinMapping(cruise, cabinTypes, 'ocean');
     
-    return {
+    const normalizedCruise = {
       id: `ocean_${cruise.id || generateId()}`,
       source: 'TWINS',
       cruiseType: 'Ocean',
       
       // Basic info
-      ship: cruise.ship_name || cruise.vessel || cruise.ship || '',
-      cruiseLine: cruise.cruise_line || cruise.operator || '',
-      itinerary: cruise.itinerary || cruise.route || '',
-      destination: cruise.destination || cruise.region || '',
+      ship: cruise.Ship || cruise.ship_name || cruise.vessel || cruise.ship || '',
+      cruiseLine: cruise['Cruise Line'] || cruise.cruise_line || cruise.operator || '',
+      itinerary: cruise.Itinerary || cruise.itinerary || cruise.route || '',
+      destination: cruise.Region || cruise.destination || cruise.region || '',
       
       // Dates
-      departureDate: normalizeDate(cruise.departure_date || cruise.sail_date),
+      departureDate: normalizeDate(cruise.Date || cruise.departure_date || cruise.sail_date),
       returnDate: normalizeDate(cruise.return_date || cruise.end_date),
-      duration: cruise.duration || cruise.nights || calculateDuration(cruise.departure_date, cruise.return_date),
+      duration: cruise.Nights || cruise.duration || cruise.nights || calculateDuration(cruise.departure_date, cruise.return_date),
       
       // Pricing
       pricing: {
-        inside: parsePrice(cruise.inside_price || cruise.interior),
-        oceanview: parsePrice(cruise.oceanview_price || cruise.ocean_view),
-        balcony: parsePrice(cruise.balcony_price || cruise.balcony),
-        suite: parsePrice(cruise.suite_price || cruise.suite)
+        inside: parsePrice(cruise.Inside || cruise.inside_price || cruise.interior),
+        oceanview: parsePrice(cruise.Oceanview || cruise.oceanview_price || cruise.ocean_view),
+        balcony: parsePrice(cruise.Balcony || cruise.balcony_price || cruise.balcony),
+        suite: parsePrice(cruise.Suite || cruise.suite_price || cruise.suite)
       },
+      
+      // Check if this is a quote-only cruise
+      quoteOnly: isQuoteOnlyCruise(cruise),
       
       // Cabin mappings
       cabinTypes: cabinMapping,
@@ -291,7 +296,21 @@ function normalizeOceanCruises(oceanData, cabinTypes) {
       originalData: cruise,
       lastUpdated: new Date().toISOString()
     };
+    
+    // Count quote-only cruises for logging
+    if (normalizedCruise.quoteOnly) {
+      quoteOnlyCount++;
+    }
+    
+    return normalizedCruise;
   });
+  
+  // Log quote-only cruise statistics
+  if (quoteOnlyCount > 0) {
+    console.log(`📋 Imported ${quoteOnlyCount} quote-only cruises out of ${oceanData.length} total ocean cruises`);
+  }
+  
+  return normalized;
 }
 
 function createCabinMapping(cruise, cabinTypes, cruiseType) {
@@ -360,6 +379,12 @@ function normalizeDate(dateStr) {
 
 function parsePrice(priceStr) {
   if (!priceStr) return null;
+  
+  // Check for quote-only pricing
+  if (priceStr.toString().toLowerCase().includes('quote available') || 
+      priceStr.toString().toLowerCase().includes('quote only')) {
+    return { price: null, quoteOnly: true };
+  }
   
   // Remove currency symbols and parse number
   const cleaned = priceStr.toString().replace(/[^0-9.]/g, '');
@@ -442,6 +467,22 @@ function applyFilters(deals, filters) {
   }
   
   return filtered;
+}
+
+function isQuoteOnlyCruise(cruise) {
+  // Check if ALLOW_QUOTE_ONLY is enabled
+  const allowQuoteOnly = process.env.ALLOW_QUOTE_ONLY === 'true';
+  if (!allowQuoteOnly) return false;
+  
+  // Check if all cabin types are quote-only
+  const cabinFields = ['Inside', 'Oceanview', 'Balcony', 'Suite'];
+  const quoteOnlyCount = cabinFields.filter(field => {
+    const value = cruise[field];
+    return value && value.toString().toLowerCase().includes('quote available');
+  }).length;
+  
+  // If all 4 cabins are quote-only, mark the entire cruise as quote-only
+  return quoteOnlyCount === 4;
 }
 
 function generateId() {

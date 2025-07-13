@@ -27,7 +27,7 @@ function runNightlyCheck() {
   logMessage('🕒 STARTING NIGHTLY SYSTEM CHECK');
   logMessage('Scheduler: Triggering nightly-system-check.js');
   
-  const checkScript = path.join(process.cwd(), 'nightly-system-check.js');
+  const checkScript = path.join(process.cwd(), 'nightly-system-check.cjs');
   
   // Spawn the system check process
   const child = spawn('node', [checkScript], {

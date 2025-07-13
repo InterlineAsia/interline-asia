@@ -1,0 +1,7 @@
+[2025-07-13T03:58:19.203Z] 🚀 NIGHTLY SYSTEM CHECK SCHEDULER STARTED
+[2025-07-13T03:58:19.204Z] Schedule: Daily at 3:00 AM (0 3 * * *)
+[2025-07-13T03:58:19.205Z] Script: nightly-system-check.js
+[2025-07-13T03:58:19.205Z] Log File: /Users/rodneypattison/Desktop/interline-asia-dev/logs/nightly-log.txt
+[2025-07-13T03:58:19.205Z] Status: Waiting for first scheduled run...
+Nightly System Check Scheduler is running...
+Press Ctrl+C to stop

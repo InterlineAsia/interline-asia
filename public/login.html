@@ -238,17 +238,20 @@
               loginTime: Date.now()
             }));
             
-            // Determine redirect based on user role
-            const isAdmin = window.supabaseClient.isAdmin(result.user.email);
-            console.log('LOGIN: User is admin:', isAdmin);
-            
-            if (isAdmin) {
-              console.log('LOGIN: Redirecting admin to dashboard-choice...');
-              window.location.href = '/dashboard-choice.html';
-            } else {
-              console.log('LOGIN: Redirecting user to dashboard...');
-              window.location.href = '/dashboard.html';
-            }
+            // Wait a moment for session to be fully established
+            setTimeout(() => {
+              // Determine redirect based on user role
+              const isAdmin = window.supabaseClient.isAdmin(result.user.email);
+              console.log('LOGIN: User is admin:', isAdmin);
+              
+              if (isAdmin) {
+                console.log('LOGIN: Redirecting admin to dashboard-choice...');
+                window.location.replace('/dashboard-choice.html');
+              } else {
+                console.log('LOGIN: Redirecting user to dashboard...');
+                window.location.replace('/dashboard.html');
+              }
+            }, 500);
           } else {
             console.error('LOGIN: Failed - No user returned');
             throw new Error('Login failed - no user data received');

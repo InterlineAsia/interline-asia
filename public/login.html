@@ -167,8 +167,51 @@
   <script>
     // Cloudflare Turnstile callback
     function onTurnstileSuccess(token) {
-      console.log('Turnstile token received:', token ? 'Yes' : 'No');
+      console.log('AUTH_DEBUG: Turnstile token received:', token ? 'Yes' : 'No');
       document.getElementById('turnstile-token').value = token;
+    }
+    
+    // Helper functions for user feedback
+    function showError(message) {
+      const errorDiv = document.getElementById('error-message');
+      const successDiv = document.getElementById('success-message');
+      
+      if (errorDiv) {
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+      }
+      if (successDiv) {
+        successDiv.style.display = 'none';
+      }
+      console.error('AUTH_DEBUG: Error shown to user:', message);
+    }
+    
+    function showSuccess(message) {
+      const errorDiv = document.getElementById('error-message');
+      const successDiv = document.getElementById('success-message');
+      
+      if (successDiv) {
+        successDiv.textContent = message;
+        successDiv.style.display = 'block';
+      }
+      if (errorDiv) {
+        errorDiv.style.display = 'none';
+      }
+      console.log('AUTH_DEBUG: Success shown to user:', message);
+    }
+    
+    function hideError() {
+      const errorDiv = document.getElementById('error-message');
+      if (errorDiv) {
+        errorDiv.style.display = 'none';
+      }
+    }
+    
+    function hideSuccess() {
+      const successDiv = document.getElementById('success-message');
+      if (successDiv) {
+        successDiv.style.display = 'none';
+      }
     }
 
     document.addEventListener('DOMContentLoaded', async function() {
@@ -215,88 +258,123 @@
         
         try {
           // Sign in with Supabase
-          console.log('LOGIN: Attempting login for:', email);
+          console.log('AUTH_DEBUG: Attempting login for:', email);
+          console.log('AUTH_DEBUG: Turnstile token present:', !!turnstileToken);
+          
           const result = await window.supabaseClient.signIn(email, password, turnstileToken);
           
-          console.log('LOGIN: Result received:', result);
-          console.log('LOGIN: User object:', result.user);
-          console.log('LOGIN: Session object:', result.session);
+          console.log('AUTH_DEBUG: SignIn result received:', result);
+          console.log('AUTH_DEBUG: User object:', result.user);
+          console.log('AUTH_DEBUG: Session object:', result.session);
           
-          if (result.user) {
-            // Track successful login
-            gtag('event', 'login', {
-              method: 'email'
-            });
-            
-            console.log('LOGIN: Success! User email:', result.user.email);
-            showSuccess('Login successful! Redirecting...');
-            
-            // Store comprehensive session data
-            const sessionData = {
-              user: result.user,
-              session: result.session,
-              timestamp: Date.now()
-            };
-            
-            sessionStorage.setItem('tempSession', JSON.stringify(sessionData));
-            sessionStorage.setItem('tempUser', JSON.stringify({
-              email: result.user.email,
-              id: result.user.id,
-              loginTime: Date.now()
-            }));
-            
-            console.log('LOGIN: Session data stored:', {
-              tempSession: !!sessionStorage.getItem('tempSession'),
-              tempUser: !!sessionStorage.getItem('tempUser'),
-              supabaseUser: !!window.supabaseClient.currentUser,
-              supabaseSession: !!window.supabaseClient.currentSession
-            });
-            
-            // CSP-safe function-based setTimeout to avoid eval violations
-            const performRedirect = async function() {
-              console.log('AUTH_DEBUG: Starting final session validation...');
-              
-              try {
-                // Use await supabase.auth.getSession() to confirm session
-                const { data: { session }, error } = await window.supabaseClient.supabase.auth.getSession();
-                console.log('AUTH_DEBUG: Final session check:', { 
-                  hasSession: !!session, 
-                  hasUser: !!session?.user,
-                  userEmail: session?.user?.email,
-                  error: error 
-                });
-                
-                if (!session || !session.user) {
-                  console.error('AUTH_DEBUG: Final session validation failed');
-                  showError('Login session could not be established. Please try again.');
-                  return;
-                }
-                
-                console.log('AUTH_DEBUG: Final Session Validated. Redirecting to dashboard-choice...');
-                
-                // Determine redirect based on user role
-                const isAdmin = window.supabaseClient.isAdmin(session.user.email);
-                console.log('AUTH_DEBUG: User is admin:', isAdmin);
-                
-                if (isAdmin) {
-                  console.log('AUTH_DEBUG: Redirecting admin to dashboard-choice...');
-                  window.location.replace('/dashboard-choice.html');
-                } else {
-                  console.log('AUTH_DEBUG: Redirecting user to dashboard...');
-                  window.location.replace('/dashboard.html');
-                }
-              } catch (redirectError) {
-                console.error('AUTH_DEBUG: Redirect error:', redirectError);
-                showError('Redirect failed. Please try logging in again.');
-              }
-            };
-            
-            // Wait 1000ms before redirect after successful login
-            setTimeout(performRedirect, 1000);
-          } else {
-            console.error('LOGIN: Failed - No user returned');
+          if (!result || !result.user) {
+            console.error('AUTH_DEBUG: No user returned from signIn');
             throw new Error('Login failed - no user data received');
           }
+          
+          // Track successful login
+          gtag('event', 'login', {
+            method: 'email'
+          });
+          
+          console.log('AUTH_DEBUG: Login successful for user:', result.user.email);
+          showSuccess('Login successful! Redirecting...');
+          
+          // Store comprehensive session data
+          const sessionData = {
+            user: result.user,
+            session: result.session,
+            timestamp: Date.now()
+          };
+          
+          sessionStorage.setItem('tempSession', JSON.stringify(sessionData));
+          sessionStorage.setItem('tempUser', JSON.stringify({
+            email: result.user.email,
+            id: result.user.id,
+            loginTime: Date.now()
+          }));
+          
+          console.log('AUTH_DEBUG: Session data stored successfully');
+          
+          // CSP-safe redirect function
+          const performRedirect = async function() {
+            console.log('AUTH_DEBUG: Starting final session validation...');
+            
+            try {
+              // Confirm session using await supabase.auth.getSession()
+              const { data: { session }, error } = await window.supabaseClient.supabase.auth.getSession();
+              
+              console.log('AUTH_DEBUG: session:', session);
+              console.log('AUTH_DEBUG: session.user:', session?.user);
+              console.log('AUTH_DEBUG: session.access_token:', !!session?.access_token);
+              console.log('AUTH_DEBUG: error:', error);
+              
+              if (error) {
+                console.error('AUTH_DEBUG: Session validation error:', error);
+                showError('Session validation failed. Please try again.');
+                return;
+              }
+              
+              if (!session || !session.user || !session.access_token) {
+                console.error('AUTH_DEBUG: Session validation failed - missing data');
+                console.log('AUTH_DEBUG: Fallback - using stored session data');
+                
+                // Fallback to stored session data
+                const storedSession = sessionStorage.getItem('tempSession');
+                if (storedSession) {
+                  const sessionData = JSON.parse(storedSession);
+                  if (sessionData.user && sessionData.user.email) {
+                    console.log('AUTH_DEBUG: Using fallback session for:', sessionData.user.email);
+                    
+                    const isAdmin = window.supabaseClient.isAdmin(sessionData.user.email);
+                    console.log('AUTH_DEBUG: User is admin:', isAdmin);
+                    console.log('AUTH_DEBUG: redirecting');
+                    
+                    if (isAdmin) {
+                      console.log('AUTH_DEBUG: Redirecting admin to dashboard-choice...');
+                      window.location.replace('/dashboard-choice.html');
+                    } else {
+                      console.log('AUTH_DEBUG: Redirecting user to dashboard...');
+                      window.location.replace('/dashboard.html');
+                    }
+                    return;
+                  }
+                }
+                
+                showError('Login session could not be established. Please try again.');
+                return;
+              }
+              
+              console.log('AUTH_DEBUG: user.email:', session.user.email);
+              console.log('AUTH_DEBUG: Final Session Validated. Redirecting to dashboard-choice...');
+              
+              // Determine redirect based on user role
+              const isAdmin = window.supabaseClient.isAdmin(session.user.email);
+              console.log('AUTH_DEBUG: User is admin:', isAdmin);
+              console.log('AUTH_DEBUG: redirecting');
+              
+              if (isAdmin) {
+                console.log('AUTH_DEBUG: Redirecting admin to dashboard-choice...');
+                window.location.replace('/dashboard-choice.html');
+              } else {
+                console.log('AUTH_DEBUG: Redirecting user to dashboard...');
+                window.location.replace('/dashboard.html');
+              }
+              
+            } catch (redirectError) {
+              console.error('AUTH_DEBUG: Redirect error:', redirectError);
+              showError('Redirect failed. Please try logging in again.');
+              
+              // Reset button state on error
+              loginBtn.disabled = false;
+              btnText.style.display = 'inline';
+              btnLoading.style.display = 'none';
+            }
+          };
+          
+          // Wait 1000ms before redirect after successful login
+          setTimeout(performRedirect, 1000);
+          
         } catch (error) {
           console.error('LOGIN: Error occurred:', error);
           

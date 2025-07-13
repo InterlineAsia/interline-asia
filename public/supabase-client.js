@@ -31,10 +31,17 @@ class SupabaseClient {
       throw new Error(msg);
     }
 
-    // Now it's safe to create the client
+    // Now it's safe to create the client with session persistence disabled
     this.supabase = window.supabase.createClient(
       window.SUPABASE_URL,
-      window.SUPABASE_ANON_KEY
+      window.SUPABASE_ANON_KEY,
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+          detectSessionInUrl: false
+        }
+      }
     );
     console.log('Supabase client initialized successfully.');
 
@@ -45,20 +52,26 @@ class SupabaseClient {
   async initializeAuth() {
     // This method is part of the internal initialization process.
     if (!this.supabase) return; // Guard against initialization failure
-    const { data: { session } } = await this.supabase.auth.getSession();
-    if (session) {
-      this.currentSession = session;
-      await this._setCurrentUserWithMetadata(session.user);
-    }
+    
+    // DISABLED: No session restoration to prevent auto-login
+    // const { data: { session } } = await this.supabase.auth.getSession();
+    // if (session) {
+    //   this.currentSession = session;
+    //   await this._setCurrentUserWithMetadata(session.user);
+    // }
+    
     this.authReady = true;
 
     this.supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state change:', event, session ? 'session exists' : 'no session');
-      this.currentSession = session;
-      if (session) {
+      
+      // Only set session for SIGNED_IN events, not restored sessions
+      if (event === 'SIGNED_IN' && session) {
+        this.currentSession = session;
         await this._setCurrentUserWithMetadata(session.user);
       } else {
         this.currentUser = null;
+        this.currentSession = null;
         // Do NOT auto-redirect on sign out - let the signOut() method handle it
       }
     });
@@ -240,15 +253,23 @@ class SupabaseClient {
     this.currentUser = null;
     this.currentSession = null;
     
-    // Sign out from Supabase
-    await this.supabase.auth.signOut();
+    // Sign out from Supabase with all scopes
+    await this.supabase.auth.signOut({ scope: 'global' });
+    
+    // Force clear session
+    await this.supabase.auth.setSession(null);
     
     // Clear any local storage that might persist session
     localStorage.clear();
     sessionStorage.clear();
     
-    // Force redirect with no history
-    window.location.replace('/login.html');
+    // Clear any cookies
+    document.cookie.split(";").forEach(function(c) { 
+      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+    });
+    
+    // Force redirect with no history and cache busting
+    window.location.replace('/login.html?t=' + Date.now());
   }
 
   isLoggedIn() {

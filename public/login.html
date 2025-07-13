@@ -313,10 +313,9 @@
       // Wait for Supabase client to initialize
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      // If already logged in, redirect to dashboard choice
-      if (window.supabaseClient.isLoggedIn()) {
-        window.location.href = '/dashboard-choice.html';
-      }
+      // DISABLED: No auto-login - always show login form
+      // This prevents auto-login issues and Git state problems
+      console.log('Login page loaded - auto-login disabled for security');
     });
 
     // Show success message if coming from registration

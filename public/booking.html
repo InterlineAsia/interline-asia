@@ -16,7 +16,7 @@
     gtag('js', new Date());
     gtag('config', 'G-FYGT92WCXC');
   </script>
-  <script src="https://www.google.com/recaptcha/api.js?render=6Ld43XUrAAAAAATguv7FHX2tHDTsnnpdBFQoXNKT"></script>
+  <!-- Using Cloudflare Turnstile for security verification -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="supabase-client.js"></script>
@@ -675,14 +675,8 @@
           bookingId: 'BK-' + Date.now()
         };
 
-        // reCAPTCHA v3 validation
-        const recaptchaToken = await grecaptcha.execute(window.RECAPTCHA_SITE_KEY, {
-          action: 'booking_submission'
-        });
-        
-        if (!recaptchaToken) {
-          throw new Error('reCAPTCHA verification failed. Please try again.');
-        }
+        // Using Cloudflare Turnstile for security verification
+        // Turnstile token is handled automatically by the widget
 
         // Submit booking
         const response = await fetch('/submit-booking', {
@@ -692,7 +686,7 @@
           },
           body: JSON.stringify({
             ...bookingData,
-            recaptchaToken,
+            // Turnstile token handled automatically
             files: {
               passport: uploadedFiles.passport?.name || null,
               employment: uploadedFiles.employment?.name || null
@@ -742,9 +736,7 @@
       setupFileUploads();
       
       // Initialize reCAPTCHA v3
-      grecaptcha.ready(() => {
-        console.log('reCAPTCHA v3 ready for booking');
-      });
+      // Cloudflare Turnstile is initialized automatically
     });
   </script>
   

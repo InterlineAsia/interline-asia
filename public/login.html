@@ -9,6 +9,81 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="auth.css">
   
+  <style>
+    /* Site Header Styles */
+    .main-header {
+      background: #fff;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    
+    .main-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+    }
+    
+    .nav-brand a {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1f2937;
+      text-decoration: none;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+    
+    .nav-links a {
+      color: #6b7280;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: #1f2937;
+    }
+    
+    .nav-cta {
+      background: #3b82f6;
+      color: white !important;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      font-weight: 600;
+    }
+    
+    .nav-cta:hover {
+      background: #2563eb;
+      color: white !important;
+    }
+    
+    /* Adjust auth container for header */
+    .auth-container {
+      margin-top: 2rem;
+    }
+    
+    @media (max-width: 768px) {
+      .main-nav {
+        padding: 1rem;
+      }
+      
+      .nav-links {
+        gap: 1rem;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+  
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
@@ -31,6 +106,23 @@
   </script>
 </head>
 <body>
+  <!-- Site Header -->
+  <header class="main-header">
+    <nav class="main-nav">
+      <div class="nav-brand">
+        <a href="/">Interline Asia</a>
+      </div>
+      <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/about.html">About</a>
+        <a href="/deals.html">Deals</a>
+        <a href="/faq.html">FAQ</a>
+        <a href="/login.html" class="active">Login</a>
+        <a href="/signup.html" class="nav-cta">Sign Up</a>
+      </div>
+    </nav>
+  </header>
+
   <div class="auth-container">
     <div class="auth-card">
       <div class="auth-header">

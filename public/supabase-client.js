@@ -31,15 +31,16 @@ class SupabaseClient {
       throw new Error(msg);
     }
 
-    // Now it's safe to create the client with session persistence disabled
+    // Create client with limited session persistence for login flow
     this.supabase = window.supabase.createClient(
       window.SUPABASE_URL,
       window.SUPABASE_ANON_KEY,
       {
         auth: {
-          persistSession: false,
-          autoRefreshToken: false,
-          detectSessionInUrl: false
+          persistSession: true,        // Enable for login flow
+          autoRefreshToken: false,     // Keep disabled for security
+          detectSessionInUrl: false,   // Keep disabled
+          storage: window.sessionStorage  // Use sessionStorage instead of localStorage
         }
       }
     );
@@ -53,26 +54,27 @@ class SupabaseClient {
     // This method is part of the internal initialization process.
     if (!this.supabase) return; // Guard against initialization failure
     
-    // DISABLED: No session restoration to prevent auto-login
-    // const { data: { session } } = await this.supabase.auth.getSession();
-    // if (session) {
-    //   this.currentSession = session;
-    //   await this._setCurrentUserWithMetadata(session.user);
-    // }
+    // Check for existing session to maintain login state
+    const { data: { session } } = await this.supabase.auth.getSession();
+    if (session) {
+      console.log('AUTH: Existing session found:', session.user.email);
+      this.currentSession = session;
+      await this._setCurrentUserWithMetadata(session.user);
+    }
     
     this.authReady = true;
 
     this.supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state change:', event, session ? 'session exists' : 'no session');
+      console.log('AUTH: State change:', event, session ? 'session exists' : 'no session');
       
-      // Only set session for SIGNED_IN events, not restored sessions
       if (event === 'SIGNED_IN' && session) {
+        console.log('AUTH: User signed in:', session.user.email);
         this.currentSession = session;
         await this._setCurrentUserWithMetadata(session.user);
-      } else {
+      } else if (event === 'SIGNED_OUT') {
+        console.log('AUTH: User signed out');
         this.currentUser = null;
         this.currentSession = null;
-        // Do NOT auto-redirect on sign out - let the signOut() method handle it
       }
     });
   }
@@ -216,7 +218,7 @@ class SupabaseClient {
 
   async signIn(email, password, turnstileToken = null) {
     await this.readyPromise;
-    console.log('Attempting login for:', email);
+    console.log('AUTH: Attempting login for:', email);
     
     const options = {};
     if (turnstileToken) {
@@ -229,20 +231,33 @@ class SupabaseClient {
       options
     });
     
-    console.log('Supabase auth response:', { data, error });
+    console.log('AUTH: Supabase auth response:', { data, error });
+    console.log('AUTH: Session data:', data?.session);
+    console.log('AUTH: User data:', data?.user);
     
     if (error) {
-      console.error('Supabase auth error details:', error);
+      console.error('AUTH: Supabase auth error details:', error);
       throw error;
     }
     
     if (data.user) {
       this.currentSession = data.session;
       await this._setCurrentUserWithMetadata(data.user);
-      console.log('Login successful, user set:', this.currentUser);
+      
+      // Ensure session is properly stored
+      if (data.session) {
+        await this.supabase.auth.setSession(data.session);
+        console.log('AUTH: Session set in Supabase');
+      }
+      
+      console.log('AUTH: Login successful, user set:', this.currentUser?.email);
+      console.log('AUTH: Is logged in check:', this.isLoggedIn());
     }
     
-    return data;
+    return {
+      user: this.currentUser,
+      session: data.session
+    };
   }
 
   async signOut() {

@@ -303,7 +303,10 @@
           
           console.log('AUTH_DEBUG: Session data stored successfully');
           
-          // Simplified redirect function
+          // Call performRedirect immediately after successful login
+          console.log('AUTH_DEBUG: *** Calling performRedirect() immediately after login success ***');
+          
+          // Define the redirect function inline to ensure it has access to result
           const performRedirect = function() {
             console.log('AUTH_DEBUG: *** INSIDE performRedirect() - FUNCTION IS BEING CALLED ***');
             console.log('AUTH_DEBUG: Starting redirect...');
@@ -345,12 +348,8 @@
             }
           };
           
-          // Wait 1000ms before redirect after successful login
-          console.log('AUTH_DEBUG: *** SETTING UP REDIRECT TIMEOUT - Will call performRedirect in 1000ms ***');
-          setTimeout(function() {
-            console.log('AUTH_DEBUG: *** TIMEOUT FIRED - About to call performRedirect() ***');
-            performRedirect();
-          }, 1000);
+          // Call the redirect function immediately
+          performRedirect();
           
         } catch (error) {
           console.error('LOGIN: Error occurred:', error);

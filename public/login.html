@@ -167,8 +167,18 @@
     // Cloudflare Turnstile callback
     function onTurnstileSuccess(token) {
       console.log('AUTH_DEBUG: Turnstile token received:', token ? 'Yes' : 'No');
-      document.getElementById('turnstile-token').value = token;
+      const tokenInput = document.getElementById('turnstile-token');
+      if (tokenInput) {
+        tokenInput.value = token;
+      }
     }
+    
+    // Handle Turnstile loading errors gracefully
+    window.addEventListener('error', function(e) {
+      if (e.message && e.message.includes('turnstile')) {
+        console.warn('AUTH_DEBUG: Turnstile loading error detected, login will proceed without it');
+      }
+    });
     
     // Reset Turnstile on error
     function resetTurnstile() {
@@ -254,8 +264,8 @@
         }
         
         if (!turnstileToken) {
-          showError('Please complete the security verification');
-          return;
+          console.warn('AUTH_DEBUG: Turnstile token missing - proceeding without it due to potential loading issues');
+          // Don't block login if Turnstile fails to load due to content blockers
         }
         
         // Show loading state

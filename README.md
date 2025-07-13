@@ -35,7 +35,6 @@ After deploying to Vercel, complete these one-time setup tasks:
 3. Update these keys if needed:
    ```
    GEMINI_API_KEY=your_google_gemini_api_key
-   LANGCHAIN_API_KEY=your_langsmith_api_key
    SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_key
    ```
 4. Redeploy if you update any environment variables

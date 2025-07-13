@@ -90,9 +90,6 @@ class SupabaseClient {
     // This is a secure way to grant top-level access without relying on database fields that could be misconfigured.
     const SUPER_ADMIN_EMAILS = [
       'admin@interlineasia.com',
-      'edvin@interlineasia.com',
-      'nuch@interlineasia.com',
-      'rodney@interlineasia.com',
       'admin@telenational.com.au',
       'rodney@telenational.com.au'
     ];
@@ -263,9 +260,17 @@ class SupabaseClient {
   }
 
   isAdmin(email = null) {
+    // Define the same super admin emails as in _setCurrentUserWithMetadata
+    const SUPER_ADMIN_EMAILS = [
+      'admin@interlineasia.com',
+      'admin@telenational.com.au',
+      'rodney@telenational.com.au'
+    ];
+    
     // Check by email parameter first (for external calls)
     if (email) {
-      const isSuperAdmin = email === 'admin@telenational.com.au' || email === 'admin@interlineasia.com';
+      const normalizedEmail = email.toLowerCase();
+      const isSuperAdmin = SUPER_ADMIN_EMAILS.includes(normalizedEmail);
       console.log(`isAdmin check by email (${email}):`, isSuperAdmin);
       return isSuperAdmin;
     }
@@ -277,8 +282,8 @@ class SupabaseClient {
     }
     
     // Check by email first (most reliable)
-    if (this.currentUser.email === 'admin@telenational.com.au' || 
-        this.currentUser.email === 'admin@interlineasia.com') {
+    const normalizedCurrentEmail = this.currentUser.email.toLowerCase();
+    if (SUPER_ADMIN_EMAILS.includes(normalizedCurrentEmail)) {
       console.log(`isAdmin check: User ${this.currentUser.email} is admin by email whitelist`);
       return true;
     }

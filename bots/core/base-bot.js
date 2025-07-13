@@ -1,7 +1,6 @@
 // Interline Asia - Base Bot Framework (Clean)
 // Core infrastructure for all AI bots with Supabase, Brevo, and Gemini integration
 
-import { createClient } from '@supabase/supabase-js';
 import GeminiClient from './gemini-client.js';
 
 export class BaseBot {
@@ -95,22 +94,32 @@ export class BaseBot {
 
   async initializeSupabase() {
     try {
-      const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+      // Use dynamic import for server-side compatibility
+      const { createClient } = await import('@supabase/supabase-js');
+      
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://nxreyyxbuwxjfmtvdkji.supabase.co';
+      const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
       
       if (!supabaseUrl || !supabaseKey) {
-        throw new Error('Supabase configuration missing');
+        console.error('Supabase config check:', {
+          url: !!supabaseUrl,
+          key: !!supabaseKey,
+          env_url: process.env.NEXT_PUBLIC_SUPABASE_URL,
+          env_key_exists: !!process.env.SUPABASE_SERVICE_ROLE_KEY
+        });
+        throw new Error('Supabase configuration missing - check environment variables');
       }
       
       this.supabaseClient = createClient(supabaseUrl, supabaseKey);
       
-      // Test connection
+      // Test connection with a simple query
       const { data, error } = await this.supabaseClient
         .from('profiles')
         .select('count')
         .limit(1);
       
-      if (error && !error.message.includes('permission')) {
+      if (error && !error.message.includes('permission') && !error.message.includes('RLS')) {
+        console.error('Supabase connection test failed:', error);
         throw error;
       }
       

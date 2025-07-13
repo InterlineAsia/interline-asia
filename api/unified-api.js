@@ -201,6 +201,101 @@ async function handleCSVManager(req, res) {
   }
 }
 
+// Update upload status
+async function handleUpdateUploadStatus(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
+    const { uploadId, status, adminNotes } = req.body;
+    
+    if (!uploadId || !status) {
+      return res.status(400).json({ error: 'Missing uploadId or status' });
+    }
+
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://nxreyyxbuwxjfmtvdkji.supabase.co';
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const { data, error } = await supabase
+      .from('uploads')
+      .update({ 
+        status, 
+        admin_notes: adminNotes,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', uploadId)
+      .select();
+
+    if (error) {
+      throw error;
+    }
+
+    return res.status(200).json({
+      success: true,
+      upload: data[0],
+      message: `Upload ${status} successfully`
+    });
+
+  } catch (error) {
+    console.error('Update upload status error:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
+// System health check
+async function handleSystemHealthCheck(req, res) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://nxreyyxbuwxjfmtvdkji.supabase.co';
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Test database connection
+    const { data: dbTest, error: dbError } = await supabase
+      .from('profiles')
+      .select('count')
+      .limit(1);
+
+    const healthStatus = {
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      services: {
+        database: dbError ? 'error' : 'connected',
+        api: 'running',
+        bots: 'operational'
+      },
+      version: '1.0.0'
+    };
+
+    if (dbError) {
+      healthStatus.status = 'degraded';
+      healthStatus.services.database_error = dbError.message;
+    }
+
+    return res.status(200).json(healthStatus);
+
+  } catch (error) {
+    console.error('System health check error:', error);
+    return res.status(503).json({
+      status: 'error',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+}
+
 // Get pending uploads for admin review
 async function handleGetPendingUploads(req, res) {
   if (req.method !== 'GET') {

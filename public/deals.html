@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Exclusive Cruise Deals - Interline Asia">
+    <title>Cruise Deals - Interline Asia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="supabase-client.js"></script>
+</head>
+<body>
+    <div id="header-placeholder"></div>
+    
+    <main style="min-height: 80vh; padding: 2rem 0;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+            
+            <!-- Page Header -->
+            <div style="text-align: center; margin-bottom: 3rem;">
+                <h1 style="color: #1e293b; font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem;">
+                    Exclusive Cruise Deals
+                </h1>
+                <p style="color: #64748b; font-size: 1.1rem; max-width: 600px; margin: 0 auto;">
+                    Discover amazing cruise deals exclusively for travel industry professionals
+                </p>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading-state" style="text-align: center; padding: 3rem;">
+                <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #e2e8f0; border-top: 4px solid #3b82f6; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                <p style="margin-top: 1rem; color: #64748b;">Loading cruise deals...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="error-state" style="display: none; text-align: center; padding: 3rem;">
+                <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 2rem; max-width: 500px; margin: 0 auto;">
+                    <i class="ri-error-warning-line" style="font-size: 3rem; color: #dc2626; margin-bottom: 1rem;"></i>
+                    <h3 style="color: #dc2626; margin-bottom: 1rem;">Unable to Load Deals</h3>
+                    <p style="color: #7f1d1d; margin-bottom: 1.5rem;">
+                        We're having trouble loading the cruise deals. Please try again later.
+                    </p>
+                    <button onclick="loadDeals()" style="background: #dc2626; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 6px; cursor: pointer;">
+                        Try Again
+                    </button>
+                </div>
+            </div>
+
+            <!-- Deals Container -->
+            <div id="deals-container" style="display: none;">
+                <!-- Deals will be loaded here -->
+            </div>
+
+            <!-- No Deals State -->
+            <div id="no-deals-state" style="display: none; text-align: center; padding: 3rem;">
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 2rem; max-width: 500px; margin: 0 auto;">
+                    <i class="ri-ship-line" style="font-size: 3rem; color: #64748b; margin-bottom: 1rem;"></i>
+                    <h3 style="color: #1e293b; margin-bottom: 1rem;">No Deals Available</h3>
+                    <p style="color: #64748b;">
+                        There are currently no cruise deals available. Please check back later.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="/js/loadPartials.js"></script>
+    <script>
+        // Authentication check
+        async function checkAuthentication() {
+            try {
+                if (window.supabaseClient) {
+                    await window.supabaseClient.readyPromise;
+                    
+                    if (!window.supabaseClient.isLoggedIn()) {
+                        console.log('DEALS: User not logged in, redirecting to login');
+                        window.location.href = '/login.html';
+                        return false;
+                    }
+                    
+                    console.log('DEALS: User authenticated');
+                    return true;
+                }
+            } catch (error) {
+                console.error('DEALS: Authentication check failed:', error);
+                window.location.href = '/login.html';
+                return false;
+            }
+        }
+
+        // Load deals function
+        async function loadDeals() {
+            console.log('DEALS: Loading deals...');
+            
+            const loadingState = document.getElementById('loading-state');
+            const errorState = document.getElementById('error-state');
+            const dealsContainer = document.getElementById('deals-container');
+            const noDealsState = document.getElementById('no-deals-state');
+            
+            // Show loading state
+            loadingState.style.display = 'block';
+            errorState.style.display = 'none';
+            dealsContainer.style.display = 'none';
+            noDealsState.style.display = 'none';
+            
+            try {
+                // Check authentication first
+                const isAuthenticated = await checkAuthentication();
+                if (!isAuthenticated) return;
+                
+                // Try to load deals from Supabase
+                if (window.supabaseClient && window.supabaseClient.getAllDeals) {
+                    const deals = await window.supabaseClient.getAllDeals();
+                    
+                    if (deals && deals.length > 0) {
+                        displayDeals(deals);
+                    } else {
+                        // No deals found
+                        loadingState.style.display = 'none';
+                        noDealsState.style.display = 'block';
+                    }
+                } else {
+                    // Fallback: Show placeholder message
+                    loadingState.style.display = 'none';
+                    dealsContainer.style.display = 'block';
+                    dealsContainer.innerHTML = `
+                        <div style="text-align: center; padding: 3rem; background: #f8fafc; border-radius: 8px;">
+                            <i class="ri-ship-line" style="font-size: 3rem; color: #3b82f6; margin-bottom: 1rem;"></i>
+                            <h3 style="color: #1e293b; margin-bottom: 1rem;">Cruise Deals Coming Soon</h3>
+                            <p style="color: #64748b;">
+                                We're working on bringing you the best cruise deals. Check back soon!
+                            </p>
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('DEALS: Error loading deals:', error);
+                loadingState.style.display = 'none';
+                errorState.style.display = 'block';
+            }
+        }
+
+        // Display deals function
+        function displayDeals(deals) {
+            const loadingState = document.getElementById('loading-state');
+            const dealsContainer = document.getElementById('deals-container');
+            
+            loadingState.style.display = 'none';
+            dealsContainer.style.display = 'block';
+            
+            let dealsHTML = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2rem;">';
+            
+            deals.forEach(deal => {
+                dealsHTML += `
+                    <div style="background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden; transition: transform 0.3s ease;">
+                        <div style="padding: 1.5rem;">
+                            <h3 style="color: #1e293b; font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">
+                                ${deal.cruise_name || 'Cruise Deal'}
+                            </h3>
+                            <p style="color: #64748b; margin-bottom: 1rem;">
+                                ${deal.cruise_line || 'Premium Cruise Line'}
+                            </p>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <span style="color: #059669; font-weight: 600; font-size: 1.1rem;">
+                                    From $${deal.price || 'TBA'}
+                                </span>
+                                <span style="color: #64748b; font-size: 0.9rem;">
+                                    ${deal.duration || '7'} nights
+                                </span>
+                            </div>
+                            <button style="width: 100%; background: #3b82f6; color: white; border: none; padding: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: 500;">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            dealsHTML += '</div>';
+            dealsContainer.innerHTML = dealsHTML;
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDeals();
+        });
+
+        // CSS for loading animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

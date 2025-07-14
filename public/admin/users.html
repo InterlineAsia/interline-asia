@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../config.js"></script>
+    <script src="../supabase-client.js"></script>
+</head>
+<body>
+    <div id="header-placeholder"></div>
+    
+    <main style="min-height: 80vh; padding: 2rem 0; background: #f8fafc;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+            
+            <!-- Page Header -->
+            <div style="margin-bottom: 2rem;">
+                <h1 style="color: #1e293b; font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;">
+                    User Management
+                </h1>
+                <p style="color: #64748b;">
+                    Manage user accounts, verification status, and permissions
+                </p>
+            </div>
+
+            <!-- Admin Check -->
+            <div id="admin-check" style="text-align: center; padding: 3rem;">
+                <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #e2e8f0; border-top: 4px solid #3b82f6; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                <p style="margin-top: 1rem; color: #64748b;">Verifying admin access...</p>
+            </div>
+
+            <!-- Access Denied -->
+            <div id="access-denied" style="display: none; text-align: center; padding: 3rem;">
+                <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 2rem; max-width: 500px; margin: 0 auto;">
+                    <i class="ri-shield-cross-line" style="font-size: 3rem; color: #dc2626; margin-bottom: 1rem;"></i>
+                    <h3 style="color: #dc2626; margin-bottom: 1rem;">Access Denied</h3>
+                    <p style="color: #7f1d1d; margin-bottom: 1.5rem;">
+                        You don't have permission to access this page. Admin access required.
+                    </p>
+                    <a href="/dashboard-choice.html" style="background: #3b82f6; color: white; text-decoration: none; padding: 0.75rem 1.5rem; border-radius: 6px; display: inline-block;">
+                        Back to Dashboard
+                    </a>
+                </div>
+            </div>
+
+            <!-- Users Content -->
+            <div id="users-content" style="display: none;">
+                
+                <!-- Stats Cards -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                    <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="display: flex; align-items: center; justify-content: between;">
+                            <div>
+                                <p style="color: #64748b; font-size: 0.875rem; margin-bottom: 0.5rem;">Total Users</p>
+                                <p id="total-users" style="color: #1e293b; font-size: 1.5rem; font-weight: 600; margin: 0;">-</p>
+                            </div>
+                            <i class="ri-user-line" style="font-size: 2rem; color: #3b82f6;"></i>
+                        </div>
+                    </div>
+                    
+                    <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="display: flex; align-items: center; justify-content: between;">
+                            <div>
+                                <p style="color: #64748b; font-size: 0.875rem; margin-bottom: 0.5rem;">Verified Users</p>
+                                <p id="verified-users" style="color: #059669; font-size: 1.5rem; font-weight: 600; margin: 0;">-</p>
+                            </div>
+                            <i class="ri-shield-check-line" style="font-size: 2rem; color: #059669;"></i>
+                        </div>
+                    </div>
+                    
+                    <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="display: flex; align-items: center; justify-content: between;">
+                            <div>
+                                <p style="color: #64748b; font-size: 0.875rem; margin-bottom: 0.5rem;">Pending</p>
+                                <p id="pending-users" style="color: #d97706; font-size: 1.5rem; font-weight: 600; margin: 0;">-</p>
+                            </div>
+                            <i class="ri-time-line" style="font-size: 2rem; color: #d97706;"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users Table -->
+                <div style="background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden;">
+                    <div style="padding: 1.5rem; border-bottom: 1px solid #e2e8f0;">
+                        <h3 style="color: #1e293b; font-size: 1.125rem; font-weight: 600; margin: 0;">
+                            All Users
+                        </h3>
+                    </div>
+                    
+                    <div id="users-table-container">
+                        <div style="text-align: center; padding: 3rem;">
+                            <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #e2e8f0; border-top: 4px solid #3b82f6; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                            <p style="margin-top: 1rem; color: #64748b;">Loading users...</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="../js/loadPartials.js"></script>
+    <script>
+        // Check admin access
+        async function checkAdminAccess() {
+            try {
+                if (window.supabaseClient) {
+                    await window.supabaseClient.readyPromise;
+                    
+                    if (!window.supabaseClient.isLoggedIn()) {
+                        window.location.href = '/login.html';
+                        return false;
+                    }
+                    
+                    const user = window.supabaseClient.getCurrentUser();
+                    const adminEmails = ['rodney@telenational.com.au', 'admin@telenational.com.au'];
+                    const isAdmin = adminEmails.includes(user?.email?.toLowerCase()) || 
+                                   user?.is_admin === true || 
+                                   user?.role === 'admin';
+                    
+                    if (!isAdmin) {
+                        document.getElementById('admin-check').style.display = 'none';
+                        document.getElementById('access-denied').style.display = 'block';
+                        return false;
+                    }
+                    
+                    document.getElementById('admin-check').style.display = 'none';
+                    document.getElementById('users-content').style.display = 'block';
+                    
+                    loadUsers();
+                    return true;
+                }
+            } catch (error) {
+                console.error('Admin access check failed:', error);
+                document.getElementById('admin-check').style.display = 'none';
+                document.getElementById('access-denied').style.display = 'block';
+                return false;
+            }
+        }
+
+        // Load users
+        async function loadUsers() {
+            try {
+                console.log('Loading users...');
+                
+                // For now, show placeholder data
+                document.getElementById('total-users').textContent = '0';
+                document.getElementById('verified-users').textContent = '0';
+                document.getElementById('pending-users').textContent = '0';
+                
+                const tableContainer = document.getElementById('users-table-container');
+                tableContainer.innerHTML = `
+                    <div style="text-align: center; padding: 3rem;">
+                        <i class="ri-user-line" style="font-size: 3rem; color: #64748b; margin-bottom: 1rem;"></i>
+                        <h3 style="color: #1e293b; margin-bottom: 1rem;">User Management Coming Soon</h3>
+                        <p style="color: #64748b;">
+                            User management functionality is being developed. Check back soon!
+                        </p>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Error loading users:', error);
+                const tableContainer = document.getElementById('users-table-container');
+                tableContainer.innerHTML = `
+                    <div style="text-align: center; padding: 3rem;">
+                        <i class="ri-error-warning-line" style="font-size: 3rem; color: #dc2626; margin-bottom: 1rem;"></i>
+                        <h3 style="color: #dc2626; margin-bottom: 1rem;">Error Loading Users</h3>
+                        <p style="color: #7f1d1d;">
+                            Unable to load user data. Please try again later.
+                        </p>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAdminAccess();
+        });
+
+        // CSS for loading animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

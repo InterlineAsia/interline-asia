@@ -288,7 +288,7 @@
 
         // Enhanced deals loading with robust CSV parsing
         async function loadDealsBasic() {
-            console.log('DEALS: Loading deals via enhanced method...');
+            console.log('🚀 INITIATING PRIO-RITIZED DEAL LOADER');
             
             const loadingState = document.getElementById('loading-state');
             const errorState = document.getElementById('error-state');
@@ -303,71 +303,240 @@
             
             try {
                 let allDeals = [];
+                let dealsSource = 'none';
+                let loadTimestamp = new Date().toISOString();
+                const startTime = Date.now();
+                const loadPath = [];
                 
-                // Method 1: Try client method first (most reliable with proper RLS)
-                if (window.supabaseClient && window.supabaseClient.getAllDeals) {
-                    console.log('DEALS: Trying Supabase client method...');
-                    try {
-                        const clientDeals = await window.supabaseClient.getAllDeals();
-                        console.log(`📊 CLIENT METHOD RESULT: ${clientDeals ? clientDeals.length : 0} deals`);
-                        if (clientDeals && clientDeals.length > 0) {
-                            allDeals = clientDeals;
-                        }
-                    } catch (clientError) {
-                        console.error('DEALS: Client method failed:', clientError);
-                    }
-                }
+                console.group('🎯 CRUISE DEALS LOADER - Execution Started');
+                console.log(`📅 Start Time: ${loadTimestamp}`);
+                console.log(`⏰ Execution Mode: ${new Date().toLocaleTimeString()}`);
                 
-                // Method 2: If client method failed, try direct queries for debugging
-                if (allDeals.length === 0 && window.supabaseClient && window.supabaseClient.supabase) {
-                    console.log('DEALS: Trying direct Supabase queries...');
+                // Reset/Initialize global diagnostics
+                window._dealsDebugInfo = {
+                    loadTimestamp,
+                    loadSource: 'none',
+                    loadDuration: 0,
+                    loadPath: [],
+                    dealsCount: 0,
+                    sourcesTried: [],
+                    errors: [],
+                    success: false
+                };
+                
+                // Method 1: Direct Supabase Query (HIGHEST PRIORITY)
+                if (window.supabaseClient && window.supabaseClient.supabase) {
+                    console.group('🔍 METHOD 1: Direct Supabase Query');
+                    
+                    // Try cruise_deals table first
+                    console.log('📝 Attempt 1A: Querying cruise_deals table');
+                    const query1AStart = Date.now();
+                    
                     try {
-                        // Quick debug check: just get one record
-                        const { data: supabaseDeals, error } = await window.supabaseClient.supabase
-                            .from('deals_dashboard')
+                        const { data: cruiseDealsData, error: cruiseError } = await window.supabaseClient.supabase
+                            .from('cruise_deals')
                             .select('*')
-                            .limit(10);
+                            .eq('is_active', true)
+                            .order('departure_date', { ascending: true })
+                            .limit(1000);
                         
-                        console.log('🔍 DEBUG: deals_dashboard query:', {
-                            count: supabaseDeals ? supabaseDeals.length : 0,
-                            error: error,
-                            sample: supabaseDeals ? supabaseDeals[0] : null
+                        const query1ADuration = Date.now() - query1AStart;
+                        console.log(`⚡ Query 1A completed in ${query1ADuration}ms`);
+                        
+                        window._dealsDebugInfo.sourcesTried.push({
+                            source: 'supabase_cruise_deals',
+                            duration: query1ADuration,
+                            error: cruiseError?.message,
+                            count: cruiseDealsData?.length || 0
                         });
                         
-                        if (supabaseDeals && supabaseDeals.length > 0) {
-                            allDeals = supabaseDeals;
+                        if (cruiseError) {
+                            console.error('❌ Query 1A error:', cruiseError);
+                            window._dealsDebugInfo.errors.push({ source: 'cruise_deals', error: cruiseError.message });
+                        } else if (cruiseDealsData && cruiseDealsData.length > 0) {
+                            console.log(`🎉 Query 1A SUCCESS: Found ${cruiseDealsData.length} deals`);
+                            console.log('🗂️ Sample columns:', Object.keys(cruiseDealsData[0] || {}).join(', '));
+                            allDeals = cruiseDealsData;
+                            dealsSource = 'supabase_cruise_deals';
+                            loadPath.push(`✅ cruise_deals: ${cruiseDealsData.length} deals (${query1ADuration}ms)`);
+                        } else {
+                            console.log('⚠️ Query 1A: No active deals found in cruise_deals');
+                            loadPath.push(`⚠️ cruise_deals: 0 deals (${query1ADuration}ms)`);
                         }
-                    } catch (supabaseError) {
-                        console.error('DEALS: Direct query failed:', supabaseError);
+                        
+                    } catch (err) {
+                        console.error('💥 Query 1A Exception:', err);
+                        window._dealsDebugInfo.errors.push({ source: 'cruise_deals', error: err.message });
                     }
+                    
+                    // Method 1B: Fallback to deals_dashboard view if cruise_deals is empty
+                    if (allDeals.length === 0) {
+                        console.log('🔄 Attempt 1B: Falling back to deals_dashboard view');
+                        const query1BStart = Date.now();
+                        
+                        try {
+                            const { data: dashboardData, error: dashboardError } = await window.supabaseClient.supabase
+                                .from('deals_dashboard')
+                                .select('*')
+                                .limit(1000);
+                            
+                            const query1BDuration = Date.now() - query1BStart;
+                            console.log(`⚡ Query 1B completed in ${query1BDuration}ms`);
+                            
+                            window._dealsDebugInfo.sourcesTried.push({
+                                source: 'supabase_deals_dashboard',
+                                duration: query1BDuration,
+                                error: dashboardError?.message,
+                                count: dashboardData?.length || 0
+                            });
+                            
+                            if (dashboardError) {
+                                console.error('❌ Query 1B error:', dashboardError);
+                                window._dealsDebugInfo.errors.push({ source: 'deals_dashboard', error: dashboardError.message });
+                            } else if (dashboardData && dashboardData.length > 0) {
+                                console.log(`🎉 Query 1B SUCCESS: Found ${dashboardData.length} deals in view`);
+                                console.log('🗂️ Sample columns:', Object.keys(dashboardData[0] || {}).join(', '));
+                                allDeals = dashboardData;
+                                dealsSource = 'supabase_deals_dashboard';
+                                loadPath.push(`✅ deals_dashboard: ${dashboardData.length} deals (${query1BDuration}ms)`);
+                            } else {
+                                console.log('⚠️ Query 1B: No deals found in deals_dashboard view');
+                                loadPath.push(`⚠️ deals_dashboard: 0 deals (${query1BDuration}ms)`);
+                            }
+                            
+                        } catch (err) {
+                            console.error('💥 Query 1B Exception:', err);
+                            window._dealsDebugInfo.errors.push({ source: 'deals_dashboard', error: err.message });
+                        }
+                    }
+                    
+                    console.groupEnd(); // Close Method 1 group
                 }
                 
-                // Method 3: Try unified API
+                // Method 2: Unified API (SECONDARY PRIORITY)
                 if (allDeals.length === 0) {
-                    console.log('DEALS: Trying unified API...');
+                    console.group('📡 METHOD 2: Unified API')
+                    console.log('📱 Attempting API endpoint: /api/unified-api?endpoint=cruise-data');
+                    
+                    const query2Start = Date.now();
+                    
                     try {
                         const response = await fetch('/api/unified-api?endpoint=cruise-data');
+                        const query2Duration = Date.now() - query2Start;
+                        
+                        window._dealsDebugInfo.sourcesTried.push({
+                            source: 'unified_api',
+                            duration: query2Duration,
+                            response: {
+                                status: response.status,
+                                statusText: response.statusText,
+                                ok: response.ok
+                            }
+                        });
+                        
                         if (response.ok) {
                             const result = await response.json();
+                            console.log(`📊 API Response Time: ${query2Duration}ms`);
+                            console.log('📋 API Response Overview:', {
+                                success: result.success,
+                                dealsCount: result.deals?.length || 0,
+                                hasError: !!result.error,
+                                error: result.error
+                            });
+                            
                             if (result.success && result.deals && result.deals.length > 0) {
-                                console.log(`DEALS: Loaded ${result.deals.length} deals from unified API`);
+                                console.log(`✅ API SUCCESS: Loaded ${result.deals.length} deals`);
+                                console.log('🗂️ Sample deal structure:', Object.keys(result.deals[0] || {}).length > 0 ? Object.keys(result.deals[0]).slice(0, 8).join(', ') + '...' : 'Empty' );
                                 allDeals = result.deals;
+                                dealsSource = 'unified_api';
+                                loadPath.push(`✅ unified_api: ${result.deals.length} deals (${query2Duration}ms)`);
+                            } else {
+                                console.log('⚠️ API: No deals available');
+                                loadPath.push(`⚠️ unified_api: 0 deals (${query2Duration}ms)`);
+                                if (result.error) {
+                                    window._dealsDebugInfo.errors.push({ source: 'unified_api', error: result.error });
+                                }
                             }
+                        } else {
+                            console.error(`❌ API HTTP Error: ${response.status} ${response.statusText}`);
+                            loadPath.push(`❌ unified_api: HTTP ${response.status} (${query2Duration}ms)`);
+                            window._dealsDebugInfo.errors.push({ source: 'unified_api', error: `${response.status} ${response.statusText}` });
                         }
-                    } catch (apiError) {
-                        console.error('DEALS: Unified API failed:', apiError);
+                        
+                    } catch (err) {
+                        console.error('💥 API Exception:', err);
+                        loadPath.push(`❌ unified_api: Exception - ${err.message}`);
+                        window._dealsDebugInfo.errors.push({ source: 'unified_api', error: err.message });
                     }
+                    
+                    console.groupEnd(); // Close Method 2 group
                 }
                 
-                // Method 4: Try CSV storage download with Papa Parse
+                // Method 3: Legacy CSV Storage (FINAL FALLBACK)
                 if (allDeals.length === 0) {
-                    console.log('DEALS: Trying CSV storage download...');
+                    console.group('📁 METHOD 3: Legacy CSV Storage')
+                    console.log('📦 Attempting to load from local CSV storage...');
+                    
+                    const query3Start = Date.now();
+                    
                     try {
-                        allDeals = await loadDealsFromCSVStorage();
-                    } catch (csvError) {
-                        console.error('DEALS: CSV storage failed:', csvError);
+                        const csvDeals = await loadDealsFromCSVStorage();
+                        const query3Duration = Date.now() - query3Start;
+                        
+                        window._dealsDebugInfo.sourcesTried.push({
+                            source: 'csv_storage',
+                            duration: query3Duration,
+                            count: csvDeals?.length || 0
+                        });
+                        
+                        if (csvDeals && csvDeals.length > 0) {
+                            console.log(`📋 CSV Storage SUCCESS: Found ${csvDeals.length} deals`);
+                            console.log('📋 CSV format check:', csvDeals[0] ? Object.keys(csvDeals[0]).join(', ') : 'Empty');
+                            allDeals = csvDeals;
+                            dealsSource = 'csv_storage';
+                            loadPath.push(`✅ csv_storage: ${csvDeals.length} deals (${query3Duration}ms)`);
+                        } else {
+                            console.log('⚠️ CSV: No deals found in local storage');
+                            loadPath.push(`⚠️ csv_storage: 0 deals (${query3Duration}ms)`);
+                        }
+                    } catch (err) {
+                        console.error('💥 CSV Storage Exception:', err);
+                        loadPath.push(`❌ csv_storage: Exception - ${err.message}`);
+                        window._dealsDebugInfo.errors.push({ source: 'csv_storage', error: err.message });
                     }
+                    
+                    console.groupEnd(); // Close Method 3 group
                 }
+                
+                const loadDuration = Date.now() - startTime;
+                
+                // Save comprehensive diagnostics globally for debug page access
+                window._dealsDebugInfo = {
+                    loadTimestamp,
+                    loadDuration,
+                    loadSource: dealsSource,
+                    dealsCount: allDeals.length,
+                    loadPath,
+                    sourcesTried: window._dealsDebugInfo.sourcesTried,
+                    errors: window._dealsDebugInfo.errors,
+                    success: allDeals.length > 0,
+                    sampleDeal: allDeals[0] || null,
+                    allColumns: allDeals[0] ? Object.keys(allDeals[0]) : []
+                };
+                
+                console.group('📊 FINAL DIAGNOSTICS');
+                console.log(`🏁 Loading completed in ${loadDuration}ms`);
+                console.log(`📊 Total deals loaded: ${allDeals.length}`);
+                console.log(`💾 Final source: ${dealsSource}`);
+                console.log(`🛤️ Load path:`, loadPath);
+                console.log('📋 Available columns in deals:', allDeals[0] ? Object.keys(allDeals[0]).join(', ') : 'None');
+                console.groupEnd(); // Close final diagnostics
+                console.groupEnd(); // Close overall loader group
+                
+                console.log(`=== DEAL LOADER SUMMARY ===`);
+                console.log(`✅ Source: ${dealsSource}`);
+                console.log(`📊 Total: ${allDeals.length} deals`);
+                console.log(`🕐 Load Time: ${new Date().toLocaleTimeString()}`);
                 
                 // Method 5: Emergency fallback with sample data
                 if (allDeals.length === 0) {

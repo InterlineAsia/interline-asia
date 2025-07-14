@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Deals Count - Interline Asia</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>🛠️ Deals Database Debug Tool</h2>
+        <p>Use this page to check your cruise deals table status:</p>
+        
+        <button class="btn btn-primary" onclick="countDeals()">Count Cruise Deals</button>
+        <button class="btn btn-secondary" onclick="checkTables()">Check Table Status</button>
+        <button class="btn btn-info" onclick="viewRLS()">Check RLS Policies</button>
+        
+        <div id="results" class="mt-3"></div>
+    </div>
+
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script>
+        // Initialize Supabase
+        const supabaseUrl = 'https://inzyhmxskjqbtcnmlaby.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImluemlobXhza2pxYnRjbm1sYWJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQzODc0NTUsImV4cCI6MjA0OTk2MzQ1NX0.z8LSvMt9B5M3g5fGBTkCXCUOj1yRLCR2DDaJ1SgK8os';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        async function countDeals() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<div class="alert alert-info">Loading...</div>';
+
+            try {
+                // Count cruise_deals
+                const { count: cruiseCount, error: cruiseError } = await supabase
+                    .from('cruise_deals')
+                    .select('*', { count: 'exact', head: true });
+
+                // Count deals_dashboard
+                const { count: dashboardCount, error: dashboardError } = await supabase
+                    .from('deals_dashboard')
+                    .select('*', { count: 'exact', head: true });
+
+                // Count active deals
+                const { count: activeCount, error: activeError } = await supabase
+                    .from('cruise_deals')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('is_active', true);
+
+                let html = '<div class="alert alert-success">';
+                html += '<h5>Deal Count Results:</h5>';
+                html += `<p><strong>cruise_deals total:</strong> ${cruiseCount || 0}</p>`;
+                html += `<p><strong>cruise_deals active:</strong> ${activeCount || 0}</p>`;
+                html += `<p><strong>deals_dashboard view:</strong> ${dashboardCount || 0}</p>`;
+                
+                if (cruiseError) html += `<p class="text-danger">Cruise deals error: ${cruiseError.message}</p>`;
+                if (dashboardError) html += `<p class="text-danger">Dashboard error: ${dashboardError.message}</p>`;
+                if (activeError) html += `<p class="text-danger">Active deals error: ${activeError.message}</p>`;
+                
+                html += '</div>';
+                results.innerHTML = html;
+
+            } catch (error) {
+                results.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+            }
+        }
+
+        async function checkTables() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<div class="alert alert-info">Checking tables...</div>';
+
+            try {
+                // Get sample data
+                const { data: cruiseData, error: cruiseError } = await supabase
+                    .from('cruise_deals')
+                    .select('*')
+                    .limit(5);
+
+                const { data: dashboardData, error: dashboardError } = await supabase
+                    .from('deals_dashboard')
+                    .select('*')
+                    .limit(5);
+
+                let html = '<div class="alert alert-info">';
+                
+                if (cruiseData && cruiseData.length > 0) {
+                    html += '<h5>Sample cruise_deals data:</h5><pre>' + JSON.stringify(cruiseData.slice(0, 2), null, 2) + '</pre>';
+                } else if (cruiseError) {
+                    html += `<h5>cruise_deals error:</h5><p>${cruiseError.message}</p>`;
+                }
+
+                if (dashboardData && dashboardData.length > 0) {
+                    html += '<h5>Sample deals_dashboard data:</h5><pre>' + JSON.stringify(dashboardData.slice(0, 2), null, 2) + '</pre>';
+                } else if (dashboardError) {
+                    html += `<h5>deals_dashboard error:</h5><p>${dashboardError.message}</p>`;
+                }
+
+                html += '</div>';
+                results.innerHTML = html;
+
+            } catch (error) {
+                results.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+            }
+        }
+
+        async function viewRLS() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<div class="alert alert-info">RLS policies are configured server-side. If you see count = 0 above, this indicates potential RLS policy issues.</div>';
+        }
+    </script>
+</body>
+</html>

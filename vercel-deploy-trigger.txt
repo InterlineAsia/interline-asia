@@ -3,3 +3,4 @@ Mon Jul 14 12:09:58 +07 2025 - Deals page fix deployed
 Mon Jul 14 12:18:41 +07 2025 - Comprehensive deals fix deployed
 Mon Jul 14 12:24:53 +07 2025 - Critical deals debug fix deployed
 Mon Jul 14 12:28:31 +07 2025 - Emergency deals dropdown fix deployed
+Mon Jul 14 12:34:37 +07 2025 - UnifiedDealsLoader fix deployed

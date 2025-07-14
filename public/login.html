@@ -6,7 +6,9 @@
   <meta name="description" content="Sign in to Interline Asia - Access your exclusive cruise deals and VIP travel offers">
   <title>Sign In - Interline Asia</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
   <link rel="stylesheet" href="auth.css">
+  <link rel="stylesheet" href="/css/main.css">
   
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-FYGT92WCXC"></script>
@@ -227,6 +229,8 @@ window.interlineLoginSystem = new InterlineLoginSystem();
   </script>
 </head>
 <body>
+  <div id="header-placeholder"></div>
+  
   <div class="auth-container">
     <div class="auth-card">
       <div class="auth-header">
@@ -269,6 +273,9 @@ window.interlineLoginSystem = new InterlineLoginSystem();
     </div>
   </div>
 
+  <div id="footer-placeholder"></div>
+  
+  <script src="/js/loadPartials.js" defer></script>
   <script>
     document.getElementById('login-form').addEventListener('submit', async function(e) {
       e.preventDefault();
@@ -333,6 +340,57 @@ window.interlineLoginSystem = new InterlineLoginSystem();
         
         // Use the rebuilt login system with Turnstile token
         console.log('LOGIN: Starting rebuilt login process...');
+        console.log('LOGIN: Email:', email);
+        console.log('LOGIN: Password length:', password ? password.length : 0);
+        console.log('LOGIN: Token:', turnstileToken);
+        
+        // For admin bypass, use the original supabase client directly
+        if (turnstileToken === 'ADMIN_BYPASS_TOKEN') {
+          console.log('LOGIN: Using direct Supabase auth for admin bypass...');
+          
+          try {
+            // Wait for Supabase client to be ready
+            await window.supabaseClient.readyPromise;
+            
+            // Direct Supabase authentication without Turnstile
+            const { data, error } = await window.supabaseClient.supabase.auth.signInWithPassword({
+              email: email,
+              password: password
+            });
+            
+            if (error) {
+              console.error('LOGIN: Supabase auth error:', error);
+              throw error;
+            }
+            
+            if (data.user) {
+              console.log('LOGIN: Direct auth successful for:', data.user.email);
+              
+              // Set current user
+              window.supabaseClient.currentUser = data.user;
+              window.supabaseClient.currentSession = data.session;
+              
+              // Determine redirect for admin users
+              const adminEmails = ['rodney@telenational.com.au', 'admin@telenational.com.au'];
+              const redirectUrl = adminEmails.includes(email) ? '/dashboard-choice.html' : '/dashboard.html';
+              
+              console.log('LOGIN: Admin bypass successful, redirecting to:', redirectUrl);
+              
+              // Track successful login
+              gtag('event', 'login', { method: 'email' });
+              
+              showSuccess('Login successful! Redirecting...');
+              
+              // Immediate redirect
+              window.location.href = redirectUrl;
+              return;
+            }
+          } catch (directAuthError) {
+            console.error('LOGIN: Direct auth failed:', directAuthError);
+            throw directAuthError;
+          }
+        }
+        
         const loginResult = await window.interlineLoginSystem.processLogin(email, password, turnstileToken);
         
         if (loginResult.success) {

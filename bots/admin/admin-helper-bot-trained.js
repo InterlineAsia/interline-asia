@@ -77,11 +77,39 @@ export class AdminHelperBot extends BaseBot {
   async handleUserQueries(message) {
     try {
       // Get user statistics
+      console.log('BOT: Attempting to fetch user data from profiles table...');
+      console.log('BOT: Supabase client available:', !!this.supabaseClient);
+      
       const { data: profiles, error: profileError } = await this.supabaseClient
         .from('profiles')
         .select('id, full_name, email, company_name, created_at, role');
 
-      if (profileError) throw profileError;
+      console.log('BOT: Query result:', {
+        profiles: profiles,
+        error: profileError,
+        profileCount: profiles ? profiles.length : 0
+      });
+
+      if (profileError) {
+        console.error('BOT: Profile query error:', profileError);
+        throw profileError;
+      }
+      
+      if (!profiles || profiles.length === 0) {
+        console.warn('BOT: No profiles found in database');
+        return {
+          response: `📊 **User Management Summary**
+
+**Total Members**: 0
+
+No user profiles found in the database. This could mean:
+- The profiles table is empty
+- There may be an RLS (Row Level Security) issue
+- The table structure may have changed
+
+Please check the database directly or contact system administrator.`
+        };
+      }
 
       const totalUsers = profiles.length;
       const adminUsers = profiles.filter(p => p.role === 'admin').length;
@@ -124,10 +152,55 @@ Would you like detailed information about any specific company or user managemen
       };
 
     } catch (error) {
-      console.error('User query error:', error);
+      console.error('BOT: Error fetching user data:', error);
+      console.error('BOT: Error details:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      });
+      
+      // Try a simpler query as fallback
+      try {
+        console.log('BOT: Attempting fallback user count query...');
+        const { count, error: countError } = await this.supabaseClient
+          .from('profiles')
+          .select('*', { count: 'exact', head: true });
+        
+        if (countError) {
+          console.error('BOT: Fallback count query failed:', countError);
+        } else {
+          console.log('BOT: Fallback count successful:', count);
+          return {
+            success: true,
+            response: `📊 **User Management Summary**
+
+**Total Members**: ${count || 0}
+
+*Note: Detailed breakdown temporarily unavailable. Basic count retrieved successfully.*
+
+Database connection is working but detailed queries may need optimization.`
+          };
+        }
+      } catch (fallbackError) {
+        console.error('BOT: Fallback query also failed:', fallbackError);
+      }
+      
       return {
         success: false,
-        response: "Unable to retrieve user data. Please check database connection."
+        response: `❌ **Database Connection Issue**
+
+Unable to retrieve user data. Error details:
+- Message: ${error.message || 'Unknown error'}
+- Code: ${error.code || 'No error code'}
+
+**Troubleshooting Steps:**
+1. Check Supabase connection status
+2. Verify profiles table exists and has data
+3. Check RLS (Row Level Security) policies
+4. Verify API key permissions
+
+Please check the browser console for detailed error logs.`
       };
     }
   }

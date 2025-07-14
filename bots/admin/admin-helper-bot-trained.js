@@ -79,8 +79,23 @@ export class AdminHelperBot extends BaseBot {
       // Get user statistics
       console.log('BOT: Attempting to fetch user data from profiles table...');
       console.log('BOT: Supabase client available:', !!this.supabaseClient);
+      console.log('BOT: this.supabase available:', !!this.supabase);
       
-      const { data: profiles, error: profileError } = await this.supabaseClient
+      // Initialize Supabase client if not available
+      if (!this.supabaseClient && !this.supabase) {
+        console.log('BOT: Initializing Supabase client...');
+        await this.initializeSupabase();
+      }
+      
+      // Use whichever client is available
+      const supabaseInstance = this.supabaseClient || this.supabase;
+      console.log('BOT: Using Supabase instance:', !!supabaseInstance);
+      
+      if (!supabaseInstance) {
+        throw new Error('No Supabase client available after initialization attempt');
+      }
+      
+      const { data: profiles, error: profileError } = await supabaseInstance
         .from('profiles')
         .select('id, full_name, email, company_name, created_at, role');
 
@@ -163,7 +178,13 @@ Would you like detailed information about any specific company or user managemen
       // Try a simpler query as fallback
       try {
         console.log('BOT: Attempting fallback user count query...');
-        const { count, error: countError } = await this.supabaseClient
+        const supabaseInstance = this.supabaseClient || this.supabase;
+        
+        if (!supabaseInstance) {
+          throw new Error('No Supabase client available for fallback query');
+        }
+        
+        const { count, error: countError } = await supabaseInstance
           .from('profiles')
           .select('*', { count: 'exact', head: true });
         

@@ -82,11 +82,11 @@ class SupabaseClient {
   async _setCurrentUserWithMetadata(authUser) {
     // console.log('Setting user metadata for:', authUser.email); // Reduce noise
     // console.log('Auth user data:', { // Reduce noise
-      id: authUser.id,
-      email: authUser.email,
-      app_metadata: authUser.app_metadata,
-      user_metadata: authUser.user_metadata
-    });
+    //   id: authUser.id,
+    //   email: authUser.email,
+    //   app_metadata: authUser.app_metadata,
+    //   user_metadata: authUser.user_metadata
+    // });
     
     // Get profile from database
     const { data: profile, error: profileError } = await this.supabase
@@ -117,13 +117,13 @@ class SupabaseClient {
     const finalRole = isSuperAdminByEmail ? 'super_admin' : roleFromSources;
     
     // console.log('Role determination:', { // Reduce noise
-      email: normalizedEmail,
-      isSuperAdminByEmail,
-      roleFromAppMetadata: authUser.app_metadata?.role,
-      roleFromUserMetadata: authUser.user_metadata?.role,
-      roleFromProfile: profile?.role,
-      finalRole
-    });
+    //   email: normalizedEmail,
+    //   isSuperAdminByEmail,
+    //   roleFromAppMetadata: authUser.app_metadata?.role,
+    //   roleFromUserMetadata: authUser.user_metadata?.role,
+    //   roleFromProfile: profile?.role,
+    //   finalRole
+    // });
 
     // Merge auth user data with profile data and extract metadata
     const profileData = profile || {}; // Ensure profileData is an object even if profile is null
@@ -146,21 +146,21 @@ class SupabaseClient {
     };
     
     // console.log('Final user object created:', { // Reduce noise
-      email: this.currentUser.email,
-      role: this.currentUser.role,
-      is_admin: this.currentUser.is_admin,
-      is_super_admin: this.currentUser.is_super_admin
-    });
+    //   email: this.currentUser.email,
+    //   role: this.currentUser.role,
+    //   is_admin: this.currentUser.is_admin,
+    //   is_super_admin: this.currentUser.is_super_admin
+    // });
     
     // console.log('User set with metadata:', { // Reduce noise
-      id: this.currentUser.id,
-      email: this.currentUser.email,
-      full_name: this.currentUser.full_name,
-      role: this.currentUser.role,
-      is_admin: this.currentUser.is_admin,
-      is_super_admin: this.currentUser.is_super_admin,
-      verification_status: this.currentUser.verification_status
-    });
+    //   id: this.currentUser.id,
+    //   email: this.currentUser.email,
+    //   full_name: this.currentUser.full_name,
+    //   role: this.currentUser.role,
+    //   is_admin: this.currentUser.is_admin,
+    //   is_super_admin: this.currentUser.is_super_admin,
+    //   verification_status: this.currentUser.verification_status
+    // });
   }
 
   async signUp(userData) {

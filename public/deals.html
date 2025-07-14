@@ -427,22 +427,23 @@ async function tryCsvDeals() {
             console.warn('📁 CSV: No deals found');
             return {
                 success: false,
+                deals: []
+            }
+        }
+    }
+    catch (err) {
+            const duration = Date.now() - startTime;
+            console.error('💥 CSV Storage Exception:', err);
+            return {
+                success: false,
                 deals: [],
                 source: 'csv_storage',
-                error: 'No deals found in CSV',
+                error: err.message,
                 duration
-            };
+            }
         }
-    } catch (err) {
-        const duration = Date.now() - startTime;
-        console.error('💥 CSV Storage Exception:', err);
-        return {
-            success: false,
-            deals: [],
-            source: 'csv_storage',
-            error: err.message,
-            duration
-        };
+    }
+
     const sources = [
         trySupabaseDeals,
         tryUnifiedApiDeals,
@@ -681,123 +682,6 @@ async function tryCsvDeals() {
                 `;
             }
         }
-                
-                const loadDuration = Date.now() - startTime;
-                
-                // Save comprehensive diagnostics globally for debug page access
-                window._dealsDebugInfo = {
-                    loadTimestamp,
-                    loadDuration,
-                    loadSource: dealsSource,
-                    dealsCount: allDeals.length,
-                    loadPath,
-                    sourcesTried: window._dealsDebugInfo.sourcesTried,
-                    errors: window._dealsDebugInfo.errors,
-                    success: allDeals.length > 0,
-                    sampleDeal: allDeals[0] || null,
-                    allColumns: allDeals[0] ? Object.keys(allDeals[0]) : []
-                };
-                
-                console.group('📊 FINAL DIAGNOSTICS');
-                console.log(`🏁 Loading completed in ${loadDuration}ms`);
-                console.log(`📊 Total deals loaded: ${allDeals.length}`);
-                console.log(`💾 Final source: ${dealsSource}`);
-                console.log(`🛤️ Load path:`, loadPath);
-                console.log('📋 Available columns in deals:', allDeals[0] ? Object.keys(allDeals[0]).join(', ') : 'None');
-                console.groupEnd(); // Close final diagnostics
-                console.groupEnd(); // Close overall loader group
-                
-                console.log(`=== DEAL LOADER SUMMARY ===`);
-                console.log(`✅ Source: ${dealsSource}`);
-                console.log(`📊 Total: ${allDeals.length} deals`);
-                console.log(`🕐 Load Time: ${new Date().toLocaleTimeString()}`);
-                
-                // Method 5: Ultimate fallback - check if CSV was used as fallback
-                const csvUsedAsFallback = window._dealsDebugInfo.sourcesTried.some(s => s.source === 'csv_storage' && s.count > 0);
-                if (csvUsedAsFallback && allDeals.length > 0) {
-                    console.warn('⚠️ CSV STORAGE FALLBACK TRIGGERED: Supabase and API both failed - using local CSV data');
-                    // Mark this in diagnostics so debug page can flag it
-                    window._dealsDebugInfo.csvFallbackWarning = true;
-                }
-                
-                // Emergency fallback data (only if ALL methods failed)
-                if (allDeals.length === 0) {
-                    console.log('DEALS: All loading methods failed - showing error state');
-                    // Update diagnostics
-                    window._dealsDebugInfo.allMethodsFailed = true;
-                }
-                
-                // Store final results
-                window._dealsDebugInfo.finalDealCount = allDeals.length;
-                
-                if (allDeals && allDeals.length > 0) {
-                    // Store deals globally for filtering
-                    window.allCruiseDeals = allDeals;
-                    console.log(`DEALS: ✅ Successfully loaded ${allDeals.length} deals from: ${window._dealsDebugInfo.loadSource}`);
-                    
-                    // Cache the data locally for 15 minutes
-                    localStorage.setItem('cruiseDeals_cache', JSON.stringify({
-                        deals: allDeals,
-                        timestamp: Date.now(),
-                        source: window._dealsDebugInfo.loadSource
-                    }));
-                    console.log('DEALS: Cached deals locally (15min expiry)');
-                    
-                    // Ensure we have the correct display function - check both possibilities
-                    const displayFunction = typeof renderDealCards === 'function' ? renderDealCards : displayDeals;
-                    
-                    // Populate filter options FIRST (ensuring proper param format)
-                    populateFilterOptions(allDeals);
-                    
-                    // Display all deals initially  
-                    displayFunction(allDeals);
-                    
-                    // Update results count
-                    updateResultsCount(allDeals.length, allDeals.length);
-                    
-                    loadingState.style.display = 'none';
-                    console.log('DEALS: ✅ Load sequence completed', window._dealsDebugInfo);
-                    
-                } else {
-                    // All methods failed - show error state
-                    console.error('❌ ALL LOADING METHODS FAILED');
-                    window._dealsDebugInfo.allMethodsFailed = true;
-                    
-                    loadingState.style.display = 'none';
-                    
-                    // Check if we have cached data to show fallback
-                    const cached = localStorage.getItem('cruiseDeals_cache');
-                    if (cached) {
-                        try {
-                            const cacheData = JSON.parse(cached);
-                            const cacheAge = Date.now() - cacheData.timestamp;
-                            const cacheAgeMinutes = Math.floor(cacheAge / 60000);
-                            
-                            if (cacheAge < 900000) { // 15 minutes
-                                console.log(`DEALS: 🔄 Using ${cacheAgeMinutes} minute old cached data`);
-                                window._dealsDebugInfo.fallbackToCache = true;
-                                window.allCruiseDeals = cacheData.deals;
-                                
-                                populateFilterOptions(cacheData.deals);
-                                const displayFunction = typeof renderDealCards === 'function' ? renderDealCards : displayDeals;
-                                displayFunction(cacheData.deals);
-                                updateResultsCount(cacheData.deals.length, cacheData.deals.length);
-                                
-                                return; // Skip showing error state
-                            }
-                        } catch (e) {
-                            console.warn('DEALS: Cache corruption, clearing...');
-                            localStorage.removeItem('cruiseDeals_cache');
-                        }
-                    }
-                    
-                    // Show comprehensive error state
-                    const errorState = document.getElementById('error-state');
-                    if (errorState) {
-                        errorState.innerHTML = `
-                            <div style="max-width: 600px; margin: 0 auto; text-align: center; padding: 2rem;">
-                                <i class="fas fa-exclamation-circle" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem;"></i>
-                                <h3 style="color: #374151; margin-bottom: 1rem;">Unable to Load Cruise Deals</h3>
                                 <p style="color: #6b7280; margin-bottom: 2rem;">
                                     All data sources are currently unavailable. Please try refreshing the page or contact support if the issue persists.
                                 </p>
@@ -1443,16 +1327,7 @@ async function tryCsvDeals() {
                 // This can be enhanced with a modal or redirect to detail page
                 alert(`Deal Details:\n\nShip: ${deal.ship_name || 'N/A'}\nCruise Line: ${deal.cruise_line || 'N/A'}\nDestination: ${deal.destination || 'N/A'}\nDuration: ${deal.duration || 'N/A'} nights\nPrice: ${deal.price || 'TBA'}`);
             }
-        }
 
-        // Display deals function
-        function displayDeals(deals) {
-            const loadingState = document.getElementById('loading-state');
-            const dealsContainer = document.getElementById('deals-container');
-            
-            loadingState.style.display = 'none';
-            dealsContainer.style.display = 'block';
-            
             let dealsHTML = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2rem;">';
             
             deals.forEach(deal => {

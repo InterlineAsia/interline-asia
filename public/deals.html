@@ -166,48 +166,101 @@
 
     <script src="/js/loadPartials.js"></script>
     <script>
-        // Enhanced authentication check with debugging
         async function checkAuthentication() {
-            console.log('DEALS: Starting authentication check...');
+            console.log('DEALS AUTH: Starting authentication check...');
+            
+            // Prevent multiple auth checks
+            if (window.authCheckInProgress) {
+                console.log('DEALS AUTH: Check already in progress, skipping...');
+                return false;
+            }
+            window.authCheckInProgress = true;
             
             try {
-                // Check if Supabase client exists
+                // Wait for supabaseClient to be available
+                let attempts = 0;
+                const maxAttempts = 50; // 5 seconds max wait
+                
+                while (!window.supabaseClient && attempts < maxAttempts) {
+                    console.log(`DEALS AUTH: Waiting for supabaseClient... (attempt ${attempts + 1})`);
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
+                
                 if (!window.supabaseClient) {
-                    console.error('DEALS: Supabase client not found on window object');
-                    console.log('DEALS: Available window properties:', Object.keys(window).filter(k => k.includes('supabase')));
+                    console.error('DEALS AUTH: Supabase client not found after waiting, redirecting to login');
                     window.location.href = '/login.html';
                     return false;
                 }
                 
-                console.log('DEALS: Supabase client found, waiting for ready state...');
-                await window.supabaseClient.readyPromise;
-                console.log('DEALS: Supabase client ready');
+                console.log('DEALS AUTH: Supabase client found, waiting for ready state...');
                 
-                // Check login status
+                // Wait for supabaseClient to be ready
+                if (window.supabaseClient.readyPromise) {
+                    await window.supabaseClient.readyPromise;
+                } else {
+                    // Fallback: wait a bit more for initialization
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+                
+                console.log('DEALS AUTH: Checking login status...');
+                
+                // Check if user is logged in
                 const isLoggedIn = window.supabaseClient.isLoggedIn();
-                console.log('DEALS: Login status:', isLoggedIn);
+                console.log('DEALS AUTH: Login status:', isLoggedIn);
                 
                 if (!isLoggedIn) {
-                    console.log('DEALS: User not logged in, redirecting to login');
+                    console.log('DEALS AUTH: User not logged in, redirecting to login page');
                     window.location.href = '/login.html';
                     return false;
                 }
                 
+                // Get current user info
                 const currentUser = window.supabaseClient.getCurrentUser();
-                console.log('DEALS: Current user:', currentUser?.email || 'No user data');
+                console.log('DEALS AUTH: Authenticated user:', currentUser?.email || 'No email available');
                 
-                console.log('DEALS: Authentication successful');
+                console.log('DEALS AUTH: Authentication successful, user can access deals');
                 return true;
                 
             } catch (error) {
-                console.error('DEALS: Authentication check failed:', error);
-                console.error('DEALS: Error details:', {
-                    message: error.message,
-                    stack: error.stack,
-                    name: error.name
-                });
+                console.error('DEALS AUTH: Authentication check failed:', error);
+                console.log('DEALS AUTH: Redirecting to login due to error');
                 window.location.href = '/login.html';
                 return false;
+            } finally {
+                window.authCheckInProgress = false;
+            }
+        }
+
+        // Enhanced initialization that checks auth FIRST
+        async function initializeDealsSystemWithAuth() {
+            console.log('DEALS: Starting initialization with authentication check...');
+            
+            // Step 1: Check authentication BEFORE doing anything else
+            const isAuthenticated = await checkAuthentication();
+            if (!isAuthenticated) {
+                console.log('DEALS: Authentication failed, stopping initialization');
+                return; // Don't proceed if not authenticated
+            }
+            
+            console.log('DEALS: Authentication passed, proceeding with deals loading...');
+            
+            // Step 2: Proceed with normal deals initialization
+            try {
+                if (typeof initializeDealsSystem === 'function') {
+                    console.log('DEALS: Calling initializeDealsSystem...');
+                    await initializeDealsSystem();
+                } else if (typeof loadDealsBasic === 'function') {
+                    console.log('DEALS: Calling loadDealsBasic...');
+                    await loadDealsBasic();
+                } else if (typeof window.loadUnifiedDeals === 'function') {
+                    console.log('DEALS: Calling loadUnifiedDeals...');
+                    await window.loadUnifiedDeals();
+                } else {
+                    console.error('DEALS: No loading function found!');
+                }
+            } catch (error) {
+                console.error('DEALS: Error during deals initialization:', error);
             }
         }
 
@@ -218,14 +271,8 @@
             console.log('DEALS: Window object keys containing "deals":', Object.keys(window).filter(k => k.toLowerCase().includes('deals')));
             
             try {
-                // Step 1: Check authentication with detailed logging
-                console.log('DEALS: Step 1 - Authentication check...');
-                const isAuthenticated = await checkAuthentication();
-                if (!isAuthenticated) {
-                    console.log('DEALS: Authentication failed, stopping initialization');
-                    return;
-                }
-                console.log('DEALS: Authentication successful, proceeding...');
+                // Authentication is now handled by initializeDealsSystemWithAuth
+                console.log('DEALS: Proceeding with deals loading (auth already verified)...');
                 
                 // Step 2: Check for available loading methods
                 console.log('DEALS: Step 2 - Checking available loading methods...');
@@ -1510,36 +1557,20 @@
         document.head.appendChild(style);
     </script>
 
-    <!-- FIXED: Initialize deals loading on page load -->
+    <!-- FIXED: Initialize deals loading with authentication check -->
     <script>
-        // Prevent multiple initializations
-        if (!window.dealsInitialized) {
-            window.dealsInitialized = true;
-            
-            document.addEventListener("DOMContentLoaded", function() {
-                console.log("DEALS PAGE: DOM loaded, initializing deals system...");
+        // Initialize with authentication check
+        document.addEventListener("DOMContentLoaded", function() {
+            if (!window.dealsInitialized) {
+                window.dealsInitialized = true;
+                console.log("DEALS PAGE: DOM loaded, starting auth-protected initialization...");
                 
-                // Wait for all scripts to load, then initialize ONCE
+                // Small delay to ensure all scripts are loaded
                 setTimeout(function() {
-                    try {
-                        if (typeof initializeDealsSystem === "function") {
-                            console.log("DEALS PAGE: Calling initializeDealsSystem...");
-                            initializeDealsSystem();
-                        } else if (typeof loadDealsBasic === "function") {
-                            console.log("DEALS PAGE: Calling loadDealsBasic...");
-                            loadDealsBasic();
-                        } else if (typeof window.loadUnifiedDeals === "function") {
-                            console.log("DEALS PAGE: Calling loadUnifiedDeals...");
-                            window.loadUnifiedDeals();
-                        } else {
-                            console.error("DEALS PAGE: No loading function found!");
-                        }
-                    } catch (error) {
-                        console.error("DEALS PAGE: Initialization error:", error);
-                    }
-                }, 1000);
-            });
-        }
+                    initializeDealsSystemWithAuth();
+                }, 500);
+            }
+        });
     </script>
 </body>
 </html>

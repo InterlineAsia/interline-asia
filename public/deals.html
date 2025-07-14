@@ -443,38 +443,6 @@ async function tryCsvDeals() {
             error: err.message,
             duration
         };
-    }
-}
-
-async function loadDealsBasic() {
-    const loadingState = document.getElementById('loading-state');
-    const errorState = document.getElementById('error-state');
-    const dealsContainer = document.getElementById('deals-container');
-    const noDealsState = document.getElementById('no-deals-state');
-
-    loadingState.style.display = 'block';
-    errorState.style.display = 'none';
-    dealsContainer.style.display = 'none';
-    noDealsState.style.display = 'none';
-
-    const loadTimestamp = new Date().toISOString();
-    const startTime = Date.now();
-    const loadPath = [];
-
-    let allDeals = [];
-    let dealsSource = 'none';
-
-    window._dealsDebugInfo = {
-        loadTimestamp,
-        loadSource: 'none',
-        loadDuration: 0,
-        loadPath: [],
-        dealsCount: 0,
-        sourcesTried: [],
-        errors: [],
-        success: false
-    };
-
     const sources = [
         trySupabaseDeals,
         tryUnifiedApiDeals,
@@ -538,25 +506,8 @@ async function loadDealsBasic() {
         `;
         errorState.style.display = 'block';
     }
-}
 
-        // ========== REFACTORED MAIN LOADER ==========
-        async function loadDealsBasic() {
-            window._dealsDebugInfo = window._dealsDebugInfo || {};
-            
-            try {
-                const loadingState = document.getElementById('loading-state');
-                const errorState = document.getElementById('error-state');
-                const dealsContainer = document.getElementById('deals-container');
-                const noDealsState = document.getElementById('no-deals-state');
-            } catch (err) {
-                const duration = Date.now() - startTime;
-                console.error('💥 CSV Storage Exception:', err);
-                return { success: false, deals: [], source: 'csv_storage', error: err.message, duration };
-            }
-        }
-
-        // ========== REFACTORED MAIN LOADER ==========
+    // ========== REFACTORED MAIN LOADER ==========
         async function loadDealsBasic() {
             console.log('🚀 REFACTORED DEALS LOADER - Multiple Sources Priority');
             

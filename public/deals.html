@@ -166,55 +166,122 @@
 
     <script src="/js/loadPartials.js"></script>
     <script>
-        // Authentication check
+        // Enhanced authentication check with debugging
         async function checkAuthentication() {
+            console.log('DEALS: Starting authentication check...');
+            
             try {
-                if (window.supabaseClient) {
-                    await window.supabaseClient.readyPromise;
-                    
-                    if (!window.supabaseClient.isLoggedIn()) {
-                        console.log('DEALS: User not logged in, redirecting to login');
-                        window.location.href = '/login.html';
-                        return false;
-                    }
-                    
-                    console.log('DEALS: User authenticated');
-                    return true;
+                // Check if Supabase client exists
+                if (!window.supabaseClient) {
+                    console.error('DEALS: Supabase client not found on window object');
+                    console.log('DEALS: Available window properties:', Object.keys(window).filter(k => k.includes('supabase')));
+                    window.location.href = '/login.html';
+                    return false;
                 }
+                
+                console.log('DEALS: Supabase client found, waiting for ready state...');
+                await window.supabaseClient.readyPromise;
+                console.log('DEALS: Supabase client ready');
+                
+                // Check login status
+                const isLoggedIn = window.supabaseClient.isLoggedIn();
+                console.log('DEALS: Login status:', isLoggedIn);
+                
+                if (!isLoggedIn) {
+                    console.log('DEALS: User not logged in, redirecting to login');
+                    window.location.href = '/login.html';
+                    return false;
+                }
+                
+                const currentUser = window.supabaseClient.getCurrentUser();
+                console.log('DEALS: Current user:', currentUser?.email || 'No user data');
+                
+                console.log('DEALS: Authentication successful');
+                return true;
+                
             } catch (error) {
                 console.error('DEALS: Authentication check failed:', error);
+                console.error('DEALS: Error details:', {
+                    message: error.message,
+                    stack: error.stack,
+                    name: error.name
+                });
                 window.location.href = '/login.html';
                 return false;
             }
         }
 
-        // Initialize deals system
+        // Enhanced deals system initialization with comprehensive debugging
         async function initializeDealsSystem() {
             console.log('DEALS: Initializing advanced deals system...');
+            console.log('DEALS: Window object keys containing "supabase":', Object.keys(window).filter(k => k.toLowerCase().includes('supabase')));
+            console.log('DEALS: Window object keys containing "deals":', Object.keys(window).filter(k => k.toLowerCase().includes('deals')));
             
             try {
-                // Check authentication first
+                // Step 1: Check authentication with detailed logging
+                console.log('DEALS: Step 1 - Authentication check...');
                 const isAuthenticated = await checkAuthentication();
-                if (!isAuthenticated) return;
+                if (!isAuthenticated) {
+                    console.log('DEALS: Authentication failed, stopping initialization');
+                    return;
+                }
+                console.log('DEALS: Authentication successful, proceeding...');
                 
-                // Wait for unified deals loader to be ready
-                if (window.loadUnifiedDeals) {
-                    console.log('DEALS: Using unified deals loader...');
-                    await window.loadUnifiedDeals();
-                } else if (window.UnifiedDealsLoader) {
-                    console.log('DEALS: Using UnifiedDealsLoader class...');
-                    const loader = new window.UnifiedDealsLoader();
-                    await loader.initialize();
-                } else {
-                    console.log('DEALS: Falling back to basic loader...');
-                    await loadDealsBasic();
+                // Step 2: Check for available loading methods
+                console.log('DEALS: Step 2 - Checking available loading methods...');
+                console.log('DEALS: window.loadUnifiedDeals available:', typeof window.loadUnifiedDeals);
+                console.log('DEALS: window.UnifiedDealsLoader available:', typeof window.UnifiedDealsLoader);
+                console.log('DEALS: window.supabaseClient available:', typeof window.supabaseClient);
+                console.log('DEALS: Papa available:', typeof window.Papa);
+                
+                // Step 3: Try loading methods in order
+                let loadingSuccess = false;
+                
+                if (window.loadUnifiedDeals && typeof window.loadUnifiedDeals === 'function') {
+                    console.log('DEALS: Step 3a - Trying unified deals loader function...');
+                    try {
+                        await window.loadUnifiedDeals();
+                        loadingSuccess = true;
+                        console.log('DEALS: Unified deals loader function succeeded');
+                    } catch (unifiedError) {
+                        console.error('DEALS: Unified deals loader function failed:', unifiedError);
+                    }
                 }
                 
-                // Setup filter event listeners
+                if (!loadingSuccess && window.UnifiedDealsLoader && typeof window.UnifiedDealsLoader === 'function') {
+                    console.log('DEALS: Step 3b - Trying UnifiedDealsLoader class...');
+                    try {
+                        const loader = new window.UnifiedDealsLoader();
+                        await loader.initialize();
+                        loadingSuccess = true;
+                        console.log('DEALS: UnifiedDealsLoader class succeeded');
+                    } catch (classError) {
+                        console.error('DEALS: UnifiedDealsLoader class failed:', classError);
+                    }
+                }
+                
+                if (!loadingSuccess) {
+                    console.log('DEALS: Step 3c - Falling back to basic loader...');
+                    try {
+                        await loadDealsBasic();
+                        loadingSuccess = true;
+                        console.log('DEALS: Basic loader succeeded');
+                    } catch (basicError) {
+                        console.error('DEALS: Basic loader failed:', basicError);
+                        throw basicError;
+                    }
+                }
+                
+                // Step 4: Setup filter event listeners
+                console.log('DEALS: Step 4 - Setting up filter listeners...');
                 setupFilterListeners();
+                console.log('DEALS: Filter listeners setup complete');
+                
+                console.log('DEALS: Initialization completed successfully');
                 
             } catch (error) {
-                console.error('DEALS: Error initializing deals system:', error);
+                console.error('DEALS: Critical error in initializeDealsSystem:', error);
+                console.error('DEALS: Error stack:', error.stack);
                 showErrorState(error);
             }
         }
@@ -674,6 +741,145 @@
             if (errorState) errorState.style.display = 'block';
         }
 
+        // CRITICAL MISSING FUNCTION: Display deals
+        function displayDeals(deals) {
+            console.log(`DEALS: Displaying ${deals.length} deals`);
+            
+            const loadingState = document.getElementById('loading-state');
+            const errorState = document.getElementById('error-state');
+            const dealsContainer = document.getElementById('deals-container');
+            const noDealsState = document.getElementById('no-deals-state');
+            
+            // Hide loading and error states
+            if (loadingState) loadingState.style.display = 'none';
+            if (errorState) errorState.style.display = 'none';
+            if (noDealsState) noDealsState.style.display = 'none';
+            
+            if (!dealsContainer) {
+                console.error('DEALS: deals-container element not found!');
+                return;
+            }
+            
+            if (!deals || deals.length === 0) {
+                console.log('DEALS: No deals to display, showing no deals state');
+                dealsContainer.style.display = 'none';
+                if (noDealsState) noDealsState.style.display = 'block';
+                return;
+            }
+            
+            // Show deals container
+            dealsContainer.style.display = 'block';
+            
+            // Generate deals HTML
+            let dealsHTML = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2rem;">';
+            
+            deals.forEach((deal, index) => {
+                // Extract deal information with fallbacks
+                const shipName = deal.ship_name || deal.shipName || deal.ship || 'Cruise Ship';
+                const cruiseLine = deal.cruise_line || deal.cruiseLine || deal.line || 'Premium Cruise Line';
+                const destination = deal.destination || deal.itinerary || 'Exciting Destination';
+                const duration = deal.duration || deal.nights || deal.days || '7';
+                const price = deal.price || deal.starting_price || deal.cost || 'TBA';
+                const departureDate = deal.departure_date || deal.departureDate || deal.date || '';
+                const ports = deal.ports || deal.port_calls || '';
+                
+                // Format price
+                let priceDisplay = 'Price TBA';
+                if (price && price !== 'TBA' && !isNaN(parseFloat(price))) {
+                    priceDisplay = `From $${parseFloat(price).toLocaleString()}`;
+                }
+                
+                // Format date
+                let dateDisplay = '';
+                if (departureDate) {
+                    try {
+                        const date = new Date(departureDate);
+                        if (!isNaN(date.getTime())) {
+                            dateDisplay = date.toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric', 
+                                year: 'numeric' 
+                            });
+                        }
+                    } catch (e) {
+                        console.warn('DEALS: Invalid date format:', departureDate);
+                    }
+                }
+                
+                dealsHTML += `
+                    <div style="background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden; transition: transform 0.3s ease; border: 1px solid #e5e7eb;"
+                         onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.15)'"
+                         onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(0,0,0,0.1)'">
+                        
+                        <div style="padding: 1.5rem;">
+                            <!-- Ship Name -->
+                            <h3 style="color: #1e293b; font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; line-height: 1.3;">
+                                ${shipName}
+                            </h3>
+                            
+                            <!-- Cruise Line -->
+                            <p style="color: #6b7280; margin-bottom: 1rem; font-weight: 500;">
+                                ${cruiseLine}
+                            </p>
+                            
+                            <!-- Destination -->
+                            <div style="margin-bottom: 1rem;">
+                                <p style="color: #374151; font-size: 0.9rem; line-height: 1.4;">
+                                    <i class="ri-map-pin-line" style="color: #3b82f6; margin-right: 0.5rem;"></i>
+                                    ${destination}
+                                </p>
+                                ${ports ? `<p style="color: #6b7280; font-size: 0.8rem; margin-top: 0.25rem;">Ports: ${ports}</p>` : ''}
+                            </div>
+                            
+                            <!-- Date and Duration -->
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 0.75rem; background: #f8fafc; border-radius: 6px;">
+                                ${dateDisplay ? `
+                                    <span style="color: #374151; font-size: 0.875rem;">
+                                        <i class="ri-calendar-line" style="margin-right: 0.25rem;"></i>
+                                        ${dateDisplay}
+                                    </span>
+                                ` : ''}
+                                <span style="color: #6b7280; font-size: 0.875rem;">
+                                    <i class="ri-time-line" style="margin-right: 0.25rem;"></i>
+                                    ${duration} nights
+                                </span>
+                            </div>
+                            
+                            <!-- Price and Action -->
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="color: #059669; font-weight: 600; font-size: 1.1rem;">
+                                    ${priceDisplay}
+                                </span>
+                                <button onclick="viewDealDetails(${index})" 
+                                        style="background: #3b82f6; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.875rem; font-weight: 500; transition: background 0.3s ease;"
+                                        onmouseover="this.style.background='#2563eb'"
+                                        onmouseout="this.style.background='#3b82f6'">
+                                    View Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            dealsHTML += '</div>';
+            dealsContainer.innerHTML = dealsHTML;
+            
+            console.log('DEALS: Successfully displayed deals in DOM');
+        }
+
+        // View deal details function
+        function viewDealDetails(index) {
+            if (window.allCruiseDeals && window.allCruiseDeals[index]) {
+                const deal = window.allCruiseDeals[index];
+                console.log('DEALS: Viewing details for deal:', deal);
+                
+                // For now, show an alert with deal details
+                // This can be enhanced with a modal or redirect to detail page
+                alert(`Deal Details:\n\nShip: ${deal.ship_name || 'N/A'}\nCruise Line: ${deal.cruise_line || 'N/A'}\nDestination: ${deal.destination || 'N/A'}\nDuration: ${deal.duration || 'N/A'} nights\nPrice: ${deal.price || 'TBA'}`);
+            }
+        }
+
         // Display deals function
         function displayDeals(deals) {
             const loadingState = document.getElementById('loading-state');
@@ -714,10 +920,85 @@
             dealsContainer.innerHTML = dealsHTML;
         }
 
-        // Initialize page
+        // Enhanced initialization with Sentry conflict detection
         document.addEventListener('DOMContentLoaded', () => {
-            initializeDealsSystem();
+            console.log('DEALS: DOM Content Loaded, starting initialization...');
+            
+            // Check for Sentry conflicts
+            detectSentryConflicts();
+            
+            // Add error handling for uncaught errors
+            window.addEventListener('error', (event) => {
+                console.error('DEALS: Uncaught error detected:', {
+                    message: event.message,
+                    filename: event.filename,
+                    lineno: event.lineno,
+                    colno: event.colno,
+                    error: event.error
+                });
+            });
+            
+            // Add unhandled promise rejection handling
+            window.addEventListener('unhandledrejection', (event) => {
+                console.error('DEALS: Unhandled promise rejection:', {
+                    reason: event.reason,
+                    promise: event.promise
+                });
+            });
+            
+            // Initialize with enhanced error handling
+            setTimeout(() => {
+                try {
+                    console.log('DEALS: Starting deals system initialization...');
+                    initializeDealsSystem();
+                } catch (initError) {
+                    console.error('DEALS: Initialization failed:', initError);
+                    showErrorState(initError);
+                }
+            }, 100); // Small delay to ensure all scripts are loaded
         });
+
+        // Detect Sentry conflicts
+        function detectSentryConflicts() {
+            console.log('DEALS: Checking for Sentry conflicts...');
+            
+            // Check if Sentry is present
+            const sentryPresent = !!(window.Sentry || window.__SENTRY__);
+            console.log('DEALS: Sentry detected:', sentryPresent);
+            
+            if (sentryPresent) {
+                console.log('DEALS: Sentry configuration:', {
+                    Sentry: !!window.Sentry,
+                    __SENTRY__: !!window.__SENTRY__,
+                    sentryMethods: window.Sentry ? Object.keys(window.Sentry) : 'N/A'
+                });
+                
+                // Check if Sentry is interfering with console
+                const originalConsoleLog = console.log;
+                const originalConsoleError = console.error;
+                
+                // Test console functionality
+                try {
+                    console.log('DEALS: Console test - this should appear');
+                    console.error('DEALS: Console error test - this should appear');
+                } catch (consoleError) {
+                    console.warn('DEALS: Console may be compromised by Sentry:', consoleError);
+                }
+            }
+            
+            // Check for script loading issues
+            const scripts = Array.from(document.scripts);
+            console.log('DEALS: Loaded scripts:', scripts.map(s => s.src || s.textContent.substring(0, 50)));
+            
+            // Check for blocked resources
+            if (window.performance && window.performance.getEntriesByType) {
+                const resources = window.performance.getEntriesByType('resource');
+                const failedResources = resources.filter(r => r.transferSize === 0 && r.decodedBodySize === 0);
+                if (failedResources.length > 0) {
+                    console.warn('DEALS: Potentially blocked resources:', failedResources.map(r => r.name));
+                }
+            }
+        }
 
         // CSS for loading animation
         const style = document.createElement('style');

@@ -231,6 +231,10 @@
         // Enhanced initialization that checks auth FIRST
         async function initializeDealsSystemWithAuth() {
             console.log('DEALS: Starting initialization with authentication check...');
+
+            // Add a small delay to ensure Supabase session has a moment to re-hydrate from local storage.
+            // This helps prevent premature redirects if the session isn't immediately available.
+            await new Promise(resolve => setTimeout(resolve, 500)); // Wait for 500ms
             
             // Step 1: Check authentication BEFORE doing anything else
             const isAuthenticated = await checkAuthentication();

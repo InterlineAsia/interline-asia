@@ -18,6 +18,22 @@
     gtag('config', 'G-FYGT92WCXC');
   </script>
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  
+  <!-- Turnstile Callback -->
+  <script>
+    function onTurnstileSuccess(token) {
+      // Create hidden input for the token if it doesn't exist
+      let hiddenInput = document.querySelector('[name="cf-turnstile-response"]');
+      if (!hiddenInput) {
+        hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'cf-turnstile-response';
+        document.getElementById('login-form').appendChild(hiddenInput);
+      }
+      hiddenInput.value = token;
+      console.log('TURNSTILE: Token received successfully');
+    }
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="supabase-client.js"></script>
@@ -191,8 +207,10 @@ window.interlineLoginSystem = new InterlineLoginSystem();
           <input type="password" id="password" name="password" required>
         </div>
 
-        <!-- Using Cloudflare Turnstile for security verification -->
-
+        <!-- Cloudflare Turnstile Widget -->
+        <div class="form-group">
+          <div class="cf-turnstile" data-sitekey="0x4AAAAAAABkMYinukE_NVJu" data-callback="onTurnstileSuccess"></div>
+        </div>
 
         <button type="submit" class="btn btn-primary">Sign In</button>
       </form>
@@ -229,9 +247,17 @@ window.interlineLoginSystem = new InterlineLoginSystem();
         // Using Cloudflare Turnstile for security verification
         // Turnstile token is handled automatically by the widget
         
-        // Use the new rebuilt login system
+        // Get Cloudflare Turnstile token
+        const turnstileToken = document.querySelector('[name="cf-turnstile-response"]')?.value;
+        console.log('NEW_LOGIN: Turnstile token present:', !!turnstileToken);
+        
+        if (!turnstileToken) {
+          throw new Error('Please complete the security verification');
+        }
+        
+        // Use the new rebuilt login system with Turnstile token
         console.log('NEW_LOGIN: Starting rebuilt login process...');
-        const loginResult = await window.interlineLoginSystem.processLogin(email, password);
+        const loginResult = await window.interlineLoginSystem.processLogin(email, password, turnstileToken);
         
         if (loginResult.success) {
           console.log('NEW_LOGIN: Login successful!');
@@ -260,9 +286,20 @@ window.interlineLoginSystem = new InterlineLoginSystem();
           errorMessage = 'Please check your email and click the verification link before signing in.';
         } else if (error.message.includes('Invalid login credentials')) {
           errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+        } else if (error.message.includes('security verification')) {
+          errorMessage = 'Please complete the security verification and try again.';
         }
         
         showError(errorMessage);
+        
+        // Reset Turnstile on error
+        if (window.turnstile) {
+          try {
+            window.turnstile.reset();
+          } catch (resetError) {
+            console.warn('Failed to reset Turnstile:', resetError);
+          }
+        }
       } finally {
         submitButton.textContent = originalText;
         submitButton.disabled = false;

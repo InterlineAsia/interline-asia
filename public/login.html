@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sign in to Interline Asia - Access your exclusive cruise deals and VIP travel offers">
+  <title>Sign In - Interline Asia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="auth.css">
+  <link rel="stylesheet" href="/css/main.css">
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FYGT92WCXC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-FYGT92WCXC');
+  </script>
+  
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+  
+  <!-- Global Turnstile Variables -->
+  <script>
+    window.turnstileCompleted = false;
+    window.turnstileToken = null;
+    
+    function onTurnstileSuccess(token) {
+      console.log('TURNSTILE: Success');
+      window.turnstileToken = token;
+      window.turnstileCompleted = true;
+    }
+    
+    function onTurnstileError() {
+      console.error('TURNSTILE: Error occurred');
+      window.turnstileCompleted = false;
+      window.turnstileToken = null;
+    }
+    
+    function onTurnstileExpired() {
+      console.warn('TURNSTILE: Token expired');
+      window.turnstileCompleted = false;
+      window.turnstileToken = null;
+    }
+  </script>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+  
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1>Welcome Back</h1>
+        <p>Sign in to access your exclusive travel deals</p>
+      </div>
+
+      <div id="error-message" class="error-message"></div>
+      <div id="success-message" class="success-message"></div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required>
+        </div>
+
+        <!-- Cloudflare Turnstile Widget -->
+        <div class="form-group">
+          <div id="turnstile-widget-container"
+               class="cf-turnstile"
+               data-sitekey="0x4AAAAAAABkMYinukE_NVJu"
+               data-callback="onTurnstileSuccess"
+               data-error-callback="onTurnstileError"
+               data-expired-callback="onTurnstileExpired">
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Sign In</button>
+      </form>
+
+      <div class="auth-links">
+        <p><a href="reset-password.html">Forgot your password?</a></p>
+        <p>Don't have an account? <a href="/signup">Create one here</a></p>
+        <p><a href="/">Back to Home</a></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-placeholder"></div>
+  
+  <script src="/js/loadPartials.js" defer></script>
+  <script>
+    document.getElementById('login-form').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      console.log('LOGIN: Form submitted for:', email);
+
+      // Admin bypass logic
+      const adminEmails = ['rodney@telenational.com.au', 'admin@telenational.com.au'];
+      let turnstileToken = '';
+
+      if (adminEmails.includes(email)) {
+        console.warn('LOGIN: ADMIN BYPASS - Allowing login without Turnstile for admin user');
+        turnstileToken = 'ADMIN_BYPASS_TOKEN';
+        window.turnstileCompleted = true;
+      } else {
+        const hiddenInput = document.querySelector('input[id^="cf-chl-widget"][id$="_response"]');
+        turnstileToken = hiddenInput?.value || window.turnstileToken || '';
+
+        if (!turnstileToken || !window.turnstileCompleted) {
+          console.error('LOGIN FAILED: Turnstile not completed or token missing');
+
+          const iframeLoaded = !!document.querySelector('iframe[src*="challenges.cloudflare.com"]');
+          if (!iframeLoaded && window.turnstile) {
+            console.warn('Turnstile iframe missing — attempting re-render...');
+            window.turnstile.render('#turnstile-widget-container', {
+              sitekey: '0x4AAAAAAABkMYinukE_NVJu',
+              callback: onTurnstileSuccess,
+              'error-callback': onTurnstileError,
+              'expired-callback': onTurnstileExpired,
+            });
+          }
+
+          alert('Please complete the security verification before logging in.');
+          return;
+        }
+      }
+
+      console.log('LOGIN: Token and Turnstile verified. Proceeding with Supabase auth...');
+
+      try {
+        // Wait for Supabase client to be ready
+        if (window.supabaseClient) {
+          await window.supabaseClient.readyPromise;
+        }
+
+        // Use the global supabase client
+        const { data, error } = await window.supabaseClient.supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) {
+          console.error('LOGIN: Supabase error:', error.message);
+          alert('Invalid email or password.');
+          return;
+        }
+
+        console.log('LOGIN SUCCESS: Authenticated');
+
+        // Track successful login
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'login', { method: 'email' });
+        }
+
+        if (adminEmails.includes(email)) {
+          console.log('LOGIN: Redirecting admin to dashboard choice');
+          window.location.href = '/dashboard-choice.html';
+        } else {
+          console.log('LOGIN: Redirecting user to dashboard');
+          window.location.href = '/dashboard.html';
+        }
+      } catch (err) {
+        console.error('LOGIN: Unexpected error occurred:', err);
+        alert('Unexpected error occurred. Please try again.');
+      }
+    });
+
+    // Show success message if coming from registration
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('registered') === 'true') {
+      const successEl = document.getElementById('success-message');
+      if (successEl) {
+        successEl.textContent = 'Account created successfully! Please check your email to verify your account, then sign in.';
+        successEl.style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>

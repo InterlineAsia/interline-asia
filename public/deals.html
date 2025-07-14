@@ -11,6 +11,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script src="supabase-client.js"></script>
+    
+    <!-- Advanced Deals Loading System -->
+    <script src="/js/unified-deals-loader.js"></script>
+    <script src="/js/deals-loader-fix.js"></script>
 </head>
 <body>
     <div id="header-placeholder"></div>
@@ -26,6 +30,56 @@
                 <p style="color: #64748b; font-size: 1.1rem; max-width: 600px; margin: 0 auto;">
                     Discover amazing cruise deals exclusively for travel industry professionals
                 </p>
+            </div>
+
+            <!-- Search and Filter Controls -->
+            <div id="filter-controls" style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                    
+                    <!-- Search -->
+                    <div>
+                        <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151;">Search</label>
+                        <input type="text" id="search-input" placeholder="Ship name, itinerary..." 
+                               style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem;">
+                    </div>
+                    
+                    <!-- Cruise Line Filter -->
+                    <div>
+                        <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151;">Cruise Line</label>
+                        <select id="cruise-line-filter" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem;">
+                            <option value="">All Cruise Lines</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Destination Filter -->
+                    <div>
+                        <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151;">Destination</label>
+                        <select id="destination-filter" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem;">
+                            <option value="">All Destinations</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Cruise Type Filter -->
+                    <div>
+                        <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151;">Type</label>
+                        <select id="cruise-type-filter" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem;">
+                            <option value="">All Types</option>
+                            <option value="Ocean">Ocean</option>
+                            <option value="River">River</option>
+                        </select>
+                    </div>
+                    
+                </div>
+                
+                <!-- Filter Actions -->
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div id="results-count" style="color: #6b7280; font-size: 0.875rem;">
+                        Loading deals...
+                    </div>
+                    <button id="clear-filters" style="background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.875rem;">
+                        Clear Filters
+                    </button>
+                </div>
             </div>
 
             <!-- Loading State -->
@@ -93,9 +147,40 @@
             }
         }
 
-        // Load deals function
-        async function loadDeals() {
-            console.log('DEALS: Loading deals...');
+        // Initialize deals system
+        async function initializeDealsSystem() {
+            console.log('DEALS: Initializing advanced deals system...');
+            
+            try {
+                // Check authentication first
+                const isAuthenticated = await checkAuthentication();
+                if (!isAuthenticated) return;
+                
+                // Wait for unified deals loader to be ready
+                if (window.loadUnifiedDeals) {
+                    console.log('DEALS: Using unified deals loader...');
+                    await window.loadUnifiedDeals();
+                } else if (window.UnifiedDealsLoader) {
+                    console.log('DEALS: Using UnifiedDealsLoader class...');
+                    const loader = new window.UnifiedDealsLoader();
+                    await loader.initialize();
+                } else {
+                    console.log('DEALS: Falling back to basic loader...');
+                    await loadDealsBasic();
+                }
+                
+                // Setup filter event listeners
+                setupFilterListeners();
+                
+            } catch (error) {
+                console.error('DEALS: Error initializing deals system:', error);
+                showErrorState(error);
+            }
+        }
+
+        // Basic deals loading fallback
+        async function loadDealsBasic() {
+            console.log('DEALS: Loading deals via basic method...');
             
             const loadingState = document.getElementById('loading-state');
             const errorState = document.getElementById('error-state');
@@ -109,10 +194,6 @@
             noDealsState.style.display = 'none';
             
             try {
-                // Check authentication first
-                const isAuthenticated = await checkAuthentication();
-                if (!isAuthenticated) return;
-                
                 // Try to load deals from Supabase
                 if (window.supabaseClient && window.supabaseClient.getAllDeals) {
                     const deals = await window.supabaseClient.getAllDeals();
@@ -125,18 +206,18 @@
                         noDealsState.style.display = 'block';
                     }
                 } else {
-                    // Fallback: Show placeholder message
-                    loadingState.style.display = 'none';
-                    dealsContainer.style.display = 'block';
-                    dealsContainer.innerHTML = `
-                        <div style="text-align: center; padding: 3rem; background: #f8fafc; border-radius: 8px;">
-                            <i class="ri-ship-line" style="font-size: 3rem; color: #3b82f6; margin-bottom: 1rem;"></i>
-                            <h3 style="color: #1e293b; margin-bottom: 1rem;">Cruise Deals Coming Soon</h3>
-                            <p style="color: #64748b;">
-                                We're working on bringing you the best cruise deals. Check back soon!
-                            </p>
-                        </div>
-                    `;
+                    // Try unified API
+                    const response = await fetch('/api/unified-api?endpoint=cruise-data');
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success && result.deals && result.deals.length > 0) {
+                            displayDeals(result.deals);
+                        } else {
+                            throw new Error('No deals available from API');
+                        }
+                    } else {
+                        throw new Error('Failed to load deals from API');
+                    }
                 }
                 
             } catch (error) {
@@ -144,6 +225,81 @@
                 loadingState.style.display = 'none';
                 errorState.style.display = 'block';
             }
+        }
+
+        // Setup filter event listeners
+        function setupFilterListeners() {
+            const searchInput = document.getElementById('search-input');
+            const cruiseLineFilter = document.getElementById('cruise-line-filter');
+            const destinationFilter = document.getElementById('destination-filter');
+            const cruiseTypeFilter = document.getElementById('cruise-type-filter');
+            const clearFiltersBtn = document.getElementById('clear-filters');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', debounce(applyFilters, 300));
+            }
+            
+            if (cruiseLineFilter) {
+                cruiseLineFilter.addEventListener('change', applyFilters);
+            }
+            
+            if (destinationFilter) {
+                destinationFilter.addEventListener('change', applyFilters);
+            }
+            
+            if (cruiseTypeFilter) {
+                cruiseTypeFilter.addEventListener('change', applyFilters);
+            }
+            
+            if (clearFiltersBtn) {
+                clearFiltersBtn.addEventListener('click', clearAllFilters);
+            }
+        }
+
+        // Apply filters function
+        function applyFilters() {
+            if (window.UnifiedDealsLoader && window.unifiedDealsLoader) {
+                window.unifiedDealsLoader.applyFilters();
+            } else {
+                console.log('DEALS: Filters not available in basic mode');
+            }
+        }
+
+        // Clear all filters
+        function clearAllFilters() {
+            const searchInput = document.getElementById('search-input');
+            const cruiseLineFilter = document.getElementById('cruise-line-filter');
+            const destinationFilter = document.getElementById('destination-filter');
+            const cruiseTypeFilter = document.getElementById('cruise-type-filter');
+            
+            if (searchInput) searchInput.value = '';
+            if (cruiseLineFilter) cruiseLineFilter.value = '';
+            if (destinationFilter) destinationFilter.value = '';
+            if (cruiseTypeFilter) cruiseTypeFilter.value = '';
+            
+            applyFilters();
+        }
+
+        // Debounce function
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Show error state
+        function showErrorState(error) {
+            const loadingState = document.getElementById('loading-state');
+            const errorState = document.getElementById('error-state');
+            
+            if (loadingState) loadingState.style.display = 'none';
+            if (errorState) errorState.style.display = 'block';
         }
 
         // Display deals function
@@ -188,7 +344,7 @@
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', () => {
-            loadDeals();
+            initializeDealsSystem();
         });
 
         // CSS for loading animation

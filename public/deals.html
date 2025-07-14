@@ -198,10 +198,6 @@
                 // Wait for supabaseClient to be ready
                 // Ensure supabaseClient is fully initialized before proceeding
                 await window.supabaseClient.readyPromise;
-                } else {
-                    // Fallback: wait a bit more for initialization
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                }
                 
                 console.log('DEALS AUTH: Checking login status...');
                 

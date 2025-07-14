@@ -205,9 +205,9 @@
                 
                 console.log('DEALS AUTH: Checking login status...');
                 
-                // Check if user is logged in
-                const isLoggedIn = window.supabaseClient.isLoggedIn();
-                console.log('DEALS AUTH: Login status:', isLoggedIn);
+                // Check if user is logged in via currentSession
+                const isLoggedIn = !!window.supabaseClient.currentSession;
+                console.log('DEALS AUTH: Login status (via session):', isLoggedIn);
                 
                 if (!isLoggedIn) {
                     console.log('DEALS AUTH: User not logged in, redirecting to login page');
@@ -215,9 +215,9 @@
                     return false;
                 }
                 
-                // Get current user info
-                const currentUser = window.supabaseClient.getCurrentUser();
-                console.log('DEALS AUTH: Authenticated user:', currentUser?.email || 'No email available');
+                // Get current user info directly from property
+                const currentUser = window.supabaseClient.currentUser;
+                console.log('DEALS AUTH: Authenticated user (via currentUser):', currentUser?.email || 'No email available');
                 
                 console.log('DEALS AUTH: Authentication successful, user can access deals');
                 return true;

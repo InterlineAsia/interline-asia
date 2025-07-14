@@ -12,6 +12,9 @@
     <script src="config.js"></script>
     <script src="supabase-client.js"></script>
     
+    <!-- Papa Parse for CSV handling -->
+    <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+    
     <!-- Advanced Deals Loading System -->
     <script src="/js/unified-deals-loader.js"></script>
     <script src="/js/deals-loader-fix.js"></script>
@@ -61,11 +64,49 @@
                     
                     <!-- Cruise Type Filter -->
                     <div>
-                        <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151;">Type</label>
+                        <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151;">Cruise Type</label>
                         <select id="cruise-type-filter" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem;">
-                            <option value="">All Types</option>
-                            <option value="Ocean">Ocean</option>
-                            <option value="River">River</option>
+                            <option value="">All Cruises</option>
+                            <option value="Ocean">Ocean Cruises</option>
+                            <option value="River">River Cruises</option>
+                            <option value="Expedition">Expedition Cruises</option>
+                        </select>
+                    </div>
+                    
+                </div>
+                
+                <!-- Date Filter Row -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                    
+                    <!-- From Date -->
+                    <div>
+                        <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151;">From Date</label>
+                        <input type="date" id="from-date-filter" 
+                               style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem;">
+                    </div>
+                    
+                    <!-- To Date -->
+                    <div>
+                        <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151;">To Date</label>
+                        <input type="date" id="to-date-filter" 
+                               style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem;">
+                    </div>
+                    
+                    <!-- Price Range -->
+                    <div>
+                        <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151;">Max Price</label>
+                        <input type="number" id="max-price-filter" placeholder="Any price" 
+                               style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem;">
+                    </div>
+                    
+                    <!-- Duration -->
+                    <div>
+                        <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151;">Duration</label>
+                        <select id="duration-filter" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem;">
+                            <option value="">Any Duration</option>
+                            <option value="1-7">1-7 nights</option>
+                            <option value="8-14">8-14 nights</option>
+                            <option value="15+">15+ nights</option>
                         </select>
                     </div>
                     
@@ -178,9 +219,9 @@
             }
         }
 
-        // Basic deals loading fallback
+        // Enhanced deals loading with robust CSV parsing
         async function loadDealsBasic() {
-            console.log('DEALS: Loading deals via basic method...');
+            console.log('DEALS: Loading deals via enhanced method...');
             
             const loadingState = document.getElementById('loading-state');
             const errorState = document.getElementById('error-state');
@@ -194,36 +235,173 @@
             noDealsState.style.display = 'none';
             
             try {
-                // Try to load deals from Supabase
-                if (window.supabaseClient && window.supabaseClient.getAllDeals) {
-                    const deals = await window.supabaseClient.getAllDeals();
-                    
-                    if (deals && deals.length > 0) {
-                        displayDeals(deals);
-                    } else {
-                        // No deals found
-                        loadingState.style.display = 'none';
-                        noDealsState.style.display = 'block';
-                    }
-                } else {
-                    // Try unified API
-                    const response = await fetch('/api/unified-api?endpoint=cruise-data');
-                    if (response.ok) {
-                        const result = await response.json();
-                        if (result.success && result.deals && result.deals.length > 0) {
-                            displayDeals(result.deals);
-                        } else {
-                            throw new Error('No deals available from API');
+                let allDeals = [];
+                
+                // Method 1: Try Supabase direct query with large range
+                console.log('DEALS: Attempting Supabase direct query...');
+                if (window.supabaseClient && window.supabaseClient.supabase) {
+                    try {
+                        const { data: supabaseDeals, error } = await window.supabaseClient.supabase
+                            .from('cruise_deals')
+                            .select('*')
+                            .range(0, 9999); // Handle up to 10,000 deals
+                        
+                        if (error) {
+                            console.error('DEALS: Supabase query error:', error);
+                        } else if (supabaseDeals && supabaseDeals.length > 0) {
+                            console.log(`DEALS: Loaded ${supabaseDeals.length} deals from Supabase direct query`);
+                            allDeals = supabaseDeals;
                         }
-                    } else {
-                        throw new Error('Failed to load deals from API');
+                    } catch (supabaseError) {
+                        console.error('DEALS: Supabase direct query failed:', supabaseError);
                     }
                 }
                 
+                // Method 2: Try client method if direct query failed
+                if (allDeals.length === 0 && window.supabaseClient && window.supabaseClient.getAllDeals) {
+                    console.log('DEALS: Trying client getAllDeals method...');
+                    try {
+                        const clientDeals = await window.supabaseClient.getAllDeals();
+                        if (clientDeals && clientDeals.length > 0) {
+                            console.log(`DEALS: Loaded ${clientDeals.length} deals from client method`);
+                            allDeals = clientDeals;
+                        }
+                    } catch (clientError) {
+                        console.error('DEALS: Client method failed:', clientError);
+                    }
+                }
+                
+                // Method 3: Try unified API
+                if (allDeals.length === 0) {
+                    console.log('DEALS: Trying unified API...');
+                    try {
+                        const response = await fetch('/api/unified-api?endpoint=cruise-data');
+                        if (response.ok) {
+                            const result = await response.json();
+                            if (result.success && result.deals && result.deals.length > 0) {
+                                console.log(`DEALS: Loaded ${result.deals.length} deals from unified API`);
+                                allDeals = result.deals;
+                            }
+                        }
+                    } catch (apiError) {
+                        console.error('DEALS: Unified API failed:', apiError);
+                    }
+                }
+                
+                // Method 4: Try CSV storage download with Papa Parse
+                if (allDeals.length === 0) {
+                    console.log('DEALS: Trying CSV storage download...');
+                    try {
+                        allDeals = await loadDealsFromCSVStorage();
+                    } catch (csvError) {
+                        console.error('DEALS: CSV storage failed:', csvError);
+                    }
+                }
+                
+                // Process and display results
+                if (allDeals && allDeals.length > 0) {
+                    console.log(`DEALS: Successfully loaded ${allDeals.length} total deals`);
+                    
+                    // Store deals globally for filtering
+                    window.allCruiseDeals = allDeals;
+                    
+                    // Populate filter options
+                    populateFilterOptions(allDeals);
+                    
+                    // Display all deals initially
+                    displayDeals(allDeals);
+                    
+                    // Update results count
+                    updateResultsCount(allDeals.length, allDeals.length);
+                    
+                } else {
+                    console.warn('DEALS: No deals found from any source');
+                    loadingState.style.display = 'none';
+                    noDealsState.style.display = 'block';
+                }
+                
             } catch (error) {
-                console.error('DEALS: Error loading deals:', error);
+                console.error('DEALS: Error in loadDealsBasic:', error);
                 loadingState.style.display = 'none';
                 errorState.style.display = 'block';
+            }
+        }
+
+        // Load deals from CSV storage using Papa Parse
+        async function loadDealsFromCSVStorage() {
+            console.log('DEALS: Loading from CSV storage...');
+            
+            if (!window.supabaseClient || !window.supabaseClient.supabase) {
+                throw new Error('Supabase client not available');
+            }
+            
+            try {
+                // List files in cruise-data bucket
+                const { data: files, error: listError } = await window.supabaseClient.supabase.storage
+                    .from('cruise-data')
+                    .list('', { limit: 100 });
+                
+                if (listError) {
+                    throw new Error(`Failed to list CSV files: ${listError.message}`);
+                }
+                
+                if (!files || files.length === 0) {
+                    throw new Error('No CSV files found in storage');
+                }
+                
+                console.log(`DEALS: Found ${files.length} files in storage`);
+                
+                let allDeals = [];
+                
+                // Process each CSV file
+                for (const file of files) {
+                    if (file.name.endsWith('.csv')) {
+                        console.log(`DEALS: Processing CSV file: ${file.name}`);
+                        
+                        try {
+                            // Download CSV file
+                            const { data: csvData, error: downloadError } = await window.supabaseClient.supabase.storage
+                                .from('cruise-data')
+                                .download(file.name);
+                            
+                            if (downloadError) {
+                                console.error(`DEALS: Failed to download ${file.name}:`, downloadError);
+                                continue;
+                            }
+                            
+                            // Convert blob to text
+                            const csvText = await csvData.text();
+                            
+                            // Parse CSV with Papa Parse
+                            const parseResult = Papa.parse(csvText, {
+                                header: true,
+                                skipEmptyLines: true,
+                                transformHeader: (header) => header.trim().toLowerCase().replace(/\s+/g, '_'),
+                                transform: (value) => value ? value.trim() : '',
+                                dynamicTyping: true
+                            });
+                            
+                            if (parseResult.errors.length > 0) {
+                                console.warn(`DEALS: Parse errors in ${file.name}:`, parseResult.errors);
+                            }
+                            
+                            if (parseResult.data && parseResult.data.length > 0) {
+                                console.log(`DEALS: Parsed ${parseResult.data.length} deals from ${file.name}`);
+                                allDeals = allDeals.concat(parseResult.data);
+                            }
+                            
+                        } catch (fileError) {
+                            console.error(`DEALS: Error processing ${file.name}:`, fileError);
+                        }
+                    }
+                }
+                
+                console.log(`DEALS: Total deals from CSV storage: ${allDeals.length}`);
+                return allDeals;
+                
+            } catch (storageError) {
+                console.error('DEALS: CSV storage error:', storageError);
+                throw storageError;
             }
         }
 
@@ -233,6 +411,10 @@
             const cruiseLineFilter = document.getElementById('cruise-line-filter');
             const destinationFilter = document.getElementById('destination-filter');
             const cruiseTypeFilter = document.getElementById('cruise-type-filter');
+            const fromDateFilter = document.getElementById('from-date-filter');
+            const toDateFilter = document.getElementById('to-date-filter');
+            const maxPriceFilter = document.getElementById('max-price-filter');
+            const durationFilter = document.getElementById('duration-filter');
             const clearFiltersBtn = document.getElementById('clear-filters');
             
             if (searchInput) {
@@ -251,6 +433,22 @@
                 cruiseTypeFilter.addEventListener('change', applyFilters);
             }
             
+            if (fromDateFilter) {
+                fromDateFilter.addEventListener('change', applyFilters);
+            }
+            
+            if (toDateFilter) {
+                toDateFilter.addEventListener('change', applyFilters);
+            }
+            
+            if (maxPriceFilter) {
+                maxPriceFilter.addEventListener('input', debounce(applyFilters, 500));
+            }
+            
+            if (durationFilter) {
+                durationFilter.addEventListener('change', applyFilters);
+            }
+            
             if (clearFiltersBtn) {
                 clearFiltersBtn.addEventListener('click', clearAllFilters);
             }
@@ -258,11 +456,114 @@
 
         // Apply filters function
         function applyFilters() {
-            if (window.UnifiedDealsLoader && window.unifiedDealsLoader) {
-                window.unifiedDealsLoader.applyFilters();
-            } else {
-                console.log('DEALS: Filters not available in basic mode');
+            if (!window.allCruiseDeals || window.allCruiseDeals.length === 0) {
+                console.log('DEALS: No deals available for filtering');
+                return;
             }
+            
+            console.log('DEALS: Applying filters...');
+            
+            const searchInput = document.getElementById('search-input');
+            const cruiseLineFilter = document.getElementById('cruise-line-filter');
+            const destinationFilter = document.getElementById('destination-filter');
+            const cruiseTypeFilter = document.getElementById('cruise-type-filter');
+            const fromDateFilter = document.getElementById('from-date-filter');
+            const toDateFilter = document.getElementById('to-date-filter');
+            const maxPriceFilter = document.getElementById('max-price-filter');
+            const durationFilter = document.getElementById('duration-filter');
+            
+            let filteredDeals = [...window.allCruiseDeals];
+            
+            // Search filter
+            const searchTerm = searchInput?.value?.toLowerCase().trim();
+            if (searchTerm) {
+                filteredDeals = filteredDeals.filter(deal => {
+                    const searchableText = [
+                        deal.ship_name,
+                        deal.cruise_line,
+                        deal.itinerary,
+                        deal.destination,
+                        deal.ports
+                    ].join(' ').toLowerCase();
+                    return searchableText.includes(searchTerm);
+                });
+                console.log(`DEALS: Search filter applied, ${filteredDeals.length} deals match "${searchTerm}"`);
+            }
+            
+            // Cruise line filter
+            const cruiseLine = cruiseLineFilter?.value;
+            if (cruiseLine) {
+                filteredDeals = filteredDeals.filter(deal => 
+                    deal.cruise_line && deal.cruise_line.toLowerCase().includes(cruiseLine.toLowerCase())
+                );
+                console.log(`DEALS: Cruise line filter applied, ${filteredDeals.length} deals match "${cruiseLine}"`);
+            }
+            
+            // Destination filter
+            const destination = destinationFilter?.value;
+            if (destination) {
+                filteredDeals = filteredDeals.filter(deal => 
+                    (deal.destination && deal.destination.toLowerCase().includes(destination.toLowerCase())) ||
+                    (deal.itinerary && deal.itinerary.toLowerCase().includes(destination.toLowerCase()))
+                );
+                console.log(`DEALS: Destination filter applied, ${filteredDeals.length} deals match "${destination}"`);
+            }
+            
+            // Cruise type filter
+            const cruiseType = cruiseTypeFilter?.value;
+            if (cruiseType) {
+                filteredDeals = filteredDeals.filter(deal => 
+                    deal.cruise_type && deal.cruise_type.toLowerCase().includes(cruiseType.toLowerCase())
+                );
+                console.log(`DEALS: Cruise type filter applied, ${filteredDeals.length} deals match "${cruiseType}"`);
+            }
+            
+            // Date range filter
+            const fromDate = fromDateFilter?.value;
+            const toDate = toDateFilter?.value;
+            if (fromDate || toDate) {
+                filteredDeals = filteredDeals.filter(deal => {
+                    if (!deal.departure_date) return false;
+                    
+                    const departureDate = new Date(deal.departure_date);
+                    if (isNaN(departureDate.getTime())) return false;
+                    
+                    if (fromDate && departureDate < new Date(fromDate)) return false;
+                    if (toDate && departureDate > new Date(toDate)) return false;
+                    
+                    return true;
+                });
+                console.log(`DEALS: Date filter applied, ${filteredDeals.length} deals in range ${fromDate} to ${toDate}`);
+            }
+            
+            // Price filter
+            const maxPrice = maxPriceFilter?.value;
+            if (maxPrice && !isNaN(maxPrice)) {
+                filteredDeals = filteredDeals.filter(deal => {
+                    const price = parseFloat(deal.price || deal.starting_price || 0);
+                    return price <= parseFloat(maxPrice);
+                });
+                console.log(`DEALS: Price filter applied, ${filteredDeals.length} deals under $${maxPrice}`);
+            }
+            
+            // Duration filter
+            const duration = durationFilter?.value;
+            if (duration) {
+                filteredDeals = filteredDeals.filter(deal => {
+                    const nights = parseInt(deal.duration || deal.nights || 0);
+                    if (duration === '1-7') return nights >= 1 && nights <= 7;
+                    if (duration === '8-14') return nights >= 8 && nights <= 14;
+                    if (duration === '15+') return nights >= 15;
+                    return true;
+                });
+                console.log(`DEALS: Duration filter applied, ${filteredDeals.length} deals match "${duration}"`);
+            }
+            
+            console.log(`DEALS: Final filtered results: ${filteredDeals.length} deals`);
+            
+            // Display filtered results
+            displayDeals(filteredDeals);
+            updateResultsCount(filteredDeals.length, window.allCruiseDeals.length);
         }
 
         // Clear all filters
@@ -271,13 +572,84 @@
             const cruiseLineFilter = document.getElementById('cruise-line-filter');
             const destinationFilter = document.getElementById('destination-filter');
             const cruiseTypeFilter = document.getElementById('cruise-type-filter');
+            const fromDateFilter = document.getElementById('from-date-filter');
+            const toDateFilter = document.getElementById('to-date-filter');
+            const maxPriceFilter = document.getElementById('max-price-filter');
+            const durationFilter = document.getElementById('duration-filter');
             
             if (searchInput) searchInput.value = '';
             if (cruiseLineFilter) cruiseLineFilter.value = '';
             if (destinationFilter) destinationFilter.value = '';
             if (cruiseTypeFilter) cruiseTypeFilter.value = '';
+            if (fromDateFilter) fromDateFilter.value = '';
+            if (toDateFilter) toDateFilter.value = '';
+            if (maxPriceFilter) maxPriceFilter.value = '';
+            if (durationFilter) durationFilter.value = '';
             
+            console.log('DEALS: All filters cleared');
             applyFilters();
+        }
+
+        // Populate filter options based on available deals
+        function populateFilterOptions(deals) {
+            console.log('DEALS: Populating filter options...');
+            
+            const cruiseLines = new Set();
+            const destinations = new Set();
+            
+            deals.forEach(deal => {
+                if (deal.cruise_line) cruiseLines.add(deal.cruise_line);
+                if (deal.destination) destinations.add(deal.destination);
+                if (deal.itinerary) {
+                    // Extract destinations from itinerary
+                    const itineraryDestinations = deal.itinerary.split(/[,;]/).map(d => d.trim());
+                    itineraryDestinations.forEach(dest => {
+                        if (dest && dest.length > 2) destinations.add(dest);
+                    });
+                }
+            });
+            
+            // Populate cruise line filter
+            const cruiseLineFilter = document.getElementById('cruise-line-filter');
+            if (cruiseLineFilter) {
+                const currentValue = cruiseLineFilter.value;
+                cruiseLineFilter.innerHTML = '<option value="">All Cruise Lines</option>';
+                Array.from(cruiseLines).sort().forEach(line => {
+                    const option = document.createElement('option');
+                    option.value = line;
+                    option.textContent = line;
+                    cruiseLineFilter.appendChild(option);
+                });
+                cruiseLineFilter.value = currentValue;
+            }
+            
+            // Populate destination filter
+            const destinationFilter = document.getElementById('destination-filter');
+            if (destinationFilter) {
+                const currentValue = destinationFilter.value;
+                destinationFilter.innerHTML = '<option value="">All Destinations</option>';
+                Array.from(destinations).sort().forEach(dest => {
+                    const option = document.createElement('option');
+                    option.value = dest;
+                    option.textContent = dest;
+                    destinationFilter.appendChild(option);
+                });
+                destinationFilter.value = currentValue;
+            }
+            
+            console.log(`DEALS: Populated ${cruiseLines.size} cruise lines and ${destinations.size} destinations`);
+        }
+
+        // Update results count
+        function updateResultsCount(filtered, total) {
+            const resultsCount = document.getElementById('results-count');
+            if (resultsCount) {
+                if (filtered === total) {
+                    resultsCount.textContent = `Showing all ${total} deals`;
+                } else {
+                    resultsCount.textContent = `Showing ${filtered} of ${total} deals`;
+                }
+            }
         }
 
         // Debounce function

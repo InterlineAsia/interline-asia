@@ -14,26 +14,56 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-FYGT92WCXC');
   </script>
+  
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   
   <!-- Turnstile Callback -->
   <script>
+    // Global variables to track Turnstile state
+    window.turnstileCompleted = false;
+    window.turnstileToken = null;
+    
     function onTurnstileSuccess(token) {
-      // Create hidden input for the token if it doesn't exist
-      let hiddenInput = document.querySelector('[name="cf-turnstile-response"]');
-      if (!hiddenInput) {
-        hiddenInput = document.createElement('input');
-        hiddenInput.type = 'hidden';
-        hiddenInput.name = 'cf-turnstile-response';
-        document.getElementById('login-form').appendChild(hiddenInput);
+      console.log('TURNSTILE: Success callback triggered with token:', token ? 'YES' : 'NO');
+      console.log('TURNSTILE: Token length:', token ? token.length : 0);
+      
+      // Store token globally
+      window.turnstileToken = token;
+      window.turnstileCompleted = true;
+      
+      // Update hidden input
+      const hiddenInput = document.getElementById('cf-turnstile-response');
+      if (hiddenInput) {
+        hiddenInput.value = token;
+        console.log('TURNSTILE: Token stored in hidden input successfully');
+      } else {
+        console.error('TURNSTILE: Hidden input not found!');
       }
-      hiddenInput.value = token;
-      console.log('TURNSTILE: Token received successfully');
+      
+      // Enable submit button
+      const submitBtn = document.querySelector('button[type="submit"]');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
+        console.log('TURNSTILE: Submit button enabled');
+      }
+    }
+    
+    function onTurnstileError() {
+      console.error('TURNSTILE: Error occurred');
+      window.turnstileCompleted = false;
+      window.turnstileToken = null;
+    }
+    
+    function onTurnstileExpired() {
+      console.warn('TURNSTILE: Token expired');
+      window.turnstileCompleted = false;
+      window.turnstileToken = null;
     }
   </script>
+  
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="supabase-client.js"></script>
@@ -145,6 +175,8 @@ class InterlineLoginSystem {
 
     async processLogin(email, password, turnstileToken = null) {
         console.log('LOGIN_SYSTEM: Processing login for:', email);
+        console.log('LOGIN_SYSTEM: Turnstile token provided:', !!turnstileToken);
+        
         try {
             await this.initialize();
             console.log('LOGIN_SYSTEM: Step 1 - Authenticating...');
@@ -153,7 +185,7 @@ class InterlineLoginSystem {
                 throw new Error('Authentication failed - no user returned');
             }
             const user = authResult.user;
-            console.log('LOGIN_SYSTEM: Authentication successful');
+            console.log('LOGIN_SYSTEM: Authentication successful for:', user.email);
 
             console.log('LOGIN_SYSTEM: Step 2 - Determining roles...');
             const roles = await this.determineUserRoles(user);
@@ -209,7 +241,12 @@ window.interlineLoginSystem = new InterlineLoginSystem();
 
         <!-- Cloudflare Turnstile Widget -->
         <div class="form-group">
-          <div class="cf-turnstile" data-sitekey="0x4AAAAAAABkMYinukE_NVJu" data-callback="onTurnstileSuccess"></div>
+          <div class="cf-turnstile" 
+               data-sitekey="0x4AAAAAAABkMYinukE_NVJu" 
+               data-callback="onTurnstileSuccess"
+               data-error-callback="onTurnstileError"
+               data-expired-callback="onTurnstileExpired"></div>
+          <input type="hidden" id="cf-turnstile-response" name="cf-turnstile-response" value="">
         </div>
 
         <button type="submit" class="btn btn-primary">Sign In</button>
@@ -240,27 +277,41 @@ window.interlineLoginSystem = new InterlineLoginSystem();
         const email = formData.get('email').trim().toLowerCase();
         const password = formData.get('password');
         
+        console.log('LOGIN: Form submitted for email:', email);
+        
         if (!email || !password) {
           throw new Error('Please enter both email and password');
         }
         
-        // Using Cloudflare Turnstile for security verification
-        // Turnstile token is handled automatically by the widget
+        // Enhanced Turnstile token validation with detailed logging
+        console.log('LOGIN: Checking Turnstile status...');
+        console.log('LOGIN: window.turnstileCompleted:', window.turnstileCompleted);
+        console.log('LOGIN: window.turnstileToken exists:', !!window.turnstileToken);
         
-        // Get Cloudflare Turnstile token
-        const turnstileToken = document.querySelector('[name="cf-turnstile-response"]')?.value;
-        console.log('NEW_LOGIN: Turnstile token present:', !!turnstileToken);
+        const hiddenInput = document.getElementById('cf-turnstile-response');
+        const turnstileToken = hiddenInput?.value || window.turnstileToken;
         
-        if (!turnstileToken) {
-          throw new Error('Please complete the security verification');
+        console.log('LOGIN: Hidden input found:', !!hiddenInput);
+        console.log('LOGIN: Hidden input value exists:', !!hiddenInput?.value);
+        console.log('LOGIN: Final turnstileToken exists:', !!turnstileToken);
+        console.log('LOGIN: Token length:', turnstileToken ? turnstileToken.length : 0);
+        
+        if (!turnstileToken || !window.turnstileCompleted) {
+          console.error('LOGIN: Turnstile validation failed');
+          console.error('LOGIN: Token exists:', !!turnstileToken);
+          console.error('LOGIN: Completed flag:', window.turnstileCompleted);
+          throw new Error('Please complete the security verification and try again');
         }
         
-        // Use the new rebuilt login system with Turnstile token
-        console.log('NEW_LOGIN: Starting rebuilt login process...');
+        console.log('LOGIN: Turnstile validation passed, proceeding with login...');
+        
+        // Use the rebuilt login system with Turnstile token
+        console.log('LOGIN: Starting rebuilt login process...');
         const loginResult = await window.interlineLoginSystem.processLogin(email, password, turnstileToken);
         
         if (loginResult.success) {
-          console.log('NEW_LOGIN: Login successful!');
+          console.log('LOGIN: Login successful!');
+          console.log('LOGIN: Redirect URL:', loginResult.redirectUrl);
           
           // Track successful login
           gtag('event', 'login', {
@@ -269,17 +320,16 @@ window.interlineLoginSystem = new InterlineLoginSystem();
           
           showSuccess('Login successful! Redirecting...');
           
-          // Redirect to determined URL
-          setTimeout(() => {
-            console.log('NEW_LOGIN: Redirecting to:', loginResult.redirectUrl);
-            window.location.href = loginResult.redirectUrl;
-          }, 1000);
+          // Immediate redirect - no timeout delay
+          console.log('LOGIN: Executing immediate redirect to:', loginResult.redirectUrl);
+          window.location.href = loginResult.redirectUrl;
+          
         } else {
           throw new Error(loginResult.error || 'Login failed');
         }
         
       } catch (error) {
-        console.error('Login error:', error);
+        console.error('LOGIN: Error occurred:', error);
         let errorMessage = 'Invalid email or password';
         
         if (error.message.includes('Email not confirmed')) {
@@ -296,8 +346,11 @@ window.interlineLoginSystem = new InterlineLoginSystem();
         if (window.turnstile) {
           try {
             window.turnstile.reset();
+            window.turnstileCompleted = false;
+            window.turnstileToken = null;
+            console.log('LOGIN: Turnstile reset after error');
           } catch (resetError) {
-            console.warn('Failed to reset Turnstile:', resetError);
+            console.warn('LOGIN: Failed to reset Turnstile:', resetError);
           }
         }
       } finally {
@@ -311,11 +364,18 @@ window.interlineLoginSystem = new InterlineLoginSystem();
       // Wait for Supabase client to initialize
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      if (window.supabaseClient.isLoggedIn()) {
-        if (window.supabaseClient.isAdmin()) {
-          window.location.href = '/admin';
-        } else {
-          window.location.href = '/dashboard';
+      if (window.supabaseClient && window.supabaseClient.isLoggedIn()) {
+        console.log('LOGIN: User already logged in, checking redirect...');
+        const user = window.supabaseClient.getCurrentUser();
+        if (user) {
+          const adminEmails = ['rodney@telenational.com.au', 'admin@telenational.com.au'];
+          if (adminEmails.includes(user.email.toLowerCase())) {
+            console.log('LOGIN: Admin user already logged in, redirecting to dashboard choice');
+            window.location.href = '/dashboard-choice.html';
+          } else {
+            console.log('LOGIN: Regular user already logged in, redirecting to dashboard');
+            window.location.href = '/dashboard.html';
+          }
         }
       }
     });
@@ -326,12 +386,35 @@ window.interlineLoginSystem = new InterlineLoginSystem();
       showSuccess('Account created successfully! Please check your email to verify your account, then sign in.');
     }
 
-    function showForgotPassword() {
-      // TODO: Implement password reset with Supabase
-      alert('Password reset functionality will be available soon. Please contact admin@interlineasia.com for assistance.');
+    function showError(message) {
+      const errorEl = document.getElementById('error-message');
+      if (errorEl) {
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
+      }
+      const successEl = document.getElementById('success-message');
+      if (successEl) successEl.style.display = 'none';
     }
 
-    // Cloudflare Turnstile is initialized automatically
+    function showSuccess(message) {
+      const successEl = document.getElementById('success-message');
+      if (successEl) {
+        successEl.textContent = message;
+        successEl.style.display = 'block';
+      }
+      const errorEl = document.getElementById('error-message');
+      if (errorEl) errorEl.style.display = 'none';
+    }
+
+    function hideError() {
+      const errorEl = document.getElementById('error-message');
+      if (errorEl) errorEl.style.display = 'none';
+    }
+
+    function hideSuccess() {
+      const successEl = document.getElementById('success-message');
+      if (successEl) successEl.style.display = 'none';
+    }
   </script>
 </body>
 </html>

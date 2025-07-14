@@ -44,7 +44,7 @@ class SupabaseClient {
         }
       }
     );
-    console.log('Supabase client initialized successfully.');
+    // console.log('Supabase client initialized successfully.'); // Reduce noise
 
     // Now that the client exists, initialize auth state
     await this.initializeAuth();
@@ -57,7 +57,7 @@ class SupabaseClient {
     // Check for existing session to maintain login state
     const { data: { session } } = await this.supabase.auth.getSession();
     if (session) {
-      console.log('AUTH: Existing session found:', session.user.email);
+      // console.log('AUTH: Existing session found:', session.user.email); // Reduce noise
       this.currentSession = session;
       await this._setCurrentUserWithMetadata(session.user);
     }
@@ -65,10 +65,10 @@ class SupabaseClient {
     this.authReady = true;
 
     this.supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('AUTH: State change:', event, session ? 'session exists' : 'no session');
+      // console.log('AUTH: State change:', event, session ? 'session exists' : 'no session'); // Reduce noise
       
       if (event === 'SIGNED_IN' && session) {
-        console.log('AUTH: User signed in:', session.user.email);
+        // console.log('AUTH: User signed in:', session.user.email); // Reduce noise
         this.currentSession = session;
         await this._setCurrentUserWithMetadata(session.user);
       } else if (event === 'SIGNED_OUT') {
@@ -80,8 +80,8 @@ class SupabaseClient {
   }
 
   async _setCurrentUserWithMetadata(authUser) {
-    console.log('Setting user metadata for:', authUser.email);
-    console.log('Auth user data:', {
+    // console.log('Setting user metadata for:', authUser.email); // Reduce noise
+    // console.log('Auth user data:', { // Reduce noise
       id: authUser.id,
       email: authUser.email,
       app_metadata: authUser.app_metadata,
@@ -96,10 +96,10 @@ class SupabaseClient {
       .maybeSingle();
       
     if (profileError) {
-      console.error('Error fetching profile:', profileError);
+      console.warn('SUPABASE: Error fetching profile, falling back:', profileError.message); // Log warning
     }
     
-    console.log('Profile data from DB:', profile);
+    // console.log('Profile data from DB:', profile); // Reduce noise
     
     // --- Define Super Admins by email for security ---
     // This is a secure way to grant top-level access without relying on database fields that could be misconfigured.
@@ -113,10 +113,10 @@ class SupabaseClient {
     const isSuperAdminByEmail = SUPER_ADMIN_EMAILS.includes(normalizedEmail);
 
     // Determine role from various sources, with a clear hierarchy.
-    const roleFromSources = authUser.app_metadata?.role || authUser.user_metadata?.role || profile?.role || 'user';
+    const roleFromSources = authUser.app_metadata?.role || authUser.user_metadata?.role || profile?.role || authUser.app_metadata?.role || authUser.user_metadata?.role || 'user'; // Ensure fallback from authUser metadata
     const finalRole = isSuperAdminByEmail ? 'super_admin' : roleFromSources;
     
-    console.log('Role determination:', {
+    // console.log('Role determination:', { // Reduce noise
       email: normalizedEmail,
       isSuperAdminByEmail,
       roleFromAppMetadata: authUser.app_metadata?.role,
@@ -126,28 +126,33 @@ class SupabaseClient {
     });
 
     // Merge auth user data with profile data and extract metadata
+    const profileData = profile || {}; // Ensure profileData is an object even if profile is null
+
     this.currentUser = {
       ...authUser,
-      ...profile,
-      // Extract metadata for easier access
-      full_name: authUser.user_metadata?.full_name || profile?.full_name || authUser.email?.split('@')[0],
+      ...profileData,
+      // Extract metadata for easier access and ensure defaults
+      full_name: authUser.user_metadata?.full_name || profileData.full_name || authUser.email?.split('@')[0] || 'Guest',
       role: finalRole,
       is_super_admin: finalRole === 'super_admin',
-      is_admin: finalRole === 'admin' || finalRole === 'super_admin' || profile?.is_admin === true,
-      verification_status: profile?.verification_status || 'pending',
-      verified: profile?.verified || false,
-      verification_document_url: profile?.verification_document_url,
-      verification_document_name: profile?.verification_document_name
+      is_admin: finalRole === 'admin' || finalRole === 'super_admin' || profileData.is_admin === true,
+      verification_status: profileData.verification_status || 'pending',
+      verified: profileData.verified || false,
+      verification_document_url: profileData.verification_document_url || null,
+      verification_document_name: profileData.verification_document_name || null,
+      // Add other expected fields that might be missing from profile
+      created_at: authUser.created_at || profileData.created_at || new Date().toISOString(),
+      updated_at: authUser.updated_at || profileData.updated_at || new Date().toISOString()
     };
     
-    console.log('Final user object created:', {
+    // console.log('Final user object created:', { // Reduce noise
       email: this.currentUser.email,
       role: this.currentUser.role,
       is_admin: this.currentUser.is_admin,
       is_super_admin: this.currentUser.is_super_admin
     });
     
-    console.log('User set with metadata:', {
+    // console.log('User set with metadata:', { // Reduce noise
       id: this.currentUser.id,
       email: this.currentUser.email,
       full_name: this.currentUser.full_name,
@@ -291,8 +296,38 @@ class SupabaseClient {
     return !!this.currentSession;
   }
 
-  getCurrentUser() {
-    return this.currentUser;
+  async getCurrentUser() {
+    if (this.currentUser) {
+      return this.currentUser;
+    }
+
+    // If currentUser is null, attempt to get session and set user again
+    // This handles cases where client might be ready but user hasn't been set yet (e.g., page refresh)
+    // Or if there was a temporary network glitch during initial session retrieval
+    const { data: { session: currentSession } } = await this.supabase.auth.getSession();
+
+    if (currentSession) {
+      this.currentSession = currentSession;
+      await this._setCurrentUserWithMetadata(currentSession.user);
+      return this.currentUser; // Return the newly set user
+    }
+
+    // Optional retry: If session is still null, try one more time
+    if (!currentSession) {
+      console.warn('SUPABASE: getSession returned null, retrying once...');
+      await new Promise(resolve => setTimeout(resolve, 500)); // Wait a bit before retrying
+      const { data: { session: retriedSession } } = await this.supabase.auth.getSession();
+
+      if (retriedSession) {
+        console.log('SUPABASE: Session found on retry.');
+        this.currentSession = retriedSession;
+        await this._setCurrentUserWithMetadata(retriedSession.user);
+        return this.currentUser;
+      } else {
+        console.warn('SUPABASE: getSession still null after retry.');
+      }
+    }
+    return null;
   }
 
   isAdmin(email = null) {
@@ -642,13 +677,6 @@ class SupabaseClient {
   }
 }
 
-// Create a single, globally accessible instance of the SupabaseClient
-window.supabaseClient = new SupabaseClient();
-
-// Export the class and instance for module systems (optional, if not using global window)
-// export { SupabaseClient };
-// export default window.supabaseClient;
-
 // Global utility functions for user feedback
 function showError(message, elementId = 'error-message', allowHtml = false) {
   const errorEl = document.getElementById(elementId);
@@ -683,3 +711,10 @@ function hideSuccess(elementId = 'success-message') {
     successEl.style.display = 'none';
   }
 }
+
+// Create a single, globally accessible instance of the SupabaseClient
+window.supabaseClient = new SupabaseClient();
+
+// Export the class and instance for module systems (optional, if not using global window)
+// export { SupabaseClient };
+// export default window.supabaseClient;

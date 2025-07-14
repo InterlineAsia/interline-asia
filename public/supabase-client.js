@@ -642,8 +642,12 @@ class SupabaseClient {
   }
 }
 
-// Global instance
+// Create a single, globally accessible instance of the SupabaseClient
 window.supabaseClient = new SupabaseClient();
+
+// Export the class and instance for module systems (optional, if not using global window)
+// export { SupabaseClient };
+// export default window.supabaseClient;
 
 // Global utility functions for user feedback
 function showError(message, elementId = 'error-message', allowHtml = false) {

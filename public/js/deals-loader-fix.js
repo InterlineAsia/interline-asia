@@ -123,10 +123,10 @@
             from: deal.from || 'Various Ports',
             to: deal.to || 'Round Trip',
             itinerary: deal.itinerary || '',
-            insidePrice: deal.insidePrice && deal.insidePrice !== 'Quote Available' ? deal.insidePrice : null,
-            oceanviewPrice: deal.oceanviewPrice && deal.oceanviewPrice !== 'Quote Available' ? deal.oceanviewPrice : null,
-            balconyPrice: deal.balconyPrice && deal.balconyPrice !== 'Quote Available' ? deal.balconyPrice : null,
-            suitePrice: deal.suitePrice && deal.suitePrice !== 'Quote Available' ? deal.suitePrice : null,
+            insidePrice: parsePrice(deal.insidePrice),
+            oceanviewPrice: parsePrice(deal.oceanviewPrice),
+            balconyPrice: parsePrice(deal.balconyPrice),
+            suitePrice: parsePrice(deal.suitePrice),
             currency: 'USD',
             cruiseType: 'Ocean',
             source: 'LEGACY',
@@ -134,6 +134,15 @@
             seq: deal.seq || '',
             year: deal.year || '2025'
         }));
+    }
+
+    function parsePrice(priceStr) {
+        if (!priceStr || priceStr === 'Quote Available') {
+            return null;
+        }
+        // Remove any non-numeric characters except for the decimal point
+        const numericPrice = parseFloat(priceStr.replace(/[^0-9.]/g, ''));
+        return isNaN(numericPrice) ? null : numericPrice;
     }
     
     // Simple deals renderer if main one doesn't exist
@@ -167,10 +176,10 @@
                     </div>
                     
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-                        ${deal.insidePrice ? `<div class="text-center"><span class="block text-slate-500">Inside</span><span class="font-semibold">$${deal.insidePrice}</span></div>` : ''}
-                        ${deal.oceanviewPrice ? `<div class="text-center"><span class="block text-slate-500">Oceanview</span><span class="font-semibold">$${deal.oceanviewPrice}</span></div>` : ''}
-                        ${deal.balconyPrice ? `<div class="text-center"><span class="block text-slate-500">Balcony</span><span class="font-semibold">$${deal.balconyPrice}</span></div>` : ''}
-                        ${deal.suitePrice ? `<div class="text-center"><span class="block text-slate-500">Suite</span><span class="font-semibold">$${deal.suitePrice}</span></div>` : ''}
+                        ${formatPriceForDisplay(deal.insidePrice, 'Inside')}
+                        ${formatPriceForDisplay(deal.oceanviewPrice, 'Oceanview')}
+                        ${formatPriceForDisplay(deal.balconyPrice, 'Balcony')}
+                        ${formatPriceForDisplay(deal.suitePrice, 'Suite')}
                     </div>
                 </div>
             </div>
@@ -178,7 +187,19 @@
         
         container.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">${dealsHTML}</div>`;
     }
-    
+
+    function formatPriceForDisplay(price, label) {
+        if (price === null) {
+            return '';
+        }
+        return `
+            <div class="text-center">
+                <span class="block text-slate-500">${label}</span>
+                <span class="font-semibold">$${price.toLocaleString('en-US')}</span>
+            </div>
+        `;
+    }
+
     function generateId() {
         return Date.now().toString(36) + Math.random().toString(36).substr(2);
     }

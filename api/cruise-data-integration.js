@@ -1,5 +1,5 @@
-// Cruise Data Integration API
-// Unifies river cruises, ocean cruises, and cabin type mappings
+// Cruise Data Integration API - FIXED to use cruise_deals table
+// Now properly fetches from the actual cruise_deals table
 
 export default async function handler(req, res) {
   if (req.method === 'GET') {
@@ -14,8 +14,8 @@ export default async function handler(req, res) {
 async function getUnifiedCruiseDeals(req, res) {
   try {
     const { createClient } = await import('@supabase/supabase-js');
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://inzyhmxskjqbtcnmlaby.supabase.co';
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     
     if (!supabaseUrl || !supabaseKey) {
       throw new Error('Supabase configuration missing');
@@ -23,48 +23,73 @@ async function getUnifiedCruiseDeals(req, res) {
     
     const supabase = createClient(supabaseUrl, supabaseKey);
     
-    console.log('🔍 Starting unified cruise deals fetch...');
+    console.log('🔍 Fetching from cruise_deals table (FIXED VERSION)...');
     
-    // Fetch all data sources in parallel
-    const [riverCruises, oceanCruises, cabinTypes] = await Promise.all([
-      fetchRiverCruises(supabase),
-      fetchOceanCruises(supabase),
-      fetchCabinTypes(supabase)
-    ]);
+    // FIXED: Fetch from the actual cruise_deals table instead of non-existent tables
+    const { data: cruiseDeals, error: cruiseError, count } = await supabase
+      .from('cruise_deals')
+      .select('*', { count: 'exact' })
+      .eq('is_active', true)
+      .order('departure_date', { ascending: true })
+      .limit(1000);
     
-    console.log(`📊 Data fetched - River: ${riverCruises.length}, Ocean: ${oceanCruises.length}, Cabin Types: ${cabinTypes.length}`);
+    if (cruiseError) {
+      console.error('❌ Supabase cruise_deals error:', cruiseError);
+      
+      // Try without RLS restrictions using service role
+      if (process.env.SUPABASE_SERVICE_ROLE_KEY && supabaseKey !== process.env.SUPABASE_SERVICE_ROLE_KEY) {
+        console.log('🔄 Retrying with service role key to bypass RLS...');
+        const serviceSupabase = createClient(supabaseUrl, process.env.SUPABASE_SERVICE_ROLE_KEY);
+        
+        const { data: serviceData, error: serviceError } = await serviceSupabase
+          .from('cruise_deals')
+          .select('*')
+          .eq('is_active', true)
+          .limit(1000);
+          
+        if (serviceError) {
+          throw new Error(`Service role query failed: ${serviceError.message}`);
+        }
+        
+        const formattedDeals = formatDealsForFrontend(serviceData || []);
+        
+        return res.status(200).json({
+          success: true,
+          deals: formattedDeals,
+          summary: {
+            total: serviceData?.length || 0,
+            source: 'cruise_deals_service_role',
+            message: 'Retrieved using service role due to RLS restrictions'
+          },
+          timestamp: new Date().toISOString()
+        });
+      }
+      
+      throw new Error(`Cruise deals query failed: ${cruiseError.message}`);
+    }
     
-    // Normalize and enrich all deals
-    const normalizedRiver = normalizeRiverCruises(riverCruises, cabinTypes);
-    const normalizedOcean = normalizeOceanCruises(oceanCruises, cabinTypes);
+    console.log(`✅ Successfully fetched ${cruiseDeals?.length || 0} deals from cruise_deals table`);
     
-    // Combine and deduplicate
-    const allDeals = [...normalizedRiver, ...normalizedOcean];
-    const deduplicatedDeals = deduplicateDeals(allDeals);
-    
-    console.log(`✅ Unified ${deduplicatedDeals.length} deals (${normalizedRiver.length} river + ${normalizedOcean.length} ocean)`);
-    
-    // Apply filters if provided
-    const filteredDeals = applyFilters(deduplicatedDeals, req.query);
+    const formattedDeals = formatDealsForFrontend(cruiseDeals || []);
     
     return res.status(200).json({
       success: true,
-      deals: filteredDeals,
+      deals: formattedDeals,
       summary: {
-        total: deduplicatedDeals.length,
-        filtered: filteredDeals.length,
-        river: normalizedRiver.length,
-        ocean: normalizedOcean.length,
-        sources: ['0807_master_upload_river', '1007_master_upload_twins', '0807_cabin_types']
+        total: count || formattedDeals.length,
+        filtered: formattedDeals.length,
+        source: 'cruise_deals',
+        message: 'Successfully retrieved from cruise_deals table'
       },
       timestamp: new Date().toISOString()
     });
     
   } catch (error) {
-    console.error('Cruise data integration error:', error);
+    console.error('❌ Cruise data integration error:', error);
     return res.status(500).json({
       success: false,
       error: error.message,
+      details: 'Failed to fetch from cruise_deals table',
       timestamp: new Date().toISOString()
     });
   }
@@ -483,6 +508,45 @@ function isQuoteOnlyCruise(cruise) {
   
   // If all 4 cabins are quote-only, mark the entire cruise as quote-only
   return quoteOnlyCount === 4;
+}
+
+function formatDealsForFrontend(deals) {
+  return deals.map(deal => ({
+    id: deal.id,
+    source: 'SUPABASE_CRUISE_DEALS',
+    cruiseType: 'Ocean', // Default, could be enhanced
+    
+    // Basic info
+    ship: deal.ship_name || '',
+    cruiseLine: deal.cruise_line || '',
+    itinerary: deal.itinerary || '',
+    destination: deal.region || '',
+    
+    // Dates
+    departureDate: deal.departure_date || null,
+    duration: deal.nights || null,
+    
+    // Pricing - handle both string and numeric formats
+    pricing: {
+      inside: parsePrice(deal.inside_price),
+      oceanview: parsePrice(deal.oceanview_price),
+      balcony: parsePrice(deal.balcony_price),
+      suite: parsePrice(deal.suite_price)
+    },
+    
+    // Ports
+    departurePort: deal.departure_port || '',
+    arrivalPort: deal.arrival_port || '',
+    
+    // Additional info
+    isActive: deal.is_active,
+    createdAt: deal.created_at,
+    updatedAt: deal.updated_at,
+    
+    // Metadata
+    originalData: deal,
+    lastUpdated: new Date().toISOString()
+  }));
 }
 
 function generateId() {

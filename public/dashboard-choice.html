@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Choose Your Dashboard - Interline Asia">
+  <title>Choose Dashboard - Interline Asia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+  
+  <main style="min-height: 80vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
+    <div style="max-width: 600px; margin: 0 auto; padding: 3rem 2rem; background: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center;">
+      
+      <div style="margin-bottom: 2rem;">
+        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center;">
+          <i class="ri-dashboard-line" style="font-size: 2.5rem; color: white;"></i>
+        </div>
+        <h1 style="color: #1e293b; margin-bottom: 0.5rem; font-size: 2rem; font-weight: 700;">Welcome Back!</h1>
+        <p id="user-info" style="color: #64748b; font-size: 1.1rem; margin-bottom: 2rem;">Choose your dashboard to continue</p>
+      </div>
+
+      <div id="dashboard-buttons" style="display: flex; flex-direction: column; gap: 1rem; max-width: 400px; margin: 0 auto;">
+        <!-- Buttons will be populated by JavaScript -->
+      </div>
+
+      <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e2e8f0;">
+        <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 1rem;">Need to switch accounts?</p>
+        <button onclick="signOut()" style="background: transparent; color: #dc2626; border: 1px solid #dc2626; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: all 0.3s ease;">
+          <i class="ri-logout-box-line" style="margin-right: 0.5rem;"></i>Sign Out
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="/js/loadPartials.js"></script>
+  <script>
+    async function initializeDashboardChoice() {
+      try {
+        console.log('DASHBOARD_CHOICE: Initializing...');
+        
+        // Wait for Supabase client to initialize
+        if (window.supabaseClient) {
+          await window.supabaseClient.readyPromise;
+        }
+        
+        // Check if user is logged in
+        if (!window.supabaseClient || !window.supabaseClient.isLoggedIn()) {
+          console.log('DASHBOARD_CHOICE: User not logged in, redirecting to login');
+          window.location.href = '/login.html';
+          return;
+        }
+
+        const user = window.supabaseClient.getCurrentUser();
+        console.log('DASHBOARD_CHOICE: Current user:', user?.email);
+
+        if (!user) {
+          console.log('DASHBOARD_CHOICE: No user found, redirecting to login');
+          window.location.href = '/login.html';
+          return;
+        }
+
+        // Determine user access levels
+        const adminEmails = ['rodney@telenational.com.au', 'admin@telenational.com.au'];
+        const hasAdminAccess = adminEmails.includes(user.email?.toLowerCase()) || 
+                              user.is_admin === true || 
+                              user.role === 'admin' || 
+                              user.role === 'super_admin';
+        
+        const hasMemberAccess = true; // Everyone has member access
+        
+        console.log('DASHBOARD_CHOICE: Access levels:', {
+          hasAdminAccess,
+          hasMemberAccess,
+          userEmail: user.email
+        });
+
+        // Update user info display
+        const userInfo = document.getElementById('user-info');
+        const displayName = user.full_name || user.email?.split('@')[0] || 'User';
+        const roleText = hasAdminAccess ? ' (Admin)' : ' (Member)';
+        
+        if (userInfo) {
+          userInfo.textContent = `Hello ${displayName}${roleText}! You have access to both dashboards. Choose one to continue:`;
+        }
+
+        // Create dashboard buttons
+        const buttonsContainer = document.getElementById('dashboard-buttons');
+        if (!buttonsContainer) {
+          console.error('DASHBOARD_CHOICE: Buttons container not found');
+          return;
+        }
+
+        buttonsContainer.innerHTML = ''; // Clear existing buttons
+
+        // Create Member Dashboard Button (always available)
+        if (hasMemberAccess) {
+          const memberBtn = createDashboardButton({
+            icon: 'ri-user-line',
+            title: 'Member Dashboard',
+            description: 'Access cruise deals, bookings, and your account',
+            gradient: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+            onClick: () => {
+              console.log('DASHBOARD_CHOICE: Navigating to member dashboard');
+              window.location.href = '/dashboard.html';
+            }
+          });
+          buttonsContainer.appendChild(memberBtn);
+        }
+
+        // Create Admin Dashboard Button (only for admins)
+        if (hasAdminAccess) {
+          console.log('DASHBOARD_CHOICE: Adding admin button');
+          const adminBtn = createDashboardButton({
+            icon: 'ri-admin-line',
+            title: 'Admin Dashboard',
+            description: 'Manage users, bookings, and system settings',
+            gradient: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
+            onClick: () => {
+              console.log('DASHBOARD_CHOICE: Navigating to admin dashboard');
+              window.location.href = '/admin.html';
+            }
+          });
+          buttonsContainer.appendChild(adminBtn);
+        } else {
+          console.log('DASHBOARD_CHOICE: User does not have admin access, no admin button');
+        }
+
+        console.log('DASHBOARD_CHOICE: Choice screen rendered successfully');
+
+      } catch (error) {
+        console.error('DASHBOARD_CHOICE: Initialization error:', error);
+        window.location.href = '/login.html';
+      }
+    }
+
+    function createDashboardButton({ icon, title, description, gradient, onClick }) {
+      const button = document.createElement('button');
+      
+      button.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: center; gap: 1rem;">
+          <i class="${icon}" style="font-size: 1.5rem;"></i>
+          <div style="text-align: left;">
+            <div style="font-weight: 600; font-size: 1.1rem;">${title}</div>
+            <div style="font-size: 0.9rem; opacity: 0.8;">${description}</div>
+          </div>
+        </div>
+      `;
+      
+      button.style.cssText = `
+        background: ${gradient};
+        color: white;
+        border: none;
+        padding: 1.5rem;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        font-family: inherit;
+        margin-bottom: 0.5rem;
+      `;
+      
+      button.onmouseover = () => {
+        button.style.transform = 'translateY(-2px)';
+        button.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
+      };
+      
+      button.onmouseout = () => {
+        button.style.transform = 'translateY(0)';
+        button.style.boxShadow = 'none';
+      };
+      
+      button.onclick = onClick;
+      return button;
+    }
+
+    function signOut() {
+      if (confirm('Are you sure you want to sign out?')) {
+        console.log('DASHBOARD_CHOICE: Signing out...');
+        if (window.supabaseClient) {
+          window.supabaseClient.signOut();
+        } else {
+          window.location.href = '/login.html';
+        }
+      }
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', initializeDashboardChoice);
+  </script>
+</body>
+</html>

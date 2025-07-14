@@ -196,8 +196,8 @@
                 console.log('DEALS AUTH: Supabase client found, waiting for ready state...');
                 
                 // Wait for supabaseClient to be ready
-                if (window.supabaseClient.readyPromise) {
-                    await window.supabaseClient.readyPromise;
+                // Ensure supabaseClient is fully initialized before proceeding
+                await window.supabaseClient.readyPromise;
                 } else {
                     // Fallback: wait a bit more for initialization
                     await new Promise(resolve => setTimeout(resolve, 500));
@@ -205,9 +205,9 @@
                 
                 console.log('DEALS AUTH: Checking login status...');
                 
-                // Check if user is logged in via currentSession
-                const isLoggedIn = !!window.supabaseClient.currentSession;
-                console.log('DEALS AUTH: Login status (via session):', isLoggedIn);
+                // Check if user is logged in using the client method
+                const isLoggedIn = await window.supabaseClient.isLoggedIn();
+                console.log('DEALS AUTH: Login status (via method):', isLoggedIn);
                 
                 if (!isLoggedIn) {
                     console.log('DEALS AUTH: User not logged in, redirecting to login page');

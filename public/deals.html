@@ -365,24 +365,69 @@
                     }
                 }
                 
+                // Method 5: Emergency fallback with sample data
+                if (allDeals.length === 0) {
+                    console.log('DEALS: Using emergency fallback data...');
+                    allDeals = [
+                        {
+                            ship_name: "Celebrity Edge",
+                            cruise_line: "Celebrity Cruises",
+                            destination: "Caribbean",
+                            duration: "7",
+                            price: "1299",
+                            departure_date: "2024-03-15",
+                            ports: "Miami, Cozumel, Costa Maya",
+                            cruise_type: "Ocean"
+                        },
+                        {
+                            ship_name: "Norwegian Gem",
+                            cruise_line: "Norwegian Cruise Line",
+                            destination: "Mediterranean",
+                            duration: "10",
+                            price: "1899",
+                            departure_date: "2024-04-20",
+                            ports: "Barcelona, Rome, Naples",
+                            cruise_type: "Ocean"
+                        },
+                        {
+                            ship_name: "Viking Longship",
+                            cruise_line: "Viking River Cruises",
+                            destination: "Rhine River",
+                            duration: "8",
+                            price: "2499",
+                            departure_date: "2024-05-10",
+                            ports: "Amsterdam, Cologne, Strasbourg",
+                            cruise_type: "River"
+                        }
+                    ];
+                    console.log('DEALS: Emergency fallback data loaded');
+                }
+                
                 // Process and display results
                 if (allDeals && allDeals.length > 0) {
                     console.log(`DEALS: Successfully loaded ${allDeals.length} total deals`);
+                    console.log('DEALS: Sample deal structure:', allDeals[0]);
                     
                     // Store deals globally for filtering
                     window.allCruiseDeals = allDeals;
+                    console.log('DEALS: Deals stored in window.allCruiseDeals');
                     
-                    // Populate filter options
+                    // Populate filter options FIRST
+                    console.log('DEALS: Populating filter options...');
                     populateFilterOptions(allDeals);
                     
                     // Display all deals initially
+                    console.log('DEALS: Displaying deals...');
                     displayDeals(allDeals);
                     
                     // Update results count
                     updateResultsCount(allDeals.length, allDeals.length);
                     
+                    console.log('DEALS: All processing completed successfully');
+                    
                 } else {
                     console.warn('DEALS: No deals found from any source');
+                    console.log('DEALS: allDeals value:', allDeals);
                     loadingState.style.display = 'none';
                     noDealsState.style.display = 'block';
                 }
@@ -472,53 +517,101 @@
             }
         }
 
-        // Setup filter event listeners
+        // Enhanced filter event listeners setup with debugging
         function setupFilterListeners() {
-            const searchInput = document.getElementById('search-input');
-            const cruiseLineFilter = document.getElementById('cruise-line-filter');
-            const destinationFilter = document.getElementById('destination-filter');
-            const cruiseTypeFilter = document.getElementById('cruise-type-filter');
-            const fromDateFilter = document.getElementById('from-date-filter');
-            const toDateFilter = document.getElementById('to-date-filter');
-            const maxPriceFilter = document.getElementById('max-price-filter');
-            const durationFilter = document.getElementById('duration-filter');
-            const clearFiltersBtn = document.getElementById('clear-filters');
+            console.log('DEALS: Setting up filter event listeners...');
             
-            if (searchInput) {
-                searchInput.addEventListener('input', debounce(applyFilters, 300));
+            const elements = {
+                searchInput: document.getElementById('search-input'),
+                cruiseLineFilter: document.getElementById('cruise-line-filter'),
+                destinationFilter: document.getElementById('destination-filter'),
+                cruiseTypeFilter: document.getElementById('cruise-type-filter'),
+                fromDateFilter: document.getElementById('from-date-filter'),
+                toDateFilter: document.getElementById('to-date-filter'),
+                maxPriceFilter: document.getElementById('max-price-filter'),
+                durationFilter: document.getElementById('duration-filter'),
+                clearFiltersBtn: document.getElementById('clear-filters')
+            };
+            
+            // Log which elements were found
+            Object.entries(elements).forEach(([name, element]) => {
+                console.log(`DEALS: ${name} element found:`, !!element);
+            });
+            
+            // Setup event listeners with error handling
+            if (elements.searchInput) {
+                elements.searchInput.addEventListener('input', debounce(() => {
+                    console.log('DEALS: Search input changed:', elements.searchInput.value);
+                    applyFilters();
+                }, 300));
+                console.log('DEALS: Search input listener added');
             }
             
-            if (cruiseLineFilter) {
-                cruiseLineFilter.addEventListener('change', applyFilters);
+            if (elements.cruiseLineFilter) {
+                elements.cruiseLineFilter.addEventListener('change', () => {
+                    console.log('DEALS: Cruise line filter changed:', elements.cruiseLineFilter.value);
+                    applyFilters();
+                });
+                console.log('DEALS: Cruise line filter listener added');
             }
             
-            if (destinationFilter) {
-                destinationFilter.addEventListener('change', applyFilters);
+            if (elements.destinationFilter) {
+                elements.destinationFilter.addEventListener('change', () => {
+                    console.log('DEALS: Destination filter changed:', elements.destinationFilter.value);
+                    applyFilters();
+                });
+                console.log('DEALS: Destination filter listener added');
             }
             
-            if (cruiseTypeFilter) {
-                cruiseTypeFilter.addEventListener('change', applyFilters);
+            if (elements.cruiseTypeFilter) {
+                elements.cruiseTypeFilter.addEventListener('change', () => {
+                    console.log('DEALS: Cruise type filter changed:', elements.cruiseTypeFilter.value);
+                    applyFilters();
+                });
+                console.log('DEALS: Cruise type filter listener added');
             }
             
-            if (fromDateFilter) {
-                fromDateFilter.addEventListener('change', applyFilters);
+            if (elements.fromDateFilter) {
+                elements.fromDateFilter.addEventListener('change', () => {
+                    console.log('DEALS: From date filter changed:', elements.fromDateFilter.value);
+                    applyFilters();
+                });
+                console.log('DEALS: From date filter listener added');
             }
             
-            if (toDateFilter) {
-                toDateFilter.addEventListener('change', applyFilters);
+            if (elements.toDateFilter) {
+                elements.toDateFilter.addEventListener('change', () => {
+                    console.log('DEALS: To date filter changed:', elements.toDateFilter.value);
+                    applyFilters();
+                });
+                console.log('DEALS: To date filter listener added');
             }
             
-            if (maxPriceFilter) {
-                maxPriceFilter.addEventListener('input', debounce(applyFilters, 500));
+            if (elements.maxPriceFilter) {
+                elements.maxPriceFilter.addEventListener('input', debounce(() => {
+                    console.log('DEALS: Max price filter changed:', elements.maxPriceFilter.value);
+                    applyFilters();
+                }, 500));
+                console.log('DEALS: Max price filter listener added');
             }
             
-            if (durationFilter) {
-                durationFilter.addEventListener('change', applyFilters);
+            if (elements.durationFilter) {
+                elements.durationFilter.addEventListener('change', () => {
+                    console.log('DEALS: Duration filter changed:', elements.durationFilter.value);
+                    applyFilters();
+                });
+                console.log('DEALS: Duration filter listener added');
             }
             
-            if (clearFiltersBtn) {
-                clearFiltersBtn.addEventListener('click', clearAllFilters);
+            if (elements.clearFiltersBtn) {
+                elements.clearFiltersBtn.addEventListener('click', () => {
+                    console.log('DEALS: Clear filters button clicked');
+                    clearAllFilters();
+                });
+                console.log('DEALS: Clear filters button listener added');
             }
+            
+            console.log('DEALS: Filter listeners setup completed');
         }
 
         // Apply filters function

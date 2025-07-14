@@ -801,7 +801,6 @@
                     errorState.style.display = 'block';
                     noDealsState.style.display = 'none';
                 }
-                
             } catch (error) {
                 console.error('DEALS: Error in loadDealsBasic:', error);
                 loadingState.style.display = 'none';
@@ -1559,45 +1558,38 @@
 
     <!-- FIXED: Initialize deals loading with authentication check -->
     <script>
-        // Initialize with authentication check
-        document.addEventListener("DOMContentLoaded", function() {
-            if (!window.dealsInitialized) {
-                window.dealsInitialized = true;
-                console.log("DEALS PAGE: DOM loaded, starting auth-protected initialization...");
-                
-                // Small delay to ensure all scripts are loaded
-                setTimeout(function() {
-                    initializeDealsSystemWithAuth();
-                }, 500);
-            }
-        });
-    </script>
-</body>
-</html>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            console.log("DEALS PAGE: DOM loaded, initializing deals system...");
-            
-            // Wait for all scripts to load, then initialize
-            setTimeout(function() {
-                try {
-                    if (typeof initializeDealsSystem === "function") {
-                        console.log("DEALS PAGE: Calling initializeDealsSystem...");
-                        initializeDealsSystem();
-                    } else if (typeof loadDealsBasic === "function") {
-                        console.log("DEALS PAGE: Calling loadDealsBasic...");
-                        loadDealsBasic();
-                    } else if (typeof window.loadUnifiedDeals === "function") {
-                        console.log("DEALS PAGE: Calling loadUnifiedDeals...");
-                        window.loadUnifiedDeals();
-                    } else {
-                        console.error("DEALS PAGE: No loading function found! Available functions:", Object.keys(window).filter(k => k.includes("load") || k.includes("Deal")));
-                    }
-                } catch (error) {
-                    console.error("DEALS PAGE: Initialization error:", error);
-                }
-            }, 1000);
-        });
-    </script>
+   // 🚀 Delayed initialization after full DOM + Supabase auth 
+   document.addEventListener("DOMContentLoaded", async function () { 
+     console.log("DEALS PAGE: DOM loaded, starting auth-protected initialization..."); 
+
+     if (!window.supabaseClient) { 
+       console.warn("Supabase client not found."); 
+       return; 
+     } 
+
+     try { 
+       const { data: { session } } = await window.supabaseClient.auth.getSession(); 
+
+       if (!session) { 
+         console.warn("No session found. Redirecting to login."); 
+         window.location.href = "/login.html"; 
+         return; 
+       } 
+
+       console.log("✅ Authenticated. Proceeding with deal system initialization."); 
+       initializeDealsSystem(); 
+
+     } catch (err) { 
+       console.error("⚠️ Error during authentication check:", err); 
+       window.location.href = "/login.html"; 
+     } 
+   }); 
+
+   // 🎯 Deal System Initialization 
+   function initializeDealsSystem() { 
+     console.log("DEALS PAGE: Initializing deals system..."); 
+     loadUnifiedDeals(); // Function must be defined in deals-loader-fix.js 
+   } 
+ </script>
 </body>
 </html>

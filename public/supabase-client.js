@@ -40,7 +40,7 @@ class SupabaseClient {
           persistSession: true,        // Enable for login flow
           autoRefreshToken: false,     // Keep disabled for security
           detectSessionInUrl: false,   // Keep disabled
-          storage: window.sessionStorage  // Use sessionStorage instead of localStorage
+          storage: window.localStorage  // Use localStorage for persistent sessions
         }
       }
     );

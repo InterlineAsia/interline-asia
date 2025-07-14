@@ -413,27 +413,142 @@
             }
         }
 
-        async function tryCsvDeals() {
-            const startTime = Date.now();
+async function tryCsvDeals() {
+    const startTime = Date.now();
+
+    try {
+        const csvDeals = await loadDealsFromCSVStorage();
+        const duration = Date.now() - startTime;
+
+        if (csvDeals && csvDeals.length > 0) {
+            console.log(`📋 CSV Storage SUCCESS: ${csvDeals.length} deals (${duration}ms)`);
+            return { success: true, deals: csvDeals, source: 'csv_storage', duration };
+        } else {
+            console.warn('📁 CSV: No deals found');
+            return {
+                success: false,
+                deals: [],
+                source: 'csv_storage',
+                error: 'No deals found in CSV',
+                duration
+            };
+        }
+    } catch (err) {
+        const duration = Date.now() - startTime;
+        console.error('💥 CSV Storage Exception:', err);
+        return {
+            success: false,
+            deals: [],
+            source: 'csv_storage',
+            error: err.message,
+            duration
+        };
+    }
+}
+
+async function loadDealsBasic() {
+    const loadingState = document.getElementById('loading-state');
+    const errorState = document.getElementById('error-state');
+    const dealsContainer = document.getElementById('deals-container');
+    const noDealsState = document.getElementById('no-deals-state');
+
+    loadingState.style.display = 'block';
+    errorState.style.display = 'none';
+    dealsContainer.style.display = 'none';
+    noDealsState.style.display = 'none';
+
+    const loadTimestamp = new Date().toISOString();
+    const startTime = Date.now();
+    const loadPath = [];
+
+    let allDeals = [];
+    let dealsSource = 'none';
+
+    window._dealsDebugInfo = {
+        loadTimestamp,
+        loadSource: 'none',
+        loadDuration: 0,
+        loadPath: [],
+        dealsCount: 0,
+        sourcesTried: [],
+        errors: [],
+        success: false
+    };
+
+    const sources = [
+        trySupabaseDeals,
+        tryUnifiedApiDeals,
+        tryCsvDeals
+    ];
+
+    for (const loader of sources) {
+        const result = await loader();
+        window._dealsDebugInfo.sourcesTried.push(result);
+
+        if (result.success) {
+            allDeals = result.deals;
+            dealsSource = result.source;
+            loadPath.push(`✅ ${dealsSource}: ${allDeals.length} deals (${result.duration}ms)`);
+            break;
+        } else {
+            loadPath.push(`❌ ${result.source}: ${result.error} (${result.duration}ms)`);
+            window._dealsDebugInfo.errors.push({ source: result.source, error: result.error });
+        }
+    }
+
+    const loadDuration = Date.now() - startTime;
+
+    window._dealsDebugInfo.loadSource = dealsSource;
+    window._dealsDebugInfo.loadDuration = loadDuration;
+    window._dealsDebugInfo.loadPath = loadPath;
+    window._dealsDebugInfo.dealsCount = allDeals.length;
+    window._dealsDebugInfo.success = allDeals.length > 0;
+
+    if (allDeals.length > 0) {
+        window.allCruiseDeals = allDeals;
+        populateFilterOptions(allDeals);
+        displayDeals(allDeals);
+        updateResultsCount(allDeals.length, allDeals.length);
+
+        loadingState.style.display = 'none';
+        dealsContainer.style.display = 'block';
+    } else {
+        console.error('❌ All data sources failed');
+
+        loadingState.style.display = 'none';
+        errorState.innerHTML = `
+            <div style="max-width: 600px; margin: 0 auto; text-align: center; padding: 2rem;">
+                <i class="fas fa-exclamation-circle" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem;"></i>
+                <h3 style="color: #374151; margin-bottom: 1rem;">Unable to Load Cruise Deals</h3>
+                <p style="color: #6b7280; margin-bottom: 2rem;">
+                    All data sources are currently unavailable. Please try refreshing the page or contact support if the issue persists.
+                </p>
+                <div style="margin-bottom: 2rem;">
+                    <p><strong>Troubleshooting tips:</strong></p>
+                    <ul style="text-align: left; display: inline-block;">
+                        <li>Check your internet connection</li>
+                        <li>Verify RLS policies in Supabase</li>
+                        <li>Open <a href="debug-deals-count.html" target="_blank">debug page</a> for diagnostics</li>
+                    </ul>
+                </div>
+                <button onclick="location.reload()" style="background: #3b82f6; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 6px; cursor: pointer;">
+                    Reload with Fresh Data
+                </button>
+            </div>
+        `;
+        errorState.style.display = 'block';
+    }
+}
+
+        // ========== REFACTORED MAIN LOADER ==========
+        async function loadDealsBasic() {
+            window._dealsDebugInfo = window._dealsDebugInfo || {};
             
             try {
-                const csvDeals = await loadDealsFromCSVStorage();
-                const duration = Date.now() - startTime;
-                
-                if (csvDeals && csvDeals.length > 0) {
-                    console.log(`📋 CSV Storage SUCCESS: ${csvDeals.length} deals (${duration}ms)`);
-                    return { success: true, deals: csvDeals, source: 'csv_storage', duration };
-                } else {
-                    console.warn('📁 CSV: No deals found (or warnings)');
-                    return { 
-                        success: false, 
-                        deals: [], 
-                        source: 'csv_storage', 
-                        error: csvDeals.length === 0 ? 'No deals found in CSV' : 'CSV loading warnings',
-                        warnings: csvDeals.warnings,
-                        duration 
-                    };
-                }
+                const loadingState = document.getElementById('loading-state');
+                const errorState = document.getElementById('error-state');
+                const dealsContainer = document.getElementById('deals-container');
+                const noDealsState = document.getElementById('no-deals-state');
             } catch (err) {
                 const duration = Date.now() - startTime;
                 console.error('💥 CSV Storage Exception:', err);
@@ -1508,6 +1623,3 @@
             }
         `;
         document.head.appendChild(style);
-    </script>
-</body>
-</html>

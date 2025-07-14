@@ -21,6 +21,153 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="supabase-client.js"></script>
+  
+  <!-- REBUILT LOGIN SYSTEM -->
+  <script>
+// INTERLINE ASIA - REBUILT LOGIN SYSTEM
+class InterlineLoginSystem {
+    constructor() {
+        this.ADMIN_EMAILS = ['rodney@telenational.com.au', 'admin@telenational.com.au'];
+        this.supabaseClient = window.supabaseClient;
+        this.isInitialized = false;
+    }
+
+    async initialize() {
+        if (this.isInitialized) return;
+        console.log('LOGIN_SYSTEM: Initializing...');
+        await this.supabaseClient.readyPromise;
+        this.isInitialized = true;
+        console.log('LOGIN_SYSTEM: Ready');
+    }
+
+    async determineUserRoles(user) {
+        console.log('LOGIN_SYSTEM: Determining roles for:', user.email);
+        const email = user.email.toLowerCase();
+        const isAdminEmail = this.ADMIN_EMAILS.includes(email);
+        
+        let profile = null;
+        try {
+            const { data, error } = await this.supabaseClient.supabase
+                .from('profiles').select('*').eq('id', user.id).maybeSingle();
+            if (error && error.code !== 'PGRST116') {
+                console.error('LOGIN_SYSTEM: Error fetching profile:', error);
+            } else {
+                profile = data;
+            }
+        } catch (err) {
+            console.error('LOGIN_SYSTEM: Profile fetch failed:', err);
+        }
+
+        const roles = {
+            hasAdmin: false,
+            hasMember: true,
+            isAdminEmail: isAdminEmail,
+            profileData: profile
+        };
+
+        if (isAdminEmail) {
+            roles.hasAdmin = true;
+            console.log('LOGIN_SYSTEM: Admin access granted via email whitelist');
+        } else if (profile?.is_admin === true || profile?.role === 'admin' || profile?.role === 'super_admin') {
+            roles.hasAdmin = true;
+            console.log('LOGIN_SYSTEM: Admin access granted via database flags');
+        }
+
+        console.log('LOGIN_SYSTEM: Final roles:', roles);
+        return roles;
+    }
+
+    async ensureUserProfile(user, roles) {
+        console.log('LOGIN_SYSTEM: Ensuring profile for:', user.email);
+        const profileData = {
+            id: user.id,
+            email: user.email,
+            full_name: user.user_metadata?.full_name || user.email.split('@')[0],
+            is_admin: roles.hasAdmin,
+            role: roles.hasAdmin ? 'admin' : 'member',
+            verified: roles.isAdminEmail ? true : (roles.profileData?.verified || false),
+            verification_status: roles.isAdminEmail ? 'verified' : (roles.profileData?.verification_status || 'pending'),
+            updated_at: new Date().toISOString()
+        };
+
+        if (roles.hasAdmin) {
+            profileData.is_super_admin = roles.isAdminEmail;
+        }
+
+        try {
+            const { data, error } = await this.supabaseClient.supabase
+                .from('profiles').upsert(profileData, { onConflict: 'id', ignoreDuplicates: false })
+                .select().single();
+            if (error) {
+                console.error('LOGIN_SYSTEM: Profile upsert failed:', error);
+            } else {
+                console.log('LOGIN_SYSTEM: Profile updated successfully');
+            }
+            return profileData;
+        } catch (err) {
+            console.error('LOGIN_SYSTEM: Profile operation failed:', err);
+            return profileData;
+        }
+    }
+
+    determineRedirect(roles) {
+        console.log('LOGIN_SYSTEM: Determining redirect for roles:', roles);
+        if (roles.hasAdmin && roles.hasMember) {
+            console.log('LOGIN_SYSTEM: User has both roles -> dashboard choice');
+            return '/dashboard-choice.html';
+        } else if (roles.hasAdmin && !roles.hasMember) {
+            console.log('LOGIN_SYSTEM: Admin-only user -> admin dashboard');
+            return '/admin.html';
+        } else if (!roles.hasAdmin && roles.hasMember) {
+            console.log('LOGIN_SYSTEM: Member-only user -> member dashboard');
+            return '/dashboard.html';
+        } else {
+            console.log('LOGIN_SYSTEM: No roles detected -> default to member dashboard');
+            return '/dashboard.html';
+        }
+    }
+
+    async processLogin(email, password, turnstileToken = null) {
+        console.log('LOGIN_SYSTEM: Processing login for:', email);
+        try {
+            await this.initialize();
+            console.log('LOGIN_SYSTEM: Step 1 - Authenticating...');
+            const authResult = await this.supabaseClient.signIn(email, password, turnstileToken);
+            if (!authResult.user) {
+                throw new Error('Authentication failed - no user returned');
+            }
+            const user = authResult.user;
+            console.log('LOGIN_SYSTEM: Authentication successful');
+
+            console.log('LOGIN_SYSTEM: Step 2 - Determining roles...');
+            const roles = await this.determineUserRoles(user);
+
+            console.log('LOGIN_SYSTEM: Step 3 - Ensuring profile...');
+            const profile = await this.ensureUserProfile(user, roles);
+
+            console.log('LOGIN_SYSTEM: Step 4 - Updating user object...');
+            this.supabaseClient.currentUser = { ...user, ...profile, roles: roles };
+
+            console.log('LOGIN_SYSTEM: Step 5 - Determining redirect...');
+            const redirectUrl = this.determineRedirect(roles);
+
+            console.log('LOGIN_SYSTEM: Login process complete!');
+            console.log('LOGIN_SYSTEM: Final state:', {
+                email: user.email,
+                hasAdmin: roles.hasAdmin,
+                hasMember: roles.hasMember,
+                redirectUrl: redirectUrl
+            });
+
+            return { success: true, user: this.supabaseClient.currentUser, roles: roles, redirectUrl: redirectUrl };
+        } catch (error) {
+            console.error('LOGIN_SYSTEM: Login failed:', error);
+            return { success: false, error: error.message, redirectUrl: null };
+        }
+    }
+}
+window.interlineLoginSystem = new InterlineLoginSystem();
+  </script>
 </head>
 <body>
   <div class="auth-container">
@@ -82,10 +229,13 @@
         // Using Cloudflare Turnstile for security verification
         // Turnstile token is handled automatically by the widget
         
-        // Sign in with Supabase
-        const result = await window.supabaseClient.signIn(email, password);
+        // Use the new rebuilt login system
+        console.log('NEW_LOGIN: Starting rebuilt login process...');
+        const loginResult = await window.interlineLoginSystem.processLogin(email, password);
         
-        if (result.user) {
+        if (loginResult.success) {
+          console.log('NEW_LOGIN: Login successful!');
+          
           // Track successful login
           gtag('event', 'login', {
             method: 'email'
@@ -93,14 +243,13 @@
           
           showSuccess('Login successful! Redirecting...');
           
-          // Redirect based on user role
+          // Redirect to determined URL
           setTimeout(() => {
-            if (window.supabaseClient.isAdmin()) {
-              window.location.href = '/admin';
-            } else {
-              window.location.href = '/dashboard';
-            }
+            console.log('NEW_LOGIN: Redirecting to:', loginResult.redirectUrl);
+            window.location.href = loginResult.redirectUrl;
           }, 1000);
+        } else {
+          throw new Error(loginResult.error || 'Login failed');
         }
         
       } catch (error) {

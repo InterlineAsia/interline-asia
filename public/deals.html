@@ -717,7 +717,7 @@
                                 displayFunction(cacheData.deals);
                                 updateResultsCount(cacheData.deals.length, cacheData.deals.length);
                                 
-                                return; // Skip showing error state
+                                // Skip showing error state - removed illegal return
                             }
                         } catch (e) {
                             console.warn('DEALS: Cache corruption, clearing...');
@@ -1512,33 +1512,37 @@
 
     <!-- FIXED: Initialize deals loading on page load -->
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            console.log("DEALS PAGE: DOM loaded, initializing deals system...");
+        // Prevent multiple initializations
+        if (!window.dealsInitialized) {
+            window.dealsInitialized = true;
             
-            // Wait for all scripts to load, then initialize
-            setTimeout(function() {
-                try {
-                    if (typeof initializeDealsSystem === "function") {
-                        console.log("DEALS PAGE: Calling initializeDealsSystem...");
-                        initializeDealsSystem();
-                    } else if (typeof loadDealsBasic === "function") {
-                        console.log("DEALS PAGE: Calling loadDealsBasic...");
-                        loadDealsBasic();
-                    } else if (typeof window.loadUnifiedDeals === "function") {
-                        console.log("DEALS PAGE: Calling loadUnifiedDeals...");
-                        window.loadUnifiedDeals();
-                    } else {
-                        console.error("DEALS PAGE: No loading function found!");
+            document.addEventListener("DOMContentLoaded", function() {
+                console.log("DEALS PAGE: DOM loaded, initializing deals system...");
+                
+                // Wait for all scripts to load, then initialize ONCE
+                setTimeout(function() {
+                    try {
+                        if (typeof initializeDealsSystem === "function") {
+                            console.log("DEALS PAGE: Calling initializeDealsSystem...");
+                            initializeDealsSystem();
+                        } else if (typeof loadDealsBasic === "function") {
+                            console.log("DEALS PAGE: Calling loadDealsBasic...");
+                            loadDealsBasic();
+                        } else if (typeof window.loadUnifiedDeals === "function") {
+                            console.log("DEALS PAGE: Calling loadUnifiedDeals...");
+                            window.loadUnifiedDeals();
+                        } else {
+                            console.error("DEALS PAGE: No loading function found!");
+                        }
+                    } catch (error) {
+                        console.error("DEALS PAGE: Initialization error:", error);
                     }
-                } catch (error) {
-                    console.error("DEALS PAGE: Initialization error:", error);
-                }
-            }, 1000);
-        });
+                }, 1000);
+            });
+        }
     </script>
 </body>
 </html>
-    <!-- FIXED: Initialize deals loading on page load -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             console.log("DEALS PAGE: DOM loaded, initializing deals system...");

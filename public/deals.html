@@ -14,7 +14,9 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="supabase-client.js"></script>
-  <script src="tmp_rovodev_deals_loader.js"></script>
+  <script src="enhanced-deals-loader.js"></script>
+  <script src="enhanced-deals-system.js"></script>
+  <script src="js/loadPartials.js" defer></script>
   
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-FYGT92WCXC"></script>
@@ -373,6 +375,9 @@
 </head>
 
 <body>
+  <!-- Header Placeholder -->
+  <div id="header-placeholder"></div>
+
   <!-- Hero Section -->
   <section class="deals-hero">
     <div class="deals-hero-content">
@@ -405,6 +410,7 @@
           <option value="">All Types</option>
           <option value="Ocean Cruise">Ocean Cruise</option>
           <option value="River Cruise">River Cruise</option>
+          <option value="Expedition Cruise">Expedition Cruise</option>
         </select>
       </div>
       
@@ -439,18 +445,77 @@
     </div>
   </main>
 
+  <!-- Footer Placeholder -->
+  <div id="footer-placeholder"></div>
+
   <script>
-    // Show loading initially
-    document.addEventListener('DOMContentLoaded', () => {
+    // Initialize deals system
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Load header and footer
+      if (typeof loadHeaderFooter === 'function') {
+        loadHeaderFooter();
+      }
+      
       const loadingState = document.getElementById('loading-state');
       const dealsContainer = document.getElementById('deals-container');
       
-      // Hide loading and show deals after a short delay
-      setTimeout(() => {
-        if (loadingState) loadingState.style.display = 'none';
-        if (dealsContainer) dealsContainer.style.display = 'grid';
-      }, 1000);
+      try {
+        // Initialize enhanced deals system
+        if (window.EnhancedDealsLoader && window.EnhancedDealsSystem) {
+          const dealsLoader = new window.EnhancedDealsLoader();
+          const dealsSystem = new window.EnhancedDealsSystem();
+          
+          // Load deals data
+          await dealsLoader.loadDeals();
+          
+          // Initialize UI
+          dealsSystem.init();
+          
+          // Hide loading and show deals
+          if (loadingState) loadingState.style.display = 'none';
+          if (dealsContainer) dealsContainer.style.display = 'grid';
+        } else {
+          // Fallback: Hide loading and show deals after delay
+          setTimeout(() => {
+            if (loadingState) loadingState.style.display = 'none';
+            if (dealsContainer) dealsContainer.style.display = 'grid';
+          }, 1000);
+        }
+      } catch (error) {
+        console.error('Error initializing deals system:', error);
+        
+        // Show error state or fallback
+        if (loadingState) {
+          loadingState.innerHTML = `
+            <i class="ri-error-warning-line"></i>
+            <p>Unable to load deals. Please try again later.</p>
+          `;
+        }
+      }
     });
+
+    // Global function for header/footer loading
+    function loadHeaderFooter() {
+      const loadPartial = (selector, url) => {
+        fetch(url)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(`Could not load ${url}: ${response.statusText}`);
+            }
+            return response.text();
+          })
+          .then(data => {
+            const element = document.querySelector(selector);
+            if (element) {
+              element.innerHTML = data;
+            }
+          })
+          .catch(error => console.error('Error loading partial:', error));
+      };
+
+      loadPartial("#header-placeholder", "/partials/header.html");
+      loadPartial("#footer-placeholder", "/partials/footer.html");
+    }
   </script>
 </body>
 </html>

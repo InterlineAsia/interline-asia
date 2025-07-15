@@ -81,9 +81,26 @@
         return;
       }
       
+      // Prevent multiple login attempts
+      let isLoggingIn = false;
+      
       // Shared login function
       async function performLogin() {
         console.log('LOGIN: performLogin triggered');
+        
+        // Prevent multiple simultaneous login attempts
+        if (isLoggingIn) {
+          console.log('LOGIN: Already in progress, ignoring duplicate request');
+          return;
+        }
+        
+        isLoggingIn = true;
+        
+        // Disable button during login
+        if (loginButton) {
+          loginButton.disabled = true;
+          loginButton.textContent = 'Signing In...';
+        }
         
         try {
           const email = document.getElementById('email').value.trim();
@@ -137,13 +154,16 @@
             gtag('event', 'login', { method: 'email' });
           }
           
+          // Small delay to ensure session is set
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
           // Redirect based on user role/admin status
           if (result.user.is_admin || result.user.is_super_admin || adminEmails.includes(email.toLowerCase())) {
             console.log('LOGIN: Redirecting admin user to dashboard choice');
-            window.location.href = '/dashboard-choice.html';
+            window.location.replace('/dashboard-choice.html');
           } else {
             console.log('LOGIN: Redirecting regular user to dashboard');
-            window.location.href = '/dashboard.html';
+            window.location.replace('/dashboard.html');
           }
           
         } catch (err) {
@@ -164,6 +184,13 @@
           }
           
           showError(errorMessage);
+        } finally {
+          // Re-enable button
+          isLoggingIn = false;
+          if (loginButton) {
+            loginButton.disabled = false;
+            loginButton.textContent = 'Sign In';
+          }
         }
       }
       

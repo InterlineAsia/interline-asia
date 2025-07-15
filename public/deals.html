@@ -218,7 +218,7 @@
       const headers = parseCSVLine(lines[0]);
       const deals = [];
 
-      for (let i = 1; i < Math.min(lines.length, 501); i++) { // Load first 500 deals for better variety
+      for (let i = 1; i < lines.length; i++) { // Load ALL deals from CSV
         const values = parseCSVLine(lines[i]);
         if (values.length >= 10) {
           const deal = createDeal(headers, values, cruiseType);
@@ -363,7 +363,35 @@
 
     function getCruiseLineLogo(cruiseLine) {
       if (!cruiseLine) return 'placeholder.png';
-      return cruiseLine.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '-') + '.png';
+      
+      // Handle special cases for cruise line logo mapping
+      const logoMap = {
+        'scenic': 'scenic.png',
+        'scenic river cruises': 'scenic.png',
+        'hx hurtigruten expeditions': 'hx.png',
+        'hurtigruten expeditions': 'hx.png',
+        'regent seven seas cruises': 'regent.png',
+        'amawaterways': 'amawaterways.png',
+        'ama waterways': 'amawaterways.png',
+        'royal caribbean': 'royal-caribbean.png',
+        'coral expeditions': 'coral-expeditions.png',
+        'holland america': 'holland-america.png',
+        'princess cruises': 'princess.png',
+        'norwegian cruise line': 'norwegian.png',
+        'msc cruises': 'msc.png',
+        'celebrity cruises': 'celebrity.png'
+      };
+      
+      const normalizedName = cruiseLine.toLowerCase().trim();
+      
+      // Check if we have a specific mapping
+      if (logoMap[normalizedName]) {
+        return logoMap[normalizedName];
+      }
+      
+      // Default slug generation
+      const slug = normalizedName.replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '-');
+      return slug + '.png';
     }
 
     function getBestPrice(deal) {

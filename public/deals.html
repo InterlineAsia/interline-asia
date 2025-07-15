@@ -566,10 +566,10 @@
         
         // Try to load from Supabase directly first
         try {
-          console.log('DEALS PAGE: Attempting direct Supabase connection...');
+          console.log('SUPABASE: Attempting direct Supabase connection...');
           if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
             const supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
-            console.log('DEALS PAGE: Supabase client created');
+            console.log('SUPABASE: Supabase client created');
             
             // Try different table names that might contain cruise data
             const tableNames = ['cruise_deals', 'deals', 'cruises', 'cruise_data', 'bookings'];
@@ -907,26 +907,27 @@
       console.log('DEALS PAGE: Loading header and footer...');
       
       const loadPartial = (selector, url) => {
-        console.log(`DEALS PAGE: Loading ${url} into ${selector}`);
+        const el = document.querySelector(selector);
+        if (!el) {
+          console.warn(`PARTIAL: Skipping ${selector}, not found on this page.`);
+          return;
+        }
+
+        console.log(`PARTIAL: Loading ${url} into ${selector}`);
         fetch(url)
           .then(response => {
-            console.log(`DEALS PAGE: Response for ${url}:`, response.status);
+            console.log(`PARTIAL: Response for ${url}:`, response.status);
             if (!response.ok) {
               throw new Error(`Could not load ${url}: ${response.statusText}`);
             }
             return response.text();
           })
           .then(data => {
-            const element = document.querySelector(selector);
-            if (element) {
-              element.innerHTML = data;
-              console.log(`DEALS PAGE: Successfully loaded ${url}`);
-            } else {
-              console.error(`DEALS PAGE: Element ${selector} not found`);
-            }
+            el.innerHTML = data;
+            console.log(`PARTIAL: Loaded ${url} into ${selector}`);
           })
           .catch(error => {
-            console.error(`DEALS PAGE: Error loading ${url}:`, error);
+            console.error(`PARTIAL: Error loading ${url}:`, error);
           });
       };
 

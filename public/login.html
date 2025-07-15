@@ -154,16 +154,17 @@
             gtag('event', 'login', { method: 'email' });
           }
           
-          // Small delay to ensure session is set
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
           // Redirect based on user role/admin status
           if (result.user.is_admin || result.user.is_super_admin || adminEmails.includes(email.toLowerCase())) {
             console.log('LOGIN: Redirecting admin user to dashboard choice');
-            window.location.replace('/dashboard-choice.html');
+            setTimeout(() => {
+              window.location.href = '/dashboard-choice.html';
+            }, 500);
           } else {
             console.log('LOGIN: Redirecting regular user to dashboard');
-            window.location.replace('/dashboard.html');
+            setTimeout(() => {
+              window.location.href = '/dashboard.html';
+            }, 500);
           }
           
         } catch (err) {

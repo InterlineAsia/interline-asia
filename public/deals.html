@@ -178,24 +178,28 @@
 
     async function loadCSVDeals() {
       try {
-        console.log('DEALS PAGE: Attempting to load CSV data...');
+        console.log('CSV_LOADER: Attempting to load CSV data from renamed files...');
         
         // Try to load river cruise data
-        const riverResponse = await fetch('/0807 Master Upload RIVER.csv');
+        const riverResponse = await fetch('/river.csv');
         if (riverResponse.ok) {
           const riverCSV = await riverResponse.text();
           const riverDeals = parseCSV(riverCSV, 'River Cruise');
-          console.log('DEALS PAGE: Loaded', riverDeals.length, 'river cruise deals');
+          console.log('CSV_LOADER: Loaded', riverDeals.length, 'river cruise deals');
           allDeals = allDeals.concat(riverDeals);
+        } else {
+          console.log('CSV_LOADER: Could not load river.csv, status:', riverResponse.status);
         }
 
         // Try to load ocean cruise data
-        const oceanResponse = await fetch('/1007 Master Upload Twins.csv');
+        const oceanResponse = await fetch('/twins.csv');
         if (oceanResponse.ok) {
           const oceanCSV = await oceanResponse.text();
           const oceanDeals = parseCSV(oceanCSV, 'Ocean Cruise');
-          console.log('DEALS PAGE: Loaded', oceanDeals.length, 'ocean cruise deals');
+          console.log('CSV_LOADER: Loaded', oceanDeals.length, 'ocean cruise deals');
           allDeals = allDeals.concat(oceanDeals);
+        } else {
+          console.log('CSV_LOADER: Could not load twins.csv, status:', oceanResponse.status);
         }
 
         if (allDeals.length === 0) {
@@ -214,7 +218,7 @@
       const headers = parseCSVLine(lines[0]);
       const deals = [];
 
-      for (let i = 1; i < Math.min(lines.length, 101); i++) { // Limit to first 100 for performance
+      for (let i = 1; i < Math.min(lines.length, 501); i++) { // Load first 500 deals for better variety
         const values = parseCSVLine(lines[i]);
         if (values.length >= 10) {
           const deal = createDeal(headers, values, cruiseType);

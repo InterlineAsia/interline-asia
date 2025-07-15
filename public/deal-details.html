@@ -1,602 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Cruise Deal Details - Interline Asia">
-    <title>Cruise Deal Details - Interline Asia</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/css/main.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="config.js"></script>
-    <script src="supabase-client.js"></script>
-    
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            margin: 0;
-            padding: 0;
-            line-height: 1.6;
-        }
-        
-        .deal-hero {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 3rem 0;
-            text-align: center;
-        }
-        
-        .deal-hero h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        
-        .deal-hero .cruise-line {
-            font-size: 1.5rem;
-            opacity: 0.9;
-            margin-bottom: 2rem;
-        }
-        
-        .cruise-type-badge {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-        
-        .deal-content {
-            background: white;
-            margin: -2rem auto 2rem;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            position: relative;
-            z-index: 10;
-        }
-        
-        .deal-nav {
-            display: flex;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        
-        .deal-nav-item {
-            flex: 1;
-            padding: 1.5rem;
-            text-align: center;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            color: #6b7280;
-            transition: all 0.3s ease;
-        }
-        
-        .deal-nav-item.active {
-            color: #3b82f6;
-            background: #f8fafc;
-            border-bottom: 3px solid #3b82f6;
-        }
-        
-        .deal-nav-item:hover {
-            background: #f8fafc;
-            color: #3b82f6;
-        }
-        
-        .deal-section {
-            display: none;
-            padding: 2rem;
-        }
-        
-        .deal-section.active {
-            display: block;
-        }
-        
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-        
-        .info-card {
-            background: #f8fafc;
-            padding: 1.5rem;
-            border-radius: 12px;
-            border-left: 4px solid #3b82f6;
-        }
-        
-        .info-card h3 {
-            color: #374151;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .info-card p {
-            margin: 0.5rem 0;
-            color: #6b7280;
-        }
-        
-        .pricing-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-        
-        .pricing-card {
-            background: #f8fafc;
-            padding: 1.5rem;
-            border-radius: 12px;
-            text-align: center;
-            border: 2px solid #e5e7eb;
-            transition: all 0.3s ease;
-        }
-        
-        .pricing-card:hover {
-            border-color: #3b82f6;
-            transform: translateY(-2px);
-        }
-        
-        .pricing-card h4 {
-            color: #374151;
-            margin-bottom: 1rem;
-            font-size: 1.1rem;
-        }
-        
-        .pricing-card .price {
-            color: #059669;
-            font-weight: 700;
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .pricing-card .description {
-            color: #6b7280;
-            font-size: 0.9rem;
-        }
-        
-        .itinerary-map {
-            width: 100%;
-            height: 400px;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            margin: 2rem 0;
-            background: #f8fafc;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #6b7280;
-            font-size: 1.1rem;
-        }
-        
-        .book-section {
-            background: linear-gradient(135deg, #059669 0%, #047857 100%);
-            color: white;
-            padding: 3rem;
-            text-align: center;
-            margin: 2rem 0;
-            border-radius: 12px;
-        }
-        
-        .book-btn {
-            background: white;
-            color: #059669;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            font-size: 1.2rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 1rem;
-        }
-        
-        .book-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
-        }
-        
-        .highlight-box {
-            background: #fef7ff;
-            border: 1px solid #e879f9;
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-        }
-        
-        .highlight-box h3 {
-            color: #a21caf;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .highlight-box p {
-            color: #86198f;
-            margin: 0;
-        }
-        
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #3b82f6;
-            text-decoration: none;
-            font-weight: 600;
-            margin-bottom: 2rem;
-            transition: color 0.3s ease;
-        }
-        
-        .back-link:hover {
-            color: #1d4ed8;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Deal Details | Interline Asia</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
-    <div id="header-placeholder"></div>
-    
-    <!-- Deal Hero Section -->
-    <div class="deal-hero">
-        <div class="container">
-            <h1 id="ship-name">Loading...</h1>
-            <p id="cruise-line" class="cruise-line">Loading...</p>
-            <span id="cruise-type-badge" class="cruise-type-badge">Loading...</span>
+  <header>
+    <h1>Interline Asia</h1>
+    <nav><a href="/deals.html">← Back to All Deals</a></nav>
+  </header>
+
+  <main id="deal-container" style="padding: 20px;">
+    <h2>Loading deal...</h2>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Interline Asia</p>
+  </footer>
+
+  <script>
+    const SUPABASE_URL = "https://interlineasia.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImludGVybGluZWFzaWEiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTcxOTU1NzQ0NCwiZXhwIjoyMDM1MTMzNDQ0fQ.YHBaKJAK-VZQJhV_4PoNcNGjOdZeE8vMSQNJQZQJQZQ";
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function loadDealDetails() {
+      const params = new URLSearchParams(window.location.search);
+      const dealId = params.get('id');
+      if (!dealId) {
+        document.getElementById("deal-container").innerHTML = "<p>❌ No deal ID provided.</p>";
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("cruise_deals")
+        .select("*")
+        .eq("id", dealId)
+        .single();
+
+      if (error || !data) {
+        document.getElementById("deal-container").innerHTML = "<p>❌ Deal not found.</p>";
+        return;
+      }
+
+      const {
+        cruise_line,
+        ship,
+        cruise_type,
+        destination,
+        itinerary,
+        departure_date,
+        price,
+        cabin_1,
+        cabin_2,
+        cabin_3,
+        cabin_4
+      } = data;
+
+      const logo = `/assets/logos/${cruise_line.toLowerCase().replace(/\s+/g, "-")}.png`;
+      const badgeColor = {
+        "Ocean Cruise": "blue",
+        "River Cruise": "green",
+        "Expedition Cruise": "orange"
+      }[cruise_type] || "gray";
+
+      document.getElementById("deal-container").innerHTML = \`
+        <div class="deal-detail">
+          <img src="\${logo}" alt="\${cruise_line} logo" style="height:50px" />
+          <h2>\${ship} - <span style="background:\${badgeColor}; color:#fff; padding:2px 8px; border-radius:6px">\${cruise_type}</span></h2>
+          <p><strong>Destination:</strong> \${destination}</p>
+          <p><strong>Itinerary:</strong> \${itinerary}</p>
+          <p><strong>Departure Date:</strong> \${departure_date}</p>
+          <p><strong>Price:</strong> \${price || 'TBA'}</p>
+          <h3>Cabins</h3>
+          <ul>
+            <li>Interior: \${cabin_1 || 'N/A'}</li>
+            <li>Oceanview: \${cabin_2 || 'N/A'}</li>
+            <li>Balcony: \${cabin_3 || 'N/A'}</li>
+            <li>Suite: \${cabin_4 || 'N/A'}</li>
+          </ul>
+          <h3>Route Map</h3>
+          <div style="width:100%; height:300px; background:#ddd; text-align:center; line-height:300px;">🗺️ Map Placeholder</div>
+          <br />
+          <a href="/booking.html?id=\${dealId}">
+            <button style="padding:10px 20px; font-size:16px;">Book This Cruise</button>
+          </a>
         </div>
-    </div>
+      \`;
+    }
 
-    <div class="container">
-        <a href="/deals.html" class="back-link">
-            <i class="ri-arrow-left-line"></i>
-            Back to All Deals
-        </a>
-        
-        <!-- Deal Content -->
-        <div class="deal-content">
-            <!-- Navigation Tabs -->
-            <div class="deal-nav">
-                <button class="deal-nav-item active" onclick="showSection('overview')">
-                    <i class="ri-information-line"></i> Overview
-                </button>
-                <button class="deal-nav-item" onclick="showSection('itinerary')">
-                    <i class="ri-route-line"></i> Itinerary
-                </button>
-                <button class="deal-nav-item" onclick="showSection('pricing')">
-                    <i class="ri-price-tag-line"></i> Pricing
-                </button>
-                <button class="deal-nav-item" onclick="showSection('booking')">
-                    <i class="ri-calendar-check-line"></i> Book Now
-                </button>
-            </div>
-            
-            <!-- Overview Section -->
-            <div id="overview-section" class="deal-section active">
-                <div class="info-grid">
-                    <div class="info-card">
-                        <h3><i class="ri-ship-line"></i> Cruise Details</h3>
-                        <p><strong>Duration:</strong> <span id="duration">Loading...</span> nights</p>
-                        <p><strong>Destination:</strong> <span id="destination">Loading...</span></p>
-                        <p><strong>Cruise Type:</strong> <span id="cruise-type">Loading...</span></p>
-                    </div>
-                    
-                    <div class="info-card">
-                        <h3><i class="ri-calendar-line"></i> Departure Information</h3>
-                        <p><strong>Date:</strong> <span id="departure-date">Loading...</span></p>
-                        <p><strong>From:</strong> <span id="departure-port">Loading...</span></p>
-                        <p><strong>To:</strong> <span id="arrival-port">Loading...</span></p>
-                    </div>
-                </div>
-                
-                <div class="highlight-box">
-                    <h3><i class="ri-vip-crown-line"></i> Exclusive Industry Professional Rates</h3>
-                    <p>These special rates are exclusively available to verified travel industry professionals. Book through Interline Asia for the best deals and personalized service.</p>
-                </div>
-                
-                <div class="info-card">
-                    <h3><i class="ri-customer-service-line"></i> Why Book with Interline Asia?</h3>
-                    <ul style="color: #6b7280; padding-left: 1.5rem;">
-                        <li>Exclusive industry professional rates</li>
-                        <li>Personalized booking service</li>
-                        <li>24/7 support during your cruise</li>
-                        <li>Flexible payment options</li>
-                        <li>Group booking discounts available</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <!-- Itinerary Section -->
-            <div id="itinerary-section" class="deal-section">
-                <h2 style="color: #374151; margin-bottom: 2rem;">
-                    <i class="ri-route-line" style="color: #3b82f6; margin-right: 0.5rem;"></i>
-                    Cruise Itinerary
-                </h2>
-                
-                <div class="info-card" style="margin-bottom: 2rem;">
-                    <h3><i class="ri-map-pin-line"></i> Route Details</h3>
-                    <p id="itinerary-details">Loading itinerary...</p>
-                </div>
-                
-                <div class="itinerary-map">
-                    <div style="text-align: center;">
-                        <i class="ri-map-line" style="font-size: 3rem; margin-bottom: 1rem; display: block;"></i>
-                        <p>Interactive cruise map coming soon</p>
-                    </div>
-                </div>
-                
-                <div style="background: #fffbeb; border: 1px solid #f59e0b; border-radius: 12px; padding: 1.5rem;">
-                    <h4 style="color: #d97706; margin-bottom: 1rem;">
-                        <i class="ri-information-line" style="margin-right: 0.5rem;"></i>
-                        Important Notes
-                    </h4>
-                    <ul style="color: #92400e; margin: 0; padding-left: 1.5rem;">
-                        <li>Itinerary may be subject to change due to weather or operational requirements</li>
-                        <li>Shore excursions available for additional cost</li>
-                        <li>Port fees and taxes may apply</li>
-                        <li>Detailed daily schedule provided upon booking</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <!-- Pricing Section -->
-            <div id="pricing-section" class="deal-section">
-                <h2 style="color: #374151; margin-bottom: 2rem;">
-                    <i class="ri-price-tag-line" style="color: #3b82f6; margin-right: 0.5rem;"></i>
-                    Cabin Categories & Pricing
-                </h2>
-                
-                <div id="pricing-grid" class="pricing-grid">
-                    <!-- Pricing cards will be populated here -->
-                </div>
-                
-                <div style="background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 12px; padding: 1.5rem; margin: 2rem 0;">
-                    <h4 style="color: #0369a1; margin-bottom: 1rem;">
-                        <i class="ri-discount-percent-line" style="margin-right: 0.5rem;"></i>
-                        Pricing Information
-                    </h4>
-                    <ul style="color: #0c4a6e; margin: 0; padding-left: 1.5rem;">
-                        <li>Prices shown are per person based on double occupancy</li>
-                        <li>Industry professional rates - exclusive to verified travel agents</li>
-                        <li>Additional taxes, fees, and port charges may apply</li>
-                        <li>Prices subject to availability and may change</li>
-                        <li>Group discounts available for 8+ passengers</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <!-- Booking Section -->
-            <div id="booking-section" class="deal-section">
-                <div class="book-section">
-                    <h2 style="margin-bottom: 1rem;">Ready to Book This Cruise?</h2>
-                    <p style="font-size: 1.1rem; opacity: 0.9; margin-bottom: 2rem;">
-                        Secure your exclusive industry professional rate today. Our booking specialists are standing by to assist you.
-                    </p>
-                    <button class="book-btn" onclick="bookThisCruise()">
-                        <i class="ri-calendar-check-line" style="margin-right: 0.5rem;"></i>
-                        Book This Cruise
-                    </button>
-                    <p style="font-size: 0.9rem; opacity: 0.8; margin-top: 1rem;">
-                        Or call us at +61 2 9999 0000 for personalized assistance
-                    </p>
-                </div>
-                
-                <div class="info-grid">
-                    <div class="info-card">
-                        <h3><i class="ri-shield-check-line"></i> Booking Protection</h3>
-                        <p>Your booking is protected with our comprehensive travel insurance options and flexible cancellation policies.</p>
-                    </div>
-                    
-                    <div class="info-card">
-                        <h3><i class="ri-customer-service-2-line"></i> Personal Service</h3>
-                        <p>Dedicated booking specialist assigned to your reservation for personalized service from booking to boarding.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="footer-placeholder"></div>
-    <script src="/js/loadPartials.js"></script>
-
-    <script>
-        // Global variables
-        let currentDeal = null;
-        
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', async () => {
-            console.log('DEAL DETAILS: Page loaded, initializing...');
-            
-            // Check authentication
-            const isAuthenticated = await checkAuthentication();
-            if (!isAuthenticated) {
-                return;
-            }
-            
-            // Load deal details
-            loadDealDetails();
-        });
-        
-        // Check authentication
-        async function checkAuthentication() {
-            try {
-                if (!window.supabaseClient) {
-                    console.error('DEAL DETAILS: Supabase client not available');
-                    window.location.href = '/login.html';
-                    return false;
-                }
-                
-                await window.supabaseClient.readyPromise;
-                
-                const { data: { session }, error } = await window.supabaseClient.supabase.auth.getSession();
-                
-                if (error || !session) {
-                    console.log('DEAL DETAILS: No valid session, redirecting to login');
-                    window.location.href = '/login.html';
-                    return false;
-                }
-                
-                console.log('DEAL DETAILS: User authenticated:', session.user.email);
-                return true;
-                
-            } catch (error) {
-                console.error('DEAL DETAILS: Authentication error:', error);
-                window.location.href = '/login.html';
-                return false;
-            }
-        }
-        
-        // Load deal details from URL parameters
-        function loadDealDetails() {
-            const urlParams = new URLSearchParams(window.location.search);
-            
-            const deal = {
-                id: urlParams.get('id'),
-                ship_name: urlParams.get('ship'),
-                cruise_line: urlParams.get('cruise_line'),
-                destination: urlParams.get('destination'),
-                departure_date: urlParams.get('departure_date'),
-                duration: urlParams.get('duration'),
-                cruise_type: urlParams.get('cruise_type') || 'Ocean Cruise'
-            };
-            
-            currentDeal = deal;
-            
-            // Populate page content
-            populatePageContent(deal);
-        }
-        
-        // Populate page content
-        function populatePageContent(deal) {
-            // Hero section
-            document.getElementById('ship-name').textContent = deal.ship_name || 'Cruise Ship';
-            document.getElementById('cruise-line').textContent = deal.cruise_line || 'Cruise Line';
-            
-            // Cruise type badge
-            const cruiseTypeBadge = document.getElementById('cruise-type-badge');
-            cruiseTypeBadge.textContent = deal.cruise_type;
-            
-            // Set badge colors
-            const typeColors = {
-                'Ocean Cruise': { bg: '#e0f2fe', color: '#0277bd' },
-                'River Cruise': { bg: '#e8f5e8', color: '#2e7d32' },
-                'Expedition Cruise': { bg: '#fff3e0', color: '#f57c00' }
-            };
-            
-            const colors = typeColors[deal.cruise_type] || typeColors['Ocean Cruise'];
-            cruiseTypeBadge.style.backgroundColor = colors.bg;
-            cruiseTypeBadge.style.color = colors.color;
-            
-            // Overview section
-            document.getElementById('duration').textContent = deal.duration || 'N/A';
-            document.getElementById('destination').textContent = deal.destination || 'N/A';
-            document.getElementById('cruise-type').textContent = deal.cruise_type || 'Ocean Cruise';
-            
-            // Format and display departure date
-            let dateDisplay = 'Date TBA';
-            if (deal.departure_date) {
-                try {
-                    const date = new Date(deal.departure_date);
-                    if (!isNaN(date.getTime())) {
-                        dateDisplay = date.toLocaleDateString('en-US', { 
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long', 
-                            day: 'numeric'
-                        });
-                    }
-                } catch (e) {
-                    dateDisplay = deal.departure_date;
-                }
-            }
-            
-            document.getElementById('departure-date').textContent = dateDisplay;
-            document.getElementById('departure-port').textContent = 'Various Ports';
-            document.getElementById('arrival-port').textContent = 'Round Trip';
-            
-            // Itinerary section
-            document.getElementById('itinerary-details').textContent = 
-                'Detailed itinerary available upon booking. Contact our specialists for complete day-by-day schedule.';
-            
-            // Pricing section
-            populatePricingSection();
-            
-            // Update page title
-            document.title = `${deal.ship_name} - ${deal.cruise_line} | Interline Asia`;
-        }
-        
-        // Populate pricing section
-        function populatePricingSection() {
-            const pricingGrid = document.getElementById('pricing-grid');
-            
-            const cabinTypes = [
-                { name: 'Interior Cabin', description: 'Comfortable interior stateroom', price: 'TBA' },
-                { name: 'Oceanview Cabin', description: 'Cabin with ocean view window', price: 'TBA' },
-                { name: 'Balcony Cabin', description: 'Private balcony with ocean views', price: 'TBA' },
-                { name: 'Suite', description: 'Spacious suite with premium amenities', price: 'TBA' }
-            ];
-            
-            const pricingHTML = cabinTypes.map(cabin => `
-                <div class="pricing-card">
-                    <h4>${cabin.name}</h4>
-                    <div class="price">From $${cabin.price}</div>
-                    <div class="description">${cabin.description}</div>
-                </div>
-            `).join('');
-            
-            pricingGrid.innerHTML = pricingHTML;
-        }
-        
-        // Show specific section
-        function showSection(sectionName) {
-            // Hide all sections
-            document.querySelectorAll('.deal-section').forEach(section => {
-                section.classList.remove('active');
-            });
-            
-            // Hide all nav items
-            document.querySelectorAll('.deal-nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            // Show selected section
-            document.getElementById(`${sectionName}-section`).classList.add('active');
-            
-            // Activate corresponding nav item
-            event.target.classList.add('active');
-        }
-        
-        // Book this cruise
-        function bookThisCruise() {
-            if (!currentDeal) {
-                alert('Deal information not available. Please try again.');
-                return;
-            }
-            
-            // Create booking URL with deal details
-            const bookingParams = new URLSearchParams({
-                ship: currentDeal.ship_name || '',
-                cruise_line: currentDeal.cruise_line || '',
-                departure_date: currentDeal.departure_date || '',
-                duration: currentDeal.duration || '',
-                destination: currentDeal.destination || '',
-                cruise_type: currentDeal.cruise_type || ''
-            });
-            
-            // Redirect to booking page
-            window.location.href = `/booking.html?${bookingParams.toString()}`;
-        }
-    </script>
+    document.addEventListener("DOMContentLoaded", loadDealDetails);
+  </script>
 </body>
 </html>

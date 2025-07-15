@@ -225,15 +225,9 @@ class SupabaseClient {
     await this.readyPromise;
     console.log('AUTH: Attempting login for:', email);
     
-    const options = {};
-    if (turnstileToken) {
-      options.captchaToken = turnstileToken;
-    }
-    
     const { data, error } = await this.supabase.auth.signInWithPassword({
       email,
-      password,
-      options
+      password
     });
     
     console.log('AUTH: Supabase auth response:', { data, error });

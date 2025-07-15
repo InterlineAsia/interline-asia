@@ -109,10 +109,10 @@
       console.log('LOGIN: Form submitted for:', email);
 
       // Admin bypass logic
-      const adminEmails = ['rodney@telenational.com.au', 'admin@telenational.com.au'];
+      const adminEmails = ['rodney@telenational.com.au', 'admin@telenational.com.au', 'admin@interlineasia.com'];
       let turnstileToken = '';
 
-      if (adminEmails.includes(email)) {
+      if (adminEmails.includes(email.toLowerCase())) {
         console.warn('LOGIN: ADMIN BYPASS - Allowing login without Turnstile for admin user');
         turnstileToken = 'ADMIN_BYPASS_TOKEN';
         window.turnstileCompleted = true;
@@ -142,40 +142,65 @@
       console.log('LOGIN: Token and Turnstile verified. Proceeding with Supabase auth...');
 
       try {
+        // Clear any previous error messages
+        const errorEl = document.getElementById('error-message');
+        if (errorEl) {
+          errorEl.style.display = 'none';
+        }
+
         // Wait for Supabase client to be ready
-        if (window.supabaseClient) {
-          await window.supabaseClient.readyPromise;
+        if (!window.supabaseClient) {
+          throw new Error('Supabase client not initialized');
+        }
+        
+        await window.supabaseClient.readyPromise;
+        console.log('LOGIN: Supabase client ready, attempting authentication...');
+
+        // Use the signIn method from our client which handles metadata properly
+        const result = await window.supabaseClient.signIn(email, password, turnstileToken);
+
+        if (!result || !result.user) {
+          throw new Error('Authentication failed - no user returned');
         }
 
-        // Use the global supabase client
-        const { data, error } = await window.supabaseClient.supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (error) {
-          console.error('LOGIN: Supabase error:', error.message);
-          alert('Invalid email or password.');
-          return;
-        }
-
-        console.log('LOGIN SUCCESS: Authenticated');
+        console.log('LOGIN SUCCESS: User authenticated:', result.user.email);
+        console.log('LOGIN: User role:', result.user.role);
+        console.log('LOGIN: Is admin:', result.user.is_admin);
 
         // Track successful login
         if (typeof gtag !== 'undefined') {
           gtag('event', 'login', { method: 'email' });
         }
 
-        if (adminEmails.includes(email)) {
-          console.log('LOGIN: Redirecting admin to dashboard choice');
+        // Redirect based on user role/admin status
+        if (result.user.is_admin || result.user.is_super_admin || adminEmails.includes(email.toLowerCase())) {
+          console.log('LOGIN: Redirecting admin user to dashboard choice');
           window.location.href = '/dashboard-choice.html';
         } else {
-          console.log('LOGIN: Redirecting user to dashboard');
+          console.log('LOGIN: Redirecting regular user to dashboard');
           window.location.href = '/dashboard.html';
         }
       } catch (err) {
-        console.error('LOGIN: Unexpected error occurred:', err);
-        alert('Unexpected error occurred. Please try again.');
+        console.error('LOGIN: Authentication error:', err);
+        const errorEl = document.getElementById('error-message');
+        if (errorEl) {
+          let errorMessage = 'Login failed. Please check your credentials and try again.';
+          
+          if (err.message) {
+            if (err.message.includes('Invalid login credentials')) {
+              errorMessage = 'Invalid email or password. Please check your credentials.';
+            } else if (err.message.includes('Email not confirmed')) {
+              errorMessage = 'Please check your email and click the confirmation link before signing in.';
+            } else if (err.message.includes('Too many requests')) {
+              errorMessage = 'Too many login attempts. Please wait a moment and try again.';
+            } else {
+              errorMessage = `Login failed: ${err.message}`;
+            }
+          }
+          
+          errorEl.textContent = errorMessage;
+          errorEl.style.display = 'block';
+        }
       }
     });
 

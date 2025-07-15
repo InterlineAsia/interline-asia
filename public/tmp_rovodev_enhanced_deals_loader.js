@@ -23,7 +23,7 @@ async function fetchDealsFromSupabase(filters = {}) {
     query = query.gte('departure_date', filters.startDate).lte('departure_date', filters.endDate);
   }
 
-  const { data, error } = await query;
+  const { data, error } = await query.order('departure_date', { ascending: true });
 
   if (error) {
     console.error('Supabase Error:', error);

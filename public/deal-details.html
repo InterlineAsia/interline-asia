@@ -1,232 +1,751 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Deal Details | Interline Asia</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="/css/main.css" />
+  
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+  <script src="tmp_rovodev_deals_loader.js"></script>
+  
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FYGT92WCXC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-FYGT92WCXC');
+  </script>
+  
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
     body {
       font-family: 'Inter', sans-serif;
       background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-      margin: 0;
-      padding: 0;
+      color: #1e293b;
+      line-height: 1.6;
+      min-height: 100vh;
     }
-    .deal-detail-container {
-      max-width: 1000px;
-      margin: 2rem auto;
+    
+    /* Header */
+    .detail-header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+      color: white;
       padding: 2rem;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      position: relative;
+      overflow: hidden;
     }
-    .cruise-logo {
+    
+    .detail-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="waves" patternUnits="userSpaceOnUse" width="100" height="100"><path d="M0,50 Q25,30 50,50 T100,50 V100 H0 Z" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23waves)"/></svg>');
+      opacity: 0.3;
+    }
+    
+    .header-content {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 2rem;
+      align-items: center;
+    }
+    
+    .cruise-logo-large {
       height: 60px;
+      width: auto;
+      max-width: 150px;
+      object-fit: contain;
+    }
+    
+    .header-info h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+    
+    .header-info .cruise-line {
+      font-size: 1.25rem;
+      opacity: 0.9;
       margin-bottom: 1rem;
     }
-    .cruise-badge {
-      display: inline-block;
-      padding: 4px 12px;
-      border-radius: 20px;
-      color: white;
+    
+    .quick-facts {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    
+    .quick-fact {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
       font-size: 0.875rem;
-      font-weight: 500;
-      margin-left: 1rem;
     }
-    .itinerary-section {
-      background: #f8fafc;
-      padding: 1.5rem;
-      border-radius: 8px;
-      margin: 1.5rem 0;
+    
+    .quick-fact i {
+      color: #60a5fa;
     }
-    .cabin-grid {
+    
+    .cruise-type-badge-large {
+      padding: 0.5rem 1rem;
+      border-radius: 25px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    
+    .cruise-type-badge-large.river-cruise {
+      background: rgba(34, 197, 94, 0.2);
+      color: #22c55e;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+    
+    .cruise-type-badge-large.ocean-cruise {
+      background: rgba(59, 130, 246, 0.2);
+      color: #3b82f6;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+    
+    /* Main Content */
+    .main-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      margin: 1rem 0;
+      grid-template-columns: 2fr 1fr;
+      gap: 2rem;
     }
-    .cabin-card {
-      background: #f8fafc;
-      padding: 1rem;
-      border-radius: 8px;
-      text-align: center;
+    
+    .content-section {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      margin-bottom: 2rem;
     }
+    
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .section-title i {
+      color: #3b82f6;
+    }
+    
+    /* Map Section */
     .map-placeholder {
       width: 100%;
       height: 300px;
-      background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
-      border-radius: 8px;
+      background: linear-gradient(135deg, #e0f2fe 0%, #b3e5fc 100%);
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2rem;
-      color: #64748b;
-      margin: 1.5rem 0;
+      color: #0277bd;
+      font-size: 1.125rem;
+      border: 2px dashed #4fc3f7;
     }
-    .book-button {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    
+    /* Itinerary */
+    .itinerary-list {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .itinerary-item {
+      padding: 1rem;
+      border-left: 3px solid #3b82f6;
+      margin-left: 1rem;
+      margin-bottom: 1rem;
+      background: #f8fafc;
+      border-radius: 0 8px 8px 0;
+      position: relative;
+    }
+    
+    .itinerary-item::before {
+      content: '';
+      position: absolute;
+      left: -8px;
+      top: 1.25rem;
+      width: 12px;
+      height: 12px;
+      background: #3b82f6;
+      border-radius: 50%;
+      border: 3px solid white;
+    }
+    
+    .itinerary-item:last-child {
+      border-left-color: #22c55e;
+    }
+    
+    .itinerary-item:last-child::before {
+      background: #22c55e;
+    }
+    
+    /* Pricing Table */
+    .pricing-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    
+    .pricing-table th,
+    .pricing-table td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .pricing-table th {
+      background: #f8fafc;
+      font-weight: 600;
+      color: #374151;
+    }
+    
+    .pricing-table .price {
+      font-weight: 700;
+      font-size: 1.125rem;
+    }
+    
+    .pricing-table .price.available {
+      color: #059669;
+    }
+    
+    .pricing-table .price.quote {
+      color: #64748b;
+    }
+    
+    /* Sidebar */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+    
+    .booking-card {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      text-align: center;
+    }
+    
+    .best-price {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+    
+    .best-price.available {
+      color: #059669;
+    }
+    
+    .best-price.quote {
+      color: #64748b;
+      font-size: 1.5rem;
+    }
+    
+    .price-note {
+      font-size: 0.875rem;
+      color: #64748b;
+      margin-bottom: 2rem;
+    }
+    
+    .btn-book {
+      width: 100%;
+      padding: 1rem 2rem;
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
       color: white;
-      padding: 12px 24px;
       border: none;
+      border-radius: 12px;
+      font-size: 1.125rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 1rem;
+    }
+    
+    .btn-book:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(5, 150, 105, 0.4);
+    }
+    
+    .btn-book:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .btn-back {
+      width: 100%;
+      padding: 0.75rem 1.5rem;
+      background: transparent;
+      color: #3b82f6;
+      border: 2px solid #3b82f6;
       border-radius: 8px;
-      font-size: 1.1rem;
       font-weight: 600;
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: all 0.2s;
     }
-    .book-button:hover {
-      transform: translateY(-2px);
+    
+    .btn-back:hover {
+      background: #3b82f6;
+      color: white;
     }
-    .back-link {
-      color: #667eea;
-      text-decoration: none;
-      font-weight: 500;
-      margin-bottom: 1rem;
-      display: inline-block;
+    
+    /* What's Included */
+    .included-list {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .included-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    
+    .included-item:last-child {
+      border-bottom: none;
+    }
+    
+    .included-item i {
+      color: #22c55e;
+      font-size: 1.125rem;
+    }
+    
+    /* Loading State */
+    .loading {
+      text-align: center;
+      padding: 4rem 2rem;
+    }
+    
+    .loading i {
+      font-size: 3rem;
+      color: #3b82f6;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 1rem;
+      }
+      
+      .header-info h1 {
+        font-size: 2rem;
+      }
+      
+      .quick-facts {
+        justify-content: center;
+      }
+      
+      .main-content {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+      }
+      
+      .content-section {
+        padding: 1.5rem;
+      }
     }
   </style>
 </head>
+
 <body>
-  <div id="header-placeholder"></div>
+  <!-- Loading State -->
+  <div id="loading-state" class="loading">
+    <i class="ri-loader-4-line"></i>
+    <p>Loading deal details...</p>
+  </div>
 
-  <main class="deal-detail-container">
-    <a href="/deals.html" class="back-link">
-      <i class="ri-arrow-left-line"></i> Back to All Deals
-    </a>
-    <div id="deal-container">
-      <div class="loading-spinner">
-        <i class="ri-loader-4-line"></i>
-        <h2>Loading deal details...</h2>
-      </div>
-    </div>
-  </main>
-
-  <div id="footer-placeholder"></div>
-  <script src="/js/loadPartials.js"></script>
-
-  <script>
-    const SUPABASE_URL = "https://nxreyyxbuwxjfmtvdkji.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im54cmV5eXhidXd4amZtdHZka2ppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NTg4NDQsImV4cCI6MjA2NzAzNDg0NH0.SuaK9TqBLbysPCe0zyrMA8owMK4R-q7iNZbtLQzEKcE";
-    const { createClient } = supabase;
-    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    async function loadDealDetails() {
-      const params = new URLSearchParams(window.location.search);
-      const dealId = params.get('id');
-      if (!dealId) {
-        document.getElementById("deal-container").innerHTML = "<p>❌ No deal ID provided.</p>";
-        return;
-      }
-
-      const { data, error } = await supabaseClient
-        .from("cruise_deals")
-        .select("*")
-        .eq("id", dealId)
-        .single();
-
-      if (error || !data) {
-        document.getElementById("deal-container").innerHTML = "<p>❌ Deal not found.</p>";
-        return;
-      }
-
-      const {
-        cruise_line,
-        ship,
-        cruise_type,
-        destination,
-        itinerary,
-        departure_date,
-        price,
-        cabin_1,
-        cabin_2,
-        cabin_3,
-        cabin_4
-      } = data;
-
-      const logo = `/logos/cruiselines/${cruise_line.toLowerCase().replace(/\s+/g, "-")}.png`;
-      const fallbackLogo = '/logos/cruiselines/placeholder.png';
-      const badgeColors = {
-        "Ocean Cruise": "#3b82f6",
-        "River Cruise": "#10b981",
-        "Expedition Cruise": "#f59e0b"
-      };
-      const badgeColor = badgeColors[cruise_type] || "#6b7280";
-
-      document.getElementById("deal-container").innerHTML = \`
-        <div class="deal-detail">
-          <div style="display: flex; align-items: center; margin-bottom: 2rem;">
-            <img class="cruise-logo" src="\${logo}" alt="\${cruise_line} logo" 
-                 onerror="this.src='\${fallbackLogo}'" />
-            <div>
-              <h1 style="margin: 0; color: #1e293b; font-size: 2rem; font-weight: 700;">\${ship}</h1>
-              <span class="cruise-badge" style="background-color:\${badgeColor}">\${cruise_type}</span>
+  <!-- Main Content (hidden initially) -->
+  <div id="main-content" style="display: none;">
+    <!-- Header -->
+    <header class="detail-header">
+      <div class="header-content">
+        <img id="cruise-logo" src="" alt="" class="cruise-logo-large">
+        
+        <div class="header-info">
+          <h1 id="ship-name">Loading...</h1>
+          <p id="cruise-line" class="cruise-line">Loading...</p>
+          <div class="quick-facts">
+            <div class="quick-fact">
+              <i class="ri-map-pin-line"></i>
+              <span id="destination">Loading...</span>
             </div>
-          </div>
-          
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
-            <div>
-              <h3 style="color: #374151; margin-bottom: 1rem;"><i class="ri-map-pin-line"></i> Destination</h3>
-              <p style="font-size: 1.1rem; color: #1e293b; font-weight: 500;">\${destination}</p>
+            <div class="quick-fact">
+              <i class="ri-time-line"></i>
+              <span id="duration">Loading...</span>
             </div>
-            <div>
-              <h3 style="color: #374151; margin-bottom: 1rem;"><i class="ri-calendar-line"></i> Departure Date</h3>
-              <p style="font-size: 1.1rem; color: #1e293b; font-weight: 500;">\${new Date(departure_date).toLocaleDateString()}</p>
+            <div class="quick-fact">
+              <i class="ri-calendar-line"></i>
+              <span id="departure-date">Loading...</span>
             </div>
-          </div>
-          
-          <div class="itinerary-section">
-            <h3 style="color: #374151; margin-bottom: 1rem;"><i class="ri-route-line"></i> Itinerary</h3>
-            <p style="color: #1e293b; line-height: 1.6;">\${itinerary}</p>
-          </div>
-          
-          <div style="margin: 2rem 0;">
-            <h3 style="color: #374151; margin-bottom: 1rem;"><i class="ri-price-tag-line"></i> Pricing</h3>
-            <div class="cabin-grid">
-              <div class="cabin-card">
-                <h4 style="margin: 0 0 0.5rem 0; color: #374151;">Interior</h4>
-                <p style="margin: 0; font-weight: 600; color: #059669;">\${cabin_1 ? '$' + parseFloat(cabin_1).toLocaleString() : 'N/A'}</p>
-              </div>
-              <div class="cabin-card">
-                <h4 style="margin: 0 0 0.5rem 0; color: #374151;">Oceanview</h4>
-                <p style="margin: 0; font-weight: 600; color: #059669;">\${cabin_2 ? '$' + parseFloat(cabin_2).toLocaleString() : 'N/A'}</p>
-              </div>
-              <div class="cabin-card">
-                <h4 style="margin: 0 0 0.5rem 0; color: #374151;">Balcony</h4>
-                <p style="margin: 0; font-weight: 600; color: #059669;">\${cabin_3 ? '$' + parseFloat(cabin_3).toLocaleString() : 'N/A'}</p>
-              </div>
-              <div class="cabin-card">
-                <h4 style="margin: 0 0 0.5rem 0; color: #374151;">Suite</h4>
-                <p style="margin: 0; font-weight: 600; color: #059669;">\${cabin_4 ? '$' + parseFloat(cabin_4).toLocaleString() : 'N/A'}</p>
-              </div>
-            </div>
-          </div>
-          
-          <div style="margin: 2rem 0;">
-            <h3 style="color: #374151; margin-bottom: 1rem;"><i class="ri-map-line"></i> Route Map</h3>
-            <div class="map-placeholder">
-              <div style="text-align: center;">
-                <i class="ri-map-2-line" style="font-size: 3rem; margin-bottom: 1rem; display: block;"></i>
-                <p style="margin: 0; font-weight: 500;">Interactive route map coming soon</p>
-              </div>
-            </div>
-          </div>
-          
-          <div style="text-align: center; margin-top: 3rem;">
-            <a href="/booking.html?id=\${dealId}" style="text-decoration: none;">
-              <button class="book-button">
-                <i class="ri-ship-line"></i> Book This Cruise
-              </button>
-            </a>
           </div>
         </div>
-      \`;
+        
+        <div id="cruise-type-badge" class="cruise-type-badge-large">Loading...</div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="content-column">
+        <!-- Map Section -->
+        <section class="content-section">
+          <h2 class="section-title">
+            <i class="ri-map-2-line"></i>
+            Route Map
+          </h2>
+          <div id="map-container">
+            <div class="map-placeholder">
+              <div>
+                <i class="ri-map-2-line" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
+                Interactive map coming soon
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Itinerary Section -->
+        <section class="content-section">
+          <h2 class="section-title">
+            <i class="ri-route-line"></i>
+            Itinerary
+          </h2>
+          <ul id="itinerary-list" class="itinerary-list">
+            <li class="itinerary-item">Loading itinerary...</li>
+          </ul>
+        </section>
+
+        <!-- Cabin Types & Pricing -->
+        <section class="content-section">
+          <h2 class="section-title">
+            <i class="ri-hotel-bed-line"></i>
+            Cabin Types & Pricing
+          </h2>
+          <table class="pricing-table">
+            <thead>
+              <tr>
+                <th>Cabin Type</th>
+                <th>Price per Person</th>
+              </tr>
+            </thead>
+            <tbody id="pricing-table-body">
+              <tr>
+                <td>Loading...</td>
+                <td>Loading...</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- What's Included -->
+        <section class="content-section">
+          <h2 class="section-title">
+            <i class="ri-checkbox-circle-line"></i>
+            What's Included
+          </h2>
+          <ul class="included-list">
+            <li class="included-item">
+              <i class="ri-check-line"></i>
+              <span>All meals and beverages</span>
+            </li>
+            <li class="included-item">
+              <i class="ri-check-line"></i>
+              <span>Shore excursions</span>
+            </li>
+            <li class="included-item">
+              <i class="ri-check-line"></i>
+              <span>Onboard entertainment</span>
+            </li>
+            <li class="included-item">
+              <i class="ri-check-line"></i>
+              <span>Wi-Fi access</span>
+            </li>
+            <li class="included-item">
+              <i class="ri-check-line"></i>
+              <span>Gratuities</span>
+            </li>
+          </ul>
+        </section>
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="booking-card">
+          <div id="best-price" class="best-price">Loading...</div>
+          <p class="price-note">Best available price per person</p>
+          
+          <button id="book-button" class="btn-book" disabled>
+            Book This Cruise
+          </button>
+          <p style="font-size: 0.875rem; color: #64748b; margin-bottom: 1rem;">
+            Booking form coming soon
+          </p>
+          
+          <button class="btn-back" onclick="window.location.href='/deals.html'">
+            <i class="ri-arrow-left-line"></i>
+            Back to Deals
+          </button>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    class DealDetailsLoader {
+      constructor() {
+        this.dealId = this.getDealIdFromUrl();
+        this.deal = null;
+        this.init();
+      }
+
+      getDealIdFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('id');
+      }
+
+      async init() {
+        if (!this.dealId) {
+          this.showError('No deal ID provided');
+          return;
+        }
+
+        try {
+          await this.loadDealDetails();
+          this.renderDealDetails();
+          this.showContent();
+        } catch (error) {
+          console.error('Error loading deal details:', error);
+          this.showError('Failed to load deal details');
+        }
+      }
+
+      async loadDealDetails() {
+        // Try to load from Supabase first
+        if (window.supabase) {
+          const { data, error } = await window.supabase
+            .from('cruise_deals')
+            .select('*')
+            .eq('id', this.dealId)
+            .single();
+
+          if (!error && data) {
+            this.deal = this.formatDeal(data);
+            return;
+          }
+        }
+
+        // Fallback to sample data or CSV parsing
+        this.loadSampleDeal();
+      }
+
+      formatDeal(deal) {
+        return {
+          id: deal.id,
+          cruiseType: deal.cruise_type || 'Ocean Cruise',
+          cruiseLine: deal.cruise_line,
+          shipName: deal.ship_name,
+          region: deal.region,
+          nights: deal.nights,
+          departureDate: deal.departure_date,
+          departurePort: deal.departure_port,
+          arrivalPort: deal.arrival_port,
+          itinerary: deal.itinerary,
+          insidePrice: parseFloat(deal.inside_price) || 0,
+          oceanviewPrice: parseFloat(deal.oceanview_price) || 0,
+          balconyPrice: parseFloat(deal.balcony_price) || 0,
+          suitePrice: parseFloat(deal.suite_price) || 0,
+          shipMap: deal.ship_map,
+          offerUrl: deal.offer_url
+        };
+      }
+
+      loadSampleDeal() {
+        // Sample deal for demonstration
+        this.deal = {
+          id: this.dealId,
+          cruiseType: 'River Cruise',
+          cruiseLine: 'AmaWaterways',
+          shipName: 'AmaBella',
+          region: 'Europe',
+          nights: 7,
+          departureDate: '2025-07-07',
+          departurePort: 'Budapest, Hungary',
+          arrivalPort: 'Vilshofen, Germany',
+          itinerary: 'Melodies of the Danube 2025 - Budapest | Bratislava | Vienna | Dürnstein | Melk | Passau | Vilshofen',
+          insidePrice: 3440,
+          oceanviewPrice: 4040,
+          balconyPrice: 4640,
+          suitePrice: 0
+        };
+      }
+
+      renderDealDetails() {
+        if (!this.deal) return;
+
+        // Header information
+        document.getElementById('ship-name').textContent = this.deal.shipName;
+        document.getElementById('cruise-line').textContent = this.deal.cruiseLine;
+        document.getElementById('destination').textContent = this.deal.region || this.deal.departurePort;
+        document.getElementById('duration').textContent = `${this.deal.nights} nights`;
+        document.getElementById('departure-date').textContent = this.formatDate(this.deal.departureDate);
+
+        // Cruise logo
+        const logo = document.getElementById('cruise-logo');
+        logo.src = this.getCruiseLineLogo(this.deal.cruiseLine);
+        logo.alt = this.deal.cruiseLine;
+
+        // Cruise type badge
+        const badge = document.getElementById('cruise-type-badge');
+        badge.textContent = this.deal.cruiseType;
+        badge.className = `cruise-type-badge-large ${this.deal.cruiseType.toLowerCase().replace(' ', '-')}`;
+
+        // Itinerary
+        this.renderItinerary();
+
+        // Pricing
+        this.renderPricing();
+
+        // Best price
+        this.renderBestPrice();
+      }
+
+      renderItinerary() {
+        const container = document.getElementById('itinerary-list');
+        if (!this.deal.itinerary) {
+          container.innerHTML = '<li class="itinerary-item">Itinerary details coming soon</li>';
+          return;
+        }
+
+        const ports = this.deal.itinerary.split('|').map(port => port.trim()).filter(port => port);
+        if (ports.length === 0) {
+          container.innerHTML = '<li class="itinerary-item">Itinerary details coming soon</li>';
+          return;
+        }
+
+        container.innerHTML = ports.map(port => `
+          <li class="itinerary-item">${port}</li>
+        `).join('');
+      }
+
+      renderPricing() {
+        const tbody = document.getElementById('pricing-table-body');
+        const cabinTypes = [
+          { name: 'Interior', price: this.deal.insidePrice },
+          { name: 'Oceanview', price: this.deal.oceanviewPrice },
+          { name: 'Balcony', price: this.deal.balconyPrice },
+          { name: 'Suite', price: this.deal.suitePrice }
+        ];
+
+        tbody.innerHTML = cabinTypes.map(cabin => `
+          <tr>
+            <td>${cabin.name}</td>
+            <td class="price ${cabin.price > 0 ? 'available' : 'quote'}">
+              ${cabin.price > 0 ? `$${cabin.price.toLocaleString()}` : 'Quote Available'}
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      renderBestPrice() {
+        const priceElement = document.getElementById('best-price');
+        const prices = [this.deal.insidePrice, this.deal.oceanviewPrice, this.deal.balconyPrice, this.deal.suitePrice]
+          .filter(p => p && p > 0);
+
+        if (prices.length > 0) {
+          const bestPrice = Math.min(...prices);
+          priceElement.textContent = `From $${bestPrice.toLocaleString()}`;
+          priceElement.className = 'best-price available';
+        } else {
+          priceElement.textContent = 'Quote Available';
+          priceElement.className = 'best-price quote';
+        }
+      }
+
+      getCruiseLineLogo(cruiseLine) {
+        if (!cruiseLine) return '/logos/cruiselines/placeholder.png';
+        
+        const slug = cruiseLine.toLowerCase()
+          .replace(/[^a-z0-9\s]/g, '')
+          .replace(/\s+/g, '-')
+          .trim();
+        
+        return `/logos/cruiselines/${slug}.png`;
+      }
+
+      formatDate(dateStr) {
+        if (!dateStr) return '';
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) return dateStr;
+        
+        return date.toLocaleDateString('en-AU', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        });
+      }
+
+      showContent() {
+        document.getElementById('loading-state').style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+      }
+
+      showError(message) {
+        document.getElementById('loading-state').innerHTML = `
+          <i class="ri-error-warning-line"></i>
+          <p>${message}</p>
+          <button class="btn-back" onclick="window.location.href='/deals.html'" style="margin-top: 1rem;">
+            Back to Deals
+          </button>
+        `;
+      }
     }
 
-    document.addEventListener("DOMContentLoaded", loadDealDetails);
+    // Initialize when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      new DealDetailsLoader();
+    });
   </script>
 </body>
 </html>

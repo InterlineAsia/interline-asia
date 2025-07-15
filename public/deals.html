@@ -532,8 +532,50 @@
         
         let deals = [];
         
-        // Try to load from enhanced system
-        if (window.EnhancedDealsLoader) {
+        // Try to load from Supabase directly first
+        try {
+          console.log('DEALS PAGE: Attempting direct Supabase connection...');
+          if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
+            const supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+            console.log('DEALS PAGE: Supabase client created');
+            
+            const { data, error } = await supabaseClient
+              .from('cruise_deals')
+              .select('*')
+              .eq('is_active', true)
+              .order('departure_date', { ascending: true })
+              .limit(100); // Load first 100 deals for performance
+            
+            if (error) {
+              console.error('DEALS PAGE: Supabase error:', error);
+            } else if (data && data.length > 0) {
+              console.log('DEALS PAGE: Loaded', data.length, 'deals from Supabase');
+              deals = data.map(deal => ({
+                id: deal.id,
+                cruiseType: deal.cruise_type || 'Ocean Cruise',
+                cruiseLine: deal.cruise_line,
+                shipName: deal.ship_name,
+                region: deal.region,
+                nights: deal.nights,
+                departureDate: deal.departure_date,
+                departurePort: deal.departure_port,
+                arrivalPort: deal.arrival_port,
+                itinerary: deal.itinerary,
+                insidePrice: parseFloat(deal.inside_price) || 0,
+                oceanviewPrice: parseFloat(deal.oceanview_price) || 0,
+                balconyPrice: parseFloat(deal.balcony_price) || 0,
+                suitePrice: parseFloat(deal.suite_price) || 0
+              }));
+            } else {
+              console.log('DEALS PAGE: No deals found in Supabase');
+            }
+          }
+        } catch (error) {
+          console.error('DEALS PAGE: Direct Supabase connection failed:', error);
+        }
+        
+        // Try enhanced system as fallback
+        if ((!deals || deals.length === 0) && window.EnhancedDealsLoader) {
           try {
             console.log('DEALS PAGE: Attempting to load from enhanced system...');
             const dealsLoader = new window.EnhancedDealsLoader();
@@ -556,6 +598,16 @@
         if (summaryElement) {
           summaryElement.textContent = `Showing ${deals.length} deals`;
         }
+        
+        // Store deals globally for filtering
+        window.allDeals = deals;
+        window.filteredDeals = deals;
+        
+        // Populate filter dropdowns
+        populateFilters(deals);
+        
+        // Setup filter event listeners
+        setupFilters();
         
         // Render deals
         renderDeals(deals, dealsContainer);
@@ -674,6 +726,111 @@
         month: '2-digit',
         year: 'numeric'
       });
+    }
+
+    // Populate filter dropdowns
+    function populateFilters(deals) {
+      console.log('DEALS PAGE: Populating filters with', deals.length, 'deals');
+      
+      // Populate cruise lines
+      const cruiseLineFilter = document.getElementById('cruise-line-filter');
+      if (cruiseLineFilter) {
+        const cruiseLines = [...new Set(deals.map(d => d.cruiseLine))].filter(Boolean).sort();
+        cruiseLineFilter.innerHTML = '<option value="">All Cruise Lines</option>' +
+          cruiseLines.map(line => `<option value="${line}">${line}</option>`).join('');
+        console.log('DEALS PAGE: Added', cruiseLines.length, 'cruise lines to filter');
+      }
+    }
+
+    // Setup filter event listeners
+    function setupFilters() {
+      console.log('DEALS PAGE: Setting up filter event listeners');
+      
+      const searchInput = document.getElementById('search-input');
+      const cruiseLineFilter = document.getElementById('cruise-line-filter');
+      const cruiseTypeFilter = document.getElementById('cruise-type-filter');
+      const destinationFilter = document.getElementById('destination-filter');
+      const dateFromFilter = document.getElementById('date-from-filter');
+      const dateToFilter = document.getElementById('date-to-filter');
+
+      if (searchInput) {
+        searchInput.addEventListener('input', applyFilters);
+      }
+      if (cruiseLineFilter) {
+        cruiseLineFilter.addEventListener('change', applyFilters);
+      }
+      if (cruiseTypeFilter) {
+        cruiseTypeFilter.addEventListener('change', applyFilters);
+      }
+      if (destinationFilter) {
+        destinationFilter.addEventListener('input', applyFilters);
+      }
+      if (dateFromFilter) {
+        dateFromFilter.addEventListener('change', applyFilters);
+      }
+      if (dateToFilter) {
+        dateToFilter.addEventListener('change', applyFilters);
+      }
+    }
+
+    // Apply filters function
+    function applyFilters() {
+      if (!window.allDeals) return;
+      
+      const searchTerm = document.getElementById('search-input')?.value.toLowerCase() || '';
+      const cruiseLine = document.getElementById('cruise-line-filter')?.value || '';
+      const cruiseType = document.getElementById('cruise-type-filter')?.value || '';
+      const destination = document.getElementById('destination-filter')?.value.toLowerCase() || '';
+      const dateFrom = document.getElementById('date-from-filter')?.value || '';
+      const dateTo = document.getElementById('date-to-filter')?.value || '';
+
+      console.log('DEALS PAGE: Applying filters:', { searchTerm, cruiseLine, cruiseType, destination, dateFrom, dateTo });
+
+      window.filteredDeals = window.allDeals.filter(deal => {
+        // Search filter
+        if (searchTerm) {
+          const searchableText = `${deal.cruiseLine} ${deal.shipName} ${deal.region} ${deal.itinerary}`.toLowerCase();
+          if (!searchableText.includes(searchTerm)) return false;
+        }
+
+        // Cruise line filter
+        if (cruiseLine && deal.cruiseLine !== cruiseLine) {
+          return false;
+        }
+
+        // Cruise type filter
+        if (cruiseType && deal.cruiseType !== cruiseType) {
+          return false;
+        }
+
+        // Destination filter
+        if (destination) {
+          const destText = `${deal.region} ${deal.departurePort} ${deal.arrivalPort}`.toLowerCase();
+          if (!destText.includes(destination)) return false;
+        }
+
+        // Date filters
+        if (dateFrom && deal.departureDate < dateFrom) {
+          return false;
+        }
+        if (dateTo && deal.departureDate > dateTo) {
+          return false;
+        }
+
+        return true;
+      });
+
+      console.log('DEALS PAGE: Filtered to', window.filteredDeals.length, 'deals');
+
+      // Update summary
+      const summaryElement = document.getElementById('deals-summary');
+      if (summaryElement) {
+        summaryElement.textContent = `Showing ${window.filteredDeals.length} of ${window.allDeals.length} deals`;
+      }
+
+      // Re-render deals
+      const dealsContainer = document.getElementById('deals-container');
+      renderDeals(window.filteredDeals, dealsContainer);
     }
 
     // Global function for header/footer loading

@@ -23,8 +23,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="supabase-client.js"></script>
-  <!-- Comprehensive Fix Script -->
-  <script src="tmp_rovodev_comprehensive_fix.js"></script>
+  <!-- Comprehensive Fix Script - TEMPORARILY DISABLED FOR DEBUGGING -->
+  <!-- <script src="tmp_rovodev_comprehensive_fix.js"></script> -->
   
   <!-- Global Turnstile Variables -->
   <script>
@@ -85,7 +85,7 @@
           </div>
         </div>
 
-        <button type="submit" class="btn btn-primary">Sign In</button>
+        <button type="submit" class="btn btn-primary" id="login-button">Sign In</button>
       </form>
 
       <div class="auth-links">
@@ -100,8 +100,32 @@
   
   <script src="/js/loadPartials.js" defer></script>
   <script>
-    document.getElementById('login-form').addEventListener('submit', async function (e) {
-      e.preventDefault();
+    // Add debugging to check if scripts are loading
+    console.log('LOGIN: Script starting...');
+    console.log('LOGIN: Supabase available:', !!window.supabase);
+    console.log('LOGIN: Config loaded:', !!window.SUPABASE_URL);
+    
+    // Wait for DOM to be ready
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('LOGIN: DOM ready, setting up form handler...');
+      
+      const loginForm = document.getElementById('login-form');
+      if (!loginForm) {
+        console.error('LOGIN: Form not found!');
+        return;
+      }
+      
+      // Add button click handler as backup
+      const loginButton = document.getElementById('login-button');
+      if (loginButton) {
+        loginButton.addEventListener('click', function(e) {
+          console.log('LOGIN: Button clicked directly!');
+        });
+      }
+      
+      loginForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        console.log('LOGIN: Form submission intercepted!');
 
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value.trim();
@@ -201,7 +225,7 @@
           errorEl.textContent = errorMessage;
           errorEl.style.display = 'block';
         }
-      }
+      });
     });
 
     // Show success message if coming from registration

@@ -456,7 +456,7 @@
   <script>
     console.log('DEALS PAGE: Script starting...');
     
-    // Sample deals data for fallback
+    // Enhanced sample deals data for fallback
     const SAMPLE_DEALS = [
       {
         id: 'sample_1',
@@ -505,6 +505,38 @@
         oceanviewPrice: 0,
         balconyPrice: 0,
         suitePrice: 0
+      },
+      {
+        id: 'sample_4',
+        cruiseType: 'Ocean Cruise',
+        cruiseLine: 'Royal Caribbean',
+        shipName: 'Allure of the Seas',
+        region: 'Mediterranean',
+        nights: 7,
+        departureDate: '2025-08-15',
+        departurePort: 'Barcelona',
+        arrivalPort: 'Rome',
+        itinerary: 'Western Mediterranean',
+        insidePrice: 2890,
+        oceanviewPrice: 3450,
+        balconyPrice: 4200,
+        suitePrice: 7500
+      },
+      {
+        id: 'sample_5',
+        cruiseType: 'River Cruise',
+        cruiseLine: 'Viking',
+        shipName: 'Viking Longship',
+        region: 'Europe',
+        nights: 8,
+        departureDate: '2025-09-01',
+        departurePort: 'Amsterdam',
+        arrivalPort: 'Basel',
+        itinerary: 'Rhine Getaway',
+        insidePrice: 0,
+        oceanviewPrice: 0,
+        balconyPrice: 0,
+        suitePrice: 0
       }
     ];
 
@@ -539,35 +571,72 @@
             const supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
             console.log('DEALS PAGE: Supabase client created');
             
-            const { data, error } = await supabaseClient
-              .from('cruise_deals')
-              .select('*')
-              .eq('is_active', true)
-              .order('departure_date', { ascending: true })
-              .limit(100); // Load first 100 deals for performance
+            // Try different table names that might contain cruise data
+            const tableNames = ['cruise_deals', 'deals', 'cruises', 'cruise_data', 'bookings'];
+            let data = null;
+            let error = null;
+            
+            for (const tableName of tableNames) {
+              try {
+                console.log(`DEALS PAGE: Trying table: ${tableName}`);
+                const result = await supabaseClient
+                  .from(tableName)
+                  .select('*')
+                  .limit(50);
+                
+                if (!result.error && result.data && result.data.length > 0) {
+                  console.log(`DEALS PAGE: Found ${result.data.length} records in table: ${tableName}`);
+                  console.log('DEALS PAGE: Sample record:', result.data[0]);
+                  data = result.data;
+                  error = null;
+                  break;
+                } else if (result.error) {
+                  console.log(`DEALS PAGE: Table ${tableName} error:`, result.error.message);
+                }
+              } catch (tableError) {
+                console.log(`DEALS PAGE: Failed to query ${tableName}:`, tableError.message);
+              }
+            }
             
             if (error) {
               console.error('DEALS PAGE: Supabase error:', error);
             } else if (data && data.length > 0) {
-              console.log('DEALS PAGE: Loaded', data.length, 'deals from Supabase');
-              deals = data.map(deal => ({
-                id: deal.id,
-                cruiseType: deal.cruise_type || 'Ocean Cruise',
-                cruiseLine: deal.cruise_line,
-                shipName: deal.ship_name,
-                region: deal.region,
-                nights: deal.nights,
-                departureDate: deal.departure_date,
-                departurePort: deal.departure_port,
-                arrivalPort: deal.arrival_port,
-                itinerary: deal.itinerary,
-                insidePrice: parseFloat(deal.inside_price) || 0,
-                oceanviewPrice: parseFloat(deal.oceanview_price) || 0,
-                balconyPrice: parseFloat(deal.balcony_price) || 0,
-                suitePrice: parseFloat(deal.suite_price) || 0
-              }));
+              console.log('DEALS PAGE: Processing', data.length, 'records from Supabase');
+              
+              // Try to map the data intelligently based on available fields
+              deals = data.map((deal, index) => {
+                // Try different field name variations
+                const getId = () => deal.id || deal.deal_id || deal.cruise_id || `supabase_${index}`;
+                const getCruiseLine = () => deal.cruise_line || deal.cruiseline || deal['Cruise Line'] || deal.operator || 'Unknown Cruise Line';
+                const getShipName = () => deal.ship_name || deal.shipname || deal.Ship || deal.vessel || 'Unknown Ship';
+                const getRegion = () => deal.region || deal.Region || deal.destination || deal.area || 'Unknown Region';
+                const getNights = () => parseInt(deal.nights || deal.Nights || deal.duration || 7);
+                const getDepartureDate = () => deal.departure_date || deal.Date || deal.sail_date || '2025-12-31';
+                const getDeparturePort = () => deal.departure_port || deal.From || deal.embark_port || 'Unknown Port';
+                const getArrivalPort = () => deal.arrival_port || deal.To || deal.disembark_port || 'Unknown Port';
+                const getItinerary = () => deal.itinerary || deal.Itinerary || deal.description || '';
+                
+                return {
+                  id: getId(),
+                  cruiseType: deal.cruise_type || deal.type || 'Ocean Cruise',
+                  cruiseLine: getCruiseLine(),
+                  shipName: getShipName(),
+                  region: getRegion(),
+                  nights: getNights(),
+                  departureDate: getDepartureDate(),
+                  departurePort: getDeparturePort(),
+                  arrivalPort: getArrivalPort(),
+                  itinerary: getItinerary(),
+                  insidePrice: parseFloat(deal.inside_price || deal.Inside || deal.interior_price || 0),
+                  oceanviewPrice: parseFloat(deal.oceanview_price || deal.Oceanview || deal.ocean_view_price || 0),
+                  balconyPrice: parseFloat(deal.balcony_price || deal.Balcony || deal.balcony || 0),
+                  suitePrice: parseFloat(deal.suite_price || deal.Suite || deal.suite || 0)
+                };
+              });
+              
+              console.log('DEALS PAGE: Mapped deals:', deals.slice(0, 2)); // Show first 2 for debugging
             } else {
-              console.log('DEALS PAGE: No deals found in Supabase');
+              console.log('DEALS PAGE: No deals found in any Supabase table');
             }
           }
         } catch (error) {
@@ -647,10 +716,10 @@
           <div class="deal-card" data-deal-id="${deal.id}">
             <div class="deal-header">
               <img src="${logoPath}" 
-                   alt="${deal.cruiseLine}" 
+                   alt="${deal.cruiseLine || 'Cruise Line'}" 
                    class="cruise-logo"
                    onerror="this.src='/logos/cruiselines/placeholder.png'">
-              <div class="cruise-type-badge ${deal.cruiseType.toLowerCase().replace(' ', '-')}">${deal.cruiseType}</div>
+              <div class="cruise-type-badge ${(deal.cruiseType || 'ocean-cruise').toLowerCase().replace(' ', '-')}">${deal.cruiseType || 'Ocean Cruise'}</div>
             </div>
             
             <div class="deal-content">

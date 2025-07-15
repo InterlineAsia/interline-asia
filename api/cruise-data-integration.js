@@ -32,6 +32,9 @@ async function getUnifiedCruiseDeals(req, res) {
       .eq('is_active', true)
       .order('departure_date', { ascending: true })
       .limit(1000);
+
+    console.log('Supabase cruise_deals data:', cruiseDeals);
+    console.log('Supabase cruise_deals error:', cruiseError);
     
     if (cruiseError) {
       console.error('❌ Supabase cruise_deals error:', cruiseError);

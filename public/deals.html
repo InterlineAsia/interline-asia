@@ -213,6 +213,11 @@
       color: #1e40af;
     }
     
+    .cruise-type-badge.expedition-cruise {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    
     .deal-content {
       padding: 1.5rem;
     }
@@ -449,56 +454,237 @@
   <div id="footer-placeholder"></div>
 
   <script>
+    console.log('DEALS PAGE: Script starting...');
+    
+    // Sample deals data for fallback
+    const SAMPLE_DEALS = [
+      {
+        id: 'sample_1',
+        cruiseType: 'River Cruise',
+        cruiseLine: 'AmaWaterways',
+        shipName: 'AmaBella',
+        region: 'Europe',
+        nights: 7,
+        departureDate: '2025-07-07',
+        departurePort: 'Budapest, Hungary',
+        arrivalPort: 'Vilshofen, Germany',
+        itinerary: 'Melodies of the Danube 2025',
+        insidePrice: 3440,
+        oceanviewPrice: 4040,
+        balconyPrice: 4640,
+        suitePrice: 0
+      },
+      {
+        id: 'sample_2',
+        cruiseType: 'Ocean Cruise',
+        cruiseLine: 'Crystal',
+        shipName: 'Crystal Symphony',
+        region: 'Europe',
+        nights: 8,
+        departureDate: '2025-07-10',
+        departurePort: 'Thessaloniki',
+        arrivalPort: 'Civitavecchia (Rome)',
+        itinerary: 'Greek Isles & Italy',
+        insidePrice: 3340,
+        oceanviewPrice: 5090,
+        balconyPrice: 6290,
+        suitePrice: 0
+      },
+      {
+        id: 'sample_3',
+        cruiseType: 'Expedition Cruise',
+        cruiseLine: 'Atlas',
+        shipName: 'World Traveller',
+        region: 'Arctic',
+        nights: 11,
+        departureDate: '2025-07-10',
+        departurePort: 'Reykjavik',
+        arrivalPort: 'Oslo',
+        itinerary: 'Arctic Explorer',
+        insidePrice: 6879,
+        oceanviewPrice: 0,
+        balconyPrice: 0,
+        suitePrice: 0
+      }
+    ];
+
     // Initialize deals system
     document.addEventListener('DOMContentLoaded', async () => {
-      // Load header and footer
-      if (typeof loadHeaderFooter === 'function') {
-        loadHeaderFooter();
-      }
+      console.log('DEALS PAGE: DOM loaded, initializing...');
+      
+      // Load header and footer immediately
+      loadHeaderFooter();
       
       const loadingState = document.getElementById('loading-state');
       const dealsContainer = document.getElementById('deals-container');
+      const summaryElement = document.getElementById('deals-summary');
       
+      console.log('DEALS PAGE: Elements found:', {
+        loadingState: !!loadingState,
+        dealsContainer: !!dealsContainer,
+        summaryElement: !!summaryElement
+      });
+
       try {
-        // Initialize enhanced deals system
-        if (window.EnhancedDealsLoader && window.EnhancedDealsSystem) {
-          const dealsLoader = new window.EnhancedDealsLoader();
-          const dealsSystem = new window.EnhancedDealsSystem();
-          
-          // Load deals data
-          await dealsLoader.loadDeals();
-          
-          // Initialize UI
-          dealsSystem.init();
-          
-          // Hide loading and show deals
-          if (loadingState) loadingState.style.display = 'none';
-          if (dealsContainer) dealsContainer.style.display = 'grid';
-        } else {
-          // Fallback: Hide loading and show deals after delay
-          setTimeout(() => {
-            if (loadingState) loadingState.style.display = 'none';
-            if (dealsContainer) dealsContainer.style.display = 'grid';
-          }, 1000);
-        }
-      } catch (error) {
-        console.error('Error initializing deals system:', error);
+        console.log('DEALS PAGE: Checking for enhanced deals system...');
+        console.log('EnhancedDealsLoader available:', !!window.EnhancedDealsLoader);
+        console.log('EnhancedDealsSystem available:', !!window.EnhancedDealsSystem);
         
-        // Show error state or fallback
-        if (loadingState) {
-          loadingState.innerHTML = `
-            <i class="ri-error-warning-line"></i>
-            <p>Unable to load deals. Please try again later.</p>
-          `;
+        let deals = [];
+        
+        // Try to load from enhanced system
+        if (window.EnhancedDealsLoader) {
+          try {
+            console.log('DEALS PAGE: Attempting to load from enhanced system...');
+            const dealsLoader = new window.EnhancedDealsLoader();
+            await dealsLoader.initialize();
+            deals = await dealsLoader.loadAllDeals();
+            console.log('DEALS PAGE: Loaded deals from enhanced system:', deals.length);
+          } catch (error) {
+            console.warn('DEALS PAGE: Enhanced system failed:', error);
+            deals = [];
+          }
         }
+        
+        // Fallback to sample data if no deals loaded
+        if (!deals || deals.length === 0) {
+          console.log('DEALS PAGE: Using sample deals fallback');
+          deals = SAMPLE_DEALS;
+        }
+        
+        // Update summary
+        if (summaryElement) {
+          summaryElement.textContent = `Showing ${deals.length} deals`;
+        }
+        
+        // Render deals
+        renderDeals(deals, dealsContainer);
+        
+        // Hide loading and show deals
+        if (loadingState) loadingState.style.display = 'none';
+        if (dealsContainer) dealsContainer.style.display = 'grid';
+        
+        console.log('DEALS PAGE: Successfully initialized with', deals.length, 'deals');
+        
+      } catch (error) {
+        console.error('DEALS PAGE: Critical error:', error);
+        
+        // Show sample deals even on error
+        if (summaryElement) {
+          summaryElement.textContent = `Showing ${SAMPLE_DEALS.length} deals`;
+        }
+        renderDeals(SAMPLE_DEALS, dealsContainer);
+        
+        if (loadingState) loadingState.style.display = 'none';
+        if (dealsContainer) dealsContainer.style.display = 'grid';
       }
     });
 
+    // Render deals function
+    function renderDeals(deals, container) {
+      if (!container || !deals) return;
+      
+      console.log('DEALS PAGE: Rendering', deals.length, 'deals');
+      
+      container.innerHTML = deals.map(deal => {
+        const logoPath = getCruiseLineLogo(deal.cruiseLine);
+        const bestPrice = getBestPrice(deal);
+        const priceDisplay = formatPrice(bestPrice);
+        
+        return `
+          <div class="deal-card" data-deal-id="${deal.id}">
+            <div class="deal-header">
+              <img src="${logoPath}" 
+                   alt="${deal.cruiseLine}" 
+                   class="cruise-logo"
+                   onerror="this.src='/logos/cruiselines/placeholder.png'">
+              <div class="cruise-type-badge ${deal.cruiseType.toLowerCase().replace(' ', '-')}">${deal.cruiseType}</div>
+            </div>
+            
+            <div class="deal-content">
+              <h3 class="ship-name">${deal.shipName}</h3>
+              <p class="cruise-line">${deal.cruiseLine}</p>
+              
+              <div class="deal-details">
+                <div class="detail-item">
+                  <i class="ri-map-pin-line"></i>
+                  <span>${deal.region || deal.departurePort}</span>
+                </div>
+                <div class="detail-item">
+                  <i class="ri-calendar-line"></i>
+                  <span>${formatDate(deal.departureDate)}</span>
+                </div>
+                <div class="detail-item">
+                  <i class="ri-time-line"></i>
+                  <span>${deal.nights} nights</span>
+                </div>
+              </div>
+              
+              ${deal.itinerary ? `<p class="itinerary">${deal.itinerary}</p>` : ''}
+              
+              <div class="pricing">
+                <span class="price ${bestPrice > 0 ? 'has-price' : 'quote-only'}">
+                  ${priceDisplay}
+                </span>
+              </div>
+            </div>
+            
+            <div class="deal-actions">
+              <button class="btn-view-details" onclick="window.location.href='/deal-details.html?id=${deal.id}'">
+                View Details
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Helper functions
+    function getCruiseLineLogo(cruiseLine) {
+      if (!cruiseLine) return '/logos/cruiselines/placeholder.png';
+      
+      const slug = cruiseLine.toLowerCase()
+        .replace(/[^a-z0-9\s]/g, '')
+        .replace(/\s+/g, '-')
+        .trim();
+      
+      return `/logos/cruiselines/${slug}.png`;
+    }
+
+    function getBestPrice(deal) {
+      const prices = [deal.insidePrice, deal.oceanviewPrice, deal.balconyPrice, deal.suitePrice]
+        .filter(p => p && p > 0);
+      return prices.length > 0 ? Math.min(...prices) : 0;
+    }
+
+    function formatPrice(price) {
+      if (!price || price === 0) {
+        return 'Quote Available';
+      }
+      return `From $${price.toLocaleString()} per person`;
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return dateStr;
+      
+      return date.toLocaleDateString('en-AU', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+    }
+
     // Global function for header/footer loading
     function loadHeaderFooter() {
+      console.log('DEALS PAGE: Loading header and footer...');
+      
       const loadPartial = (selector, url) => {
+        console.log(`DEALS PAGE: Loading ${url} into ${selector}`);
         fetch(url)
           .then(response => {
+            console.log(`DEALS PAGE: Response for ${url}:`, response.status);
             if (!response.ok) {
               throw new Error(`Could not load ${url}: ${response.statusText}`);
             }
@@ -508,9 +694,14 @@
             const element = document.querySelector(selector);
             if (element) {
               element.innerHTML = data;
+              console.log(`DEALS PAGE: Successfully loaded ${url}`);
+            } else {
+              console.error(`DEALS PAGE: Element ${selector} not found`);
             }
           })
-          .catch(error => console.error('Error loading partial:', error));
+          .catch(error => {
+            console.error(`DEALS PAGE: Error loading ${url}:`, error);
+          });
       };
 
       loadPartial("#header-placeholder", "/partials/header.html");

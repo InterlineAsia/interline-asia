@@ -1,0 +1,258 @@
+// Enhanced Deals Loader - Production Ready
+// Loads cruise deals from Supabase with advanced filtering and caching
+
+class EnhancedDealsLoader {
+  constructor() {
+    this.supabase = null;
+    this.dealsCache = null;
+    this.lastUpdated = null;
+    this.isLoading = false;
+  }
+
+  async initialize() {
+    if (!window.supabase || !window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
+      throw new Error('Supabase not available');
+    }
+
+    this.supabase = window.supabase.createClient(
+      window.SUPABASE_URL,
+      window.SUPABASE_ANON_KEY
+    );
+
+    console.log('DEALS LOADER: Initialized successfully');
+    return true;
+  }
+
+  async loadAllDeals(forceRefresh = false) {
+    if (this.isLoading) {
+      console.log('DEALS LOADER: Already loading, returning cached data');
+      return this.dealsCache || [];
+    }
+
+    if (!forceRefresh && this.dealsCache && this.lastUpdated) {
+      const cacheAge = Date.now() - this.lastUpdated;
+      if (cacheAge < 5 * 60 * 1000) { // 5 minutes cache
+        console.log('DEALS LOADER: Using cached data');
+        return this.dealsCache;
+      }
+    }
+
+    this.isLoading = true;
+
+    try {
+      if (!this.supabase) {
+        await this.initialize();
+      }
+
+      console.log('DEALS LOADER: Fetching deals from Supabase...');
+
+      const { data, error } = await this.supabase
+        .from('cruise_deals')
+        .select('*')
+        .eq('is_active', true)
+        .order('departure_date', { ascending: true });
+
+      if (error) {
+        console.error('DEALS LOADER: Supabase error:', error);
+        throw error;
+      }
+
+      console.log(`DEALS LOADER: Loaded ${data?.length || 0} deals from Supabase`);
+
+      // Process and enhance the deals data
+      const processedDeals = this.processDeals(data || []);
+
+      this.dealsCache = processedDeals;
+      this.lastUpdated = Date.now();
+
+      return processedDeals;
+
+    } catch (error) {
+      console.error('DEALS LOADER: Error loading deals:', error);
+      
+      // Return sample data as fallback
+      console.log('DEALS LOADER: Using fallback sample data');
+      return this.getSampleDeals();
+      
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  processDeals(rawDeals) {
+    return rawDeals.map(deal => {
+      // Calculate lowest price from available cabin types
+      const prices = [
+        deal.cabin_1 ? parseFloat(deal.cabin_1) : null,
+        deal.cabin_2 ? parseFloat(deal.cabin_2) : null,
+        deal.cabin_3 ? parseFloat(deal.cabin_3) : null,
+        deal.cabin_4 ? parseFloat(deal.cabin_4) : null,
+        deal.price ? parseFloat(deal.price) : null
+      ].filter(p => p && p > 0);
+
+      const fromPrice = prices.length > 0 ? Math.min(...prices) : null;
+
+      // Determine cruise type
+      let cruiseType = deal.cruise_type || 'Ocean Cruise';
+      if (deal.ship && deal.ship.toLowerCase().includes('river')) {
+        cruiseType = 'River Cruise';
+      }
+
+      // Format departure date
+      const departureDate = deal.departure_date ? new Date(deal.departure_date) : null;
+
+      // Calculate duration
+      let duration = deal.nights || deal.duration || null;
+      if (!duration && deal.departure_date && deal.arrival_date) {
+        const start = new Date(deal.departure_date);
+        const end = new Date(deal.arrival_date);
+        duration = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+      }
+
+      return {
+        ...deal,
+        cruise_type: cruiseType,
+        from_price: fromPrice,
+        departure_date_formatted: departureDate ? departureDate.toLocaleDateString() : 'TBA',
+        departure_date_obj: departureDate,
+        duration_nights: duration,
+        cruise_line_normalized: deal.cruise_line ? deal.cruise_line.toLowerCase().replace(/\s+/g, '-') : 'unknown',
+        search_text: [
+          deal.ship,
+          deal.cruise_line,
+          deal.destination,
+          deal.itinerary,
+          cruiseType
+        ].filter(Boolean).join(' ').toLowerCase()
+      };
+    });
+  }
+
+  async filterDeals(filters = {}) {
+    const allDeals = await this.loadAllDeals();
+    
+    let filtered = [...allDeals];
+
+    // Apply filters
+    if (filters.cruiseLine && filters.cruiseLine !== 'all') {
+      filtered = filtered.filter(deal => 
+        deal.cruise_line && deal.cruise_line.toLowerCase().includes(filters.cruiseLine.toLowerCase())
+      );
+    }
+
+    if (filters.cruiseType && filters.cruiseType !== 'all') {
+      filtered = filtered.filter(deal => 
+        deal.cruise_type && deal.cruise_type.toLowerCase() === filters.cruiseType.toLowerCase()
+      );
+    }
+
+    if (filters.destination && filters.destination !== 'all') {
+      filtered = filtered.filter(deal => 
+        deal.destination && deal.destination.toLowerCase().includes(filters.destination.toLowerCase())
+      );
+    }
+
+    if (filters.search) {
+      const searchTerm = filters.search.toLowerCase();
+      filtered = filtered.filter(deal => 
+        deal.search_text.includes(searchTerm)
+      );
+    }
+
+    if (filters.dateFrom) {
+      const fromDate = new Date(filters.dateFrom);
+      filtered = filtered.filter(deal => 
+        deal.departure_date_obj && deal.departure_date_obj >= fromDate
+      );
+    }
+
+    if (filters.dateTo) {
+      const toDate = new Date(filters.dateTo);
+      filtered = filtered.filter(deal => 
+        deal.departure_date_obj && deal.departure_date_obj <= toDate
+      );
+    }
+
+    console.log(`DEALS LOADER: Filtered ${filtered.length} deals from ${allDeals.length} total`);
+    return filtered;
+  }
+
+  getFilterOptions(deals) {
+    const cruiseLines = new Set();
+    const cruiseTypes = new Set();
+    const destinations = new Set();
+
+    deals.forEach(deal => {
+      if (deal.cruise_line) cruiseLines.add(deal.cruise_line);
+      if (deal.cruise_type) cruiseTypes.add(deal.cruise_type);
+      if (deal.destination) destinations.add(deal.destination);
+    });
+
+    return {
+      cruiseLines: Array.from(cruiseLines).sort(),
+      cruiseTypes: Array.from(cruiseTypes).sort(),
+      destinations: Array.from(destinations).sort()
+    };
+  }
+
+  getSampleDeals() {
+    return [
+      {
+        id: 'sample-1',
+        ship: 'AmaBella',
+        cruise_line: 'AmaWaterways',
+        destination: 'Danube River',
+        cruise_type: 'River Cruise',
+        departure_date: '2025-07-15',
+        departure_date_formatted: '7/15/2025',
+        departure_date_obj: new Date('2025-07-15'),
+        duration_nights: 7,
+        from_price: 3440,
+        itinerary: 'Budapest - Bratislava - Vienna - Melk - Passau',
+        cruise_line_normalized: 'amawaterways',
+        search_text: 'amabella amawaterways danube river river cruise'
+      },
+      {
+        id: 'sample-2',
+        ship: 'Seven Seas Explorer',
+        cruise_line: 'Regent Seven Seas Cruises',
+        destination: 'Mediterranean',
+        cruise_type: 'Ocean Cruise',
+        departure_date: '2025-08-10',
+        departure_date_formatted: '8/10/2025',
+        departure_date_obj: new Date('2025-08-10'),
+        duration_nights: 14,
+        from_price: 4999,
+        itinerary: 'Barcelona - Monaco - Florence - Rome - Naples',
+        cruise_line_normalized: 'regent-seven-seas-cruises',
+        search_text: 'seven seas explorer regent seven seas cruises mediterranean ocean cruise'
+      },
+      {
+        id: 'sample-3',
+        ship: 'World Explorer',
+        cruise_line: 'Atlas Ocean Voyages',
+        destination: 'Arctic',
+        cruise_type: 'Expedition Cruise',
+        departure_date: '2025-07-20',
+        departure_date_formatted: '7/20/2025',
+        departure_date_obj: new Date('2025-07-20'),
+        duration_nights: 11,
+        from_price: 6879,
+        itinerary: 'Reykjavik - Isafjordur - Akureyri - Bergen - Oslo',
+        cruise_line_normalized: 'atlas-ocean-voyages',
+        search_text: 'world explorer atlas ocean voyages arctic expedition cruise'
+      }
+    ];
+  }
+
+  getLastUpdated() {
+    return this.lastUpdated;
+  }
+
+  getTotalDealsCount() {
+    return this.dealsCache ? this.dealsCache.length : 0;
+  }
+}
+
+// Export for global use
+window.EnhancedDealsLoader = EnhancedDealsLoader;

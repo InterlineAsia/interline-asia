@@ -11,6 +11,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="supabase-client.js"></script>
+  <!-- Comprehensive Fix Script -->
+  <script src="tmp_rovodev_comprehensive_fix.js"></script>
 </head>
 <body>
   <div id="header-placeholder"></div>
@@ -59,7 +61,7 @@
           return;
         }
 
-        const user = window.supabaseClient.getCurrentUser();
+        const user = await window.supabaseClient.getCurrentUser();
         console.log('DASHBOARD_CHOICE: Current user:', user?.email);
 
         if (!user) {

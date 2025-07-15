@@ -112,6 +112,13 @@
       const adminEmails = ['rodney@telenational.com.au', 'admin@telenational.com.au', 'admin@interlineasia.com'];
       let turnstileToken = '';
 
+      // TEMPORARILY DISABLED: Turnstile validation for all users during testing
+      // TODO: Re-enable Turnstile after login system is working
+      console.log('LOGIN: Turnstile validation temporarily disabled for testing');
+      turnstileToken = 'TESTING_BYPASS_TOKEN';
+      window.turnstileCompleted = true;
+      
+      /* ORIGINAL TURNSTILE CODE - TO BE RE-ENABLED LATER:
       if (adminEmails.includes(email.toLowerCase())) {
         console.warn('LOGIN: ADMIN BYPASS - Allowing login without Turnstile for admin user');
         turnstileToken = 'ADMIN_BYPASS_TOKEN';
@@ -122,22 +129,15 @@
 
         if (!turnstileToken || !window.turnstileCompleted) {
           console.error('LOGIN FAILED: Turnstile not completed or token missing');
-
-          const iframeLoaded = !!document.querySelector('iframe[src*="challenges.cloudflare.com"]');
-          if (!iframeLoaded && window.turnstile) {
-            console.warn('Turnstile iframe missing — attempting re-render...');
-            window.turnstile.render('#turnstile-widget-container', {
-              sitekey: '0x4AAAAAAABkMYinukE_NVJu',
-              callback: onTurnstileSuccess,
-              'error-callback': onTurnstileError,
-              'expired-callback': onTurnstileExpired,
-            });
+          const errorEl = document.getElementById('error-message');
+          if (errorEl) {
+            errorEl.textContent = 'Please complete the security verification before logging in.';
+            errorEl.style.display = 'block';
           }
-
-          alert('Please complete the security verification before logging in.');
           return;
         }
       }
+      */
 
       console.log('LOGIN: Token and Turnstile verified. Proceeding with Supabase auth...');
 

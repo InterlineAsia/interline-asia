@@ -562,22 +562,143 @@
       }
 
       async loadDealDetails() {
-        // Try to load from Supabase first
-        if (window.supabase) {
-          const { data, error } = await window.supabase
-            .from('cruise_deals')
-            .select('*')
-            .eq('id', this.dealId)
-            .single();
+        try {
+          console.log('DEAL_DETAILS: Loading deal with ID:', this.dealId);
+          
+          // Try to load from CSV data (same as deals page)
+          await this.loadFromCSV();
+          
+        } catch (error) {
+          console.error('DEAL_DETAILS: Error loading deal details:', error);
+          // Fallback to sample data
+          this.loadSampleDeal();
+        }
+      }
 
-          if (!error && data) {
-            this.deal = this.formatDeal(data);
-            return;
+      async loadFromCSV() {
+        try {
+          console.log('DEAL_DETAILS: Attempting to load from CSV files...');
+          
+          // Load both CSV files and find the deal
+          const [riverResponse, oceanResponse] = await Promise.all([
+            fetch('/river.csv'),
+            fetch('/twins.csv')
+          ]);
+
+          let foundDeal = null;
+
+          // Search in river cruise data
+          if (riverResponse.ok) {
+            const riverCSV = await riverResponse.text();
+            foundDeal = this.findDealInCSV(riverCSV, 'River Cruise');
+          }
+
+          // Search in ocean cruise data if not found
+          if (!foundDeal && oceanResponse.ok) {
+            const oceanCSV = await oceanResponse.text();
+            foundDeal = this.findDealInCSV(oceanCSV, 'Ocean Cruise');
+          }
+
+          if (foundDeal) {
+            this.deal = foundDeal;
+            console.log('DEAL_DETAILS: Found deal in CSV data');
+          } else {
+            console.log('DEAL_DETAILS: Deal not found in CSV, using sample');
+            this.loadSampleDeal();
+          }
+
+        } catch (error) {
+          console.error('DEAL_DETAILS: Error loading from CSV:', error);
+          this.loadSampleDeal();
+        }
+      }
+
+      findDealInCSV(csvText, cruiseType) {
+        const lines = csvText.trim().split('\n');
+        const headers = this.parseCSVLine(lines[0]);
+        
+        for (let i = 1; i < lines.length; i++) {
+          const values = this.parseCSVLine(lines[i]);
+          if (values.length >= 10) {
+            const deal = this.createDealFromCSV(headers, values, cruiseType);
+            if (deal.id === this.dealId) {
+              return deal;
+            }
           }
         }
+        return null;
+      }
 
-        // Fallback to sample data or CSV parsing
-        this.loadSampleDeal();
+      parseCSVLine(line) {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+        
+        for (let i = 0; i < line.length; i++) {
+          const char = line[i];
+          if (char === '"') {
+            inQuotes = !inQuotes;
+          } else if (char === ',' && !inQuotes) {
+            result.push(current.trim());
+            current = '';
+          } else {
+            current += char;
+          }
+        }
+        result.push(current.trim());
+        return result;
+      }
+
+      createDealFromCSV(headers, values, cruiseType) {
+        const deal = {};
+        headers.forEach((header, index) => {
+          deal[header] = values[index] || '';
+        });
+
+        return {
+          id: \`\${cruiseType.toLowerCase().replace(' ', '_')}_\${deal.SEQ || Math.random().toString(36).substr(2, 9)}\`,
+          cruiseType: cruiseType,
+          cruiseLine: deal['Cruise Line'] || '',
+          shipName: deal.Ship || '',
+          region: deal.Region || '',
+          nights: parseInt(deal.Nights || 0),
+          departureDate: this.parseDate(deal.Date),
+          departurePort: deal.From || '',
+          arrivalPort: deal.To || '',
+          itinerary: deal.Itinerary || '',
+          insidePrice: this.parsePrice(deal.Inside),
+          oceanviewPrice: this.parsePrice(deal.Oceanview),
+          balconyPrice: this.parsePrice(deal.Balcony),
+          suitePrice: this.parsePrice(deal.Suite),
+          shipMap: deal.Shipmap || ''
+        };
+      }
+
+      parseDate(dateStr) {
+        if (!dateStr) return null;
+        if (dateStr.includes('-') && dateStr.length <= 9) {
+          const parts = dateStr.split('-');
+          if (parts.length === 3) {
+            const day = parts[0];
+            const month = parts[1];
+            const year = parts[2].length === 2 ? '20' + parts[2] : parts[2];
+            const monthMap = {
+              'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
+              'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
+              'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
+            };
+            const monthNum = monthMap[month] || month;
+            return \`\${year}-\${monthNum.padStart(2, '0')}-\${day.padStart(2, '0')}\`;
+          }
+        }
+        return null;
+      }
+
+      parsePrice(priceStr) {
+        if (!priceStr || priceStr.toLowerCase().includes('quote')) return 0;
+        const cleaned = priceStr.replace(/[$,]/g, '');
+        const price = parseFloat(cleaned);
+        return isNaN(price) ? 0 : price;
       }
 
       formatDeal(deal) {

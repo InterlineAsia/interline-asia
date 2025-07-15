@@ -31,7 +31,7 @@ class EnhancedDealsLoader {
 
     if (!forceRefresh && this.dealsCache && this.lastUpdated) {
       const cacheAge = Date.now() - this.lastUpdated;
-      if (cacheAge < 5 * 60 * 1000) { // 5 minutes cache
+      if (cacheAge < 5 * 60 * 1000) {
         console.log('DEALS LOADER: Using cached data');
         return this.dealsCache;
       }
@@ -44,36 +44,48 @@ class EnhancedDealsLoader {
         await this.initialize();
       }
 
-      console.log('DEALS LOADER: Fetching deals from Supabase...');
+      console.log('SUPABASE: Searching for cruise deals table...');
 
-      const { data, error } = await this.supabase
-        .from('cruise_deals')
-        .select('*')
-        .eq('is_active', true)
-        .order('departure_date', { ascending: true });
+      const tableNames = ['cruise_deals', 'deals', 'cruises', 'cruise_data', 'bookings'];
+      let selectedTable = null;
+      let data = [];
 
-      if (error) {
-        console.error('DEALS LOADER: Supabase error:', error);
-        throw error;
+      for (const table of tableNames) {
+        try {
+          const result = await this.supabase
+            .from(table)
+            .select('*')
+            .eq('is_active', true)
+            .limit(5);
+
+          if (result?.data?.length) {
+            console.log(`SUPABASE: Found table "${table}" with ${result.data.length} records`);
+            console.log('SUPABASE: Sample record:', result.data[0]);
+            selectedTable = table;
+            data = result.data;
+            break;
+          } else {
+            console.warn(`SUPABASE: Table "${table}" not found or empty.`);
+          }
+        } catch (err) {
+          console.error(`SUPABASE: Error querying "${table}":`, err.message);
+        }
       }
 
-      console.log(`DEALS LOADER: Loaded ${data?.length || 0} deals from Supabase`);
+      if (!selectedTable || data.length === 0) {
+        console.warn('SUPABASE: No valid deals table found, falling back to sample deals.');
+        return this.getSampleDeals();
+      }
 
-      // Process and enhance the deals data
-      const processedDeals = this.processDeals(data || []);
-
+      const processedDeals = this.processDeals(data);
       this.dealsCache = processedDeals;
       this.lastUpdated = Date.now();
-
       return processedDeals;
 
     } catch (error) {
       console.error('DEALS LOADER: Error loading deals:', error);
-      
-      // Return sample data as fallback
       console.log('DEALS LOADER: Using fallback sample data');
       return this.getSampleDeals();
-      
     } finally {
       this.isLoading = false;
     }

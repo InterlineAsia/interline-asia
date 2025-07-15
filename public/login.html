@@ -19,36 +19,11 @@
     gtag('config', 'G-FYGT92WCXC');
   </script>
   
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <!-- Turnstile temporarily disabled -->
+  <!-- <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script> -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="supabase-client.js"></script>
-  <!-- Comprehensive Fix Script - TEMPORARILY DISABLED FOR DEBUGGING -->
-  <!-- <script src="tmp_rovodev_comprehensive_fix.js"></script> -->
-  
-  <!-- Global Turnstile Variables -->
-  <script>
-    window.turnstileCompleted = false;
-    window.turnstileToken = null;
-    
-    function onTurnstileSuccess(token) {
-      console.log('TURNSTILE: Success');
-      window.turnstileToken = token;
-      window.turnstileCompleted = true;
-    }
-    
-    function onTurnstileError() {
-      console.error('TURNSTILE: Error occurred');
-      window.turnstileCompleted = false;
-      window.turnstileToken = null;
-    }
-    
-    function onTurnstileExpired() {
-      console.warn('TURNSTILE: Token expired');
-      window.turnstileCompleted = false;
-      window.turnstileToken = null;
-    }
-  </script>
 </head>
 <body>
   <div id="header-placeholder"></div>
@@ -74,15 +49,9 @@
           <input type="password" id="password" name="password" required>
         </div>
 
-        <!-- Cloudflare Turnstile Widget -->
-        <div class="form-group">
-          <div id="turnstile-widget-container"
-               class="cf-turnstile"
-               data-sitekey="0x4AAAAAAABkMYinukE_NVJu"
-               data-callback="onTurnstileSuccess"
-               data-error-callback="onTurnstileError"
-               data-expired-callback="onTurnstileExpired">
-          </div>
+        <!-- Turnstile temporarily hidden -->
+        <div class="form-group" style="display: none;">
+          <div id="turnstile-widget-container"></div>
         </div>
 
         <button type="submit" class="btn btn-primary" id="login-button">Sign In</button>
@@ -100,16 +69,13 @@
   
   <script src="/js/loadPartials.js" defer></script>
   <script>
-    // Add debugging to check if scripts are loading
-    console.log('LOGIN: Script starting...');
-    console.log('LOGIN: Supabase available:', !!window.supabase);
-    console.log('LOGIN: Config loaded:', !!window.SUPABASE_URL);
-    
-    // Wait for DOM to be ready
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('LOGIN: DOM ready, setting up form handler...');
+      console.log('LOGIN: DOM ready, initializing login system...');
       
       const loginForm = document.getElementById('login-form');
+      const loginButton = document.getElementById('login-button');
+      const errorEl = document.getElementById('error-message');
+      
       if (!loginForm) {
         console.error('LOGIN: Form not found!');
         return;
@@ -117,96 +83,70 @@
       
       // Shared login function
       async function performLogin() {
-        const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value.trim();
-        
-        if (!email || !password) {
-          const errorEl = document.getElementById('error-message');
+        try {
+          const email = document.getElementById('email').value.trim();
+          const password = document.getElementById('password').value.trim();
+          
+          // Clear previous errors
           if (errorEl) {
-            errorEl.textContent = 'Please enter both email and password.';
-            errorEl.style.display = 'block';
+            errorEl.style.display = 'none';
           }
-          return;
-        }
-        
-        console.log('LOGIN: Starting authentication for:', email);
-
-        // Admin bypass logic
-        const adminEmails = ['rodney@telenational.com.au', 'admin@telenational.com.au', 'admin@interlineasia.com'];
-        let turnstileToken = '';
-
-        // TEMPORARILY DISABLED: Turnstile validation for all users during testing
-        // TODO: Re-enable Turnstile after login system is working
-        console.log('LOGIN: Turnstile validation temporarily disabled for testing');
-        turnstileToken = 'TESTING_BYPASS_TOKEN';
-        window.turnstileCompleted = true;
-      
-      /* ORIGINAL TURNSTILE CODE - TO BE RE-ENABLED LATER:
-      if (adminEmails.includes(email.toLowerCase())) {
-        console.warn('LOGIN: ADMIN BYPASS - Allowing login without Turnstile for admin user');
-        turnstileToken = 'ADMIN_BYPASS_TOKEN';
-        window.turnstileCompleted = true;
-      } else {
-        const hiddenInput = document.querySelector('input[id^="cf-chl-widget"][id$="_response"]');
-        turnstileToken = hiddenInput?.value || window.turnstileToken || '';
-
-        if (!turnstileToken || !window.turnstileCompleted) {
-          console.error('LOGIN FAILED: Turnstile not completed or token missing');
-          const errorEl = document.getElementById('error-message');
-          if (errorEl) {
-            errorEl.textContent = 'Please complete the security verification before logging in.';
-            errorEl.style.display = 'block';
+          
+          // Validation
+          if (!email || !password) {
+            showError('Please enter both email and password.');
+            return;
           }
-          return;
-        }
-      }
-      */
-
-      console.log('LOGIN: Token and Turnstile verified. Proceeding with Supabase auth...');
-
-      try {
-        // Clear any previous error messages
-        const errorEl = document.getElementById('error-message');
-        if (errorEl) {
-          errorEl.style.display = 'none';
-        }
-
-        // Wait for Supabase client to be ready
-        if (!window.supabaseClient) {
-          throw new Error('Supabase client not initialized');
-        }
-        
-        await window.supabaseClient.readyPromise;
-        console.log('LOGIN: Supabase client ready, attempting authentication...');
-
-        // Use the signIn method from our client which handles metadata properly
-        const result = await window.supabaseClient.signIn(email, password, turnstileToken);
-
-        if (!result || !result.user) {
-          throw new Error('Authentication failed - no user returned');
-        }
-
-        console.log('LOGIN SUCCESS: User authenticated:', result.user.email);
-        console.log('LOGIN: User role:', result.user.role);
-        console.log('LOGIN: Is admin:', result.user.is_admin);
-
-        // Track successful login
-        if (typeof gtag !== 'undefined') {
-          gtag('event', 'login', { method: 'email' });
-        }
-
-        // Redirect based on user role/admin status
-        if (result.user.is_admin || result.user.is_super_admin || adminEmails.includes(email.toLowerCase())) {
-          console.log('LOGIN: Redirecting admin user to dashboard choice');
-          window.location.href = '/dashboard-choice.html';
-        } else {
-          console.log('LOGIN: Redirecting regular user to dashboard');
-          window.location.href = '/dashboard.html';
-        }
-      } catch (err) {
-        console.error('LOGIN: Authentication error:', err);
-        const errorEl = document.getElementById('error-message');
-        if (errorEl) {
+          
+          console.log('LOGIN: Starting authentication for:', email);
+          
+          // Admin emails for redirect logic
+          const adminEmails = [
+            'rodney@telenational.com.au', 
+            'admin@telenational.com.au', 
+            'admin@interlineasia.com'
+          ];
+          
+          // Turnstile temporarily bypassed
+          const turnstileToken = 'TESTING_BYPASS_TOKEN';
+          console.log('LOGIN: Turnstile validation temporarily disabled for testing');
+          
+          // Wait for Supabase client
+          if (!window.supabaseClient) {
+            throw new Error('Supabase client not initialized');
+          }
+          
+          await window.supabaseClient.readyPromise;
+          console.log('LOGIN: Supabase client ready, attempting authentication...');
+          
+          // Authenticate with Supabase
+          const result = await window.supabaseClient.signIn(email, password, turnstileToken);
+          
+          if (!result || !result.user) {
+            throw new Error('Authentication failed - no user returned');
+          }
+          
+          console.log('LOGIN SUCCESS: User authenticated:', result.user.email);
+          console.log('LOGIN: User role:', result.user.role);
+          console.log('LOGIN: Is admin:', result.user.is_admin);
+          
+          // Track successful login
+          if (typeof gtag !== 'undefined') {
+            gtag('event', 'login', { method: 'email' });
+          }
+          
+          // Redirect based on user role/admin status
+          if (result.user.is_admin || result.user.is_super_admin || adminEmails.includes(email.toLowerCase())) {
+            console.log('LOGIN: Redirecting admin user to dashboard choice');
+            window.location.href = '/dashboard-choice.html';
+          } else {
+            console.log('LOGIN: Redirecting regular user to dashboard');
+            window.location.href = '/dashboard.html';
+          }
+          
+        } catch (err) {
+          console.error('LOGIN: Authentication error:', err);
+          
           let errorMessage = 'Login failed. Please check your credentials and try again.';
           
           if (err.message) {
@@ -221,13 +161,20 @@
             }
           }
           
-          errorEl.textContent = errorMessage;
+          showError(errorMessage);
+        }
+      }
+      
+      // Helper function to show errors
+      function showError(message) {
+        if (errorEl) {
+          errorEl.textContent = message;
           errorEl.style.display = 'block';
         }
       }
       
       // Form submit handler
-      loginForm.addEventListener('submit', async function (e) {
+      loginForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         e.stopPropagation();
         console.log('LOGIN: Form submission intercepted!');
@@ -235,7 +182,6 @@
       });
       
       // Button click handler as backup
-      const loginButton = document.getElementById('login-button');
       if (loginButton) {
         loginButton.addEventListener('click', async function(e) {
           e.preventDefault();
@@ -244,17 +190,19 @@
           await performLogin();
         });
       }
-    });
-
-    // Show success message if coming from registration
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('registered') === 'true') {
-      const successEl = document.getElementById('success-message');
-      if (successEl) {
-        successEl.textContent = 'Account created successfully! Please check your email to verify your account, then sign in.';
-        successEl.style.display = 'block';
+      
+      // Show success message if coming from registration
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('registered') === 'true') {
+        const successEl = document.getElementById('success-message');
+        if (successEl) {
+          successEl.textContent = 'Account created successfully! Please check your email to verify your account, then sign in.';
+          successEl.style.display = 'block';
+        }
       }
-    }
+      
+      console.log('LOGIN: System initialized successfully');
+    });
   </script>
 </body>
 </html>

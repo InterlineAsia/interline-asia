@@ -38,7 +38,7 @@
       <div id="error-message" class="error-message"></div>
       <div id="success-message" class="success-message"></div>
 
-      <form id="login-form">
+      <form id="login-form" onsubmit="return false;">
         <div class="form-group">
           <label for="email">Email Address</label>
           <input type="email" id="email" name="email" required>
@@ -54,7 +54,7 @@
           <div id="turnstile-widget-container"></div>
         </div>
 
-        <button type="submit" class="btn btn-primary" id="login-button">Sign In</button>
+        <button type="button" class="btn btn-primary" id="login-button">Sign In</button>
       </form>
 
       <div class="auth-links">
@@ -83,6 +83,8 @@
       
       // Shared login function
       async function performLogin() {
+        console.log('LOGIN: performLogin triggered');
+        
         try {
           const email = document.getElementById('email').value.trim();
           const password = document.getElementById('password').value.trim();
@@ -173,23 +175,33 @@
         }
       }
       
-      // Form submit handler
-      loginForm.addEventListener('submit', async function(e) {
+      // Form submit handler - BLOCK ALL FORM SUBMISSION
+      loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
         e.stopPropagation();
-        console.log('LOGIN: Form submission intercepted!');
-        await performLogin();
+        e.stopImmediatePropagation();
+        console.log('LOGIN: Form submission BLOCKED!');
+        performLogin();
+        return false;
       });
       
-      // Button click handler as backup
+      // Button click handler - PRIMARY LOGIN TRIGGER
       if (loginButton) {
-        loginButton.addEventListener('click', async function(e) {
+        loginButton.addEventListener('click', function(e) {
           e.preventDefault();
           e.stopPropagation();
-          console.log('LOGIN: Button clicked directly!');
-          await performLogin();
+          e.stopImmediatePropagation();
+          console.log('LOGIN: Button clicked - triggering login!');
+          performLogin();
+          return false;
         });
       }
+      
+      // Additional form submission blocker
+      loginForm.onsubmit = function() {
+        console.log('LOGIN: Native form submission blocked!');
+        return false;
+      };
       
       // Show success message if coming from registration
       const urlParams = new URLSearchParams(window.location.search);

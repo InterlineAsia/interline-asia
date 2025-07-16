@@ -1,5 +1,7 @@
 // Interline Asia - Booking API Endpoints
-// Handles cruise booking submissions and responses
+// Handles cruise booking submissions and responses with resilient email delivery
+
+const { sendEmailWithRetry } = require('../lib/email.js');
 
 // POST /submit-booking - Handle booking form submissions
 export default async function handler(req, res) {
@@ -24,12 +26,13 @@ export default async function handler(req, res) {
       // Generate booking reference
       const bookingReference = `IA${Date.now()}`;
       
-      // Send email to reservations team (not to customer)
+      // Send email to reservations team (not to customer) with retry logic
       try {
         const emailData = {
-          to: 'reservations@interlinetravel.com.au',
+          toEmail: 'reservations@interlinetravel.com.au',
+          toName: 'Reservations Team',
           subject: `New Cruise Booking Request - ${bookingReference}`,
-          html: `
+          htmlContent: `
             <h2>New Cruise Booking Request</h2>
             <p><strong>Booking Reference:</strong> ${bookingReference}</p>
             <p><strong>Customer Email:</strong> ${bookingData.email}</p>
@@ -48,12 +51,13 @@ export default async function handler(req, res) {
           `
         };
         
-        // Send email using your email service (Brevo, etc.)
-        // await sendEmail(emailData);
+        // Send email with retry logic and failover
+        await sendEmailWithRetry(emailData);
+        console.log('Booking notification email sent successfully with retry system');
         
       } catch (emailError) {
-        console.error('Email sending failed:', emailError);
-        // Continue with booking even if email fails
+        console.error('Email sending failed after all retry attempts:', emailError);
+        // Continue with booking even if email fails completely
       }
       
       // Return success response

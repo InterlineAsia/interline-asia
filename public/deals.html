@@ -8,11 +8,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
-  
+
   <!-- Site-wide styles for header/footer consistency -->
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap');
-    
+
     /* Header Styles */
     header {
       width: 100%;
@@ -27,13 +27,13 @@
       z-index: 1000;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
-    
+
     .logo {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
     }
-    
+
     .logo h1 {
       color: #fff;
       font-size: 24px;
@@ -41,24 +41,24 @@
       letter-spacing: 1px;
       margin: 0;
     }
-    
+
     .logo span {
       color: #ccc;
       font-size: 12px;
       font-style: italic;
     }
-    
+
     nav ul {
       display: flex;
       list-style: none;
       margin: 0;
       padding: 0;
     }
-    
+
     nav ul li {
       margin-left: 30px;
     }
-    
+
     nav ul li a {
       color: #fff;
       text-decoration: none;
@@ -66,11 +66,11 @@
       font-weight: 500;
       transition: color 0.3s;
     }
-    
+
     nav ul li a:hover {
       color: #FF7F41;
     }
-    
+
     .contact-btn {
       background-color: #FF7F41;
       color: #fff;
@@ -80,13 +80,12 @@
       text-decoration: none;
       transition: background-color 0.3s;
     }
-    
+
     .contact-btn:hover {
       background-color: #e66a2e;
     }
-  </style>
-  
-  <style>
+
+    /* Page-specific styles */
     * {
       margin: 0;
       padding: 0;
@@ -411,6 +410,23 @@
 
     /* Enhanced Mobile Optimization */
     @media (max-width: 768px) {
+      header {
+        padding: 0 20px;
+        flex-direction: column;
+        height: auto;
+        padding: 15px 20px;
+      }
+
+      nav ul {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+      }
+
+      nav ul li {
+        margin: 0;
+      }
+
       .hero {
         padding: 2rem 1rem;
       }
@@ -428,14 +444,15 @@
         grid-template-columns: 1fr;
         gap: 1rem;
       }
-      
-      .filter-input, .filter-select {
+
+      .filter-input,
+      .filter-select {
         padding: 1rem;
         font-size: 1rem;
-        min-height: 48px; /* Touch-friendly */
+        min-height: 48px;
         border-radius: 12px;
       }
-      
+
       .btn-clear-filters {
         padding: 1rem 2rem;
         font-size: 1rem;
@@ -453,17 +470,17 @@
         gap: 1rem;
         padding: 0;
       }
-      
+
       .deal-card {
         max-width: 100%;
         margin: 0 auto;
       }
-      
+
       .deal-actions {
         grid-template-columns: 1fr;
         gap: 0.75rem;
       }
-      
+
       .btn-action {
         padding: 1rem;
         font-size: 1rem;
@@ -472,17 +489,31 @@
         border-radius: 12px;
       }
     }
-    
-    /* Loading and transition effects */
-    .deals-container-loading {
-      opacity: 0.6;
-      filter: blur(2px);
-      transition: all 0.3s ease;
-    }
   </style>
 </head>
 
 <body>
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <h1>INTERLINE ASIA</h1>
+      <span>Luxury Cruises. Verified Access. Exceptional Value for Travel Professionals.</span>
+    </div>
+    <nav>
+      <ul id="main-nav">
+        <li><a href="/">Home</a></li>
+        <li><a href="/#about">About Us</a></li>
+        <li><a href="/#partners">Partners</a></li>
+        <li><a href="/#faq">FAQ</a></li>
+        <li><a href="/terms-and-conditions">Terms & Conditions</a></li>
+        <li><a href="/privacy-policy">Privacy Policy</a></li>
+        <li id="auth-section">
+          <a href="/login">Login / Signup</a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
   <div class="hero">
     <h1>Exclusive Cruise Deals</h1>
     <p>For Interline & Travel Industry Staff</p>
@@ -582,6 +613,89 @@
     </div>
     <div id="deals-container" class="deals-grid" style="display: none;"></div>
   </div>
+
+  <!-- Social Media Section -->
+  <section style="background-color: #fff; padding: 60px 40px; text-align: center; border-top: 1px solid #e0e0e0;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <h3 style="color: #0C1E36; margin-bottom: 30px; font-size: 28px; font-weight: bold;">Connect With Us</h3>
+      <p style="color: #666; margin-bottom: 30px; font-size: 16px;">Stay updated with the latest cruise deals and travel
+        industry news</p>
+      <div style="display: flex; justify-content: center; gap: 25px; flex-wrap: wrap;">
+        <a href="#"
+          style="background: #1877f2; padding: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; transition: transform 0.3s ease, box-shadow 0.3s ease;"
+          onmouseover="this.style.transform='scale(1.15)'; this.style.boxShadow='0 8px 25px rgba(24, 119, 242, 0.3)'"
+          onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+          <i class="ri-facebook-fill" style="color: white; font-size: 28px;"></i>
+        </a>
+        <a href="#"
+          style="background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); padding: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; transition: transform 0.3s ease, box-shadow 0.3s ease;"
+          onmouseover="this.style.transform='scale(1.15)'; this.style.boxShadow='0 8px 25px rgba(225, 48, 108, 0.3)'"
+          onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+          <i class="ri-instagram-line" style="color: white; font-size: 28px;"></i>
+        </a>
+        <a href="#"
+          style="background: #000000; padding: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; transition: transform 0.3s ease, box-shadow 0.3s ease;"
+          onmouseover="this.style.transform='scale(1.15)'; this.style.boxShadow='0 8px 25px rgba(0, 0, 0, 0.3)'"
+          onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+          <i class="ri-twitter-x-line" style="color: white; font-size: 28px;"></i>
+        </a>
+        <a href="#"
+          style="background: #0077b5; padding: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; transition: transform 0.3s ease, box-shadow 0.3s ease;"
+          onmouseover="this.style.transform='scale(1.15)'; this.style.boxShadow='0 8px 25px rgba(0, 119, 181, 0.3)'"
+          onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+          <i class="ri-linkedin-fill" style="color: white; font-size: 28px;"></i>
+        </a>
+        <a href="#"
+          style="background: #ff0000; padding: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; transition: transform 0.3s ease, box-shadow 0.3s ease;"
+          onmouseover="this.style.transform='scale(1.15)'; this.style.boxShadow='0 8px 25px rgba(255, 0, 0, 0.3)'"
+          onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+          <i class="ri-youtube-fill" style="color: white; font-size: 28px;"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="background-color: #08152B; padding: 40px 20px 30px; color: #fff;">
+    <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
+      <div style="margin-bottom: 25px;">
+        <div
+          style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 20px; font-size: 14px;">
+          <a href="/"
+            style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;"
+            onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'"
+            onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">Home</a>
+          <a href="/#about"
+            style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;"
+            onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'"
+            onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">About Us</a>
+          <a href="/#partners"
+            style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;"
+            onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'"
+            onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">Partners</a>
+          <a href="/#faq"
+            style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;"
+            onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'"
+            onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">FAQ</a>
+          <a href="/terms-and-conditions"
+            style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;"
+            onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'"
+            onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">Terms & Conditions</a>
+          <a href="/privacy-policy"
+            style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;"
+            onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'"
+            onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">Privacy Policy</a>
+          <a href="signup.html"
+            style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;"
+            onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'"
+            onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">Login / Signup</a>
+        </div>
+      </div>
+      <div style="color: #999; font-size: 12px;">
+        <p style="margin: 0;">© 2025 Interline Asia. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
 
   <script>
     console.log('🚀 DEALS PAGE: Starting with STRICT 30-deal limit...');
@@ -719,7 +833,12 @@
         departurePort: deal.From || '',
         arrivalPort: deal.To || '',
         itinerary: deal.Itinerary || '',
-        price: price
+        price: price,
+        // Include pricing details but NOT external URLs
+        insidePrice: deal.Inside || '',
+        oceanviewPrice: deal.Oceanview || '',
+        balconyPrice: deal.Balcony || '',
+        suitePrice: deal.Suite || ''
       };
     }
 
@@ -767,7 +886,11 @@
           departurePort: 'Budapest, Hungary',
           arrivalPort: 'Vilshofen, Germany',
           itinerary: 'Melodies of the Danube - Experience the beauty of the Danube River through Hungary, Austria, and Germany',
-          price: 3440
+          price: 3440,
+          insidePrice: '$3,440',
+          oceanviewPrice: '$3,840',
+          balconyPrice: '$4,240',
+          suitePrice: '$5,640'
         },
         {
           id: 'sample_2',
@@ -780,7 +903,11 @@
           departurePort: 'Thessaloniki',
           arrivalPort: 'Civitavecchia (Rome)',
           itinerary: 'Greek Isles & Italy - Discover ancient civilizations and stunning coastlines',
-          price: 3340
+          price: 3340,
+          insidePrice: '$3,340',
+          oceanviewPrice: '$3,740',
+          balconyPrice: '$4,140',
+          suitePrice: '$5,540'
         }
       ];
     }
@@ -839,7 +966,7 @@
       // Show loading spinner during filtering
       container.style.opacity = '0.6';
       container.style.filter = 'blur(2px)';
-      
+
       setTimeout(() => {
         // Show only first 30 cards, but indicate total available
         const displayDeals = deals.slice(0, DISPLAY_SETTINGS.CARDS_PER_PAGE);
@@ -865,57 +992,88 @@
           }
 
           container.innerHTML = displayDeals.map(deal => `
-        <div class="deal-card">
-          <div class="deal-header">
-            <img src="/logos/cruiselines/${getCruiseLineLogo(deal.cruiseLine)}" 
-                 alt="${deal.cruiseLine}" 
-                 class="cruise-logo"
-                 onerror="this.src='/logos/cruiselines/placeholder.png'">
-            <div class="cruise-type-badge ${deal.cruiseType.toLowerCase().replace(/\s+/g, '-')}">${deal.cruiseType}</div>
-          </div>
-          
-          <div class="deal-content">
-            <h3 class="ship-name">${deal.shipName}</h3>
-            <p class="cruise-line">${deal.cruiseLine}</p>
-            
-            <div class="deal-details">
-              <div class="detail-item">
-                <i class="ri-map-pin-line"></i>
-                <span>${deal.departurePort || deal.region}</span>
+            <div class="deal-card">
+              <div class="deal-header">
+                <img src="/logos/cruiselines/${getCruiseLineLogo(deal.cruiseLine)}" 
+                     alt="${deal.cruiseLine}" 
+                     class="cruise-logo"
+                     onerror="this.src='/logos/cruiselines/placeholder.png'">
+                <div class="cruise-type-badge ${deal.cruiseType.toLowerCase().replace(/\s+/g, '-')}">${deal.cruiseType}</div>
               </div>
-              <div class="detail-item">
-                <i class="ri-calendar-line"></i>
-                <span>${formatDate(deal.departureDate)}</span>
+              
+              <div class="deal-content">
+                <h3 class="ship-name">${deal.shipName}</h3>
+                <p class="cruise-line">${deal.cruiseLine}</p>
+                
+                <div class="deal-details">
+                  <div class="detail-item">
+                    <i class="ri-map-pin-line"></i>
+                    <span>${deal.departurePort || deal.region}</span>
+                  </div>
+                  <div class="detail-item">
+                    <i class="ri-calendar-line"></i>
+                    <span>${formatDate(deal.departureDate)}</span>
+                  </div>
+                  <div class="detail-item">
+                    <i class="ri-time-line"></i>
+                    <span>${deal.nights} nights</span>
+                  </div>
+                  <div class="detail-item">
+                    <i class="ri-global-line"></i>
+                    <span>${deal.region}</span>
+                  </div>
+                </div>
+                
+                <div class="itinerary">${deal.itinerary}</div>
+                
+                <div class="pricing">
+                  ${getPricingDisplay(deal)}
+                </div>
               </div>
-              <div class="detail-item">
-                <i class="ri-time-line"></i>
-                <span>${deal.nights} nights</span>
-              </div>
-              <div class="detail-item">
-                <i class="ri-global-line"></i>
-                <span>${deal.region}</span>
+              
+              <div class="deal-actions">
+                <button class="btn-action btn-view-details" onclick="window.location.href='/deal-details.html?id=${deal.id}'">
+                  View Details
+                </button>
+                <button class="btn-action btn-book-now" onclick="window.location.href='/booking.html?deal=${encodeURIComponent(deal.id)}'">
+                  Book Now
+                </button>
               </div>
             </div>
-            
-            <div class="itinerary">${deal.itinerary}</div>
-            
-            <div class="pricing">
-              <span class="price">
-                ${deal.price > 0 ? `From $${deal.price.toLocaleString()} per person` : 'Quote Available'}
-              </span>
-            </div>
-          </div>
-          
-          <div class="deal-actions">
-            <button class="btn-action btn-view-details" onclick="window.location.href='/deal-details.html?id=${deal.id}'">
-              View Details
-            </button>
-            <button class="btn-action btn-book-now" onclick="window.location.href='/booking.html?deal=${encodeURIComponent(deal.id)}'">
-              Book Now
-            </button>
-          </div>
-        </div>
-      `).join('');
+          `).join('');
+        }
+
+        // Remove loading effect
+        container.style.opacity = '1';
+        container.style.filter = 'none';
+      }, 300);
+    }
+
+    function getPricingDisplay(deal) {
+      const prices = [];
+      if (deal.insidePrice && !deal.insidePrice.toLowerCase().includes('quote')) {
+        prices.push(`Interior: ${deal.insidePrice}`);
+      }
+      if (deal.oceanviewPrice && !deal.oceanviewPrice.toLowerCase().includes('quote')) {
+        prices.push(`Oceanview: ${deal.oceanviewPrice}`);
+      }
+      if (deal.balconyPrice && !deal.balconyPrice.toLowerCase().includes('quote')) {
+        prices.push(`Balcony: ${deal.balconyPrice}`);
+      }
+      if (deal.suitePrice && !deal.suitePrice.toLowerCase().includes('quote')) {
+        prices.push(`Suite: ${deal.suitePrice}`);
+      }
+
+      if (prices.length > 0) {
+        return `<div class="price-breakdown" style="font-size: 0.875rem; color: #059669; font-weight: 600;">
+          ${prices.slice(0, 2).join(' • ')}
+          ${prices.length > 2 ? '<br>' + prices.slice(2).join(' • ') : ''}
+        </div>`;
+      } else if (deal.price > 0) {
+        return `<span class="price">From $${deal.price.toLocaleString()} per person</span>`;
+      } else {
+        return `<span class="price">Quote Available</span>`;
+      }
     }
 
     function formatDate(date) {
@@ -977,12 +1135,11 @@
           if (nights === 14 && deal.nights < 14) return false;
         }
 
-        // Enhanced date filtering - handle dd/mm/yyyy input and ISO dates
+        // Enhanced date filtering
         if (fromDateStr || toDateStr) {
           const dealDate = deal.departureDate;
           if (!dealDate) return true; // Include deals without dates
 
-          // Convert deal date to comparable format
           let comparableDate;
           if (typeof dealDate === 'string') {
             comparableDate = new Date(dealDate);
@@ -997,7 +1154,7 @@
 
           if (fromDateStr) {
             const fromDate = new Date(fromDateStr);
-            fromDate.setHours(0, 0, 0, 0); // Start of day
+            fromDate.setHours(0, 0, 0, 0);
             if (comparableDate < fromDate) {
               return false;
             }
@@ -1005,7 +1162,7 @@
 
           if (toDateStr) {
             const toDate = new Date(toDateStr);
-            toDate.setHours(23, 59, 59, 999); // End of day
+            toDate.setHours(23, 59, 59, 999);
             if (comparableDate > toDate) {
               return false;
             }
@@ -1048,8 +1205,61 @@
 
       console.log(`✅ COMPLETE: Loaded ${allDeals.length} deals, showing first ${DISPLAY_SETTINGS.CARDS_PER_PAGE} cards`);
     });
+
+    // Header authentication management
+    document.addEventListener('DOMContentLoaded', async function () {
+      setTimeout(async () => {
+        try {
+          if (window.supabaseClient) {
+            await window.supabaseClient.readyPromise;
+            updateHeaderAuth();
+          }
+        } catch (error) {
+          console.log('Header auth update skipped:', error.message);
+        }
+      }, 500);
+    });
+
+    function updateHeaderAuth() {
+      const authSection = document.getElementById('auth-section');
+      if (!authSection) return;
+
+      if (window.supabaseClient && window.supabaseClient.isLoggedIn()) {
+        const user = window.supabaseClient.currentUser;
+        const displayName = user?.full_name || user?.email?.split('@')[0] || 'User';
+        const isAdmin = user?.is_admin || user?.is_super_admin || user?.role === 'admin';
+
+        authSection.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+            <a href="/dashboard.html" style="color: #ccc; text-decoration: none; font-size: 14px; transition: color 0.3s;" onmouseover="this.style.color='#FF7F41'" onmouseout="this.style.color='#ccc'">
+              <i class="ri-dashboard-line" style="margin-right: 4px;"></i>Dashboard
+            </a>
+            ${isAdmin ? '<a href="/deals.html" style="color: #ccc; text-decoration: none; font-size: 14px; transition: color 0.3s;" onmouseover="this.style.color=\'#FF7F41\'" onmouseout="this.style.color=\'#ccc\'"><i class="ri-ship-line" style="margin-right: 4px;"></i>Deals</a>' : ''}
+            ${!isAdmin ? '<a href="/deals.html" style="color: #ccc; text-decoration: none; font-size: 14px; transition: color 0.3s;" onmouseover="this.style.color=\'#FF7F41\'" onmouseout="this.style.color=\'#ccc\'"><i class="ri-ship-line" style="margin-right: 4px;"></i>Browse Deals</a>' : ''}
+            ${isAdmin ? '<a href="/admin.html" style="color: #ccc; text-decoration: none; font-size: 14px; transition: color 0.3s;" onmouseover="this.style.color=\'#FF7F41\'" onmouseout="this.style.color=\'#ccc\'"><i class="ri-settings-line" style="margin-right: 4px;"></i>Admin</a>' : ''}
+            <span style="color: #FF7F41; font-size: 14px; font-weight: 500; display: flex; align-items: center;">
+              <i class="ri-user-line" style="margin-right: 4px;"></i>
+              ${displayName}${isAdmin ? ' (Admin)' : ' (Member)'}
+            </span>
+            <button onclick="handleSignOut()" style="background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center;" onmouseover="this.style.background='#c82333'; this.style.transform='scale(1.05)'" onmouseout="this.style.background='#dc3545'; this.style.transform='scale(1)'">
+              <i class="ri-logout-box-line" style="margin-right: 4px;"></i>Sign Out
+            </button>
+          </div>
+        `;
+      } else {
+        authSection.innerHTML = '<a href="/login">Login / Signup</a>';
+      }
+    }
+
+    function handleSignOut() {
+      if (window.supabaseClient) {
+        window.supabaseClient.signOut();
+      } else {
+        window.location.href = '/login';
+      }
+    }
   </script>
-  
+
   <!-- CruiseHelper Bot -->
   <script src="/js/cruise-helper-bot.js"></script>
 </body>

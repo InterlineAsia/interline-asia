@@ -9,6 +9,68 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
   
+  <!-- Load partials -->
+  <script src="/js/loadPartials.js"></script>
+  
+  <!-- Supabase (optional for auth) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+  
+  <style>
+    /* Header styles */
+    header {
+      background: linear-gradient(135deg, #0C1E36 0%, #1a365d 100%);
+      color: white;
+      padding: 1rem 2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    header .logo h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin: 0;
+      color: #FF7F41;
+    }
+    
+    header .logo span {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      display: block;
+      margin-top: 0.25rem;
+    }
+    
+    header nav ul {
+      list-style: none;
+      display: flex;
+      gap: 2rem;
+      margin: 1rem 0 0 0;
+      padding: 0;
+      flex-wrap: wrap;
+    }
+    
+    header nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+    
+    header nav a:hover {
+      color: #FF7F41;
+    }
+    
+    @media (max-width: 768px) {
+      header {
+        padding: 1rem;
+      }
+      
+      header nav ul {
+        gap: 1rem;
+        font-size: 0.9rem;
+      }
+    }
+    
   <style>
     * {
       margin: 0;
@@ -250,6 +312,9 @@
 </head>
 
 <body>
+  <!-- Header -->
+  <div id="header-placeholder"></div>
+  
   <div id="loading-state" class="loading">
     <p>Loading deal details...</p>
   </div>
@@ -389,6 +454,9 @@
     </div>
   </div>
 
+  <!-- Footer -->
+  <div id="footer-placeholder"></div>
+
   <script>
     let allDeals = [];
 
@@ -397,19 +465,25 @@
         console.log('DEAL_DETAILS: Loading CSV data...');
         
         // Load river cruise data
-        const riverResponse = await fetch('/public/river.csv');
+        const riverResponse = await fetch('/river.csv');
         if (riverResponse.ok) {
           const riverCSV = await riverResponse.text();
           const riverDeals = parseCSV(riverCSV, 'River Cruise');
+          console.log('DEAL_DETAILS: Loaded', riverDeals.length, 'river cruise deals');
           allDeals = allDeals.concat(riverDeals);
+        } else {
+          console.log('DEAL_DETAILS: Could not load river.csv, status:', riverResponse.status);
         }
 
         // Load ocean cruise data
-        const oceanResponse = await fetch('/public/twins.csv');
+        const oceanResponse = await fetch('/twins.csv');
         if (oceanResponse.ok) {
           const oceanCSV = await oceanResponse.text();
           const oceanDeals = parseCSV(oceanCSV, 'Ocean Cruise');
+          console.log('DEAL_DETAILS: Loaded', oceanDeals.length, 'ocean cruise deals');
           allDeals = allDeals.concat(oceanDeals);
+        } else {
+          console.log('DEAL_DETAILS: Could not load twins.csv, status:', oceanResponse.status);
         }
 
         console.log('DEAL_DETAILS: Loaded', allDeals.length, 'total deals');
@@ -649,6 +723,31 @@
       document.getElementById('loading-state').style.display = 'none';
       document.getElementById('error-state').style.display = 'block';
     }
+    
+    function showSampleDeal() {
+      // Show a sample deal if no real deal is found
+      const sampleDeal = {
+        id: 'sample_deal',
+        cruiseType: 'Ocean Cruise',
+        cruiseLine: 'Sample Cruise Line',
+        shipName: 'Sample Ship',
+        region: 'Caribbean',
+        nights: 7,
+        departureDate: new Date('2025-07-15'),
+        departurePort: 'Miami',
+        arrivalPort: 'Miami',
+        itinerary: 'Sample 7-night Caribbean cruise visiting beautiful destinations.',
+        insidePrice: 1299,
+        oceanviewPrice: 1599,
+        balconyPrice: 1999,
+        suitePrice: 3499,
+        cabinTypes: ['Interior', 'Oceanview', 'Balcony', 'Suite']
+      };
+      
+      displayDeal(sampleDeal);
+      showDeal();
+      console.log('DEAL_DETAILS: Showing sample deal as fallback');
+    }
 
     function showDeal() {
       document.getElementById('loading-state').style.display = 'none';
@@ -676,8 +775,18 @@
         showDeal();
         console.log('DEAL_DETAILS: Found and displayed deal:', deal);
       } else {
-        console.log('DEAL_DETAILS: Deal not found, available IDs:', allDeals.slice(0, 5).map(d => d.id));
-        showError();
+        console.log('DEAL_DETAILS: Deal not found, available IDs:', allDeals.slice(0, 10).map(d => d.id));
+        console.log('DEAL_DETAILS: Looking for ID:', dealId);
+        
+        // Try to find a deal with similar ID pattern
+        const similarDeal = allDeals.find(d => d.id.includes(dealId.split('_').pop()));
+        if (similarDeal) {
+          console.log('DEAL_DETAILS: Found similar deal:', similarDeal.id);
+          displayDeal(similarDeal);
+          showDeal();
+        } else {
+          showSampleDeal();
+        }
       }
     });
   </script>

@@ -457,33 +457,223 @@
     };
 
     // Load deal details from URL parameters
-    function loadDealDetails() {
+    async function loadDealDetails() {
       const urlParams = new URLSearchParams(window.location.search);
       const dealData = urlParams.get('deal');
       
       if (dealData) {
         try {
+          // Try to parse as JSON first (full deal object)
           selectedDeal = JSON.parse(decodeURIComponent(dealData));
+          console.log('BOOKING: Loaded deal from JSON data:', selectedDeal);
           populateDealDetails(selectedDeal);
           populateCabinOptions(selectedDeal);
         } catch (error) {
-          console.error('Error parsing deal data:', error);
-          showError('Invalid deal data. Please return to deals page and try again.');
+          // If JSON parsing fails, treat as deal ID and load from CSV
+          console.log('BOOKING: Treating as deal ID, loading from CSV:', dealData);
+          await loadDealById(dealData);
         }
       } else {
         showError('No deal selected. Please return to deals page and select a cruise.');
       }
     }
 
+    // Load deal by ID from CSV data
+    async function loadDealById(dealId) {
+      try {
+        // Use the enhanced CSV loader if available
+        if (window.csvLoader) {
+          const deal = await window.csvLoader.findDealById(dealId);
+          if (deal) {
+            selectedDeal = deal;
+            console.log('BOOKING: Loaded deal by ID:', selectedDeal);
+            populateDealDetails(selectedDeal);
+            populateCabinOptions(selectedDeal);
+            return;
+          }
+        }
+        
+        // Fallback: load CSV data manually
+        await loadCSVAndFindDeal(dealId);
+        
+      } catch (error) {
+        console.error('BOOKING: Error loading deal by ID:', error);
+        showError('Unable to load deal details. Please try again.');
+      }
+    }
+
+    // Fallback CSV loading
+    async function loadCSVAndFindDeal(dealId) {
+      try {
+        const allDeals = [];
+        
+        // Load river cruise data
+        try {
+          const riverResponse = await fetch('/river.csv?v=' + Date.now());
+          if (riverResponse.ok) {
+            const riverCSV = await riverResponse.text();
+            const riverDeals = parseCSV(riverCSV, 'River Cruise');
+            allDeals.push(...riverDeals);
+          }
+        } catch (error) {
+          console.warn('BOOKING: Failed to load river.csv:', error);
+        }
+
+        // Load ocean cruise data
+        try {
+          const oceanResponse = await fetch('/data/twins.csv?v=' + Date.now());
+          if (oceanResponse.ok) {
+            const oceanCSV = await oceanResponse.text();
+            const oceanDeals = parseCSV(oceanCSV, 'Ocean Cruise');
+            allDeals.push(...oceanDeals);
+          }
+        } catch (error) {
+          console.warn('BOOKING: Failed to load twins.csv:', error);
+        }
+
+        // Find the deal
+        const deal = allDeals.find(d => d.id === dealId);
+        if (deal) {
+          selectedDeal = deal;
+          console.log('BOOKING: Found deal in CSV data:', selectedDeal);
+          populateDealDetails(selectedDeal);
+          populateCabinOptions(selectedDeal);
+        } else {
+          showError('Deal not found. Please return to deals page and try again.');
+        }
+        
+      } catch (error) {
+        console.error('BOOKING: Error loading CSV data:', error);
+        showError('Unable to load deal details. Please try again.');
+      }
+    }
+
+    // Parse CSV data (same logic as other pages)
+    function parseCSV(csvText, cruiseType) {
+      const lines = csvText.trim().split('\n');
+      if (lines.length < 2) return [];
+
+      const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+      const deals = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        try {
+          const values = parseCSVLine(lines[i]);
+          const deal = createDeal(headers, values, cruiseType);
+          if (deal && deal.cruiseLine && deal.shipName) {
+            deals.push(deal);
+          }
+        } catch (error) {
+          console.warn(`BOOKING: Skipping CSV row ${i}:`, error);
+        }
+      }
+
+      return deals;
+    }
+
+    function parseCSVLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          result.push(current.trim().replace(/"/g, ''));
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      result.push(current.trim().replace(/"/g, ''));
+      return result;
+    }
+
+    function createDeal(headers, values, cruiseType) {
+      const deal = {};
+      headers.forEach((header, index) => {
+        deal[header] = values[index] || '';
+      });
+
+      // Determine actual cruise type
+      let actualType = cruiseType;
+      const region = (deal.Region || '').toLowerCase();
+      const itinerary = (deal.Itinerary || '').toLowerCase();
+
+      if (region.includes('arctic') || region.includes('antarctic') ||
+          itinerary.includes('expedition') || itinerary.includes('polar')) {
+        actualType = 'Expedition Cruise';
+      }
+
+      // Generate consistent ID based on SEQ field
+      const seq = deal.SEQ || deal.seq || Math.random().toString(36).substr(2, 9);
+      const dealId = `${actualType.toLowerCase().replace(/\s+/g, '_')}_${seq}`;
+
+      return {
+        id: dealId,
+        seq: seq,
+        cruiseType: actualType,
+        cruiseLine: deal['Cruise Line'] || '',
+        shipName: deal.Ship || '',
+        region: deal.Region || '',
+        nights: parseInt(deal.Nights || 0),
+        departureDate: parseDate(deal.Date),
+        departurePort: deal.From || '',
+        arrivalPort: deal.To || '',
+        itinerary: deal.Itinerary || '',
+        insidePrice: parsePrice(deal.Inside),
+        oceanviewPrice: parsePrice(deal.Oceanview),
+        balconyPrice: parsePrice(deal.Balcony),
+        suitePrice: parsePrice(deal.Suite),
+        saleEndDate: parseDate(deal.Sale),
+        shipMap: deal.Shipmap || '',
+        cruiseOfferUrl: deal['Cruise Offer URL'] || ''
+      };
+    }
+
+    function parseDate(dateStr) {
+      if (!dateStr) return null;
+
+      if (dateStr.includes('-') && dateStr.length <= 9) {
+        const parts = dateStr.split('-');
+        if (parts.length === 3) {
+          const day = parseInt(parts[0]);
+          const month = parts[1];
+          const year = parts[2].length === 2 ? parseInt('20' + parts[2]) : parseInt(parts[2]);
+          const monthMap = {
+            'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+            'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+          };
+          const monthNum = monthMap[month];
+          if (!isNaN(day) && monthNum !== undefined && !isNaN(year)) {
+            return new Date(year, monthNum, day);
+          }
+        }
+      }
+
+      const date = new Date(dateStr);
+      return isNaN(date.getTime()) ? null : date;
+    }
+
+    function parsePrice(priceStr) {
+      if (!priceStr || priceStr.toLowerCase().includes('quote')) return 0;
+      const cleaned = priceStr.replace(/[$,]/g, '');
+      const price = parseFloat(cleaned);
+      return isNaN(price) ? 0 : price;
+    }
+
     // Populate deal details in the summary
     function populateDealDetails(deal) {
+      console.log('BOOKING: Populating deal details:', deal);
       document.getElementById('cruise-title').textContent = `${deal.shipName} - ${deal.cruiseLine}`;
-      document.getElementById('ship-name').textContent = deal.shipName;
+      document.getElementById('ship-name').textContent = deal.shipName || 'TBA';
       document.getElementById('departure-date').textContent = formatDate(deal.departureDate);
       document.getElementById('duration').textContent = `${deal.nights} nights`;
-      document.getElementById('route').textContent = `${deal.from} to ${deal.to}`;
-      document.getElementById('region').textContent = deal.region;
-      document.getElementById('cruise-line').textContent = deal.cruiseLine;
+      document.getElementById('route').textContent = `${deal.departurePort || 'TBA'} to ${deal.arrivalPort || 'TBA'}`;
+      document.getElementById('region').textContent = deal.region || 'TBA';
+      document.getElementById('cruise-line').textContent = deal.cruiseLine || 'TBA';
     }
 
     // Populate cabin options
@@ -733,14 +923,71 @@
       }
     });
 
-    // Initialize
-    window.addEventListener('load', () => {
-      loadDealDetails();
+    // Error and success message functions
+    function showError(message) {
+      const errorDiv = document.getElementById('error-message');
+      if (errorDiv) {
+        errorDiv.innerHTML = `<div style="background: #fee2e2; border: 1px solid #fca5a5; color: #dc2626; padding: 1rem; border-radius: 8px; margin: 1rem 0;">${message}</div>`;
+        errorDiv.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        alert(message);
+      }
+    }
+
+    function showSuccess(message) {
+      const successDiv = document.getElementById('success-message');
+      if (successDiv) {
+        successDiv.innerHTML = `<div style="background: #dcfce7; border: 1px solid #86efac; color: #166534; padding: 1rem; border-radius: 8px; margin: 1rem 0;">${message}</div>`;
+        successDiv.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        alert(message);
+      }
+    }
+
+    function hideError() {
+      const errorDiv = document.getElementById('error-message');
+      if (errorDiv) errorDiv.innerHTML = '';
+    }
+
+    function hideSuccess() {
+      const successDiv = document.getElementById('success-message');
+      if (successDiv) successDiv.innerHTML = '';
+    }
+
+    // Initialize - make sure to load enhanced CSV loader first
+    window.addEventListener('load', async () => {
+      // Load enhanced CSV loader if not already loaded
+      if (!window.csvLoader) {
+        try {
+          const script = document.createElement('script');
+          script.src = '/js/enhanced-csv-loader.js';
+          document.head.appendChild(script);
+          
+          // Wait for script to load
+          await new Promise((resolve) => {
+            script.onload = resolve;
+            setTimeout(resolve, 1000); // Fallback timeout
+          });
+        } catch (error) {
+          console.warn('BOOKING: Could not load enhanced CSV loader:', error);
+        }
+      }
+      
+      await loadDealDetails();
       setupFileUploads();
       
       // Initialize reCAPTCHA v3
       // Cloudflare Turnstile is initialized automatically
     });
+  </script>
+  
+  <!-- Enhanced CSV Loader -->
+  <script src="/js/enhanced-csv-loader.js"></script>
+  
+  <div id="footer-placeholder"></div>
+  <script src="/js/loadPartials.js" defer></script>
+</body>
+</html>
   </script>
   
   <div id="footer-placeholder"></div>

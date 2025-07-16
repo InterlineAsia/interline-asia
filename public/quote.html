@@ -1,877 +1,1433 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Secure Quote Request | Interline Asia</title>
-  
-  <!-- Fonts & Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
-  
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
-      color: #1e293b;
-      line-height: 1.6;
-      min-height: 100vh;
-    }
-    
-    /* Header */
-    .quote-header {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      color: white;
-      padding: 1.5rem 2rem;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .header-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-    
-    .logo i {
-      font-size: 1.5rem;
-      color: #3b82f6;
-    }
-    
-    .logo h1 {
-      font-size: 1.5rem;
-      font-weight: 700;
-    }
-    
-    .security-badge {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      background: rgba(34, 197, 94, 0.2);
-      border: 1px solid rgba(34, 197, 94, 0.3);
-      border-radius: 20px;
-      font-size: 0.875rem;
-      color: #22c55e;
-    }
-    
-    /* Main Container */
-    .quote-container {
-      max-width: 1000px;
-      margin: 2rem auto;
-      padding: 0 2rem;
-    }
-    
-    /* Cruise Summary Card */
-    .cruise-summary {
-      background: white;
-      border-radius: 16px;
-      padding: 2rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    }
-    
-    .cruise-summary-header {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      margin-bottom: 1.5rem;
-      padding-bottom: 1.5rem;
-      border-bottom: 1px solid #e2e8f0;
-    }
-    
-    .cruise-logo {
-      height: 60px;
-      width: auto;
-      max-width: 120px;
-      object-fit: contain;
-    }
-    
-    .cruise-info h2 {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: #1e293b;
-      margin-bottom: 0.5rem;
-    }
-    
-    .cruise-info p {
-      color: #64748b;
-      font-size: 1.125rem;
-    }
-    
-    .cruise-type-badge {
-      padding: 0.5rem 1rem;
-      border-radius: 25px;
-      font-size: 0.875rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      margin-left: auto;
-    }
-    
-    .cruise-type-badge.river-cruise { background: #dcfce7; color: #166534; }
-    .cruise-type-badge.ocean-cruise { background: #dbeafe; color: #1e40af; }
-    .cruise-type-badge.expedition-cruise { background: #fef3c7; color: #92400e; }
-    
-    .cruise-details-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-    }
-    
-    .detail-item {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 1rem;
-      background: #f8fafc;
-      border-radius: 12px;
-    }
-    
-    .detail-item i {
-      color: #3b82f6;
-      font-size: 1.25rem;
-      width: 20px;
-    }
-    
-    .detail-label {
-      font-size: 0.75rem;
-      color: #64748b;
-      text-transform: uppercase;
-      font-weight: 600;
-      margin-bottom: 0.25rem;
-    }
-    
-    .detail-value {
-      font-weight: 600;
-      color: #1e293b;
-    }
-    
-    /* Quote Form */
-    .quote-form {
-      background: white;
-      border-radius: 16px;
-      padding: 2rem;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    }
-    
-    .form-header {
-      margin-bottom: 2rem;
-      text-align: center;
-    }
-    
-    .form-header h3 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #1e293b;
-      margin-bottom: 0.5rem;
-    }
-    
-    .form-header p {
-      color: #64748b;
-    }
-    
-    .pricing-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
-    
-    .price-input-group {
-      position: relative;
-    }
-    
-    .price-input-group label {
-      display: block;
-      font-weight: 600;
-      color: #374151;
-      margin-bottom: 0.5rem;
-      font-size: 0.875rem;
-    }
-    
-    .price-input-wrapper {
-      position: relative;
-    }
-    
-    .price-input-wrapper::before {
-      content: '$';
-      position: absolute;
-      left: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #64748b;
-      font-weight: 600;
-    }
-    
-    .price-input {
-      width: 100%;
-      padding: 0.75rem 1rem 0.75rem 2rem;
-      border: 2px solid #e2e8f0;
-      border-radius: 8px;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-      background: white;
-    }
-    
-    .price-input:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-    
-    .notes-group {
-      margin-bottom: 2rem;
-    }
-    
-    .notes-group label {
-      display: block;
-      font-weight: 600;
-      color: #374151;
-      margin-bottom: 0.5rem;
-    }
-    
-    .notes-textarea {
-      width: 100%;
-      min-height: 120px;
-      padding: 1rem;
-      border: 2px solid #e2e8f0;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-family: inherit;
-      resize: vertical;
-      transition: all 0.3s ease;
-    }
-    
-    .notes-textarea:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-    
-    .form-actions {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      align-items: center;
-    }
-    
-    .btn {
-      padding: 0.875rem 2rem;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      border: none;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    
-    .btn-primary {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      color: white;
-    }
-    
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-    }
-    
-    .btn-secondary {
-      background: #f8fafc;
-      color: #64748b;
-      border: 2px solid #e2e8f0;
-    }
-    
-    .btn-secondary:hover {
-      background: #f1f5f9;
-      border-color: #cbd5e1;
-    }
-    
-    /* Access Denied */
-    .access-denied {
-      background: white;
-      border-radius: 16px;
-      padding: 3rem;
-      text-align: center;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-      margin-top: 4rem;
-    }
-    
-    .access-denied i {
-      font-size: 4rem;
-      color: #ef4444;
-      margin-bottom: 1.5rem;
-    }
-    
-    .access-denied h2 {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: #1e293b;
-      margin-bottom: 1rem;
-    }
-    
-    .access-denied p {
-      color: #64748b;
-      font-size: 1.125rem;
-      margin-bottom: 2rem;
-    }
-    
-    /* Loading State */
-    .loading {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 60vh;
-      color: white;
-    }
-    
-    .loading i {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-      animation: spin 2s linear infinite;
-    }
-    
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    
-    /* Success Message */
-    .success-message {
-      background: #dcfce7;
-      border: 1px solid #22c55e;
-      color: #166534;
-      padding: 1rem;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-      display: none;
-    }
-    
-    .success-message i {
-      margin-right: 0.5rem;
-    }
-    
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      .quote-container {
-        padding: 0 1rem;
-      }
-      
-      .cruise-summary-header {
-        flex-direction: column;
-        text-align: center;
-      }
-      
-      .cruise-type-badge {
-        margin-left: 0;
-      }
-      
-      .cruise-details-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .pricing-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .form-actions {
-        flex-direction: column;
-      }
-      
-      .btn {
-        width: 100%;
-        justify-content: center;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Quote Request | Interline Asia</title>
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            color: #1e293b;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .quote-header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+            color: #3b82f6;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .security-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 20px;
+            font-size: 0.875rem;
+            color: #22c55e;
+        }
+
+        /* Main Container */
+        .quote-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Cruise Summary Card */
+        .cruise-summary {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .cruise-summary-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .cruise-logo {
+            height: 60px;
+            width: auto;
+            max-width: 120px;
+            object-fit: contain;
+        }
+
+        .cruise-info h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .cruise-info p {
+            color: #64748b;
+            font-size: 1.125rem;
+        }
+
+        .cruise-type-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-left: auto;
+        }
+
+        .cruise-type-badge.river-cruise {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .cruise-type-badge.ocean-cruise {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .cruise-type-badge.expedition-cruise {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .cruise-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+
+        .detail-item i {
+            color: #3b82f6;
+            font-size: 1.25rem;
+            width: 20px;
+        }
+
+        .detail-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        /* Quote Form */
+        .quote-form {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .form-header h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            color: #64748b;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .price-input-group {
+            position: relative;
+        }
+
+        .price-input-group label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .price-input-wrapper {
+            position: relative;
+        }
+
+        .price-input-wrapper::before {
+            content: '$';
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .price-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .price-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .notes-group {
+            margin-bottom: 2rem;
+        }
+
+        .notes-group label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .notes-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        .notes-textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.875rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f8fafc;
+            color: #64748b;
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        /* Access Denied */
+        .access-denied {
+            background: white;
+            border-radius: 16px;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-top: 4rem;
+        }
+
+        .access-denied i {
+            font-size: 4rem;
+            color: #ef4444;
+            margin-bottom: 1.5rem;
+        }
+
+        .access-denied h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        .access-denied p {
+            color: #64748b;
+            font-size: 1.125rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            color: white;
+        }
+
+        .loading i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Success Message */
+        .success-message {
+            background: #dcfce7;
+            border: 1px solid #22c55e;
+            color: #166534;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .success-message i {
+            margin-right: 0.5rem;
+        }
+
+        /* Session Timer */
+        .session-timer {
+            background: rgba(251, 191, 36, 0.2);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            color: #f59e0b;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .session-timer.warning {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        /* Session Expired Overlay */
+        .session-expired-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .session-expired-modal {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .session-expired-modal i {
+            font-size: 3rem;
+            color: #ef4444;
+            margin-bottom: 1rem;
+        }
+
+        .session-expired-modal h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        .session-expired-modal p {
+            color: #64748b;
+            margin-bottom: 2rem;
+        }
+
+        /* Form Validation */
+        .price-input.error {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        .field-error {
+            color: #ef4444;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        /* Auto-save Indicator */
+        .auto-save-indicator {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(34, 197, 94, 0.9);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 100;
+        }
+
+        /* Success Confirmation Panel */
+        .success-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .success-panel i {
+            font-size: 4rem;
+            color: #22c55e;
+            margin-bottom: 1.5rem;
+        }
+
+        .success-panel h3 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        .success-panel p {
+            color: #64748b;
+            font-size: 1.125rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Print Button */
+        .print-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .print-button:hover {
+            background: white;
+            border-color: #cbd5e1;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+            }
+
+            .quote-header,
+            .form-actions,
+            .print-button,
+            .session-timer,
+            .auto-save-indicator,
+            .success-message {
+                display: none !important;
+            }
+
+            .quote-container {
+                max-width: none !important;
+                margin: 0 !important;
+                padding: 1rem !important;
+            }
+
+            .cruise-summary,
+            .quote-form {
+                box-shadow: none !important;
+                border: 1px solid #e2e8f0 !important;
+                page-break-inside: avoid;
+            }
+
+            .form-header h3 {
+                color: black !important;
+            }
+
+            .price-input {
+                border: 1px solid #ccc !important;
+                background: #f9f9f9 !important;
+            }
+
+            .notes-textarea {
+                border: 1px solid #ccc !important;
+                background: #f9f9f9 !important;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .quote-container {
+                padding: 0 1rem;
+            }
+
+            .cruise-summary-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .cruise-type-badge {
+                margin-left: 0;
+            }
+
+            .cruise-details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
 
 <body>
-  <!-- Header -->
-  <div class="quote-header">
-    <div class="header-content">
-      <div class="logo">
-        <i class="ri-ship-line"></i>
-        <h1>Interline Asia</h1>
-      </div>
-      <div class="security-badge">
-        <i class="ri-shield-check-line"></i>
-        Secure Quote System
-      </div>
-    </div>
-  </div>
-
-  <!-- Loading State -->
-  <div id="loading-state" class="loading">
-    <i class="ri-loader-4-line"></i>
-    <p>Verifying access and loading cruise details...</p>
-  </div>
-
-  <!-- Access Denied -->
-  <div id="access-denied" class="quote-container" style="display: none;">
-    <div class="access-denied">
-      <i class="ri-error-warning-line"></i>
-      <h2>Access Denied</h2>
-      <p>Invalid or missing security token. This page requires proper authorization to access.</p>
-      <a href="/deals.html" class="btn btn-primary">
-        <i class="ri-arrow-left-line"></i>
-        Return to Deals
-      </a>
-    </div>
-  </div>
-
-  <!-- Main Quote Content -->
-  <div id="quote-content" class="quote-container" style="display: none;">
-    <!-- Cruise Summary -->
-    <div class="cruise-summary">
-      <div class="cruise-summary-header">
-        <img id="cruise-logo" src="" alt="" class="cruise-logo">
-        <div class="cruise-info">
-          <h2 id="ship-name">Loading...</h2>
-          <p id="cruise-line">Loading...</p>
+    <!-- Header -->
+    <div class="quote-header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="ri-ship-line"></i>
+                <h1>Interline Asia</h1>
+            </div>
+            <div class="security-badge">
+                <i class="ri-shield-check-line"></i>
+                Secure Quote System
+            </div>
         </div>
-        <div id="cruise-type-badge" class="cruise-type-badge">Loading...</div>
-      </div>
-      
-      <div class="cruise-details-grid">
-        <div class="detail-item">
-          <i class="ri-map-pin-line"></i>
-          <div>
-            <div class="detail-label">Departure Port</div>
-            <div class="detail-value" id="departure-port">Loading...</div>
-          </div>
-        </div>
-        
-        <div class="detail-item">
-          <i class="ri-calendar-line"></i>
-          <div>
-            <div class="detail-label">Departure Date</div>
-            <div class="detail-value" id="departure-date">Loading...</div>
-          </div>
-        </div>
-        
-        <div class="detail-item">
-          <i class="ri-time-line"></i>
-          <div>
-            <div class="detail-label">Duration</div>
-            <div class="detail-value" id="duration">Loading...</div>
-          </div>
-        </div>
-        
-        <div class="detail-item">
-          <i class="ri-global-line"></i>
-          <div>
-            <div class="detail-label">Region</div>
-            <div class="detail-value" id="region">Loading...</div>
-          </div>
-        </div>
-      </div>
     </div>
 
-    <!-- Quote Form -->
-    <div class="quote-form">
-      <div class="form-header">
-        <h3>Staff Quote Request</h3>
-        <p>Enter pricing information for this cruise. The quote will be sent directly to the client.</p>
-      </div>
-
-      <div class="success-message" id="success-message">
-        <i class="ri-check-line"></i>
-        Quote sent successfully! The client has been notified via email.
-      </div>
-
-      <form id="quote-form">
-        <div class="pricing-grid">
-          <div class="price-input-group">
-            <label for="interior-price">Interior Cabin</label>
-            <div class="price-input-wrapper">
-              <input type="number" id="interior-price" name="interior-price" class="price-input" 
-                     placeholder="0.00" step="0.01" min="0">
-            </div>
-          </div>
-          
-          <div class="price-input-group">
-            <label for="oceanview-price">Oceanview Cabin</label>
-            <div class="price-input-wrapper">
-              <input type="number" id="oceanview-price" name="oceanview-price" class="price-input" 
-                     placeholder="0.00" step="0.01" min="0">
-            </div>
-          </div>
-          
-          <div class="price-input-group">
-            <label for="balcony-price">Balcony Cabin</label>
-            <div class="price-input-wrapper">
-              <input type="number" id="balcony-price" name="balcony-price" class="price-input" 
-                     placeholder="0.00" step="0.01" min="0">
-            </div>
-          </div>
-          
-          <div class="price-input-group">
-            <label for="suite-price">Suite</label>
-            <div class="price-input-wrapper">
-              <input type="number" id="suite-price" name="suite-price" class="price-input" 
-                     placeholder="0.00" step="0.01" min="0">
-            </div>
-          </div>
-        </div>
-
-        <div class="notes-group">
-          <label for="notes">Notes & Upgrade Suggestions</label>
-          <textarea id="notes" name="notes" class="notes-textarea" 
-                    placeholder="Add any special notes, upgrade suggestions, or additional information for the client..."></textarea>
-        </div>
-
-        <div class="form-actions">
-          <button type="button" class="btn btn-secondary" onclick="window.history.back()">
-            <i class="ri-arrow-left-line"></i>
-            Cancel
-          </button>
-          <button type="submit" class="btn btn-primary" id="send-quote-btn">
-            <i class="ri-mail-send-line"></i>
-            Send Quote
-          </button>
-        </div>
-      </form>
+    <!-- Loading State -->
+    <div id="loading-state" class="loading">
+        <i class="ri-loader-4-line"></i>
+        <p>Verifying access and loading cruise details...</p>
     </div>
-  </div>
 
-  <script>
-    let currentDeal = null;
-    let allDeals = [];
+    <!-- Access Denied -->
+    <div id="access-denied" class="quote-container" style="display: none;">
+        <div class="access-denied">
+            <i class="ri-error-warning-line"></i>
+            <h2>Access Denied</h2>
+            <p>Invalid or missing security token. This page requires proper authorization to access.</p>
+            <a href="/deals.html" class="btn btn-primary">
+                <i class="ri-arrow-left-line"></i>
+                Return to Deals
+            </a>
+        </div>
+    </div>
 
-    // Security validation
-    function validateAccess() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const dealId = urlParams.get('id');
-      const token = urlParams.get('token');
-      
-      // Basic validation - in production, this would be more sophisticated
-      if (!dealId || !token) {
-        return false;
-      }
-      
-      // Simple token validation (in production, this would verify against a secure backend)
-      const validTokenPattern = /^[a-zA-Z0-9]{6,}$/;
-      return validTokenPattern.test(token);
-    }
+    <!-- Main Quote Content -->
+    <div id="quote-content" class="quote-container" style="display: none;">
+        <!-- Cruise Summary -->
+        <div class="cruise-summary">
+            <div class="cruise-summary-header">
+                <img id="cruise-logo" src="" alt="" class="cruise-logo">
+                <div class="cruise-info">
+                    <h2 id="ship-name">Loading...</h2>
+                    <p id="cruise-line">Loading...</p>
+                </div>
+                <div id="cruise-type-badge" class="cruise-type-badge">Loading...</div>
+            </div>
 
-    // Load CSV data (same as deal-details page)
-    async function loadCSVDeals() {
-      try {
-        console.log('QUOTE: Loading CSV data...');
-        
-        // Load river cruise data
-        const riverResponse = await fetch('/public/river.csv');
-        if (riverResponse.ok) {
-          const riverCSV = await riverResponse.text();
-          const riverDeals = parseCSV(riverCSV, 'River Cruise');
-          allDeals = allDeals.concat(riverDeals);
+            <div class="cruise-details-grid">
+                <div class="detail-item">
+                    <i class="ri-map-pin-line"></i>
+                    <div>
+                        <div class="detail-label">Departure Port</div>
+                        <div class="detail-value" id="departure-port">Loading...</div>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <i class="ri-calendar-line"></i>
+                    <div>
+                        <div class="detail-label">Departure Date</div>
+                        <div class="detail-value" id="departure-date">Loading...</div>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <i class="ri-time-line"></i>
+                    <div>
+                        <div class="detail-label">Duration</div>
+                        <div class="detail-value" id="duration">Loading...</div>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <i class="ri-global-line"></i>
+                    <div>
+                        <div class="detail-label">Region</div>
+                        <div class="detail-value" id="region">Loading...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quote Form -->
+        <div class="quote-form" style="position: relative;">
+            <button class="print-button" onclick="window.print()">
+                <i class="ri-printer-line"></i>
+                Print Quote
+            </button>
+
+            <div class="form-header">
+                <h3>Staff Quote Request</h3>
+                <p>Enter pricing information for this cruise. The quote will be sent directly to the client.</p>
+            </div>
+
+            <!-- Session Timer -->
+            <div class="session-timer" id="session-timer">
+                <i class="ri-time-line"></i>
+                <span id="timer-text">This session will expire in 15:00</span>
+            </div>
+
+            <div class="success-message" id="success-message">
+                <i class="ri-check-line"></i>
+                Quote sent successfully! The client has been notified via email.
+            </div>
+
+            <form id="quote-form">
+                <div class="pricing-grid">
+                    <div class="price-input-group">
+                        <label for="interior-price">Interior Cabin</label>
+                        <div class="price-input-wrapper">
+                            <input type="number" id="interior-price" name="interior-price" class="price-input"
+                                placeholder="0.00" step="0.01" min="0">
+                        </div>
+                    </div>
+
+                    <div class="price-input-group">
+                        <label for="oceanview-price">Oceanview Cabin</label>
+                        <div class="price-input-wrapper">
+                            <input type="number" id="oceanview-price" name="oceanview-price" class="price-input"
+                                placeholder="0.00" step="0.01" min="0">
+                        </div>
+                    </div>
+
+                    <div class="price-input-group">
+                        <label for="balcony-price">Balcony Cabin</label>
+                        <div class="price-input-wrapper">
+                            <input type="number" id="balcony-price" name="balcony-price" class="price-input"
+                                placeholder="0.00" step="0.01" min="0">
+                        </div>
+                    </div>
+
+                    <div class="price-input-group">
+                        <label for="suite-price">Suite</label>
+                        <div class="price-input-wrapper">
+                            <input type="number" id="suite-price" name="suite-price" class="price-input"
+                                placeholder="0.00" step="0.01" min="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="notes-group">
+                    <label for="notes">Notes & Upgrade Suggestions</label>
+                    <textarea id="notes" name="notes" class="notes-textarea"
+                        placeholder="Add any special notes, upgrade suggestions, or additional information for the client..."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="window.history.back()">
+                        <i class="ri-arrow-left-line"></i>
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="send-quote-btn">
+                        <i class="ri-mail-send-line"></i>
+                        Send Quote
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Success Panel -->
+        <div class="success-panel" id="success-panel">
+            <i class="ri-check-circle-line"></i>
+            <h3>Quote Submitted Successfully!</h3>
+            <p>Your quote has been sent to the client and a copy has been sent to the admin team.</p>
+            <a href="/deals.html" class="btn btn-primary">
+                <i class="ri-arrow-left-line"></i>
+                Back to Deals
+            </a>
+        </div>
+    </div>
+
+    <!-- Session Expired Overlay -->
+    <div class="session-expired-overlay" id="session-expired-overlay">
+        <div class="session-expired-modal">
+            <i class="ri-time-line"></i>
+            <h3>Session Expired</h3>
+            <p>This quote session has expired. Please start again from the cruise details page.</p>
+            <a href="/deals.html" class="btn btn-primary">
+                <i class="ri-arrow-left-line"></i>
+                Return to Deals
+            </a>
+        </div>
+    </div>
+
+    <!-- Auto-save Indicator -->
+    <div class="auto-save-indicator" id="auto-save-indicator">
+        <i class="ri-save-line"></i>
+        Draft saved
+    </div>
+
+    <script>
+        let currentDeal = null;
+        let allDeals = [];
+
+        // Security validation
+        function validateAccess() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const dealId = urlParams.get('id');
+            const token = urlParams.get('token');
+
+            // Basic validation - in production, this would be more sophisticated
+            if (!dealId || !token) {
+                return false;
+            }
+
+            // Simple token validation (in production, this would verify against a secure backend)
+            const validTokenPattern = /^[a-zA-Z0-9]{6,}$/;
+            return validTokenPattern.test(token);
         }
 
-        // Load ocean cruise data
-        const oceanResponse = await fetch('/public/twins.csv');
-        if (oceanResponse.ok) {
-          const oceanCSV = await oceanResponse.text();
-          const oceanDeals = parseCSV(oceanCSV, 'Ocean Cruise');
-          allDeals = allDeals.concat(oceanDeals);
+        // Load CSV data (same as deal-details page)
+        async function loadCSVDeals() {
+            try {
+                console.log('QUOTE: Loading CSV data...');
+
+                // Load river cruise data
+                const riverResponse = await fetch('/public/river.csv');
+                if (riverResponse.ok) {
+                    const riverCSV = await riverResponse.text();
+                    const riverDeals = parseCSV(riverCSV, 'River Cruise');
+                    allDeals = allDeals.concat(riverDeals);
+                }
+
+                // Load ocean cruise data
+                const oceanResponse = await fetch('/public/twins.csv');
+                if (oceanResponse.ok) {
+                    const oceanCSV = await oceanResponse.text();
+                    const oceanDeals = parseCSV(oceanCSV, 'Ocean Cruise');
+                    allDeals = allDeals.concat(oceanDeals);
+                }
+
+                console.log('QUOTE: Loaded', allDeals.length, 'total deals');
+            } catch (error) {
+                console.error('QUOTE: Error loading CSV data:', error);
+            }
         }
 
-        console.log('QUOTE: Loaded', allDeals.length, 'total deals');
-      } catch (error) {
-        console.error('QUOTE: Error loading CSV data:', error);
-      }
-    }
+        // Parse CSV (same logic as deal-details)
+        function parseCSV(csvText, cruiseType) {
+            const lines = csvText.trim().split('\n');
+            const headers = parseCSVLine(lines[0]);
+            const deals = [];
 
-    // Parse CSV (same logic as deal-details)
-    function parseCSV(csvText, cruiseType) {
-      const lines = csvText.trim().split('\n');
-      const headers = parseCSVLine(lines[0]);
-      const deals = [];
-
-      for (let i = 1; i < lines.length; i++) {
-        const values = parseCSVLine(lines[i]);
-        if (values.length >= 10) {
-          const deal = createDeal(headers, values, cruiseType);
-          if (deal.cruiseLine && deal.shipName) {
-            deals.push(deal);
-          }
+            for (let i = 1; i < lines.length; i++) {
+                const values = parseCSVLine(lines[i]);
+                if (values.length >= 10) {
+                    const deal = createDeal(headers, values, cruiseType);
+                    if (deal.cruiseLine && deal.shipName) {
+                        deals.push(deal);
+                    }
+                }
+            }
+            return deals;
         }
-      }
-      return deals;
-    }
 
-    function parseCSVLine(line) {
-      const result = [];
-      let current = '';
-      let inQuotes = false;
-      
-      for (let i = 0; i < line.length; i++) {
-        const char = line[i];
-        if (char === '"') {
-          inQuotes = !inQuotes;
-        } else if (char === ',' && !inQuotes) {
-          result.push(current.trim());
-          current = '';
-        } else {
-          current += char;
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            result.push(current.trim());
+            return result;
         }
-      }
-      result.push(current.trim());
-      return result;
-    }
 
-    function createDeal(headers, values, cruiseType) {
-      const deal = {};
-      headers.forEach((header, index) => {
-        deal[header] = values[index] || '';
-      });
+        function createDeal(headers, values, cruiseType) {
+            const deal = {};
+            headers.forEach((header, index) => {
+                deal[header] = values[index] || '';
+            });
 
-      // Determine actual cruise type
-      let actualCruiseType = cruiseType;
-      const region = (deal.Region || '').toLowerCase();
-      const itinerary = (deal.Itinerary || '').toLowerCase();
-      
-      if (region.includes('arctic') || region.includes('antarctic') || 
-          itinerary.includes('expedition') || itinerary.includes('arctic') || 
-          itinerary.includes('antarctic') || itinerary.includes('polar')) {
-        actualCruiseType = 'Expedition Cruise';
-      }
+            // Determine actual cruise type
+            let actualCruiseType = cruiseType;
+            const region = (deal.Region || '').toLowerCase();
+            const itinerary = (deal.Itinerary || '').toLowerCase();
 
-      return {
-        id: `${actualCruiseType.toLowerCase().replace(/\s+/g, '_')}_${deal.SEQ || Math.random().toString(36).substr(2, 9)}`,
-        cruiseType: actualCruiseType,
-        cruiseLine: deal['Cruise Line'] || '',
-        shipName: deal.Ship || '',
-        region: deal.Region || '',
-        nights: parseInt(deal.Nights || 0),
-        departureDate: parseDate(deal.Date),
-        departurePort: deal.From || '',
-        arrivalPort: deal.To || '',
-        itinerary: deal.Itinerary || ''
-      };
-    }
+            if (region.includes('arctic') || region.includes('antarctic') ||
+                itinerary.includes('expedition') || itinerary.includes('arctic') ||
+                itinerary.includes('antarctic') || itinerary.includes('polar')) {
+                actualCruiseType = 'Expedition Cruise';
+            }
 
-    function parseDate(dateStr) {
-      if (!dateStr) return null;
-      
-      if (dateStr.includes('-') && dateStr.length <= 9) {
-        const parts = dateStr.split('-');
-        if (parts.length === 3) {
-          const day = parseInt(parts[0]);
-          const monthMap = {
-            'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5,
-            'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11
-          };
-          const month = monthMap[parts[1].toLowerCase()];
-          let year = parseInt(parts[2]);
-          if (year < 100) year += 2000;
-          
-          if (!isNaN(day) && month !== undefined && !isNaN(year)) {
-            return new Date(year, month, day);
-          }
+            return {
+                id: `${actualCruiseType.toLowerCase().replace(/\s+/g, '_')}_${deal.SEQ || Math.random().toString(36).substr(2, 9)}`,
+                cruiseType: actualCruiseType,
+                cruiseLine: deal['Cruise Line'] || '',
+                shipName: deal.Ship || '',
+                region: deal.Region || '',
+                nights: parseInt(deal.Nights || 0),
+                departureDate: parseDate(deal.Date),
+                departurePort: deal.From || '',
+                arrivalPort: deal.To || '',
+                itinerary: deal.Itinerary || ''
+            };
         }
-      }
-      
-      const date = new Date(dateStr);
-      return isNaN(date.getTime()) ? null : date;
-    }
 
-    function formatDate(date) {
-      if (!date) return 'TBA';
-      return date.toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-      });
-    }
+        function parseDate(dateStr) {
+            if (!dateStr) return null;
 
-    function getCruiseLineLogo(cruiseLine) {
-      const logoMap = {
-        'royal caribbean': 'royal-caribbean.png',
-        'celebrity cruises': 'celebrity.png',
-        'norwegian cruise line': 'norwegian.png',
-        'carnival cruise line': 'carnival.png',
-        'princess cruises': 'princess.png',
-        'holland america line': 'holland-america.png',
-        'msc cruises': 'msc.png',
-        'costa cruises': 'costa.png',
-        'cunard': 'cunard.png',
-        'seabourn': 'seabourn.png',
-        'silversea': 'silversea.png',
-        'regent seven seas': 'regent.png',
-        'oceania cruises': 'oceania.png',
-        'azamara': 'azamara.png',
-        'viking ocean cruises': 'viking.png',
-        'amawaterways': 'amawaterways.png',
-        'avalon waterways': 'avalon.png',
-        'scenic': 'scenic.png',
-        'emerald cruises': 'emerald-cruises.png',
-        'crystal': 'crystal.png',
-        'atlas': 'atlas.png',
-        'hx hurtigruten expeditions': 'hx.png',
-        'hurtigruten expeditions': 'hx.png',
-        'ponant': 'ponant.png',
-        'lindblad expeditions': 'lindblad.png',
-        'quark expeditions': 'quark.png',
-        'coral expeditions': 'coral-expeditions.png',
-        'heritage expeditions': 'heritage-expeditions.png'
-      };
-      
-      return logoMap[cruiseLine.toLowerCase()] || 'placeholder.png';
-    }
+            if (dateStr.includes('-') && dateStr.length <= 9) {
+                const parts = dateStr.split('-');
+                if (parts.length === 3) {
+                    const day = parseInt(parts[0]);
+                    const monthMap = {
+                        'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5,
+                        'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11
+                    };
+                    const month = monthMap[parts[1].toLowerCase()];
+                    let year = parseInt(parts[2]);
+                    if (year < 100) year += 2000;
 
-    // Display cruise information
-    function displayCruise(deal) {
-      currentDeal = deal;
-      
-      // Header
-      document.getElementById('cruise-logo').src = `/logos/cruiselines/${getCruiseLineLogo(deal.cruiseLine)}`;
-      document.getElementById('cruise-logo').alt = deal.cruiseLine;
-      document.getElementById('ship-name').textContent = deal.shipName;
-      document.getElementById('cruise-line').textContent = deal.cruiseLine;
-      
-      const badge = document.getElementById('cruise-type-badge');
-      badge.textContent = deal.cruiseType;
-      badge.className = `cruise-type-badge ${deal.cruiseType.toLowerCase().replace(/\s+/g, '-')}`;
+                    if (!isNaN(day) && month !== undefined && !isNaN(year)) {
+                        return new Date(year, month, day);
+                    }
+                }
+            }
 
-      // Details
-      document.getElementById('departure-port').textContent = deal.departurePort || 'TBA';
-      document.getElementById('departure-date').textContent = formatDate(deal.departureDate);
-      document.getElementById('duration').textContent = `${deal.nights} nights`;
-      document.getElementById('region').textContent = deal.region || 'TBA';
+            const date = new Date(dateStr);
+            return isNaN(date.getTime()) ? null : date;
+        }
 
-      // Update page title
-      document.title = `Quote Request - ${deal.shipName} | Interline Asia`;
-    }
+        function formatDate(date) {
+            if (!date) return 'TBA';
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
 
-    // Handle form submission
-    function handleQuoteSubmission(event) {
-      event.preventDefault();
-      
-      const formData = {
-        dealId: currentDeal.id,
-        cruiseLine: currentDeal.cruiseLine,
-        shipName: currentDeal.shipName,
-        departureDate: formatDate(currentDeal.departureDate),
-        interiorPrice: document.getElementById('interior-price').value,
-        oceanviewPrice: document.getElementById('oceanview-price').value,
-        balconyPrice: document.getElementById('balcony-price').value,
-        suitePrice: document.getElementById('suite-price').value,
-        notes: document.getElementById('notes').value
-      };
+        function getCruiseLineLogo(cruiseLine) {
+            const logoMap = {
+                'royal caribbean': 'royal-caribbean.png',
+                'celebrity cruises': 'celebrity.png',
+                'norwegian cruise line': 'norwegian.png',
+                'carnival cruise line': 'carnival.png',
+                'princess cruises': 'princess.png',
+                'holland america line': 'holland-america.png',
+                'msc cruises': 'msc.png',
+                'costa cruises': 'costa.png',
+                'cunard': 'cunard.png',
+                'seabourn': 'seabourn.png',
+                'silversea': 'silversea.png',
+                'regent seven seas': 'regent.png',
+                'oceania cruises': 'oceania.png',
+                'azamara': 'azamara.png',
+                'viking ocean cruises': 'viking.png',
+                'amawaterways': 'amawaterways.png',
+                'avalon waterways': 'avalon.png',
+                'scenic': 'scenic.png',
+                'emerald cruises': 'emerald-cruises.png',
+                'crystal': 'crystal.png',
+                'atlas': 'atlas.png',
+                'hx hurtigruten expeditions': 'hx.png',
+                'hurtigruten expeditions': 'hx.png',
+                'ponant': 'ponant.png',
+                'lindblad expeditions': 'lindblad.png',
+                'quark expeditions': 'quark.png',
+                'coral expeditions': 'coral-expeditions.png',
+                'heritage expeditions': 'heritage-expeditions.png'
+            };
 
-      // Validate at least one price is entered
-      const hasPrice = formData.interiorPrice || formData.oceanviewPrice || 
-                      formData.balconyPrice || formData.suitePrice;
-      
-      if (!hasPrice) {
-        alert('Please enter at least one cabin price.');
-        return;
-      }
+            return logoMap[cruiseLine.toLowerCase()] || 'placeholder.png';
+        }
 
-      console.log('QUOTE: Submitting quote data:', formData);
-      
-      // Disable submit button
-      const submitBtn = document.getElementById('send-quote-btn');
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<i class="ri-loader-4-line"></i> Sending...';
+        // Display cruise information
+        function displayCruise(deal) {
+            currentDeal = deal;
 
-      // TODO: This is where Robo will integrate with Brevo email service
-      // For now, we'll simulate the email sending
-      setTimeout(() => {
-        // Show success message
-        document.getElementById('success-message').style.display = 'block';
-        
-        // Reset form
-        document.getElementById('quote-form').reset();
-        
-        // Re-enable button
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="ri-mail-send-line"></i> Send Quote';
-        
-        // Scroll to success message
-        document.getElementById('success-message').scrollIntoView({ behavior: 'smooth' });
-        
-        console.log('QUOTE: Quote sent successfully (simulated)');
-      }, 2000);
-    }
+            // Header
+            document.getElementById('cruise-logo').src = `/logos/cruiselines/${getCruiseLineLogo(deal.cruiseLine)}`;
+            document.getElementById('cruise-logo').alt = deal.cruiseLine;
+            document.getElementById('ship-name').textContent = deal.shipName;
+            document.getElementById('cruise-line').textContent = deal.cruiseLine;
 
-    // Initialize page
-    document.addEventListener('DOMContentLoaded', async () => {
-      // Validate access first
-      if (!validateAccess()) {
-        document.getElementById('loading-state').style.display = 'none';
-        document.getElementById('access-denied').style.display = 'block';
-        return;
-      }
+            const badge = document.getElementById('cruise-type-badge');
+            badge.textContent = deal.cruiseType;
+            badge.className = `cruise-type-badge ${deal.cruiseType.toLowerCase().replace(/\s+/g, '-')}`;
 
-      const urlParams = new URLSearchParams(window.location.search);
-      const dealId = urlParams.get('id');
+            // Details
+            document.getElementById('departure-port').textContent = deal.departurePort || 'TBA';
+            document.getElementById('departure-date').textContent = formatDate(deal.departureDate);
+            document.getElementById('duration').textContent = `${deal.nights} nights`;
+            document.getElementById('region').textContent = deal.region || 'TBA';
 
-      console.log('QUOTE: Looking for deal ID:', dealId);
+            // Update page title
+            document.title = `Quote Request - ${deal.shipName} | Interline Asia`;
+        }
 
-      await loadCSVDeals();
+        // ✅ AUTO-SAVE FUNCTIONALITY
+        let autoSaveInterval;
+        const AUTOSAVE_KEY = 'quote_draft_';
 
-      const deal = allDeals.find(d => d.id === dealId);
+        function startAutoSave() {
+            autoSaveInterval = setInterval(() => {
+                saveDraft();
+            }, 3000); // Save every 3 seconds
+        }
 
-      if (deal) {
-        displayCruise(deal);
-        document.getElementById('loading-state').style.display = 'none';
-        document.getElementById('quote-content').style.display = 'block';
-        console.log('QUOTE: Found and displayed deal:', deal);
-      } else {
-        console.log('QUOTE: Deal not found');
-        document.getElementById('loading-state').style.display = 'none';
-        document.getElementById('access-denied').style.display = 'block';
-      }
+        function saveDraft() {
+            if (!currentDeal) return;
 
-      // Attach form handler
-      document.getElementById('quote-form').addEventListener('submit', handleQuoteSubmission);
-    });
+            const draftData = {
+                dealId: currentDeal.id,
+                interiorPrice: document.getElementById('interior-price').value,
+                oceanviewPrice: document.getElementById('oceanview-price').value,
+                balconyPrice: document.getElementById('balcony-price').value,
+                suitePrice: document.getElementById('suite-price').value,
+                notes: document.getElementById('notes').value,
+                timestamp: Date.now()
+            };
 
-    // INTEGRATION NOTES FOR ROBO:
-    // 
-    // 1. EMAIL INTEGRATION:
-    //    Replace the setTimeout simulation in handleQuoteSubmission() with actual Brevo API call
-    //    Email should be sent to the client who originally requested the quote
-    //    CC: rodney@telenational.com
-    //    
-    // 2. SECURITY TOKEN VALIDATION:
-    //    The validateAccess() function currently does basic pattern matching
-    //    In production, tokens should be validated against a secure backend/database
-    //    
-    // 3. DEAL ID MAPPING:
-    //    The system uses the same deal ID format as the deal-details page
-    //    This ensures consistency across the booking flow
-    //    
-    // 4. FORM DATA STRUCTURE:
-    //    The formData object in handleQuoteSubmission() contains all necessary
-    //    information for the email template
-    //    
-    // 5. ERROR HANDLING:
-    //    Add proper error handling for failed email sends
-    //    Show appropriate user feedback for network issues
-  </script>
+            // Only save if there's actual content
+            const hasContent = draftData.interiorPrice || draftData.oceanviewPrice ||
+                draftData.balconyPrice || draftData.suitePrice || draftData.notes;
+
+            if (hasContent) {
+                localStorage.setItem(AUTOSAVE_KEY + currentDeal.id, JSON.stringify(draftData));
+                showAutoSaveIndicator();
+            }
+        }
+
+        function loadDraft() {
+            if (!currentDeal) return;
+
+            const savedDraft = localStorage.getItem(AUTOSAVE_KEY + currentDeal.id);
+            if (savedDraft) {
+                try {
+                    const draftData = JSON.parse(savedDraft);
+
+                    // Restore form values
+                    document.getElementById('interior-price').value = draftData.interiorPrice || '';
+                    document.getElementById('oceanview-price').value = draftData.oceanviewPrice || '';
+                    document.getElementById('balcony-price').value = draftData.balconyPrice || '';
+                    document.getElementById('suite-price').value = draftData.suitePrice || '';
+                    document.getElementById('notes').value = draftData.notes || '';
+
+                    console.log('QUOTE: Draft restored from localStorage');
+                } catch (error) {
+                    console.error('QUOTE: Error loading draft:', error);
+                }
+            }
+        }
+
+        function clearDraft() {
+            if (!currentDeal) return;
+            localStorage.removeItem(AUTOSAVE_KEY + currentDeal.id);
+        }
+
+        function showAutoSaveIndicator() {
+            const indicator = document.getElementById('auto-save-indicator');
+            indicator.style.display = 'flex';
+            setTimeout(() => {
+                indicator.style.display = 'none';
+            }, 2000);
+        }
+
+        // ✅ SESSION TIMER FUNCTIONALITY
+        let sessionTimer;
+        let sessionTimeLeft = 15 * 60; // 15 minutes in seconds
+
+        function startSessionTimer() {
+            sessionTimer = setInterval(() => {
+                sessionTimeLeft--;
+                updateTimerDisplay();
+
+                if (sessionTimeLeft <= 0) {
+                    expireSession();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(sessionTimeLeft / 60);
+            const seconds = sessionTimeLeft % 60;
+            const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+            const timerElement = document.getElementById('timer-text');
+            const sessionTimerElement = document.getElementById('session-timer');
+
+            timerElement.textContent = `This session will expire in ${timeString}`;
+
+            // Add warning class when under 2 minutes
+            if (sessionTimeLeft <= 120) {
+                sessionTimerElement.classList.add('warning');
+            }
+        }
+
+        function expireSession() {
+            clearInterval(sessionTimer);
+            clearInterval(autoSaveInterval);
+            document.getElementById('session-expired-overlay').style.display = 'flex';
+        }
+
+        // ✅ FORM VALIDATION
+        function validateForm() {
+            const interiorPrice = document.getElementById('interior-price').value;
+            const oceanviewPrice = document.getElementById('oceanview-price').value;
+            const balconyPrice = document.getElementById('balcony-price').value;
+            const suitePrice = document.getElementById('suite-price').value;
+
+            const hasPrice = interiorPrice || oceanviewPrice || balconyPrice || suitePrice;
+
+            if (!hasPrice) {
+                alert('Please enter at least one cabin price.');
+                return false;
+            }
+
+            return true;
+        }
+
+        // Handle form submission
+        function handleQuoteSubmission(event) {
+            event.preventDefault();
+
+            if (!validateForm()) {
+                return;
+            }
+
+            const formData = {
+                dealId: currentDeal.id,
+                cruiseLine: currentDeal.cruiseLine,
+                shipName: currentDeal.shipName,
+                departureDate: formatDate(currentDeal.departureDate),
+                interiorPrice: document.getElementById('interior-price').value,
+                oceanviewPrice: document.getElementById('oceanview-price').value,
+                balconyPrice: document.getElementById('balcony-price').value,
+                suitePrice: document.getElementById('suite-price').value,
+                notes: document.getElementById('notes').value
+            };
+
+            console.log('QUOTE: Submitting quote data:', formData);
+
+            // Disable submit button and show loading
+            const submitBtn = document.getElementById('send-quote-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="ri-loader-4-line"></i> Sending Quote...';
+
+            // TODO: Replace with actual Brevo integration (see Robo section below)
+            setTimeout(() => {
+                // Hide form and show success panel
+                document.getElementById('quote-form').style.display = 'none';
+                document.getElementById('success-panel').style.display = 'block';
+
+                // Clear the draft
+                clearDraft();
+
+                // Stop timers
+                clearInterval(sessionTimer);
+                clearInterval(autoSaveInterval);
+
+                console.log('QUOTE: Quote sent successfully (simulated)');
+            }, 2000);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Validate access first
+            if (!validateAccess()) {
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('access-denied').style.display = 'block';
+                return;
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const dealId = urlParams.get('id');
+
+            console.log('QUOTE: Looking for deal ID:', dealId);
+
+            await loadCSVDeals();
+
+            const deal = allDeals.find(d => d.id === dealId);
+
+            if (deal) {
+                displayCruise(deal);
+
+                // Load any saved draft
+                loadDraft();
+
+                // Start auto-save and session timer
+                startAutoSave();
+                startSessionTimer();
+
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('quote-content').style.display = 'block';
+                console.log('QUOTE: Found and displayed deal:', deal);
+            } else {
+                console.log('QUOTE: Deal not found');
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('access-denied').style.display = 'block';
+            }
+
+            // Attach form handler
+            document.getElementById('quote-form').addEventListener('submit', handleQuoteSubmission);
+        });
+
+        // 🚀 Robo Integration: Email Sending via Brevo
+        //
+        // INSTRUCTIONS FOR ROBO:
+        // Replace the setTimeout simulation in handleQuoteSubmission() with this actual implementation:
+        //
+        // async function sendQuoteEmail(formData) {
+        //     try {
+        //         const response = await fetch('/api/send-quote', {
+        //             method: 'POST',
+        //             headers: {
+        //                 'Content-Type': 'application/json',
+        //             },
+        //             body: JSON.stringify({
+        //                 cruiseId: formData.dealId,
+        //                 interior: formData.interiorPrice || null,
+        //                 oceanview: formData.oceanviewPrice || null,
+        //                 balcony: formData.balconyPrice || null,
+        //                 suite: formData.suitePrice || null,
+        //                 notes: formData.notes || '',
+        //                 cruiseDetails: {
+        //                     shipName: formData.shipName,
+        //                     cruiseLine: formData.cruiseLine,
+        //                     departureDate: formData.departureDate
+        //                 },
+        //                 sendTo: "client@email.com", // TODO: Look up client email by cruiseId
+        //                 cc: "rodney@telenational.com"
+        //             })
+        //         });
+        //
+        //         if (!response.ok) {
+        //             throw new Error(`HTTP error! status: ${response.status}`);
+        //         }
+        //
+        //         const result = await response.json();
+        //         return result;
+        //     } catch (error) {
+        //         console.error('Error sending quote email:', error);
+        //         throw error;
+        //     }
+        // }
+        //
+        // BACKEND ENDPOINT NEEDED (/api/send-quote):
+        // - Validate the quote data
+        // - Look up client email address using cruiseId
+        // - Format email template with cruise details and pricing
+        // - Send via Brevo transactional API
+        // - Return success/error response
+        //
+        // EMAIL TEMPLATE SHOULD INCLUDE:
+        // - Cruise details (ship, line, date, duration)
+        // - Pricing table with entered values
+        // - Staff notes/upgrade suggestions
+        // - Contact information for booking
+        // - Professional Interline Asia branding
+        //
+        // ERROR HANDLING:
+        // - Show user-friendly error messages
+        // - Log detailed errors for debugging
+        // - Allow retry on network failures
+        // - Maintain form data on errors
+    </script>
 </body>
+
+</html>ruten expeditions': 'hx.png',
+'hurtigruten expeditions': 'hx.png',
+'ponant': 'ponant.png',
+'lindblad expeditions': 'lindblad.png',
+'quark expeditions': 'quark.png',
+'coral expeditions': 'coral-expeditions.png',
+'heritage expeditions': 'heritage-expeditions.png'
+};
+
+return logoMap[cruiseLine.toLowerCase()] || 'placeholder.png';
+}
+
+// Display cruise information
+function displayCruise(deal) {
+currentDeal = deal;
+
+// Header
+document.getElementById('cruise-logo').src = `/logos/cruiselines/${getCruiseLineLogo(deal.cruiseLine)}`;
+document.getElementById('cruise-logo').alt = deal.cruiseLine;
+document.getElementById('ship-name').textContent = deal.shipName;
+document.getElementById('cruise-line').textContent = deal.cruiseLine;
+
+const badge = document.getElementById('cruise-type-badge');
+badge.textContent = deal.cruiseType;
+badge.className = `cruise-type-badge ${deal.cruiseType.toLowerCase().replace(/\s+/g, '-')}`;
+
+// Details
+document.getElementById('departure-port').textContent = deal.departurePort || 'TBA';
+document.getElementById('departure-date').textContent = formatDate(deal.departureDate);
+document.getElementById('duration').textContent = `${deal.nights} nights`;
+document.getElementById('region').textContent = deal.region || 'TBA';
+
+// Update page title
+document.title = `Quote Request - ${deal.shipName} | Interline Asia`;
+}
+
+// Handle form submission
+function handleQuoteSubmission(event) {
+event.preventDefault();
+
+const formData = {
+dealId: currentDeal.id,
+cruiseLine: currentDeal.cruiseLine,
+shipName: currentDeal.shipName,
+departureDate: formatDate(currentDeal.departureDate),
+interiorPrice: document.getElementById('interior-price').value,
+oceanviewPrice: document.getElementById('oceanview-price').value,
+balconyPrice: document.getElementById('balcony-price').value,
+suitePrice: document.getElementById('suite-price').value,
+notes: document.getElementById('notes').value
+};
+
+// Validate at least one price is entered
+const hasPrice = formData.interiorPrice || formData.oceanviewPrice ||
+formData.balconyPrice || formData.suitePrice;
+
+if (!hasPrice) {
+alert('Please enter at least one cabin price.');
+return;
+}
+
+console.log('QUOTE: Submitting quote data:', formData);
+
+// Disable submit button
+const submitBtn = document.getElementById('send-quote-btn');
+submitBtn.disabled = true;
+submitBtn.innerHTML = '<i class="ri-loader-4-line"></i> Sending...';
+
+// TODO: This is where Robo will integrate with Brevo email service
+// For now, we'll simulate the email sending
+setTimeout(() => {
+// Show success message
+document.getElementById('success-message').style.display = 'block';
+
+// Reset form
+document.getElementById('quote-form').reset();
+
+// Re-enable button
+submitBtn.disabled = false;
+submitBtn.innerHTML = '<i class="ri-mail-send-line"></i> Send Quote';
+
+// Scroll to success message
+document.getElementById('success-message').scrollIntoView({ behavior: 'smooth' });
+
+console.log('QUOTE: Quote sent successfully (simulated)');
+}, 2000);
+}
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', async () => {
+// Validate access first
+if (!validateAccess()) {
+document.getElementById('loading-state').style.display = 'none';
+document.getElementById('access-denied').style.display = 'block';
+return;
+}
+
+const urlParams = new URLSearchParams(window.location.search);
+const dealId = urlParams.get('id');
+
+console.log('QUOTE: Looking for deal ID:', dealId);
+
+await loadCSVDeals();
+
+const deal = allDeals.find(d => d.id === dealId);
+
+if (deal) {
+displayCruise(deal);
+document.getElementById('loading-state').style.display = 'none';
+document.getElementById('quote-content').style.display = 'block';
+console.log('QUOTE: Found and displayed deal:', deal);
+} else {
+console.log('QUOTE: Deal not found');
+document.getElementById('loading-state').style.display = 'none';
+document.getElementById('access-denied').style.display = 'block';
+}
+
+// Attach form handler
+document.getElementById('quote-form').addEventListener('submit', handleQuoteSubmission);
+});
+
+// INTEGRATION NOTES FOR ROBO:
+//
+// 1. EMAIL INTEGRATION:
+// Replace the setTimeout simulation in handleQuoteSubmission() with actual Brevo API call
+// Email should be sent to the client who originally requested the quote
+// CC: rodney@telenational.com
+//
+// 2. SECURITY TOKEN VALIDATION:
+// The validateAccess() function currently does basic pattern matching
+// In production, tokens should be validated against a secure backend/database
+//
+// 3. DEAL ID MAPPING:
+// The system uses the same deal ID format as the deal-details page
+// This ensures consistency across the booking flow
+//
+// 4. FORM DATA STRUCTURE:
+// The formData object in handleQuoteSubmission() contains all necessary
+// information for the email template
+//
+// 5. ERROR HANDLING:
+// Add proper error handling for failed email sends
+// Show appropriate user feedback for network issues
+</script>
+</body>
+
 </html>

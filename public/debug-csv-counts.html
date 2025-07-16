@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Parsing Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        #log {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 400px;
+            overflow-y: auto;
+        }
+        .success { color: green; }
+        .error { color: red; }
+        .warning { color: orange; }
+        .info { color: blue; }
+        button {
+            padding: 8px 16px;
+            margin: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>CSV Parsing Debug</h1>
+    
+    <div>
+        <button id="load-river">Load River CSV</button>
+        <button id="load-ocean">Load Ocean CSV</button>
+        <button id="load-both">Load Both CSVs</button>
+        <button id="clear-log">Clear Log</button>
+    </div>
+
+    <div id="log"></div>
+
+    <script>
+        const logElement = document.getElementById('log');
+
+        // Logging function with colored output
+        function log(message, type = 'info') {
+            const line = document.createElement('div');
+            line.className = type;
+            line.textContent = message;
+            logElement.appendChild(line);
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        // Parse CSV function similar to the one in deals.html
+        function parseCSV(csvText, cruiseType) {
+            const lines = csvText.trim().split('\n');
+            const headers = parseCSVLine(lines[0]);
+            const deals = [];
+            let successCount = 0;
+            let errorCount = 0;
+
+            log(`Found ${lines.length - 1} lines of data in the CSV`, 'info');
+
+            // Show first 10 headers for debug
+            log(`Sample headers: ${headers.slice(0, 10).join(', ')}...`, 'info');
+            
+            // Display all headers for detailed inspection
+            log('All headers: ' + headers.join(', '), 'info');
+
+            for (let i = 1; i < lines.length; i++) { // Skip header
+                const values = parseCSVLine(lines[i]);
+                if (values.length >= 10) {
+                    const deal = createDeal(headers, values, cruiseType);
+                    if (deal.cruiseLine && deal.shipName) {
+                        deals.push(deal);
+                        successCount++;
+                    } else {
+                        const missingFields = [];
+                        if (!deal.cruiseLine) missingFields.push('cruiseLine');
+                        if (!deal.shipName) missingFields.push('shipName');
+                        log(`Skipped line ${i} due to missing fields: ${missingFields.join(', ')}`, 'warning');
+                        // Log raw values for debug
+                        log(`Raw data for line ${i}: ${values.slice(0, 5).join(', ')}...`, 'warning');
+                        errorCount++;
+                    }
+                } else {
+                    log(`Skipped line ${i} due to insufficient columns (${values.length})`, 'warning');
+                }
+            }
+
+            // Log stats about loaded deals
+            log(`Successfully created ${deals.length} ${cruiseType} deals`, 'success');
+            log(`Summary: ${successCount} deals created, ${errorCount} rows skipped`, 'info');
+            
+            // Log cruise lines found
+            const cruiseLines = {};
+            deals.forEach(deal => {
+                cruiseLines[deal.cruiseLine] = (cruiseLines[deal.cruiseLine] || 0) + 1;
+            });
+            log('Cruise lines found:', 'info');
+            for (const [line, count] of Object.entries(cruiseLines)) {
+                log(`  ${line}: ${count} deals`, 'info');
+            }
+            
+            // Log regions/destinations found
+            const regions = {};
+            deals.forEach(deal => {
+                regions[deal.region] = (regions[deal.region] || 0) + 1;
+            });
+            log('Regions found:', 'info');
+            for (const [region, count] of Object.entries(regions)) {
+                log(`  ${region}: ${count} deals`, 'info');
+            }
+
+            return deals;
+        }
+
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            result.push(current.trim());
+            return result;
+        }
+
+        function createDeal(headers, values, cruiseType) {
+            const deal = {};
+            
+            // Log all header-value pairs for debug
+            if (values.length < headers.length) {
+                log(`Warning: Values array (${values.length}) is shorter than headers array (${headers.length})`, 'warning');
+            }
+            
+            headers.forEach((header, index) => {
+                deal[header] = values[index] || '';
+            });
+
+            // Map CSV columns to deal properties
+            return {
+                id: `${cruiseType.toLowerCase().replace(' ', '_')}_${deal.SEQ || Math.random().toString(36).substr(2, 9)}`,
+                cruiseType: cruiseType,
+                cruiseLine: deal['Cruise Line'] || '',
+                shipName: deal.Ship || '',
+                region: deal.Region || '',
+                nights: parseInt(deal.Nights || 0),
+                departureDate: parseDate(deal.Date),
+                departurePort: deal.From || '',
+                arrivalPort: deal.To || '',
+                itinerary: deal.Itinerary || '',
+                insidePrice: parsePrice(deal.Inside),
+                oceanviewPrice: parsePrice(deal.Oceanview),
+                balconyPrice: parsePrice(deal.Balcony),
+                suitePrice: parsePrice(deal.Suite)
+            };
+        }
+
+        function parseDate(dateStr) {
+            if (!dateStr) return null;
+            
+            // Log the date string for debugging
+            log(`Parsing date: ${dateStr}`, 'info');
+            
+            if (dateStr.includes('-') && dateStr.length <= 10) {
+                const parts = dateStr.split('-');
+                if (parts.length === 3) {
+                    const day = parts[0];
+                    const month = parts[1];
+                    const year = parts[2].length === 2 ? '20' + parts[2] : parts[2];
+                    const monthMap = {
+                        'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
+                        'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
+                        'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
+                    };
+                    const monthNum = monthMap[month] || month;
+                    return `${year}-${monthNum.padStart(2, '0')}-${day.padStart(2, '0')}`;
+                }
+            }
+            return null;
+        }
+
+        function parsePrice(priceStr) {
+            if (!priceStr || priceStr.toLowerCase().includes('quote')) return 0;
+            const cleaned = priceStr.replace(/[$,]/g, '');
+            const price = parseFloat(cleaned);
+            return isNaN(price) ? 0 : price;
+        }
+
+        // Load river.csv
+        async function loadRiver() {
+            log('Attempting to load river.csv...', 'info');
+            try {
+                const response = await fetch('/public/river.csv');
+                log(`Fetch response status: ${response.status} ${response.statusText}`, 'info');
+                if (response.ok) {
+                    const csv = await response.text();
+                    log(`Received river.csv (${csv.length} bytes)`, 'success');
+                    const deals = parseCSV(csv, 'River Cruise');
+                    log(`Total River Cruise deals created: ${deals.length}`, 'success');
+                    return deals;
+                } else {
+                    log(`Failed to load river.csv: ${response.status} ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                log(`Error loading river.csv: ${error.message}`, 'error');
+            }
+            return [];
+        }
+
+        // Load twins.csv (ocean cruises)
+        async function loadOcean() {
+            log('Attempting to load twins.csv...', 'info');
+            try {
+                const response = await fetch('/public/twins.csv');
+                log(`Fetch response status: ${response.status} ${response.statusText}`, 'info');
+                if (response.ok) {
+                    const csv = await response.text();
+                    log(`Received twins.csv (${csv.length} bytes)`, 'success');
+                    const deals = parseCSV(csv, 'Ocean Cruise');
+                    log(`Total Ocean Cruise deals created: ${deals.length}`, 'success');
+                    return deals;
+                } else {
+                    log(`Failed to load twins.csv: ${response.status} ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                log(`Error loading twins.csv: ${error.message}`, 'error');
+            }
+            return [];
+        }
+
+        // Button event listeners
+        document.getElementById('load-river').addEventListener('click', loadRiver);
+        document.getElementById('load-ocean').addEventListener('click', loadOcean);
+        document.getElementById('load-both').addEventListener('click', async () => {
+            const riverDeals = await loadRiver();
+            const oceanDeals = await loadOcean();
+            const allDeals = [...riverDeals, ...oceanDeals];
+            log(`Total deals from both CSVs: ${allDeals.length}`, 'success');
+            
+            if (allDeals.length > 0) {
+                // Sample the first few deals
+                log('Sample of loaded deals:', 'info');
+                allDeals.slice(0, 3).forEach((deal, index) => {
+                    log(`Deal ${index+1}: ${deal.cruiseLine} - ${deal.shipName} - ${deal.region} - ${deal.Date || 'No Date'}`, 'info');
+                    // Log all fields for the first deal to understand structure
+                    if (index === 0) {
+                        log('First deal fields:', 'info');
+                        Object.entries(deal).forEach(([key, value]) => {
+                            if (value && value.trim && value.trim() !== '') {
+                                log(`  ${key}: ${value}`, 'info');
+                            }
+                        });
+                    }
+                });
+            }
+        });
+        document.getElementById('clear-log').addEventListener('click', () => {
+            logElement.innerHTML = '';
+        });
+
+        // Initial message
+        log('Click a button above to load and parse CSV data', 'info');
+    </script>
+</body>
+</html>

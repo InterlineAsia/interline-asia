@@ -9,21 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
   
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js"></script>
-  <script src="supabase-client.js"></script>
-  <script src="tmp_rovodev_deals_loader.js"></script>
-  
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FYGT92WCXC"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-FYGT92WCXC');
-  </script>
-  
   <style>
     * {
       margin: 0;
@@ -46,17 +31,6 @@
       padding: 2rem;
       position: relative;
       overflow: hidden;
-    }
-    
-    .detail-header::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="waves" patternUnits="userSpaceOnUse" width="100" height="100"><path d="M0,50 Q25,30 50,50 T100,50 V100 H0 Z" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23waves)"/></svg>');
-      opacity: 0.3;
     }
     
     .header-content {
@@ -83,53 +57,25 @@
       margin-bottom: 0.5rem;
     }
     
-    .header-info .cruise-line {
+    .header-info p {
       font-size: 1.25rem;
       opacity: 0.9;
-      margin-bottom: 1rem;
     }
     
-    .quick-facts {
-      display: flex;
-      gap: 2rem;
-      flex-wrap: wrap;
-    }
-    
-    .quick-fact {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.875rem;
-    }
-    
-    .quick-fact i {
-      color: #60a5fa;
-    }
-    
-    .cruise-type-badge-large {
+    .cruise-type-badge {
       padding: 0.5rem 1rem;
       border-radius: 25px;
       font-size: 0.875rem;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      white-space: nowrap;
     }
     
-    .cruise-type-badge-large.river-cruise {
-      background: rgba(34, 197, 94, 0.2);
-      color: #22c55e;
-      border: 1px solid rgba(34, 197, 94, 0.3);
-    }
-    
-    .cruise-type-badge-large.ocean-cruise {
-      background: rgba(59, 130, 246, 0.2);
-      color: #3b82f6;
-      border: 1px solid rgba(59, 130, 246, 0.3);
-    }
+    .cruise-type-badge.river-cruise { background: #dcfce7; color: #166534; }
+    .cruise-type-badge.ocean-cruise { background: #dbeafe; color: #1e40af; }
+    .cruise-type-badge.expedition-cruise { background: #fef3c7; color: #92400e; }
     
     /* Main Content */
-    .main-content {
+    .detail-content {
       max-width: 1200px;
       margin: 0 auto;
       padding: 2rem;
@@ -138,79 +84,72 @@
       gap: 2rem;
     }
     
-    .content-section {
+    .main-details {
       background: white;
       border-radius: 16px;
       padding: 2rem;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      margin-bottom: 2rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    
+    .detail-section {
+      background: white;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
     }
     
     .section-title {
-      font-size: 1.5rem;
+      font-size: 1.25rem;
       font-weight: 700;
-      margin-bottom: 1.5rem;
-      color: #1e293b;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    
-    .section-title i {
-      color: #3b82f6;
-    }
-    
-    /* Map Section */
-    .map-placeholder {
-      width: 100%;
-      height: 300px;
-      background: linear-gradient(135deg, #e0f2fe 0%, #b3e5fc 100%);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #0277bd;
-      font-size: 1.125rem;
-      border: 2px dashed #4fc3f7;
-    }
-    
-    /* Itinerary */
-    .itinerary-list {
-      list-style: none;
-      padding: 0;
-    }
-    
-    .itinerary-item {
-      padding: 1rem;
-      border-left: 3px solid #3b82f6;
-      margin-left: 1rem;
       margin-bottom: 1rem;
+      color: #1e293b;
+    }
+    
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .detail-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem;
       background: #f8fafc;
-      border-radius: 0 8px 8px 0;
-      position: relative;
+      border-radius: 12px;
     }
     
-    .itinerary-item::before {
-      content: '';
-      position: absolute;
-      left: -8px;
-      top: 1.25rem;
-      width: 12px;
-      height: 12px;
-      background: #3b82f6;
-      border-radius: 50%;
-      border: 3px solid white;
+    .detail-item i {
+      color: #3b82f6;
+      font-size: 1.25rem;
+      width: 20px;
     }
     
-    .itinerary-item:last-child {
-      border-left-color: #22c55e;
+    .detail-item-content {
+      flex: 1;
     }
     
-    .itinerary-item:last-child::before {
-      background: #22c55e;
+    .detail-label {
+      font-size: 0.75rem;
+      color: #64748b;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
     }
     
-    /* Pricing Table */
+    .detail-value {
+      font-weight: 600;
+      color: #1e293b;
+    }
+    
     .pricing-table {
       width: 100%;
       border-collapse: collapse;
@@ -221,7 +160,7 @@
     .pricing-table td {
       padding: 1rem;
       text-align: left;
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid #e2e8f0;
     }
     
     .pricing-table th {
@@ -230,642 +169,516 @@
       color: #374151;
     }
     
-    .pricing-table .price {
+    .price {
       font-weight: 700;
-      font-size: 1.125rem;
-    }
-    
-    .pricing-table .price.available {
       color: #059669;
     }
     
-    .pricing-table .price.quote {
+    .price.quote {
       color: #64748b;
+      font-style: italic;
     }
     
-    /* Sidebar */
-    .sidebar {
+    .cabin-types {
       display: flex;
-      flex-direction: column;
-      gap: 2rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
     }
     
-    .booking-card {
-      background: white;
-      border-radius: 16px;
-      padding: 2rem;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      text-align: center;
-    }
-    
-    .best-price {
-      font-size: 2rem;
-      font-weight: 800;
-      margin-bottom: 0.5rem;
-    }
-    
-    .best-price.available {
-      color: #059669;
-    }
-    
-    .best-price.quote {
-      color: #64748b;
-      font-size: 1.5rem;
-    }
-    
-    .price-note {
+    .cabin-type {
+      padding: 0.5rem 1rem;
+      background: #f1f5f9;
+      border-radius: 20px;
       font-size: 0.875rem;
       color: #64748b;
+      font-weight: 500;
+    }
+    
+    .itinerary-text {
+      background: #f8fafc;
+      padding: 1.5rem;
+      border-radius: 12px;
+      border-left: 4px solid #3b82f6;
+      margin-top: 1rem;
+    }
+    
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      background: #3b82f6;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.3s ease;
       margin-bottom: 2rem;
     }
     
-    .btn-book {
-      width: 100%;
-      padding: 1rem 2rem;
-      background: linear-gradient(135deg, #059669 0%, #047857 100%);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-size: 1.125rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.3s;
-      margin-bottom: 1rem;
+    .back-button:hover {
+      background: #2563eb;
+      transform: translateY(-1px);
     }
     
-    .btn-book:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(5, 150, 105, 0.4);
-    }
-    
-    .btn-book:disabled {
-      background: #9ca3af;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-    
-    .btn-back {
-      width: 100%;
-      padding: 0.75rem 1.5rem;
-      background: transparent;
-      color: #3b82f6;
-      border: 2px solid #3b82f6;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    
-    .btn-back:hover {
-      background: #3b82f6;
-      color: white;
-    }
-    
-    /* What's Included */
-    .included-list {
-      list-style: none;
-      padding: 0;
-    }
-    
-    .included-item {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.5rem 0;
-      border-bottom: 1px solid #f1f5f9;
-    }
-    
-    .included-item:last-child {
-      border-bottom: none;
-    }
-    
-    .included-item i {
-      color: #22c55e;
-      font-size: 1.125rem;
-    }
-    
-    /* Loading State */
-    .loading {
+    .loading, .error {
       text-align: center;
       padding: 4rem 2rem;
     }
     
-    .loading i {
-      font-size: 3rem;
-      color: #3b82f6;
-      animation: spin 1s linear infinite;
+    .error {
+      color: #dc2626;
     }
     
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    
-    /* Responsive */
     @media (max-width: 768px) {
       .header-content {
         grid-template-columns: 1fr;
         text-align: center;
-        gap: 1rem;
       }
       
-      .header-info h1 {
-        font-size: 2rem;
-      }
-      
-      .quick-facts {
-        justify-content: center;
-      }
-      
-      .main-content {
+      .detail-content {
         grid-template-columns: 1fr;
         padding: 1rem;
       }
       
-      .content-section {
-        padding: 1.5rem;
+      .detail-grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
 
 <body>
-  <!-- Loading State -->
   <div id="loading-state" class="loading">
-    <i class="ri-loader-4-line"></i>
     <p>Loading deal details...</p>
   </div>
-
-  <!-- Main Content (hidden initially) -->
-  <div id="main-content" style="display: none;">
-    <!-- Header -->
-    <header class="detail-header">
+  
+  <div id="error-state" class="error" style="display: none;">
+    <h2>Deal Not Found</h2>
+    <p>The requested deal could not be found.</p>
+    <a href="/deals.html" class="back-button">
+      <i class="ri-arrow-left-line"></i>
+      Back to Deals
+    </a>
+  </div>
+  
+  <div id="deal-content" style="display: none;">
+    <div class="detail-header">
       <div class="header-content">
         <img id="cruise-logo" src="" alt="" class="cruise-logo-large">
-        
         <div class="header-info">
           <h1 id="ship-name">Loading...</h1>
-          <p id="cruise-line" class="cruise-line">Loading...</p>
-          <div class="quick-facts">
-            <div class="quick-fact">
-              <i class="ri-map-pin-line"></i>
-              <span id="destination">Loading...</span>
+          <p id="cruise-line">Loading...</p>
+        </div>
+        <div id="cruise-type-badge" class="cruise-type-badge">Loading...</div>
+      </div>
+    </div>
+
+    <div class="detail-content">
+      <div class="main-details">
+        <a href="/deals.html" class="back-button">
+          <i class="ri-arrow-left-line"></i>
+          Back to Deals
+        </a>
+        
+        <h2 class="section-title">Cruise Details</h2>
+        
+        <div class="detail-grid">
+          <div class="detail-item">
+            <i class="ri-map-pin-line"></i>
+            <div class="detail-item-content">
+              <div class="detail-label">Departure Port</div>
+              <div class="detail-value" id="departure-port">Loading...</div>
             </div>
-            <div class="quick-fact">
-              <i class="ri-time-line"></i>
-              <span id="duration">Loading...</span>
+          </div>
+          
+          <div class="detail-item">
+            <i class="ri-map-pin-2-line"></i>
+            <div class="detail-item-content">
+              <div class="detail-label">Arrival Port</div>
+              <div class="detail-value" id="arrival-port">Loading...</div>
             </div>
-            <div class="quick-fact">
-              <i class="ri-calendar-line"></i>
-              <span id="departure-date">Loading...</span>
+          </div>
+          
+          <div class="detail-item">
+            <i class="ri-calendar-line"></i>
+            <div class="detail-item-content">
+              <div class="detail-label">Departure Date</div>
+              <div class="detail-value" id="departure-date">Loading...</div>
+            </div>
+          </div>
+          
+          <div class="detail-item">
+            <i class="ri-time-line"></i>
+            <div class="detail-item-content">
+              <div class="detail-label">Duration</div>
+              <div class="detail-value" id="duration">Loading...</div>
+            </div>
+          </div>
+          
+          <div class="detail-item">
+            <i class="ri-global-line"></i>
+            <div class="detail-item-content">
+              <div class="detail-label">Region</div>
+              <div class="detail-value" id="region">Loading...</div>
+            </div>
+          </div>
+          
+          <div class="detail-item" id="sale-end-item" style="display: none;">
+            <i class="ri-alarm-line"></i>
+            <div class="detail-item-content">
+              <div class="detail-label">Sale Ends</div>
+              <div class="detail-value" id="sale-end">Loading...</div>
             </div>
           </div>
         </div>
         
-        <div id="cruise-type-badge" class="cruise-type-badge-large">Loading...</div>
+        <h3 class="section-title">Available Cabin Types</h3>
+        <div id="cabin-types" class="cabin-types">
+          Loading...
+        </div>
+        
+        <h3 class="section-title">Itinerary</h3>
+        <div id="itinerary" class="itinerary-text">
+          Loading itinerary details...
+        </div>
       </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="main-content">
-      <div class="content-column">
-        <!-- Map Section -->
-        <section class="content-section">
-          <h2 class="section-title">
-            <i class="ri-map-2-line"></i>
-            Route Map
-          </h2>
-          <div id="map-container">
-            <div class="map-placeholder">
-              <div>
-                <i class="ri-map-2-line" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
-                Interactive map coming soon
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Itinerary Section -->
-        <section class="content-section">
-          <h2 class="section-title">
-            <i class="ri-route-line"></i>
-            Itinerary
-          </h2>
-          <ul id="itinerary-list" class="itinerary-list">
-            <li class="itinerary-item">Loading itinerary...</li>
-          </ul>
-        </section>
-
-        <!-- Cabin Types & Pricing -->
-        <section class="content-section">
-          <h2 class="section-title">
-            <i class="ri-hotel-bed-line"></i>
-            Cabin Types & Pricing
-          </h2>
+      
+      <div class="sidebar">
+        <div class="detail-section">
+          <h3 class="section-title">Pricing</h3>
           <table class="pricing-table">
             <thead>
               <tr>
                 <th>Cabin Type</th>
-                <th>Price per Person</th>
+                <th>Price</th>
               </tr>
             </thead>
             <tbody id="pricing-table-body">
-              <tr>
-                <td>Loading...</td>
-                <td>Loading...</td>
-              </tr>
+              <tr><td colspan="2">Loading...</td></tr>
             </tbody>
           </table>
-        </section>
-
-        <!-- What's Included -->
-        <section class="content-section">
-          <h2 class="section-title">
-            <i class="ri-checkbox-circle-line"></i>
-            What's Included
-          </h2>
-          <ul class="included-list">
-            <li class="included-item">
-              <i class="ri-check-line"></i>
-              <span>All meals and beverages</span>
-            </li>
-            <li class="included-item">
-              <i class="ri-check-line"></i>
-              <span>Shore excursions</span>
-            </li>
-            <li class="included-item">
-              <i class="ri-check-line"></i>
-              <span>Onboard entertainment</span>
-            </li>
-            <li class="included-item">
-              <i class="ri-check-line"></i>
-              <span>Wi-Fi access</span>
-            </li>
-            <li class="included-item">
-              <i class="ri-check-line"></i>
-              <span>Gratuities</span>
-            </li>
-          </ul>
-        </section>
-      </div>
-
-      <!-- Sidebar -->
-      <aside class="sidebar">
-        <div class="booking-card">
-          <div id="best-price" class="best-price">Loading...</div>
-          <p class="price-note">Best available price per person</p>
-          
-          <button id="book-button" class="btn-book" disabled>
-            Book This Cruise
-          </button>
-          <p style="font-size: 0.875rem; color: #64748b; margin-bottom: 1rem;">
-            Booking form coming soon
-          </p>
-          
-          <button class="btn-back" onclick="window.location.href='/deals.html'">
-            <i class="ri-arrow-left-line"></i>
-            Back to Deals
-          </button>
         </div>
-      </aside>
-    </main>
+        
+        <div class="detail-section">
+          <h3 class="section-title">Quick Info</h3>
+          <div class="detail-item">
+            <i class="ri-ship-line"></i>
+            <div class="detail-item-content">
+              <div class="detail-label">Ship</div>
+              <div class="detail-value" id="ship-name-sidebar">Loading...</div>
+            </div>
+          </div>
+          <div class="detail-item">
+            <i class="ri-anchor-line"></i>
+            <div class="detail-item-content">
+              <div class="detail-label">Cruise Line</div>
+              <div class="detail-value" id="cruise-line-sidebar">Loading...</div>
+            </div>
+          </div>
+          <div class="detail-item">
+            <i class="ri-compass-line"></i>
+            <div class="detail-item-content">
+              <div class="detail-label">Cruise Type</div>
+              <div class="detail-value" id="cruise-type-sidebar">Loading...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
-    class DealDetailsLoader {
-      constructor() {
-        this.dealId = this.getDealIdFromUrl();
-        this.deal = null;
-        this.init();
-      }
+    let allDeals = [];
 
-      getDealIdFromUrl() {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get('id');
-      }
-
-      async init() {
-        if (!this.dealId) {
-          this.showError('No deal ID provided');
-          return;
-        }
-
-        try {
-          await this.loadDealDetails();
-          this.renderDealDetails();
-          this.showContent();
-        } catch (error) {
-          console.error('Error loading deal details:', error);
-          this.showError('Failed to load deal details');
-        }
-      }
-
-      async loadDealDetails() {
-        try {
-          console.log('DEAL_DETAILS: Loading deal with ID:', this.dealId);
-          
-          // Try to load from CSV data (same as deals page)
-          await this.loadFromCSV();
-          
-        } catch (error) {
-          console.error('DEAL_DETAILS: Error loading deal details:', error);
-          // Fallback to sample data
-          this.loadSampleDeal();
-        }
-      }
-
-      async loadFromCSV() {
-        try {
-          console.log('DEAL_DETAILS: Attempting to load from CSV files...');
-          
-          // Load both CSV files and find the deal
-          const [riverResponse, oceanResponse] = await Promise.all([
-            fetch('/river.csv'),
-            fetch('/twins.csv')
-          ]);
-
-          let foundDeal = null;
-
-          // Search in river cruise data
-          if (riverResponse.ok) {
-            const riverCSV = await riverResponse.text();
-            foundDeal = this.findDealInCSV(riverCSV, 'River Cruise');
-          }
-
-          // Search in ocean cruise data if not found
-          if (!foundDeal && oceanResponse.ok) {
-            const oceanCSV = await oceanResponse.text();
-            foundDeal = this.findDealInCSV(oceanCSV, 'Ocean Cruise');
-          }
-
-          if (foundDeal) {
-            this.deal = foundDeal;
-            console.log('DEAL_DETAILS: Found deal in CSV data');
-          } else {
-            console.log('DEAL_DETAILS: Deal not found in CSV, using sample');
-            this.loadSampleDeal();
-          }
-
-        } catch (error) {
-          console.error('DEAL_DETAILS: Error loading from CSV:', error);
-          this.loadSampleDeal();
-        }
-      }
-
-      findDealInCSV(csvText, cruiseType) {
-        const lines = csvText.trim().split('\n');
-        const headers = this.parseCSVLine(lines[0]);
+    async function loadCSVDeals() {
+      try {
+        console.log('DEAL_DETAILS: Loading CSV data...');
         
-        for (let i = 1; i < lines.length; i++) {
-          const values = this.parseCSVLine(lines[i]);
-          if (values.length >= 10) {
-            const deal = this.createDealFromCSV(headers, values, cruiseType);
-            if (deal.id === this.dealId) {
-              return deal;
-            }
-          }
-        }
-        return null;
-      }
-
-      parseCSVLine(line) {
-        const result = [];
-        let current = '';
-        let inQuotes = false;
-        
-        for (let i = 0; i < line.length; i++) {
-          const char = line[i];
-          if (char === '"') {
-            inQuotes = !inQuotes;
-          } else if (char === ',' && !inQuotes) {
-            result.push(current.trim());
-            current = '';
-          } else {
-            current += char;
-          }
-        }
-        result.push(current.trim());
-        return result;
-      }
-
-      createDealFromCSV(headers, values, cruiseType) {
-        const deal = {};
-        headers.forEach((header, index) => {
-          deal[header] = values[index] || '';
-        });
-
-        return {
-          id: \`\${cruiseType.toLowerCase().replace(' ', '_')}_\${deal.SEQ || Math.random().toString(36).substr(2, 9)}\`,
-          cruiseType: cruiseType,
-          cruiseLine: deal['Cruise Line'] || '',
-          shipName: deal.Ship || '',
-          region: deal.Region || '',
-          nights: parseInt(deal.Nights || 0),
-          departureDate: this.parseDate(deal.Date),
-          departurePort: deal.From || '',
-          arrivalPort: deal.To || '',
-          itinerary: deal.Itinerary || '',
-          insidePrice: this.parsePrice(deal.Inside),
-          oceanviewPrice: this.parsePrice(deal.Oceanview),
-          balconyPrice: this.parsePrice(deal.Balcony),
-          suitePrice: this.parsePrice(deal.Suite),
-          shipMap: deal.Shipmap || ''
-        };
-      }
-
-      parseDate(dateStr) {
-        if (!dateStr) return null;
-        if (dateStr.includes('-') && dateStr.length <= 9) {
-          const parts = dateStr.split('-');
-          if (parts.length === 3) {
-            const day = parts[0];
-            const month = parts[1];
-            const year = parts[2].length === 2 ? '20' + parts[2] : parts[2];
-            const monthMap = {
-              'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
-              'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
-              'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
-            };
-            const monthNum = monthMap[month] || month;
-            return \`\${year}-\${monthNum.padStart(2, '0')}-\${day.padStart(2, '0')}\`;
-          }
-        }
-        return null;
-      }
-
-      parsePrice(priceStr) {
-        if (!priceStr || priceStr.toLowerCase().includes('quote')) return 0;
-        const cleaned = priceStr.replace(/[$,]/g, '');
-        const price = parseFloat(cleaned);
-        return isNaN(price) ? 0 : price;
-      }
-
-      formatDeal(deal) {
-        return {
-          id: deal.id,
-          cruiseType: deal.cruise_type || 'Ocean Cruise',
-          cruiseLine: deal.cruise_line,
-          shipName: deal.ship_name,
-          region: deal.region,
-          nights: deal.nights,
-          departureDate: deal.departure_date,
-          departurePort: deal.departure_port,
-          arrivalPort: deal.arrival_port,
-          itinerary: deal.itinerary,
-          insidePrice: parseFloat(deal.inside_price) || 0,
-          oceanviewPrice: parseFloat(deal.oceanview_price) || 0,
-          balconyPrice: parseFloat(deal.balcony_price) || 0,
-          suitePrice: parseFloat(deal.suite_price) || 0,
-          shipMap: deal.ship_map,
-          offerUrl: deal.offer_url
-        };
-      }
-
-      loadSampleDeal() {
-        // Sample deal for demonstration
-        this.deal = {
-          id: this.dealId,
-          cruiseType: 'River Cruise',
-          cruiseLine: 'AmaWaterways',
-          shipName: 'AmaBella',
-          region: 'Europe',
-          nights: 7,
-          departureDate: '2025-07-07',
-          departurePort: 'Budapest, Hungary',
-          arrivalPort: 'Vilshofen, Germany',
-          itinerary: 'Melodies of the Danube 2025 - Budapest | Bratislava | Vienna | Dürnstein | Melk | Passau | Vilshofen',
-          insidePrice: 3440,
-          oceanviewPrice: 4040,
-          balconyPrice: 4640,
-          suitePrice: 0
-        };
-      }
-
-      renderDealDetails() {
-        if (!this.deal) return;
-
-        // Header information
-        document.getElementById('ship-name').textContent = this.deal.shipName;
-        document.getElementById('cruise-line').textContent = this.deal.cruiseLine;
-        document.getElementById('destination').textContent = this.deal.region || this.deal.departurePort;
-        document.getElementById('duration').textContent = `${this.deal.nights} nights`;
-        document.getElementById('departure-date').textContent = this.formatDate(this.deal.departureDate);
-
-        // Cruise logo
-        const logo = document.getElementById('cruise-logo');
-        logo.src = this.getCruiseLineLogo(this.deal.cruiseLine);
-        logo.alt = this.deal.cruiseLine;
-
-        // Cruise type badge
-        const badge = document.getElementById('cruise-type-badge');
-        badge.textContent = this.deal.cruiseType;
-        badge.className = `cruise-type-badge-large ${this.deal.cruiseType.toLowerCase().replace(' ', '-')}`;
-
-        // Itinerary
-        this.renderItinerary();
-
-        // Pricing
-        this.renderPricing();
-
-        // Best price
-        this.renderBestPrice();
-      }
-
-      renderItinerary() {
-        const container = document.getElementById('itinerary-list');
-        if (!this.deal.itinerary) {
-          container.innerHTML = '<li class="itinerary-item">Itinerary details coming soon</li>';
-          return;
+        // Load river cruise data
+        const riverResponse = await fetch('/public/river.csv');
+        if (riverResponse.ok) {
+          const riverCSV = await riverResponse.text();
+          const riverDeals = parseCSV(riverCSV, 'River Cruise');
+          allDeals = allDeals.concat(riverDeals);
         }
 
-        const ports = this.deal.itinerary.split('|').map(port => port.trim()).filter(port => port);
-        if (ports.length === 0) {
-          container.innerHTML = '<li class="itinerary-item">Itinerary details coming soon</li>';
-          return;
+        // Load ocean cruise data
+        const oceanResponse = await fetch('/public/twins.csv');
+        if (oceanResponse.ok) {
+          const oceanCSV = await oceanResponse.text();
+          const oceanDeals = parseCSV(oceanCSV, 'Ocean Cruise');
+          allDeals = allDeals.concat(oceanDeals);
         }
 
-        container.innerHTML = ports.map(port => `
-          <li class="itinerary-item">${port}</li>
-        `).join('');
-      }
-
-      renderPricing() {
-        const tbody = document.getElementById('pricing-table-body');
-        const cabinTypes = [
-          { name: 'Interior', price: this.deal.insidePrice },
-          { name: 'Oceanview', price: this.deal.oceanviewPrice },
-          { name: 'Balcony', price: this.deal.balconyPrice },
-          { name: 'Suite', price: this.deal.suitePrice }
-        ];
-
-        tbody.innerHTML = cabinTypes.map(cabin => `
-          <tr>
-            <td>${cabin.name}</td>
-            <td class="price ${cabin.price > 0 ? 'available' : 'quote'}">
-              ${cabin.price > 0 ? `$${cabin.price.toLocaleString()}` : 'Quote Available'}
-            </td>
-          </tr>
-        `).join('');
-      }
-
-      renderBestPrice() {
-        const priceElement = document.getElementById('best-price');
-        const prices = [this.deal.insidePrice, this.deal.oceanviewPrice, this.deal.balconyPrice, this.deal.suitePrice]
-          .filter(p => p && p > 0);
-
-        if (prices.length > 0) {
-          const bestPrice = Math.min(...prices);
-          priceElement.textContent = `From $${bestPrice.toLocaleString()}`;
-          priceElement.className = 'best-price available';
-        } else {
-          priceElement.textContent = 'Quote Available';
-          priceElement.className = 'best-price quote';
-        }
-      }
-
-      getCruiseLineLogo(cruiseLine) {
-        if (!cruiseLine) return '/logos/cruiselines/placeholder.png';
-        
-        const slug = cruiseLine.toLowerCase()
-          .replace(/[^a-z0-9\s]/g, '')
-          .replace(/\s+/g, '-')
-          .trim();
-        
-        return `/logos/cruiselines/${slug}.png`;
-      }
-
-      formatDate(dateStr) {
-        if (!dateStr) return '';
-        const date = new Date(dateStr);
-        if (isNaN(date.getTime())) return dateStr;
-        
-        return date.toLocaleDateString('en-AU', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric'
-        });
-      }
-
-      showContent() {
-        document.getElementById('loading-state').style.display = 'none';
-        document.getElementById('main-content').style.display = 'block';
-      }
-
-      showError(message) {
-        document.getElementById('loading-state').innerHTML = `
-          <i class="ri-error-warning-line"></i>
-          <p>${message}</p>
-          <button class="btn-back" onclick="window.location.href='/deals.html'" style="margin-top: 1rem;">
-            Back to Deals
-          </button>
-        `;
+        console.log('DEAL_DETAILS: Loaded', allDeals.length, 'total deals');
+      } catch (error) {
+        console.error('DEAL_DETAILS: Error loading CSV data:', error);
       }
     }
 
-    // Initialize when DOM is loaded
-    document.addEventListener('DOMContentLoaded', () => {
-      new DealDetailsLoader();
+    function parseCSV(csvText, cruiseType) {
+      const lines = csvText.trim().split('\n');
+      const headers = parseCSVLine(lines[0]);
+      const deals = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const values = parseCSVLine(lines[i]);
+        if (values.length >= 10) {
+          const deal = createDeal(headers, values, cruiseType);
+          if (deal.cruiseLine && deal.shipName) {
+            deals.push(deal);
+          }
+        }
+      }
+      return deals;
+    }
+
+    function parseCSVLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          result.push(current.trim());
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      result.push(current.trim());
+      return result;
+    }
+
+    function createDeal(headers, values, cruiseType) {
+      const deal = {};
+      headers.forEach((header, index) => {
+        deal[header] = values[index] || '';
+      });
+
+      // Determine actual cruise type based on region and other factors
+      let actualCruiseType = cruiseType;
+      const region = (deal.Region || '').toLowerCase();
+      const itinerary = (deal.Itinerary || '').toLowerCase();
+      
+      // Check for expedition cruises
+      if (region.includes('arctic') || region.includes('antarctic') || 
+          itinerary.includes('expedition') || itinerary.includes('arctic') || 
+          itinerary.includes('antarctic') || itinerary.includes('polar')) {
+        actualCruiseType = 'Expedition Cruise';
+      }
+
+      // Determine available cabin types
+      const cabinTypes = [];
+      if (deal.Inside && deal.Inside !== 'Quote Available' && deal.Inside !== '') cabinTypes.push('Interior');
+      if (deal.Oceanview && deal.Oceanview !== 'Quote Available' && deal.Oceanview !== '') cabinTypes.push('Oceanview');
+      if (deal.Balcony && deal.Balcony !== 'Quote Available' && deal.Balcony !== '') cabinTypes.push('Balcony');
+      if (deal.Suite && deal.Suite !== 'Quote Available' && deal.Suite !== '') cabinTypes.push('Suite');
+
+      return {
+        id: `${actualCruiseType.toLowerCase().replace(/\s+/g, '_')}_${deal.SEQ || Math.random().toString(36).substr(2, 9)}`,
+        cruiseType: actualCruiseType,
+        cruiseLine: deal['Cruise Line'] || '',
+        shipName: deal.Ship || '',
+        region: deal.Region || '',
+        nights: parseInt(deal.Nights || 0),
+        departureDate: parseDate(deal.Date),
+        departurePort: deal.From || '',
+        arrivalPort: deal.To || '',
+        itinerary: deal.Itinerary || '',
+        insidePrice: parsePrice(deal.Inside),
+        oceanviewPrice: parsePrice(deal.Oceanview),
+        balconyPrice: parsePrice(deal.Balcony),
+        suitePrice: parsePrice(deal.Suite),
+        saleEndDate: parseDate(deal.Sale),
+        cabinTypes: cabinTypes,
+        shipMap: deal.Shipmap || '',
+        cruiseOfferUrl: deal['Cruise Offer URL'] || ''
+      };
+    }
+
+    function parseDate(dateStr) {
+      if (!dateStr) return null;
+      
+      // Handle DD-MMM-YY format (e.g., "07-Jul-25")
+      if (dateStr.includes('-') && dateStr.length <= 9) {
+        const parts = dateStr.split('-');
+        if (parts.length === 3) {
+          const day = parseInt(parts[0]);
+          const monthMap = {
+            'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5,
+            'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11
+          };
+          const month = monthMap[parts[1].toLowerCase()];
+          let year = parseInt(parts[2]);
+          if (year < 100) year += 2000; // Convert 2-digit year
+          
+          if (!isNaN(day) && month !== undefined && !isNaN(year)) {
+            return new Date(year, month, day);
+          }
+        }
+      }
+      
+      // Try standard date parsing
+      const date = new Date(dateStr);
+      return isNaN(date.getTime()) ? null : date;
+    }
+
+    function parsePrice(priceStr) {
+      if (!priceStr || priceStr === 'Quote Available') return 0;
+      const price = parseFloat(priceStr.replace(/[$,]/g, ''));
+      return isNaN(price) ? 0 : price;
+    }
+
+    function formatPrice(price) {
+      return price > 0 ? `$${price.toLocaleString()}` : 'Quote Available';
+    }
+
+    function formatDate(date) {
+      if (!date) return 'TBA';
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+    }
+
+    function getCruiseLineLogo(cruiseLine) {
+      const logoMap = {
+        'royal caribbean': 'royal-caribbean.png',
+        'celebrity cruises': 'celebrity.png',
+        'norwegian cruise line': 'norwegian.png',
+        'carnival cruise line': 'carnival.png',
+        'princess cruises': 'princess.png',
+        'holland america line': 'holland-america.png',
+        'msc cruises': 'msc.png',
+        'costa cruises': 'costa.png',
+        'cunard': 'cunard.png',
+        'seabourn': 'seabourn.png',
+        'silversea': 'silversea.png',
+        'regent seven seas': 'regent.png',
+        'oceania cruises': 'oceania.png',
+        'azamara': 'azamara.png',
+        'viking ocean cruises': 'viking.png',
+        'amawaterways': 'amawaterways.png',
+        'avalon waterways': 'avalon.png',
+        'scenic': 'scenic.png',
+        'emerald cruises': 'emerald-cruises.png',
+        'crystal': 'crystal.png',
+        'atlas': 'atlas.png',
+        'hx hurtigruten expeditions': 'hx.png',
+        'hurtigruten expeditions': 'hx.png',
+        'ponant': 'ponant.png',
+        'lindblad expeditions': 'lindblad.png',
+        'quark expeditions': 'quark.png',
+        'coral expeditions': 'coral-expeditions.png',
+        'heritage expeditions': 'heritage-expeditions.png'
+      };
+      
+      return logoMap[cruiseLine.toLowerCase()] || 'placeholder.png';
+    }
+
+    function displayDeal(deal) {
+      // Header
+      document.getElementById('cruise-logo').src = `/logos/cruiselines/${getCruiseLineLogo(deal.cruiseLine)}`;
+      document.getElementById('cruise-logo').alt = deal.cruiseLine;
+      document.getElementById('ship-name').textContent = deal.shipName;
+      document.getElementById('cruise-line').textContent = deal.cruiseLine;
+      
+      const badge = document.getElementById('cruise-type-badge');
+      badge.textContent = deal.cruiseType;
+      badge.className = `cruise-type-badge ${deal.cruiseType.toLowerCase().replace(/\s+/g, '-')}`;
+
+      // Main details
+      document.getElementById('departure-port').textContent = deal.departurePort || 'TBA';
+      document.getElementById('arrival-port').textContent = deal.arrivalPort || 'TBA';
+      document.getElementById('departure-date').textContent = formatDate(deal.departureDate);
+      document.getElementById('duration').textContent = `${deal.nights} nights`;
+      document.getElementById('region').textContent = deal.region || 'TBA';
+
+      // Sale end date
+      if (deal.saleEndDate) {
+        document.getElementById('sale-end').textContent = formatDate(deal.saleEndDate);
+        document.getElementById('sale-end-item').style.display = 'flex';
+      }
+
+      // Cabin types
+      const cabinTypesContainer = document.getElementById('cabin-types');
+      if (deal.cabinTypes && deal.cabinTypes.length > 0) {
+        cabinTypesContainer.innerHTML = deal.cabinTypes.map(type => 
+          `<span class="cabin-type">${type}</span>`
+        ).join('');
+      } else {
+        cabinTypesContainer.innerHTML = '<span class="cabin-type">Contact for details</span>';
+      }
+
+      // Itinerary
+      document.getElementById('itinerary').textContent = deal.itinerary || 'Detailed itinerary available upon request.';
+
+      // Pricing table
+      const pricingBody = document.getElementById('pricing-table-body');
+      const prices = [
+        { type: 'Interior', price: deal.insidePrice },
+        { type: 'Oceanview', price: deal.oceanviewPrice },
+        { type: 'Balcony', price: deal.balconyPrice },
+        { type: 'Suite', price: deal.suitePrice }
+      ];
+
+      pricingBody.innerHTML = prices.map(({ type, price }) => `
+        <tr>
+          <td>${type}</td>
+          <td class="price ${price > 0 ? '' : 'quote'}">${formatPrice(price)}</td>
+        </tr>
+      `).join('');
+
+      // Sidebar
+      document.getElementById('ship-name-sidebar').textContent = deal.shipName;
+      document.getElementById('cruise-line-sidebar').textContent = deal.cruiseLine;
+      document.getElementById('cruise-type-sidebar').textContent = deal.cruiseType;
+
+      // Update page title
+      document.title = `${deal.shipName} - ${deal.cruiseLine} | Interline Asia`;
+    }
+
+    function showError() {
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('error-state').style.display = 'block';
+    }
+
+    function showDeal() {
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('deal-content').style.display = 'block';
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const dealId = urlParams.get('id');
+
+      if (!dealId) {
+        showError();
+        return;
+      }
+
+      console.log('DEAL_DETAILS: Looking for deal ID:', dealId);
+
+      await loadCSVDeals();
+
+      const deal = allDeals.find(d => d.id === dealId);
+
+      if (deal) {
+        displayDeal(deal);
+        showDeal();
+        console.log('DEAL_DETAILS: Found and displayed deal:', deal);
+      } else {
+        console.log('DEAL_DETAILS: Deal not found, available IDs:', allDeals.slice(0, 5).map(d => d.id));
+        showError();
+      }
     });
   </script>
 </body>

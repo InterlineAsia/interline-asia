@@ -1,15 +1,10 @@
 {
-  "version": 2,
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "rewrites": [
-    {
-      "source": "/admin",
-      "destination": "/public/admin.html"
-    },
-    {
-      "source": "/deals",
-      "destination": "/public/deals.html"
+  "env": {
+    "WEB3FORMS_API_KEY": "@web3forms_api_key"
+  },
+  "build": {
+    "env": {
+      "WEB3FORMS_API_KEY": "@web3forms_api_key"
     }
-  ]
+  }
 }

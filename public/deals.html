@@ -273,7 +273,7 @@
                max="2026-12-31"
                placeholder="Select end date">
       </div>
-      <div class="filter-group" style="grid-column: span 1; display: flex; align-items: end;">
+      <div class="filter-group" style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: center;">
         <button id="clear-filters-btn" class="btn-clear-filters" onclick="clearAllFilters()">
           <i class="ri-refresh-line"></i>
           Clear Filters
@@ -729,21 +729,32 @@
         // Enhanced Date filters - fix the date comparison
         if (fromDateStr || toDateStr) {
           const dealDate = deal.departureDate;
-          if (!dealDate) return false; // Skip deals without dates when filtering by date
+          if (!dealDate) return true; // Include deals without dates when not filtering by date
+          
+          // Convert deal date to comparable format
+          let comparableDate;
+          if (typeof dealDate === 'string') {
+            comparableDate = new Date(dealDate);
+          } else if (dealDate instanceof Date) {
+            comparableDate = dealDate;
+          } else {
+            return true; // Include if we can't parse the date
+          }
+          
+          if (isNaN(comparableDate.getTime())) return true; // Include if date is invalid
           
           if (fromDateStr) {
             const fromDate = new Date(fromDateStr);
-            if (dealDate < fromDate) {
-              console.log('DEALS: Filtering out deal - too early:', deal.shipName, dealDate, '<', fromDate);
+            fromDate.setHours(0, 0, 0, 0); // Start of day
+            if (comparableDate < fromDate) {
               return false;
             }
           }
           
           if (toDateStr) {
             const toDate = new Date(toDateStr);
-            toDate.setHours(23, 59, 59, 999); // Include the entire end date
-            if (dealDate > toDate) {
-              console.log('DEALS: Filtering out deal - too late:', deal.shipName, dealDate, '>', toDate);
+            toDate.setHours(23, 59, 59, 999); // End of day
+            if (comparableDate > toDate) {
               return false;
             }
           }

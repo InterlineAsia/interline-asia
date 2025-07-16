@@ -21,4 +21,4 @@ const sentryWebpackPluginOptions = {
   project: "interline-asia-frontend",
 };
 
-export default withSentryConfig(nextConfig, sentryWebpackPluginOptions);
+export default withSentryConfig(nextConfig, sentryWebpackPluginOptions);/* FORCE DEPLOY Wed Jul 16 16:02:58 +07 2025 */

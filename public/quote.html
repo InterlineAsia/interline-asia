@@ -1137,7 +1137,7 @@
         }
 
         // Handle form submission
-        function handleQuoteSubmission(event) {
+        async function handleQuoteSubmission(event) {
             event.preventDefault();
 
             if (!validateForm()) {
@@ -1145,15 +1145,18 @@
             }
 
             const formData = {
-                dealId: currentDeal.id,
-                cruiseLine: currentDeal.cruiseLine,
-                shipName: currentDeal.shipName,
-                departureDate: formatDate(currentDeal.departureDate),
-                interiorPrice: document.getElementById('interior-price').value,
-                oceanviewPrice: document.getElementById('oceanview-price').value,
-                balconyPrice: document.getElementById('balcony-price').value,
-                suitePrice: document.getElementById('suite-price').value,
-                notes: document.getElementById('notes').value
+                cruiseId: currentDeal.id,
+                interior: document.getElementById('interior-price').value || null,
+                oceanview: document.getElementById('oceanview-price').value || null,
+                balcony: document.getElementById('balcony-price').value || null,
+                suite: document.getElementById('suite-price').value || null,
+                notes: document.getElementById('notes').value || '',
+                cruiseDetails: {
+                    shipName: currentDeal.shipName,
+                    cruiseLine: currentDeal.cruiseLine,
+                    departureDate: formatDate(currentDeal.departureDate)
+                },
+                cc: 'admin@interlineasia.com'
             };
 
             console.log('QUOTE: Submitting quote data:', formData);
@@ -1163,21 +1166,45 @@
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="ri-loader-4-line"></i> Sending Quote...';
 
-            // TODO: Replace with actual Brevo integration (see Robo section below)
-            setTimeout(() => {
-                // Hide form and show success panel
-                document.getElementById('quote-form').style.display = 'none';
-                document.getElementById('success-panel').style.display = 'block';
+            try {
+                // Send quote via API
+                const response = await fetch('/api/send-quote', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
 
-                // Clear the draft
-                clearDraft();
+                const result = await response.json();
 
-                // Stop timers
-                clearInterval(sessionTimer);
-                clearInterval(autoSaveInterval);
+                if (result.success) {
+                    // Hide form and show success panel
+                    document.getElementById('quote-form').style.display = 'none';
+                    document.getElementById('success-panel').style.display = 'block';
 
-                console.log('QUOTE: Quote sent successfully (simulated)');
-            }, 2000);
+                    // Clear the draft
+                    clearDraft();
+
+                    // Stop timers
+                    clearInterval(sessionTimer);
+                    clearInterval(autoSaveInterval);
+
+                    console.log('QUOTE: Quote sent successfully:', result);
+                } else {
+                    throw new Error(result.error || 'Failed to send quote');
+                }
+
+            } catch (error) {
+                console.error('QUOTE: Error sending quote:', error);
+
+                // Show error message
+                alert(`Failed to send quote: ${error.message}\n\nPlease try again or contact support if the problem persists.`);
+
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="ri-mail-send-line"></i> Send Quote';
+            }
         }
 
         // Initialize page

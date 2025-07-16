@@ -626,10 +626,51 @@
 
     async function loadCSVDeals() {
       try {
-        console.log('DEAL_DETAILS: Loading CSV data...');
+        console.log('DEAL_DETAILS: Loading CSV data using enhanced loader...');
+        
+        // Use the enhanced CSV loader
+        if (window.csvLoader) {
+          allDeals = await window.csvLoader.loadCSVData();
+          console.log('DEAL_DETAILS: Loaded', allDeals.length, 'total deals');
+          return allDeals;
+        } else {
+          console.error('DEAL_DETAILS: Enhanced CSV loader not available');
+          return await loadCSVFallback();
+        }
+      } catch (error) {
+        console.error('DEAL_DETAILS: Error loading CSV data:', error);
+        return await loadCSVFallback();
+      }
+    }
+
+    async function findDealById(dealId) {
+      console.log('DEAL_DETAILS: Looking for deal ID:', dealId);
+      
+      if (window.csvLoader) {
+        const deal = await window.csvLoader.findDealById(dealId);
+        if (deal) {
+          console.log('DEAL_DETAILS: Found deal:', deal);
+          return deal;
+        }
+      }
+      
+      // Fallback: search through loaded deals
+      const deals = await loadCSVDeals();
+      const foundDeal = deals.find(deal => deal.id === dealId);
+      
+      if (!foundDeal) {
+        console.log('DEAL_DETAILS: Deal not found, available IDs:', deals.map(d => d.id).slice(0, 10));
+      }
+      
+      return foundDeal;
+    }
+
+    async function loadCSVFallback() {
+      try {
+        console.log('DEAL_DETAILS: Using fallback CSV loading...');
         
         // Load river cruise data
-        const riverResponse = await fetch('/river.csv');
+        const riverResponse = await fetch('/river.csv?v=' + Date.now());
         if (riverResponse.ok) {
           const riverCSV = await riverResponse.text();
           const riverDeals = parseCSV(riverCSV, 'River Cruise');
@@ -640,7 +681,7 @@
         }
 
         // Load ocean cruise data
-        const oceanResponse = await fetch('/twins.csv');
+        const oceanResponse = await fetch('/twins.csv?v=' + Date.now());
         if (oceanResponse.ok) {
           const oceanCSV = await oceanResponse.text();
           const oceanDeals = parseCSV(oceanCSV, 'Ocean Cruise');
@@ -967,10 +1008,70 @@
       // Set up booking button
       const bookNowBtn = document.getElementById('book-now-btn');
       if (bookNowBtn) {
-        bookNowBtn.href = `/booking.html?deal=${encodeURIComponent(deal.id)}`;
+        bookNowBtn.href = `/booking.html?deal=${encodeURIComponent(JSON.stringify(deal))}`;
         bookNowBtn.onclick = function(e) {
           // Track booking attempt
-          console.log('BOOKING: User clicked book now for deal:', deal.id);
+          console.log('BOOKING: Redirecting to booking page for deal:', deal.id);
+        };
+      }
+
+      // Show the deal content
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('error-state').style.display = 'none';
+      document.getElementById('deal-content').style.display = 'block';
+    }
+
+    // Main initialization function
+    async function initializePage() {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const dealId = urlParams.get('id');
+        
+        if (!dealId) {
+          showError('No deal ID provided');
+          return;
+        }
+
+        console.log('DEAL_DETAILS: Loading deal with ID:', dealId);
+        
+        // Find the deal
+        const deal = await findDealById(dealId);
+        
+        if (deal) {
+          console.log('DEAL_DETAILS: Found deal:', deal);
+          displayDealWithMap(deal);
+        } else {
+          console.log('DEAL_DETAILS: Deal not found for ID:', dealId);
+          showError('Deal not found');
+        }
+        
+      } catch (error) {
+        console.error('DEAL_DETAILS: Error initializing page:', error);
+        showError('Error loading deal details');
+      }
+    }
+
+    function showError(message) {
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('deal-content').style.display = 'none';
+      document.getElementById('error-state').style.display = 'block';
+      document.getElementById('error-state').innerHTML = `
+        <h2>Deal Not Found</h2>
+        <p>${message}</p>
+        <a href="/deals.html" class="back-button">
+          <i class="ri-arrow-left-line"></i>
+          Back to Deals
+        </a>
+      `;
+    }
+
+    function restoreFiltersAndReturn() {
+      // Restore any saved filters when returning to deals page
+      window.location.href = '/deals.html';
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', initializePage);NG: User clicked book now for deal:', deal.id);
           
           // Optional: Add analytics tracking here
           if (typeof gtag !== 'undefined') {

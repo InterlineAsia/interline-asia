@@ -532,9 +532,14 @@
 
     // Update booking total
     function updateBookingTotal() {
-      if (!selectedCabin) return;
+      if (!selectedCabin) {
+        document.getElementById('selected-cabin-type').textContent = 'Please select a cabin type';
+        document.getElementById('price-per-person').textContent = '--';
+        document.getElementById('total-amount').textContent = '--';
+        return;
+      }
       
-      const guestCount = parseInt(document.getElementById('guest-count').value);
+      const guestCount = 2; // Fixed at 2 guests
       const pricePerPerson = parseFloat(selectedCabin.price.toString().replace(/[$,]/g, ''));
       const totalAmount = pricePerPerson * guestCount;
       

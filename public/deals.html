@@ -1052,27 +1052,27 @@
     function getPricingDisplay(deal) {
       const prices = [];
       if (deal.insidePrice && !deal.insidePrice.toLowerCase().includes('quote')) {
-        prices.push(`Interior: ${deal.insidePrice}`);
+        prices.push('Interior: ' + deal.insidePrice);
       }
       if (deal.oceanviewPrice && !deal.oceanviewPrice.toLowerCase().includes('quote')) {
-        prices.push(`Oceanview: ${deal.oceanviewPrice}`);
+        prices.push('Oceanview: ' + deal.oceanviewPrice);
       }
       if (deal.balconyPrice && !deal.balconyPrice.toLowerCase().includes('quote')) {
-        prices.push(`Balcony: ${deal.balconyPrice}`);
+        prices.push('Balcony: ' + deal.balconyPrice);
       }
       if (deal.suitePrice && !deal.suitePrice.toLowerCase().includes('quote')) {
-        prices.push(`Suite: ${deal.suitePrice}`);
+        prices.push('Suite: ' + deal.suitePrice);
       }
 
       if (prices.length > 0) {
-        return `<div class="price-breakdown" style="font-size: 0.875rem; color: #059669; font-weight: 600;">
-          ${prices.slice(0, 2).join(' • ')}
-          ${prices.length > 2 ? '<br>' + prices.slice(2).join(' • ') : ''}
-        </div>`;
+        return '<div class="price-breakdown" style="font-size: 0.875rem; color: #059669; font-weight: 600;">' +
+          prices.slice(0, 2).join(' • ') +
+          (prices.length > 2 ? '<br>' + prices.slice(2).join(' • ') : '') +
+          '</div>';
       } else if (deal.price > 0) {
-        return `<span class="price">From $${deal.price.toLocaleString()} per person</span>`;
+        return '<span class="price">From $' + deal.price.toLocaleString() + ' per person</span>';
       } else {
-        return `<span class="price">Quote Available</span>`;
+        return '<span class="price">Quote Available</span>';
       }
     }
 

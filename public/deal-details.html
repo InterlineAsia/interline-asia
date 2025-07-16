@@ -257,6 +257,79 @@
       font-weight: 500;
     }
     
+    .booking-section {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      border-radius: 16px;
+      padding: 2rem;
+      text-align: center;
+      color: white;
+      margin-bottom: 1.5rem;
+    }
+    
+    .booking-section h3 {
+      color: white;
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+    }
+    
+    .booking-section p {
+      opacity: 0.9;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+    
+    .book-now-btn {
+      width: 100%;
+      background: white;
+      color: #1d4ed8;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.125rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+    
+    .book-now-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+      background: #f8fafc;
+    }
+    
+    .book-now-btn i {
+      font-size: 1.25rem;
+    }
+    
+    .quote-btn {
+      width: 100%;
+      background: transparent;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      margin-top: 1rem;
+    }
+    
+    .quote-btn:hover {
+      border-color: white;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
     .itinerary-text {
       background: #f8fafc;
       padding: 1.5rem;
@@ -444,6 +517,20 @@
       </div>
       
       <div class="sidebar">
+        <!-- Booking Section -->
+        <div class="booking-section">
+          <h3>Ready to Book?</h3>
+          <p>Secure your spot on this amazing cruise adventure</p>
+          <a href="#" class="book-now-btn" id="book-now-btn">
+            <i class="ri-ship-line"></i>
+            Book This Cruise
+          </a>
+          <a href="/contact.html" class="quote-btn">
+            <i class="ri-message-line"></i>
+            Request Quote
+          </a>
+        </div>
+        
         <div class="detail-section">
           <h3 class="section-title">Pricing</h3>
           <table class="pricing-table">
@@ -693,6 +780,10 @@
       return logoMap[cruiseLine.toLowerCase()] || 'placeholder.png';
     }
 
+    function displayDealWithMap(deal) {
+      displayDeal(deal);
+    }
+    
     function displayDeal(deal) {
       displayDealWithMap(deal);
     }
@@ -823,6 +914,36 @@
 
       // Update page title
       document.title = `${deal.shipName} - ${deal.cruiseLine} | Interline Asia`;
+      
+      // Set up booking button
+      const bookNowBtn = document.getElementById('book-now-btn');
+      if (bookNowBtn) {
+        bookNowBtn.href = `/booking.html?deal=${encodeURIComponent(deal.id)}`;
+        bookNowBtn.onclick = function(e) {
+          // Track booking attempt
+          console.log('BOOKING: User clicked book now for deal:', deal.id);
+          
+          // Optional: Add analytics tracking here
+          if (typeof gtag !== 'undefined') {
+            gtag('event', 'begin_checkout', {
+              'currency': 'USD',
+              'value': getBestPrice(deal),
+              'items': [{
+                'item_id': deal.id,
+                'item_name': `${deal.shipName} - ${deal.cruiseLine}`,
+                'item_category': deal.cruiseType,
+                'quantity': 1,
+                'price': getBestPrice(deal)
+              }]
+            });
+          }
+        };
+      }
+    }
+    
+    function getBestPrice(deal) {
+      const prices = [deal.insidePrice, deal.oceanviewPrice, deal.balconyPrice, deal.suitePrice].filter(p => p > 0);
+      return prices.length > 0 ? Math.min(...prices) : 0;
     }
 
     function showError() {
@@ -872,14 +993,9 @@
 
       console.log('DEAL_DETAILS: Looking for deal ID:', dealId);
 
-      try {
-        // Use enhanced CSV loader first
-        allDeals = await window.csvLoader.loadAllDeals();
-        console.log('DEAL_DETAILS: Enhanced loader provided', allDeals.length, 'deals');
-      } catch (error) {
-        console.warn('DEAL_DETAILS: Enhanced loader failed, using fallback:', error);
-        await loadCSVDeals();
-      }
+      // Always use the standard CSV loading method for consistency
+      await loadCSVDeals();
+      console.log('DEAL_DETAILS: Loaded', allDeals.length, 'deals from CSV files');
 
       const deal = allDeals.find(d => d.id === dealId);
 

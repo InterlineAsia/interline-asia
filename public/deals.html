@@ -19,11 +19,12 @@
     .filters-grid { 
       display: grid; 
       grid-template-columns: repeat(4, 1fr); 
-      grid-template-rows: auto auto; 
+      grid-template-rows: 1fr 1fr; 
       gap: 1rem;
       width: 100%;
       max-width: 100%;
       overflow: hidden;
+      align-items: stretch;
     }
     .filter-group { display: flex; flex-direction: column; }
     .filter-group label { 
@@ -393,8 +394,8 @@
       const headers = parseCSVLine(lines[0]);
       const deals = [];
 
-      // Limit to first 100 deals for optimal performance (like major travel sites)
-      const maxDeals = Math.min(lines.length - 1, 100);
+      // Limit to first 15 deals per CSV for optimal performance (30 total)
+      const maxDeals = Math.min(lines.length - 1, 15);
       
       for (let i = 1; i <= maxDeals; i++) {
         const values = parseCSVLine(lines[i]);
@@ -577,9 +578,14 @@
             </div>
             
             <div class="deal-actions">
-              <button class="btn-view-details" onclick="window.location.href='/deal-details.html?id=${deal.id}'">
-                View Details
-              </button>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                <button class="btn-view-details" onclick="window.location.href='/deal-details.html?id=${deal.id}'" style="width: 100%; font-size: 0.9rem; padding: 0.6rem;">
+                  View Details
+                </button>
+                <button class="btn-book-now" onclick="window.location.href='/booking.html?deal=${encodeURIComponent(deal.id)}'" style="width: 100%; background: linear-gradient(135deg, #059669 0%, #047857 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 0.9rem; padding: 0.6rem;">
+                  Book Now
+                </button>
+              </div>
             </div>
           </div>
         `;
@@ -593,6 +599,12 @@
       const logoMap = {
         'scenic': 'scenic.png',
         'scenic river cruises': 'scenic.png',
+        'emerald cruises': 'emerald-cruises.png',
+        'emerald': 'emerald-cruises.png',
+        'p&o cruises': 'placeholder.png',
+        'po cruises': 'placeholder.png',
+        'p&o': 'placeholder.png',
+        'po': 'placeholder.png',
         'hx hurtigruten expeditions': 'hx.png',
         'hurtigruten expeditions': 'hx.png',
         'regent seven seas cruises': 'regent.png',

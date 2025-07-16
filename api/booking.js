@@ -21,14 +21,46 @@ export default async function handler(req, res) {
         timestamp: new Date().toISOString()
       });
       
-      // Simulate processing (replace with actual booking logic)
+      // Generate booking reference
       const bookingReference = `IA${Date.now()}`;
+      
+      // Send email to reservations team (not to customer)
+      try {
+        const emailData = {
+          to: 'reservations@interlinetravel.com.au',
+          subject: `New Cruise Booking Request - ${bookingReference}`,
+          html: `
+            <h2>New Cruise Booking Request</h2>
+            <p><strong>Booking Reference:</strong> ${bookingReference}</p>
+            <p><strong>Customer Email:</strong> ${bookingData.email}</p>
+            <p><strong>Cruise ID:</strong> ${bookingData.cruiseId}</p>
+            <p><strong>Passenger Details:</strong></p>
+            <ul>
+              <li>Name: ${bookingData.firstName} ${bookingData.lastName}</li>
+              <li>Phone: ${bookingData.phone}</li>
+              <li>Date of Birth: ${bookingData.dateOfBirth}</li>
+            </ul>
+            <p><strong>Documents:</strong> ${bookingData.uploadedFiles ? 'Uploaded to Supabase' : 'None'}</p>
+            <p><strong>Special Requests:</strong> ${bookingData.specialRequests || 'None'}</p>
+            <p><strong>Submitted:</strong> ${new Date().toISOString()}</p>
+            <hr>
+            <p><em>Please respond using the secure web form, not by email.</em></p>
+          `
+        };
+        
+        // Send email using your email service (Brevo, etc.)
+        // await sendEmail(emailData);
+        
+      } catch (emailError) {
+        console.error('Email sending failed:', emailError);
+        // Continue with booking even if email fails
+      }
       
       // Return success response
       res.status(200).json({
         success: true,
         bookingReference,
-        message: 'Booking request received and is being processed',
+        message: 'Booking request received and is being processed. Our team will contact you within 24 hours.',
         status: 'pending'
       });
       

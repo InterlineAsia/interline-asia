@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Loading Status Check</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .status { margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; color: #0c5460; }
+        pre { background-color: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>CSV Loading Status Check</h1>
+    <div id="riverStatus" class="status">Checking river.csv...</div>
+    <div id="twinsStatus" class="status">Checking twins.csv...</div>
+    <div id="combinedStatus" class="status">Combined deals: waiting for data...</div>
+    
+    <h2>First 5 River Deals</h2>
+    <pre id="riverSample">Loading...</pre>
+    
+    <h2>First 5 Twins Deals</h2>
+    <pre id="twinsSample">Loading...</pre>
+    
+    <h2>First 5 Combined Deals</h2>
+    <pre id="combinedSample">Loading...</pre>
+    
+    <h2>Deal Counts by Type</h2>
+    <pre id="typeCounts">Loading...</pre>
+
+    <script>
+        // Sample deals array as backup (same as in deals.html)
+        const sampleDeals = [
+            {"id":1, "startDate":"2023-09-05", "endDate":"2023-09-15", "cruiseLine":"Scenic", "shipName":"Scenic Amber","suite":"Standard Suite","fare":"3,000","cruiseType":"Premium","destination":"Europe","link":"scenic.com","image":"/logos/cruiselines/Scenic.png"},
+            {"id":2, "startDate":"2023-11-15", "endDate":"2023-11-25", "cruiseLine":"AmaWaterways", "shipName":"AmaDouro","suite":"Panorama Suite","fare":"2,850","cruiseType":"Premium","destination":"Europe","link":"amawaterways.com","image":"/logos/cruiselines/AmaWaterways.png"},
+            {"id":3, "startDate":"2024-05-20", "endDate":"2024-05-30", "cruiseLine":"Scenic", "shipName":"Scenic Ruby","suite":"Balcony Suite","fare":"4,500","cruiseType":"Premium","destination":"Europe","link":"scenic.com","image":"/logos/cruiselines/Scenic.png"}
+        ];
+        
+        // Function to parse CSV
+        function parseCSV(csvText) {
+            const lines = csvText.split('\n');
+            const headers = lines[0].split(',').map(header => header.trim());
+            const deals = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+                
+                // Handle quoted values with commas inside them
+                const values = parseCSVLine(lines[i]);
+                
+                if (values.length === headers.length) {
+                    const deal = {};
+                    headers.forEach((header, index) => {
+                        deal[header] = values[index];
+                    });
+                    deals.push(deal);
+                }
+            }
+            return deals;
+        }
+
+        // Helper function to parse a CSV line with proper handling of quoted values
+        function parseCSVLine(line) {
+            const values = [];
+            let current = '';
+            let insideQuotes = false;
+            
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                
+                if (char === '"') {
+                    insideQuotes = !insideQuotes;
+                } else if (char === ',' && !insideQuotes) {
+                    values.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            
+            values.push(current.trim()); // Add the last value
+            return values;
+        }
+
+        function updateStatus(elementId, isSuccess, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${isSuccess ? 'success' : 'error'}`;
+        }
+
+        function displaySample(elementId, deals, count = 5) {
+            const element = document.getElementById(elementId);
+            if (deals && deals.length > 0) {
+                const sample = deals.slice(0, count);
+                element.textContent = JSON.stringify(sample, null, 2);
+            } else {
+                element.textContent = 'No deals available';
+            }
+        }
+
+        function countByType(deals) {
+            const counts = {};
+            deals.forEach(deal => {
+                const type = deal.cruiseType || 'Unknown';
+                counts[type] = (counts[type] || 0) + 1;
+            });
+            return counts;
+        }
+
+        // Load River CSV
+        let riverDeals = [];
+        fetch('/public/river.csv')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Error loading river.csv: Status ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(text => {
+                riverDeals = parseCSV(text);
+                updateStatus('riverStatus', true, `Successfully loaded ${riverDeals.length} river deals`);
+                displaySample('riverSample', riverDeals);
+                checkAllLoaded();
+            })
+            .catch(error => {
+                console.error('Error loading river.csv:', error);
+                updateStatus('riverStatus', false, `Failed to load river.csv: ${error.message}`);
+            });
+
+        // Load Twins CSV
+        let twinsDeals = [];
+        fetch('/public/twins.csv')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Error loading twins.csv: Status ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(text => {
+                twinsDeals = parseCSV(text);
+                updateStatus('twinsStatus', true, `Successfully loaded ${twinsDeals.length} twins deals`);
+                displaySample('twinsSample', twinsDeals);
+                checkAllLoaded();
+            })
+            .catch(error => {
+                console.error('Error loading twins.csv:', error);
+                updateStatus('twinsStatus', false, `Failed to load twins.csv: ${error.message}`);
+            });
+
+        function checkAllLoaded() {
+            if (riverDeals.length > 0 || twinsDeals.length > 0) {
+                const allDeals = [...riverDeals, ...twinsDeals];
+                updateStatus('combinedStatus', true, `Total deals: ${allDeals.length} (${riverDeals.length} river + ${twinsDeals.length} twins)`);
+                displaySample('combinedSample', allDeals);
+                
+                const typeCounts = countByType(allDeals);
+                document.getElementById('typeCounts').textContent = JSON.stringify(typeCounts, null, 2);
+            } else if (document.getElementById('riverStatus').classList.contains('error') && 
+                     document.getElementById('twinsStatus').classList.contains('error')) {
+                updateStatus('combinedStatus', false, 'Failed to load any CSV data. Using sample deals.');
+                displaySample('combinedSample', sampleDeals);
+                document.getElementById('typeCounts').textContent = JSON.stringify(countByType(sampleDeals), null, 2);
+            }
+        }
+    </script>
+</body>
+</html>

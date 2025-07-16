@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSV Loading Test</title>
+</head>
+<body>
+    <h1>CSV Loading Test</h1>
+    <div id="result"></div>
+
+    <script>
+        async function testCSVLoading() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Testing CSV loading...</p>';
+            
+            try {
+                // Test loading river.csv
+                console.log('Testing loading /river.csv...');
+                const riverResponse = await fetch('/river.csv');
+                const riverSuccess = riverResponse.ok;
+                console.log(`River CSV loading ${riverSuccess ? 'succeeded' : 'failed'} with status ${riverResponse.status}`);
+                
+                // Test loading twins.csv
+                console.log('Testing loading /twins.csv...');
+                const twinsResponse = await fetch('/twins.csv');
+                const twinsSuccess = twinsResponse.ok;
+                console.log(`Twins CSV loading ${twinsSuccess ? 'succeeded' : 'failed'} with status ${twinsResponse.status}`);
+                
+                // Alternative paths
+                console.log('Testing loading /public/river.csv...');
+                const riverAltResponse = await fetch('/public/river.csv');
+                const riverAltSuccess = riverAltResponse.ok;
+                console.log(`River CSV (alt path) loading ${riverAltSuccess ? 'succeeded' : 'failed'} with status ${riverAltResponse.status}`);
+                
+                console.log('Testing loading /public/twins.csv...');
+                const twinsAltResponse = await fetch('/public/twins.csv');
+                const twinsAltSuccess = twinsAltResponse.ok;
+                console.log(`Twins CSV (alt path) loading ${twinsAltSuccess ? 'succeeded' : 'failed'} with status ${twinsAltResponse.status}`);
+                
+                // Display results
+                resultDiv.innerHTML = `
+                    <h2>Results:</h2>
+                    <p>/river.csv: ${riverSuccess ? '✅ Success' : '❌ Failed'} (Status: ${riverResponse.status})</p>
+                    <p>/twins.csv: ${twinsSuccess ? '✅ Success' : '❌ Failed'} (Status: ${twinsResponse.status})</p>
+                    <p>/public/river.csv: ${riverAltSuccess ? '✅ Success' : '❌ Failed'} (Status: ${riverAltResponse.status})</p>
+                    <p>/public/twins.csv: ${twinsAltSuccess ? '✅ Success' : '❌ Failed'} (Status: ${twinsAltResponse.status})</p>
+                `;
+            } catch (error) {
+                console.error('Error testing CSV loading:', error);
+                resultDiv.innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', testCSVLoading);
+    </script>
+</body>
+</html>

@@ -16,13 +16,16 @@
     .summary { background: rgba(255,255,255,0.1); padding: 1rem 2rem; border-radius: 12px; display: inline-block; }
     
     .filters { background: white; padding: 2rem; margin: -2rem 2rem 2rem; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); max-width: 1200px; margin-left: auto; margin-right: auto; }
-    .filters-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr; gap: 1rem; }
+    .filters-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 1fr; gap: 1rem; }
     .filter-group { display: flex; flex-direction: column; }
     .filter-group label { font-weight: 600; margin-bottom: 0.5rem; color: #374151; font-size: 0.875rem; }
     .filter-input, .filter-select { padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; }
     
     .main-content { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-    .deals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2rem; }
+    .deals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 2rem; }
+    
+    .cabin-types { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+    .cabin-type { padding: 0.25rem 0.5rem; background: #f1f5f9; border-radius: 12px; font-size: 0.75rem; color: #64748b; }
     
     .deal-card { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: all 0.3s ease; }
     .deal-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.15); }
@@ -32,6 +35,7 @@
     .cruise-type-badge { padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
     .cruise-type-badge.river-cruise { background: #dcfce7; color: #166534; }
     .cruise-type-badge.ocean-cruise { background: #dbeafe; color: #1e40af; }
+    .cruise-type-badge.expedition-cruise { background: #fef3c7; color: #92400e; }
     
     .deal-content { padding: 1.5rem; }
     .ship-name { font-size: 1.25rem; font-weight: 700; color: #1e293b; margin-bottom: 0.25rem; }
@@ -93,6 +97,12 @@
           <option value="Ocean Cruise">Ocean Cruise</option>
           <option value="River Cruise">River Cruise</option>
           <option value="Expedition Cruise">Expedition Cruise</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="ship-filter">Ship</label>
+        <select id="ship-filter" class="filter-select">
+          <option value="">All Ships</option>
         </select>
       </div>
       <div class="filter-group">
@@ -256,9 +266,28 @@
         deal[header] = values[index] || '';
       });
 
+      // Determine actual cruise type based on region and other factors
+      let actualCruiseType = cruiseType;
+      const region = (deal.Region || '').toLowerCase();
+      const itinerary = (deal.Itinerary || '').toLowerCase();
+      
+      // Check for expedition cruises
+      if (region.includes('arctic') || region.includes('antarctic') || 
+          itinerary.includes('expedition') || itinerary.includes('arctic') || 
+          itinerary.includes('antarctic') || itinerary.includes('polar')) {
+        actualCruiseType = 'Expedition Cruise';
+      }
+
+      // Determine available cabin types
+      const cabinTypes = [];
+      if (deal.Inside && deal.Inside !== 'Quote Available' && deal.Inside !== '') cabinTypes.push('Interior');
+      if (deal.Oceanview && deal.Oceanview !== 'Quote Available' && deal.Oceanview !== '') cabinTypes.push('Oceanview');
+      if (deal.Balcony && deal.Balcony !== 'Quote Available' && deal.Balcony !== '') cabinTypes.push('Balcony');
+      if (deal.Suite && deal.Suite !== 'Quote Available' && deal.Suite !== '') cabinTypes.push('Suite');
+
       return {
-        id: `${cruiseType.toLowerCase().replace(' ', '_')}_${deal.SEQ || Math.random().toString(36).substr(2, 9)}`,
-        cruiseType: cruiseType,
+        id: `${actualCruiseType.toLowerCase().replace(/\s+/g, '_')}_${deal.SEQ || Math.random().toString(36).substr(2, 9)}`,
+        cruiseType: actualCruiseType,
         cruiseLine: deal['Cruise Line'] || '',
         shipName: deal.Ship || '',
         region: deal.Region || '',
@@ -270,12 +299,16 @@
         insidePrice: parsePrice(deal.Inside),
         oceanviewPrice: parsePrice(deal.Oceanview),
         balconyPrice: parsePrice(deal.Balcony),
-        suitePrice: parsePrice(deal.Suite)
+        suitePrice: parsePrice(deal.Suite),
+        saleEndDate: parseDate(deal.Sale),
+        cabinTypes: cabinTypes
       };
     }
 
     function parseDate(dateStr) {
       if (!dateStr) return null;
+      
+      // Handle DD-MMM-YY format (e.g., "07-Jul-25")
       if (dateStr.includes('-') && dateStr.length <= 9) {
         const parts = dateStr.split('-');
         if (parts.length === 3) {
@@ -330,7 +363,7 @@
               <div class="deal-details">
                 <div class="detail-item">
                   <i class="ri-map-pin-line"></i>
-                  <span>${deal.region || deal.departurePort}</span>
+                  <span>${deal.departurePort || deal.region}</span>
                 </div>
                 <div class="detail-item">
                   <i class="ri-calendar-line"></i>
@@ -340,7 +373,25 @@
                   <i class="ri-time-line"></i>
                   <span>${deal.nights} nights</span>
                 </div>
+                ${deal.region ? `
+                <div class="detail-item">
+                  <i class="ri-global-line"></i>
+                  <span>${deal.region}</span>
+                </div>
+                ` : ''}
+                ${deal.saleEndDate ? `
+                <div class="detail-item">
+                  <i class="ri-alarm-line"></i>
+                  <span>Sale ends: ${formatDate(deal.saleEndDate)}</span>
+                </div>
+                ` : ''}
               </div>
+              
+              ${deal.cabinTypes && deal.cabinTypes.length > 0 ? `
+              <div class="cabin-types">
+                ${deal.cabinTypes.map(type => `<span class="cabin-type">${type}</span>`).join('')}
+              </div>
+              ` : ''}
               
               ${deal.itinerary ? `<div class="itinerary">${deal.itinerary.substring(0, 100)}${deal.itinerary.length > 100 ? '...' : ''}</div>` : ''}
               
@@ -403,10 +454,25 @@
       return price > 0 ? `From $${price.toLocaleString()} per person` : 'Quote Available';
     }
 
-    function formatDate(dateStr) {
-      if (!dateStr) return 'TBA';
-      const date = new Date(dateStr);
-      return isNaN(date.getTime()) ? dateStr : date.toLocaleDateString('en-AU');
+    function formatDate(date) {
+      if (!date) return 'TBA';
+      if (typeof date === 'string') {
+        const parsedDate = new Date(date);
+        return isNaN(parsedDate.getTime()) ? date : parsedDate.toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'short', 
+          day: 'numeric' 
+        });
+      }
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+      });
+    }
+
+    function viewDealDetails(dealId) {
+      window.location.href = `/deal-details.html?id=${dealId}`;
     }
 
     function populateFilters() {
@@ -416,10 +482,18 @@
         cruiseLineFilter.innerHTML = '<option value="">All Cruise Lines</option>' +
           cruiseLines.map(line => `<option value="${line}">${line}</option>`).join('');
       }
+
+      // Populate ships
+      const ships = [...new Set(allDeals.map(d => d.shipName))].filter(Boolean).sort();
+      const shipFilter = document.getElementById('ship-filter');
+      if (shipFilter) {
+        shipFilter.innerHTML = '<option value="">All Ships</option>' +
+          ships.map(ship => `<option value="${ship}">${ship}</option>`).join('');
+      }
     }
 
     function setupFilters() {
-      ['search-input', 'cruise-line-filter', 'cruise-type-filter', 'destination-filter', 'date-from-filter', 'date-to-filter'].forEach(id => {
+      ['search-input', 'cruise-line-filter', 'cruise-type-filter', 'ship-filter', 'destination-filter', 'date-from-filter', 'date-to-filter'].forEach(id => {
         const element = document.getElementById(id);
         if (element) {
           element.addEventListener(element.type === 'select-one' ? 'change' : 'input', applyFilters);
@@ -431,13 +505,37 @@
       const searchTerm = document.getElementById('search-input')?.value.toLowerCase() || '';
       const cruiseLine = document.getElementById('cruise-line-filter')?.value || '';
       const cruiseType = document.getElementById('cruise-type-filter')?.value || '';
+      const ship = document.getElementById('ship-filter')?.value || '';
       const destination = document.getElementById('destination-filter')?.value.toLowerCase() || '';
+      const fromDate = document.getElementById('date-from-filter')?.value ? new Date(document.getElementById('date-from-filter').value) : null;
+      const toDate = document.getElementById('date-to-filter')?.value ? new Date(document.getElementById('date-to-filter').value) : null;
 
       filteredDeals = allDeals.filter(deal => {
-        if (searchTerm && !`${deal.cruiseLine} ${deal.shipName} ${deal.region}`.toLowerCase().includes(searchTerm)) return false;
+        // Search filter
+        if (searchTerm && !`${deal.cruiseLine} ${deal.shipName} ${deal.region} ${deal.itinerary}`.toLowerCase().includes(searchTerm)) return false;
+        
+        // Cruise line filter
         if (cruiseLine && deal.cruiseLine !== cruiseLine) return false;
-        if (cruiseType && deal.cruiseType !== cruiseType) return false;
-        if (destination && !`${deal.region} ${deal.departurePort}`.toLowerCase().includes(destination)) return false;
+        
+        // Cruise type filter - improved to handle expedition cruises
+        if (cruiseType) {
+          const dealType = deal.cruiseType.toLowerCase();
+          const filterType = cruiseType.toLowerCase();
+          if (!dealType.includes(filterType.replace(' cruise', ''))) return false;
+        }
+        
+        // Ship filter
+        if (ship && deal.shipName !== ship) return false;
+        
+        // Destination filter
+        if (destination && !`${deal.region} ${deal.departurePort} ${deal.arrivalPort}`.toLowerCase().includes(destination)) return false;
+        
+        // Date filters
+        if (deal.departureDate) {
+          if (fromDate && deal.departureDate < fromDate) return false;
+          if (toDate && deal.departureDate > toDate) return false;
+        }
+        
         return true;
       });
 

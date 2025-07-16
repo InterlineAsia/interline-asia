@@ -1,15 +1,1 @@
-{
-  "env": {
-    "WEB3FORMS_API_KEY": "@web3forms_api_key"
-  },
-  "build": {
-    "env": {
-      "WEB3FORMS_API_KEY": "@web3forms_api_key"
-    }
-  },
-  "functions": {
-    "public/**/*.html": {
-      "maxDuration": 10
-    }
-  }
-}
+{"framework": "nextjs", "buildCommand": "npm run build || npx next build", "outputDirectory": "out"}

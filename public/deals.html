@@ -18,24 +18,69 @@
     .filters { background: white; padding: 2rem; margin: -2rem 2rem 2rem; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); max-width: 1200px; margin-left: auto; margin-right: auto; }
     .filters-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; grid-template-rows: auto auto; gap: 1rem; }
     .filter-group { display: flex; flex-direction: column; }
-    .filter-group label { font-weight: 600; margin-bottom: 0.5rem; color: #374151; font-size: 0.875rem; }
-    .filter-input, .filter-select { padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; }
+    .filter-group label { 
+      font-weight: 600; 
+      margin-bottom: 0.5rem; 
+      color: #374151; 
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .filter-input, .filter-select { 
+      padding: 0.75rem; 
+      border: 2px solid #e5e7eb; 
+      border-radius: 8px; 
+      font-size: 0.875rem;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s ease;
+      background: white;
+    }
+    .filter-input:focus, .filter-select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    .filter-input:hover, .filter-select:hover {
+      border-color: #d1d5db;
+    }
+    .filter-select {
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+      background-position: right 0.5rem center;
+      background-repeat: no-repeat;
+      background-size: 1.5em 1.5em;
+      padding-right: 2.5rem;
+      appearance: none;
+    }
     
     .main-content { max-width: 1200px; margin: 0 auto; padding: 2rem; }
     .deals-grid { 
       display: grid; 
-      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
-      gap: 2rem; 
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+      gap: 1.5rem; 
       width: 100%;
       max-width: 100%;
       overflow: hidden;
+      justify-items: center;
     }
     
     .cabin-types { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
     .cabin-type { padding: 0.25rem 0.5rem; background: #f1f5f9; border-radius: 12px; font-size: 0.75rem; color: #64748b; }
     
-    .deal-card { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: all 0.3s ease; }
-    .deal-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.15); }
+    .deal-card { 
+      background: white; 
+      border-radius: 16px; 
+      overflow: hidden; 
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 100%;
+      max-width: 380px;
+    }
+    .deal-card:hover { 
+      transform: translateY(-6px) scale(1.02); 
+      box-shadow: 0 20px 40px rgba(0,0,0,0.12); 
+    }
     
     .deal-header { padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; }
     .cruise-logo { height: 40px; width: auto; max-width: 120px; object-fit: contain; }
@@ -98,18 +143,29 @@
   <div class="filters">
     <div class="filters-grid">
       <div class="filter-group">
-        <label for="search-input">Search</label>
-        <input type="text" id="search-input" class="filter-input" placeholder="Search cruise lines, ships, destinations...">
+        <label for="search-input">
+          <i class="ri-search-line"></i>
+          Search
+        </label>
+        <input type="text" id="search-input" class="filter-input" 
+               placeholder="Search cruise lines, ships, destinations..."
+               aria-label="Search cruise deals">
       </div>
       <div class="filter-group">
-        <label for="cruise-line-filter">Cruise Line</label>
-        <select id="cruise-line-filter" class="filter-select">
+        <label for="cruise-line-filter">
+          <i class="ri-ship-line"></i>
+          Cruise Line
+        </label>
+        <select id="cruise-line-filter" class="filter-select" aria-label="Filter by cruise line">
           <option value="">All Cruise Lines</option>
         </select>
       </div>
       <div class="filter-group">
-        <label for="cruise-type-filter">Cruise Type</label>
-        <select id="cruise-type-filter" class="filter-select">
+        <label for="cruise-type-filter">
+          <i class="ri-compass-line"></i>
+          Cruise Type
+        </label>
+        <select id="cruise-type-filter" class="filter-select" aria-label="Filter by cruise type">
           <option value="">All Types</option>
           <option value="Ocean Cruise">Ocean Cruise</option>
           <option value="River Cruise">River Cruise</option>
@@ -117,24 +173,36 @@
         </select>
       </div>
       <div class="filter-group">
-        <label for="ship-filter">Ship</label>
-        <select id="ship-filter" class="filter-select">
+        <label for="ship-filter">
+          <i class="ri-anchor-line"></i>
+          Ship
+        </label>
+        <select id="ship-filter" class="filter-select" aria-label="Filter by ship">
           <option value="">All Ships</option>
         </select>
       </div>
       <div class="filter-group">
-        <label for="destination-filter">Destination</label>
-        <select id="destination-filter" class="filter-select">
+        <label for="destination-filter">
+          <i class="ri-map-pin-line"></i>
+          Destination
+        </label>
+        <select id="destination-filter" class="filter-select" aria-label="Filter by destination">
           <option value="">All Destinations</option>
         </select>
       </div>
       <div class="filter-group">
-        <label for="date-from-filter">From Date</label>
-        <input type="date" id="date-from-filter" class="filter-input">
+        <label for="date-from-filter">
+          <i class="ri-calendar-line"></i>
+          From Date
+        </label>
+        <input type="date" id="date-from-filter" class="filter-input" aria-label="Filter from date">
       </div>
       <div class="filter-group">
-        <label for="date-to-filter">To Date</label>
-        <input type="date" id="date-to-filter" class="filter-input">
+        <label for="date-to-filter">
+          <i class="ri-calendar-check-line"></i>
+          To Date
+        </label>
+        <input type="date" id="date-to-filter" class="filter-input" aria-label="Filter to date">
       </div>
     </div>
   </div>
@@ -147,8 +215,11 @@
     <div id="deals-container" class="deals-grid" style="display: none;"></div>
   </div>
 
+  <!-- Enhanced CSV Loader -->
+  <script src="/js/enhanced-csv-loader.js"></script>
+  
   <script>
-    console.log('DEALS PAGE: Starting simple deals loader...');
+    console.log('DEALS PAGE: Starting enhanced deals system...');
     
     let allDeals = [];
     let filteredDeals = [];
@@ -569,16 +640,32 @@
       renderDeals(filteredDeals);
     }
 
-    // Initialize
+    // Initialize with Enhanced CSV Loader
     document.addEventListener('DOMContentLoaded', async () => {
-      console.log('DEALS PAGE: DOM loaded, initializing...');
+      console.log('DEALS PAGE: DOM loaded, initializing enhanced system...');
       
-      await loadCSVDeals();
-      filteredDeals = allDeals;
-      
-      populateFilters();
-      setupFilters();
-      renderDeals(filteredDeals);
+      try {
+        // Use enhanced CSV loader
+        allDeals = await window.csvLoader.loadAllDeals();
+        filteredDeals = allDeals;
+        
+        console.log('DEALS PAGE: Enhanced loader provided', allDeals.length, 'deals');
+        
+        populateFilters();
+        setupFilters();
+        renderDeals(filteredDeals);
+        
+      } catch (error) {
+        console.error('DEALS PAGE: Enhanced loader failed, falling back to legacy system:', error);
+        
+        // Fallback to legacy CSV loading
+        await loadCSVDeals();
+        filteredDeals = allDeals;
+        
+        populateFilters();
+        setupFilters();
+        renderDeals(filteredDeals);
+      }
       
       document.getElementById('loading-state').style.display = 'none';
       document.getElementById('deals-container').style.display = 'grid';

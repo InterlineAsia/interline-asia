@@ -265,6 +265,31 @@
       margin-top: 1rem;
     }
     
+    /* Map Section Styles */
+    .map-section {
+      margin-top: 2rem;
+    }
+    
+    .map-container {
+      background: #f8fafc;
+      padding: 1.5rem;
+      border-radius: 12px;
+      border-left: 4px solid #22c55e;
+      text-align: center;
+    }
+    
+    .route-map-image {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+    
+    .route-map-image:hover {
+      transform: scale(1.02);
+    }
+    
     .back-button {
       display: inline-flex;
       align-items: center;
@@ -327,7 +352,7 @@
       Back to Deals
     </a>
   </div>
-  
+
   <div id="deal-content" style="display: none;">
     <div class="detail-header">
       <div class="header-content">
@@ -408,6 +433,14 @@
         <div id="itinerary" class="itinerary-text">
           Loading itinerary details...
         </div>
+        
+        <!-- Map Image Section -->
+        <div id="map-section" class="map-section" style="display: none;">
+          <h3 class="section-title">Route Map</h3>
+          <div class="map-container">
+            <img id="route-map" src="" alt="Cruise Route Map" class="route-map-image">
+          </div>
+        </div>
       </div>
       
       <div class="sidebar">
@@ -457,6 +490,9 @@
   <!-- Footer -->
   <div id="footer-placeholder"></div>
 
+  <!-- Enhanced CSV Loader -->
+  <script src="/js/enhanced-csv-loader.js"></script>
+  
   <script>
     let allDeals = [];
 
@@ -658,6 +694,10 @@
     }
 
     function displayDeal(deal) {
+      displayDealWithMap(deal);
+    }
+
+    function displayDealWithMap(deal) {
       // Header
       document.getElementById('cruise-logo').src = `/logos/cruiselines/${getCruiseLineLogo(deal.cruiseLine)}`;
       document.getElementById('cruise-logo').alt = deal.cruiseLine;
@@ -693,6 +733,20 @@
 
       // Itinerary
       document.getElementById('itinerary').textContent = deal.itinerary || 'Detailed itinerary available upon request.';
+
+      // Map Image (Enhanced CSV Loader feature)
+      const mapSection = document.getElementById('map-section');
+      const routeMapImg = document.getElementById('route-map');
+      
+      if (deal.mapImage || deal.shipMap || (deal.metadata && deal.metadata.Shipmap)) {
+        const mapPath = deal.mapImage || deal.shipMap || deal.metadata.Shipmap;
+        if (mapPath && !mapPath.startsWith('http')) { // Security: only local images
+          routeMapImg.src = `/maps/${mapPath}`;
+          routeMapImg.alt = `Route map for ${deal.shipName}`;
+          mapSection.style.display = 'block';
+          console.log('DEAL_DETAILS: Displaying route map:', mapPath);
+        }
+      }
 
       // Pricing table
       const pricingBody = document.getElementById('pricing-table-body');
@@ -754,7 +808,7 @@
       document.getElementById('deal-content').style.display = 'block';
     }
 
-    // Initialize
+    // Initialize with Enhanced CSV Loader
     document.addEventListener('DOMContentLoaded', async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const dealId = urlParams.get('id');
@@ -766,12 +820,19 @@
 
       console.log('DEAL_DETAILS: Looking for deal ID:', dealId);
 
-      await loadCSVDeals();
+      try {
+        // Use enhanced CSV loader first
+        allDeals = await window.csvLoader.loadAllDeals();
+        console.log('DEAL_DETAILS: Enhanced loader provided', allDeals.length, 'deals');
+      } catch (error) {
+        console.warn('DEAL_DETAILS: Enhanced loader failed, using fallback:', error);
+        await loadCSVDeals();
+      }
 
       const deal = allDeals.find(d => d.id === dealId);
 
       if (deal) {
-        displayDeal(deal);
+        displayDealWithMap(deal);
         showDeal();
         console.log('DEAL_DETAILS: Found and displayed deal:', deal);
       } else {
@@ -782,7 +843,7 @@
         const similarDeal = allDeals.find(d => d.id.includes(dealId.split('_').pop()));
         if (similarDeal) {
           console.log('DEAL_DETAILS: Found similar deal:', similarDeal.id);
-          displayDeal(similarDeal);
+          displayDealWithMap(similarDeal);
           showDeal();
         } else {
           showSampleDeal();
@@ -790,5 +851,11 @@
       }
     });
   </script>
+
+  <!-- Footer Placeholder -->
+  <div id="footer-placeholder"></div>
+
+  <!-- Load Partials -->
+  <script src="/js/loadPartials.js"></script>
 </body>
 </html>

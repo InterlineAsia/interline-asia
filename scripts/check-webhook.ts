@@ -76,7 +76,7 @@ class WebhookChecker {
 
       return await response.json();
     } catch (error) {
-      throw new Error(`Failed to fetch from GitHub API: ${error.message}`);
+      throw new Error(`Failed to fetch from GitHub API: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -134,7 +134,7 @@ class WebhookChecker {
 
       return result;
     } catch (error) {
-      throw new Error(`Failed to check webhooks: ${error.message}`);
+      throw new Error(`Failed to check webhooks: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -173,7 +173,7 @@ class WebhookChecker {
 
       return await response.json();
     } catch (error) {
-      throw new Error(`Failed to create Vercel webhook: ${error.message}`);
+      throw new Error(`Failed to create Vercel webhook: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -225,9 +225,10 @@ async function main() {
     
     console.log('\n✅ Webhook check completed successfully');
   } catch (error) {
-    console.error('❌ Webhook check failed:', error.message);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('❌ Webhook check failed:', errorMessage);
     
-    if (error.message.includes('GitHub token')) {
+    if (errorMessage.includes('GitHub token')) {
       console.log('\n💡 To fix this:');
       console.log('   1. Generate a GitHub Personal Access Token');
       console.log('   2. Add GITHUB_TOKEN=your_token to .env.local');

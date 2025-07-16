@@ -1,7 +1,7 @@
 // utils/admin-utils.ts
 
-// Assumes a shared Supabase admin client is exported from './supabase.ts'
-import { supabase } from './supabase';
+// Import the shared Supabase admin client
+import { supabase } from '../lib/supabase';
 import SafeSentry from '../sentry.server';
 
 /**

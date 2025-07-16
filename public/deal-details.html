@@ -1071,69 +1071,11 @@
     }
 
     // Initialize when page loads
-    document.addEventListener('DOMContentLoaded', initializePage);NG: User clicked book now for deal:', deal.id);
-          
-          // Optional: Add analytics tracking here
-          if (typeof gtag !== 'undefined') {
-            gtag('event', 'begin_checkout', {
-              'currency': 'USD',
-              'value': getBestPrice(deal),
-              'items': [{
-                'item_id': deal.id,
-                'item_name': `${deal.shipName} - ${deal.cruiseLine}`,
-                'item_category': deal.cruiseType,
-                'quantity': 1,
-                'price': getBestPrice(deal)
-              }]
-            });
-          }
-        };
-      }
-    }
-    
-    function getBestPrice(deal) {
-      const prices = [deal.insidePrice, deal.oceanviewPrice, deal.balconyPrice, deal.suitePrice].filter(p => p > 0);
-      return prices.length > 0 ? Math.min(...prices) : 0;
-    }
+    document.addEventListener('DOMContentLoaded', initializePage);
+  </script>
 
-    function showError() {
-      document.getElementById('loading-state').style.display = 'none';
-      document.getElementById('error-state').style.display = 'block';
-    }
-    
-    function showSampleDeal() {
-      // Show a sample deal if no real deal is found
-      const sampleDeal = {
-        id: 'sample_deal',
-        cruiseType: 'Ocean Cruise',
-        cruiseLine: 'Sample Cruise Line',
-        shipName: 'Sample Ship',
-        region: 'Caribbean',
-        nights: 7,
-        departureDate: new Date('2025-07-15'),
-        departurePort: 'Miami',
-        arrivalPort: 'Miami',
-        itinerary: 'Sample 7-night Caribbean cruise visiting beautiful destinations.',
-        insidePrice: 1299,
-        oceanviewPrice: 1599,
-        balconyPrice: 1999,
-        suitePrice: 3499,
-        cabinTypes: ['Interior', 'Oceanview', 'Balcony', 'Suite']
-      };
-      
-      displayDealWithMap(sampleDeal);
-      showDeal();
-      console.log('DEAL_DETAILS: Showing sample deal as fallback');
-    }
-
-    function showDeal() {
-      document.getElementById('loading-state').style.display = 'none';
-      document.getElementById('deal-content').style.display = 'block';
-    }
-
-    // Enhanced navigation with filter state restoration
-    function restoreFiltersAndReturn() {
-      // This function will be called when user clicks "Back to Search Results"
+</body>
+</html>
       window.location.href = '/deals.html';
     }
 

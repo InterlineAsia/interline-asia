@@ -47,9 +47,7 @@ const SafeSentry = {
       console.error('Sentry capture failed:', sentryError);
       console.log('Original message:', message);
     }
-  },
-  // Pass through other Sentry methods safely
-  ...Sentry,
+  }
 };
 
 export default SafeSentry;

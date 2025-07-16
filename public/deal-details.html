@@ -980,9 +980,560 @@
       document.getElementById('deal-content').style.display = 'block';
     }
 
-    // Initialize with Enhanced CSV Loader
+    // Initialize deal details page
     document.addEventListener('DOMContentLoaded', async () => {
       const urlParams = new URLSearchParams(window.location.search);
+      const dealId = urlParams.get('id');
+
+      if (!dealId) {
+        console.log('DEAL_DETAILS: No deal ID provided');
+        showError();
+        return;
+      }
+
+      console.log('DEAL_DETAILS: Looking for deal ID:', dealId);
+
+      // Load CSV data first
+      await loadCSVDeals();
+      console.log('DEAL_DETAILS: Loaded', allDeals.length, 'deals from CSV files');
+      
+      // Debug: Log first few deal IDs to see the pattern
+      console.log('DEAL_DETAILS: Sample deal IDs:', allDeals.slice(0, 5).map(d => ({ id: d.id, ship: d.shipName })));
+      
+      // Try exact match first
+      let deal = allDeals.find(d => d.id === dealId);
+      
+      // If no exact match, try to find by SEQ number or similar pattern
+      if (!deal) {
+        console.log('DEAL_DETAILS: No exact match, trying pattern matching...');
+        
+        // Extract potential SEQ number from the URL ID
+        const urlIdParts = dealId.split('_');
+        const lastPart = urlIdParts[urlIdParts.length - 1];
+        
+        // Try to find by SEQ number or partial match
+        deal = allDeals.find(d => {
+          const dealIdParts = d.id.split('_');
+          const dealLastPart = dealIdParts[dealIdParts.length - 1];
+          return dealLastPart === lastPart || d.id.includes(lastPart);
+        });
+        
+        if (deal) {
+          console.log('DEAL_DETAILS: Found deal by pattern matching:', deal.id);
+        }
+      }
+
+      if (deal) {
+        console.log('DEAL_DETAILS: Found deal:', deal.shipName, deal.cruiseLine);
+        displayDealWithMap(deal);
+        showDeal();
+      } else {
+        console.log('DEAL_DETAILS: Deal not found, available IDs:', allDeals.slice(0, 10).map(d => d.id));
+        console.log('DEAL_DETAILS: Looking for ID:', dealId);
+        
+        // Try to find a deal with similar ID pattern
+        const seqNumber = dealId.split('_').pop();
+        const similarDeal = allDeals.find(d => d.id.includes(seqNumber));
+        if (similarDeal) {
+          console.log('DEAL_DETAILS: Found similar deal:', similarDeal.id);
+          displayDealWithMap(similarDeal);
+          showDeal();
+        } else {
+          console.log('DEAL_DETAILS: No similar deal found, showing sample');
+          showSampleDeal();
+        }
+      }
+    });
+  </script>
+
+  <!-- Footer Placeholder -->
+  <div id="footer-placeholder"></div>
+
+  <!-- Load Partials -->
+  <script src="/js/loadPartials.js"></script>
+</body>
+</html>s = new URLSearchParams(window.location.search);
+      const dealId = urlParams.get('id');
+
+      if (!dealId) {
+        console.log('DEAL_DETAILS: No deal ID provided');
+        showError();
+        return;
+      }
+
+      console.log('DEAL_DETAILS: Looking for deal ID:', dealId);
+
+      // Load CSV data first
+      await loadCSVDeals();
+      console.log('DEAL_DETAILS: Loaded', allDeals.length, 'deals from CSV files');
+      
+      // Debug: Log first few deal IDs to see the pattern
+      console.log('DEAL_DETAILS: Sample deal IDs:', allDeals.slice(0, 5).map(d => ({ id: d.id, ship: d.shipName })));
+      
+      // Try exact match first
+      let deal = allDeals.find(d => d.id === dealId);
+      
+      // If no exact match, try to find by SEQ number or similar pattern
+      if (!deal) {
+        console.log('DEAL_DETAILS: No exact match, trying pattern matching...');
+        
+        // Extract potential SEQ number from the URL ID
+        const urlIdParts = dealId.split('_');
+        const lastPart = urlIdParts[urlIdParts.length - 1];
+        
+        // Try to find by SEQ number or partial match
+        deal = allDeals.find(d => {
+          const dealIdParts = d.id.split('_');
+          const dealLastPart = dealIdParts[dealIdParts.length - 1];
+          return dealLastPart === lastPart || d.id.includes(lastPart);
+        });
+        
+        if (deal) {
+          console.log('DEAL_DETAILS: Found deal by pattern matching:', deal.id);
+        }
+      }
+
+      if (deal) {
+        console.log('DEAL_DETAILS: Found deal:', deal.shipName, deal.cruiseLine);
+        displayDealWithMap(deal);
+        showDeal();
+      } else {
+        console.log('DEAL_DETAILS: Deal not found, available IDs:', allDeals.slice(0, 10).map(d => d.id));
+        console.log('DEAL_DETAILS: Looking for ID:', dealId);
+        
+        // Try to find a deal with similar ID pattern
+        const seqNumber = dealId.split('_').pop();
+        const similarDeal = allDeals.find(d => d.id.includes(seqNumber));
+        if (similarDeal) {
+          console.log('DEAL_DETAILS: Found similar deal:', similarDeal.id);
+          displayDealWithMap(similarDeal);
+          showDeal();
+        } else {
+          console.log('DEAL_DETAILS: No similar deal found, showing sample');
+          showSampleDeal();
+        }
+      }
+    });
+  </script>
+
+  <!-- Footer Placeholder -->
+  <div id="footer-placeholder"></div>
+
+  <!-- Load Partials -->
+  <script src="/js/loadPartials.js"></script>
+</body>
+</html>s = new URLSearchParams(window.location.search);
+      const dealId = urlParams.get('id');
+
+      if (!dealId) {
+        console.log('DEAL_DETAILS: No deal ID provided');
+        showError();
+        return;
+      }
+
+      console.log('DEAL_DETAILS: Looking for deal ID:', dealId);
+
+      // Load CSV data first
+      await loadCSVDeals();
+      console.log('DEAL_DETAILS: Loaded', allDeals.length, 'deals from CSV files');
+      
+      // Debug: Log first few deal IDs to see the pattern
+      console.log('DEAL_DETAILS: Sample deal IDs:', allDeals.slice(0, 5).map(d => ({ id: d.id, ship: d.shipName })));
+      
+      // Try exact match first
+      let deal = allDeals.find(d => d.id === dealId);
+      
+      // If no exact match, try to find by SEQ number or similar pattern
+      if (!deal) {
+        console.log('DEAL_DETAILS: No exact match, trying pattern matching...');
+        
+        // Extract potential SEQ number from the URL ID
+        const urlIdParts = dealId.split('_');
+        const lastPart = urlIdParts[urlIdParts.length - 1];
+        
+        // Try to find by SEQ number or partial match
+        deal = allDeals.find(d => {
+          const dealIdParts = d.id.split('_');
+          const dealLastPart = dealIdParts[dealIdParts.length - 1];
+          return dealLastPart === lastPart || d.id.includes(lastPart);
+        });
+        
+        if (deal) {
+          console.log('DEAL_DETAILS: Found deal by pattern matching:', deal.id);
+        }
+      }
+
+      if (deal) {
+        console.log('DEAL_DETAILS: Found deal:', deal.shipName, deal.cruiseLine);
+        displayDealWithMap(deal);
+        showDeal();
+      } else {
+        console.log('DEAL_DETAILS: Deal not found, available IDs:', allDeals.slice(0, 10).map(d => d.id));
+        console.log('DEAL_DETAILS: Looking for ID:', dealId);
+        
+        // Try to find a deal with similar ID pattern
+        const seqNumber = dealId.split('_').pop();
+        const similarDeal = allDeals.find(d => d.id.includes(seqNumber));
+        if (similarDeal) {
+          console.log('DEAL_DETAILS: Found similar deal:', similarDeal.id);
+          displayDealWithMap(similarDeal);
+          showDeal();
+        } else {
+          console.log('DEAL_DETAILS: No similar deal found, showing sample');
+          showSampleDeal();
+        }
+      }
+    });
+  </script>
+
+  <!-- Footer Placeholder -->
+  <div id="footer-placeholder"></div>
+
+  <!-- Load Partials -->
+  <script src="/js/loadPartials.js"></script>
+</body>
+</html>s = new URLSearchParams(window.location.search);
+      const dealId = urlParams.get('id');
+
+      if (!dealId) {
+        console.log('DEAL_DETAILS: No deal ID provided');
+        showError();
+        return;
+      }
+
+      console.log('DEAL_DETAILS: Looking for deal ID:', dealId);
+
+      // Load CSV data first
+      await loadCSVDeals();
+      console.log('DEAL_DETAILS: Loaded', allDeals.length, 'deals from CSV files');
+      
+      // Debug: Log first few deal IDs to see the pattern
+      console.log('DEAL_DETAILS: Sample deal IDs:', allDeals.slice(0, 5).map(d => ({ id: d.id, ship: d.shipName })));
+      
+      // Try exact match first
+      let deal = allDeals.find(d => d.id === dealId);
+      
+      // If no exact match, try to find by SEQ number or similar pattern
+      if (!deal) {
+        console.log('DEAL_DETAILS: No exact match, trying pattern matching...');
+        
+        // Extract potential SEQ number from the URL ID
+        const urlIdParts = dealId.split('_');
+        const lastPart = urlIdParts[urlIdParts.length - 1];
+        
+        // Try to find by SEQ number or partial match
+        deal = allDeals.find(d => {
+          const dealIdParts = d.id.split('_');
+          const dealLastPart = dealIdParts[dealIdParts.length - 1];
+          return dealLastPart === lastPart || d.id.includes(lastPart);
+        });
+        
+        if (deal) {
+          console.log('DEAL_DETAILS: Found deal by pattern matching:', deal.id);
+        }
+      }
+
+      if (deal) {
+        console.log('DEAL_DETAILS: Found deal:', deal.shipName, deal.cruiseLine);
+        displayDealWithMap(deal);
+        showDeal();
+      } else {
+        console.log('DEAL_DETAILS: Deal not found, available IDs:', allDeals.slice(0, 10).map(d => d.id));
+        console.log('DEAL_DETAILS: Looking for ID:', dealId);
+        
+        // Try to find a deal with similar ID pattern
+        const seqNumber = dealId.split('_').pop();
+        const similarDeal = allDeals.find(d => d.id.includes(seqNumber));
+        if (similarDeal) {
+          console.log('DEAL_DETAILS: Found similar deal:', similarDeal.id);
+          displayDealWithMap(similarDeal);
+          showDeal();
+        } else {
+          console.log('DEAL_DETAILS: No similar deal found, showing sample');
+          showSampleDeal();
+        }
+      }
+    });
+  </script>
+
+  <!-- Footer Placeholder -->
+  <div id="footer-placeholder"></div>
+
+  <!-- Load Partials -->
+  <script src="/js/loadPartials.js"></script>
+</body>
+</html>s = new URLSearchParams(window.location.search);
+      const dealId = urlParams.get('id');
+
+      if (!dealId) {
+        console.log('DEAL_DETAILS: No deal ID provided');
+        showError();
+        return;
+      }
+
+      console.log('DEAL_DETAILS: Looking for deal ID:', dealId);
+
+      // Load CSV data first
+      await loadCSVDeals();
+      console.log('DEAL_DETAILS: Loaded', allDeals.length, 'deals from CSV files');
+      
+      // Debug: Log first few deal IDs to see the pattern
+      console.log('DEAL_DETAILS: Sample deal IDs:', allDeals.slice(0, 5).map(d => ({ id: d.id, ship: d.shipName })));
+      
+      // Try exact match first
+      let deal = allDeals.find(d => d.id === dealId);
+      
+      // If no exact match, try to find by SEQ number or similar pattern
+      if (!deal) {
+        console.log('DEAL_DETAILS: No exact match, trying pattern matching...');
+        
+        // Extract potential SEQ number from the URL ID
+        const urlIdParts = dealId.split('_');
+        const lastPart = urlIdParts[urlIdParts.length - 1];
+        
+        // Try to find by SEQ number or partial match
+        deal = allDeals.find(d => {
+          const dealIdParts = d.id.split('_');
+          const dealLastPart = dealIdParts[dealIdParts.length - 1];
+          return dealLastPart === lastPart || d.id.includes(lastPart);
+        });
+        
+        if (deal) {
+          console.log('DEAL_DETAILS: Found deal by pattern matching:', deal.id);
+        }
+      }
+
+      if (deal) {
+        console.log('DEAL_DETAILS: Found deal:', deal.shipName, deal.cruiseLine);
+        displayDealWithMap(deal);
+        showDeal();
+      } else {
+        console.log('DEAL_DETAILS: Deal not found, available IDs:', allDeals.slice(0, 10).map(d => d.id));
+        console.log('DEAL_DETAILS: Looking for ID:', dealId);
+        
+        // Try to find a deal with similar ID pattern
+        const seqNumber = dealId.split('_').pop();
+        const similarDeal = allDeals.find(d => d.id.includes(seqNumber));
+        if (similarDeal) {
+          console.log('DEAL_DETAILS: Found similar deal:', similarDeal.id);
+          displayDealWithMap(similarDeal);
+          showDeal();
+        } else {
+          console.log('DEAL_DETAILS: No similar deal found, showing sample');
+          showSampleDeal();
+        }
+      }
+    });
+  </script>
+
+  <!-- Footer Placeholder -->
+  <div id="footer-placeholder"></div>
+
+  <!-- Load Partials -->
+  <script src="/js/loadPartials.js"></script>
+</body>
+</html>s = new URLSearchParams(window.location.search);
+      const dealId = urlParams.get('id');
+
+      if (!dealId) {
+        console.log('DEAL_DETAILS: No deal ID provided');
+        showError();
+        return;
+      }
+
+      console.log('DEAL_DETAILS: Looking for deal ID:', dealId);
+
+      // Load CSV data first
+      await loadCSVDeals();
+      console.log('DEAL_DETAILS: Loaded', allDeals.length, 'deals from CSV files');
+      
+      // Debug: Log first few deal IDs to see the pattern
+      console.log('DEAL_DETAILS: Sample deal IDs:', allDeals.slice(0, 5).map(d => ({ id: d.id, ship: d.shipName })));
+      
+      // Try exact match first
+      let deal = allDeals.find(d => d.id === dealId);
+      
+      // If no exact match, try to find by SEQ number or similar pattern
+      if (!deal) {
+        console.log('DEAL_DETAILS: No exact match, trying pattern matching...');
+        
+        // Extract potential SEQ number from the URL ID
+        const urlIdParts = dealId.split('_');
+        const lastPart = urlIdParts[urlIdParts.length - 1];
+        
+        // Try to find by SEQ number or partial match
+        deal = allDeals.find(d => {
+          const dealIdParts = d.id.split('_');
+          const dealLastPart = dealIdParts[dealIdParts.length - 1];
+          return dealLastPart === lastPart || d.id.includes(lastPart);
+        });
+        
+        if (deal) {
+          console.log('DEAL_DETAILS: Found deal by pattern matching:', deal.id);
+        }
+      }
+
+      if (deal) {
+        console.log('DEAL_DETAILS: Found deal:', deal.shipName, deal.cruiseLine);
+        displayDealWithMap(deal);
+        showDeal();
+      } else {
+        console.log('DEAL_DETAILS: Deal not found, available IDs:', allDeals.slice(0, 10).map(d => d.id));
+        console.log('DEAL_DETAILS: Looking for ID:', dealId);
+        
+        // Try to find a deal with similar ID pattern
+        const seqNumber = dealId.split('_').pop();
+        const similarDeal = allDeals.find(d => d.id.includes(seqNumber));
+        if (similarDeal) {
+          console.log('DEAL_DETAILS: Found similar deal:', similarDeal.id);
+          displayDealWithMap(similarDeal);
+          showDeal();
+        } else {
+          console.log('DEAL_DETAILS: No similar deal found, showing sample');
+          showSampleDeal();
+        }
+      }
+    });
+  </script>
+
+  <!-- Footer Placeholder -->
+  <div id="footer-placeholder"></div>
+
+  <!-- Load Partials -->
+  <script src="/js/loadPartials.js"></script>
+</body>
+</html>s = new URLSearchParams(window.location.search);
+      const dealId = urlParams.get('id');
+
+      if (!dealId) {
+        console.log('DEAL_DETAILS: No deal ID provided');
+        showError();
+        return;
+      }
+
+      console.log('DEAL_DETAILS: Looking for deal ID:', dealId);
+
+      // Load CSV data first
+      await loadCSVDeals();
+      console.log('DEAL_DETAILS: Loaded', allDeals.length, 'deals from CSV files');
+      
+      // Debug: Log first few deal IDs to see the pattern
+      console.log('DEAL_DETAILS: Sample deal IDs:', allDeals.slice(0, 5).map(d => ({ id: d.id, ship: d.shipName })));
+      
+      // Try exact match first
+      let deal = allDeals.find(d => d.id === dealId);
+      
+      // If no exact match, try to find by SEQ number or similar pattern
+      if (!deal) {
+        console.log('DEAL_DETAILS: No exact match, trying pattern matching...');
+        
+        // Extract potential SEQ number from the URL ID
+        const urlIdParts = dealId.split('_');
+        const lastPart = urlIdParts[urlIdParts.length - 1];
+        
+        // Try to find by SEQ number or partial match
+        deal = allDeals.find(d => {
+          const dealIdParts = d.id.split('_');
+          const dealLastPart = dealIdParts[dealIdParts.length - 1];
+          return dealLastPart === lastPart || d.id.includes(lastPart);
+        });
+        
+        if (deal) {
+          console.log('DEAL_DETAILS: Found deal by pattern matching:', deal.id);
+        }
+      }
+
+      if (deal) {
+        console.log('DEAL_DETAILS: Found deal:', deal.shipName, deal.cruiseLine);
+        displayDealWithMap(deal);
+        showDeal();
+      } else {
+        console.log('DEAL_DETAILS: Deal not found, available IDs:', allDeals.slice(0, 10).map(d => d.id));
+        console.log('DEAL_DETAILS: Looking for ID:', dealId);
+        
+        // Try to find a deal with similar ID pattern
+        const seqNumber = dealId.split('_').pop();
+        const similarDeal = allDeals.find(d => d.id.includes(seqNumber));
+        if (similarDeal) {
+          console.log('DEAL_DETAILS: Found similar deal:', similarDeal.id);
+          displayDealWithMap(similarDeal);
+          showDeal();
+        } else {
+          console.log('DEAL_DETAILS: No similar deal found, showing sample');
+          showSampleDeal();
+        }
+      }
+    });
+  </script>
+
+  <!-- Footer Placeholder -->
+  <div id="footer-placeholder"></div>
+
+  <!-- Load Partials -->
+  <script src="/js/loadPartials.js"></script>
+</body>
+</html>s = new URLSearchParams(window.location.search);
+      const dealId = urlParams.get('id');
+
+      if (!dealId) {
+        console.log('DEAL_DETAILS: No deal ID provided');
+        showError();
+        return;
+      }
+
+      console.log('DEAL_DETAILS: Looking for deal ID:', dealId);
+
+      // Load CSV data first
+      await loadCSVDeals();
+      console.log('DEAL_DETAILS: Loaded', allDeals.length, 'deals from CSV files');
+      
+      // Debug: Log first few deal IDs to see the pattern
+      console.log('DEAL_DETAILS: Sample deal IDs:', allDeals.slice(0, 5).map(d => ({ id: d.id, ship: d.shipName })));
+      
+      // Try exact match first
+      let deal = allDeals.find(d => d.id === dealId);
+      
+      // If no exact match, try to find by SEQ number or similar pattern
+      if (!deal) {
+        console.log('DEAL_DETAILS: No exact match, trying pattern matching...');
+        
+        // Extract potential SEQ number from the URL ID
+        const urlIdParts = dealId.split('_');
+        const lastPart = urlIdParts[urlIdParts.length - 1];
+        
+        // Try to find by SEQ number or partial match
+        deal = allDeals.find(d => {
+          const dealIdParts = d.id.split('_');
+          const dealLastPart = dealIdParts[dealIdParts.length - 1];
+          return dealLastPart === lastPart || d.id.includes(lastPart);
+        });
+        
+        if (deal) {
+          console.log('DEAL_DETAILS: Found deal by pattern matching:', deal.id);
+        }
+      }
+
+      if (deal) {
+        console.log('DEAL_DETAILS: Found deal:', deal.shipName, deal.cruiseLine);
+        displayDealWithMap(deal);
+        showDeal();
+      } else {
+        console.log('DEAL_DETAILS: Deal not found, available IDs:', allDeals.slice(0, 10).map(d => d.id));
+        console.log('DEAL_DETAILS: Looking for ID:', dealId);
+        
+        // Try to find a deal with similar ID pattern
+        const seqNumber = dealId.split('_').pop();
+        const similarDeal = allDeals.find(d => d.id.includes(seqNumber));
+        if (similarDeal) {
+          console.log('DEAL_DETAILS: Found similar deal:', similarDeal.id);
+          displayDealWithMap(similarDeal);
+          showDeal();
+        } else {
+          console.log('DEAL_DETAILS: No similar deal found, showing sample');
+          showSampleDeal();
+        }
+      }
+    });rlParams = new URLSearchParams(window.location.search);
       const dealId = urlParams.get('id');
 
       if (!dealId) {
@@ -992,11 +1543,35 @@
 
       console.log('DEAL_DETAILS: Looking for deal ID:', dealId);
 
-      // Always use the standard CSV loading method for consistency
+      // Load CSV data first
       await loadCSVDeals();
       console.log('DEAL_DETAILS: Loaded', allDeals.length, 'deals from CSV files');
-
-      const deal = allDeals.find(d => d.id === dealId);
+      
+      // Debug: Log first few deal IDs to see the pattern
+      console.log('DEAL_DETAILS: Sample deal IDs:', allDeals.slice(0, 5).map(d => ({ id: d.id, ship: d.shipName })));
+      
+      // Try exact match first
+      let deal = allDeals.find(d => d.id === dealId);
+      
+      // If no exact match, try to find by SEQ number or similar pattern
+      if (!deal) {
+        console.log('DEAL_DETAILS: No exact match, trying pattern matching...');
+        
+        // Extract potential SEQ number from the URL ID
+        const urlIdParts = dealId.split('_');
+        const lastPart = urlIdParts[urlIdParts.length - 1];
+        
+        // Try to find by SEQ number or partial match
+        deal = allDeals.find(d => {
+          const dealIdParts = d.id.split('_');
+          const dealLastPart = dealIdParts[dealIdParts.length - 1];
+          return dealLastPart === lastPart || d.id.includes(lastPart);
+        });
+        
+        if (deal) {
+          console.log('DEAL_DETAILS: Found deal by pattern matching:', deal.id);
+        }
+      }
 
       if (deal) {
         displayDealWithMap(deal);

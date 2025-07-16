@@ -264,6 +264,10 @@
       text-align: center;
       color: white;
       margin-bottom: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
     
     .booking-section h3 {
@@ -525,7 +529,7 @@
             <i class="ri-ship-line"></i>
             Book This Cruise
           </a>
-          <a href="/contact.html" class="quote-btn">
+          <a href="/quote.html" class="quote-btn">
             <i class="ri-message-line"></i>
             Request Quote
           </a>
@@ -750,32 +754,41 @@
 
     function getCruiseLineLogo(cruiseLine) {
       const logoMap = {
+        'emerald cruises': 'emerald-cruises.png',
+        'emerald': 'emerald-cruises.png',
+        'p&o cruises': 'placeholder.png',
+        'po cruises': 'placeholder.png',
+        'p&o': 'placeholder.png',
+        'po': 'placeholder.png',
+        'scenic': 'scenic.png',
+        'scenic river cruises': 'scenic.png',
+        'amawaterways': 'amawaterways.png',
+        'ama waterways': 'amawaterways.png',
         'royal caribbean': 'royal-caribbean.png',
-        'celebrity cruises': 'celebrity.png',
-        'norwegian cruise line': 'norwegian.png',
-        'carnival cruise line': 'carnival.png',
-        'princess cruises': 'princess.png',
+        'royal caribbean international': 'royal-caribbean.png',
+        'crystal': 'crystal.png',
+        'crystal cruises': 'crystal.png',
+        'holland america': 'holland-america.png',
         'holland america line': 'holland-america.png',
+        'princess cruises': 'princess.png',
+        'princess': 'princess.png',
+        'norwegian cruise line': 'norwegian.png',
+        'norwegian': 'norwegian.png',
         'msc cruises': 'msc.png',
-        'costa cruises': 'costa.png',
+        'msc': 'msc.png',
+        'celebrity cruises': 'celebrity.png',
+        'celebrity': 'celebrity.png',
+        'regent seven seas cruises': 'regent.png',
+        'regent': 'regent.png',
+        'oceania cruises': 'oceania.png',
+        'oceania': 'oceania.png',
+        'azamara': 'azamara.png',
         'cunard': 'cunard.png',
         'seabourn': 'seabourn.png',
         'silversea': 'silversea.png',
-        'regent seven seas': 'regent.png',
-        'oceania cruises': 'oceania.png',
-        'azamara': 'azamara.png',
-        'viking ocean cruises': 'viking.png',
-        'amawaterways': 'amawaterways.png',
-        'avalon waterways': 'avalon.png',
-        'scenic': 'scenic.png',
-        'emerald cruises': 'emerald-cruises.png',
-        'crystal': 'crystal.png',
         'atlas': 'atlas.png',
         'hx hurtigruten expeditions': 'hx.png',
         'hurtigruten expeditions': 'hx.png',
-        'ponant': 'ponant.png',
-        'lindblad expeditions': 'lindblad.png',
-        'quark expeditions': 'quark.png',
         'coral expeditions': 'coral-expeditions.png',
         'heritage expeditions': 'heritage-expeditions.png'
       };

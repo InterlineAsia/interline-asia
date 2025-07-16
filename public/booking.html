@@ -321,48 +321,12 @@
           </div>
         </div>
 
-        <!-- Credit Card Information -->
-        <div class="form-section">
-          <h4>💳 Credit Card Information</h4>
-          <p class="security-note">
-            🔒 Your card details are validated but never stored or charged. This is for booking verification only.
+        <!-- Currency Notice -->
+        <div class="form-section currency-notice">
+          <h4>💵 Currency Information</h4>
+          <p class="currency-info">
+            All prices are quoted and charged in Australian Dollars (AUD), fully inclusive of port fees, taxes, and charges.
           </p>
-          
-          <div class="form-group">
-            <label for="cardName">Name on Card *</label>
-            <input type="text" id="cardName" name="cardName" required autocomplete="cc-name">
-          </div>
-          
-          <div class="form-group">
-            <label for="cardNumber">Card Number *</label>
-            <div class="card-input-container">
-              <input type="text" id="cardNumber" name="cardNumber" required 
-                     placeholder="1234 5678 9012 3456" 
-                     autocomplete="cc-number"
-                     maxlength="19">
-              <div class="card-type" id="cardType"></div>
-            </div>
-            <div class="card-validation" id="cardValidation"></div>
-          </div>
-          
-          <div class="form-row">
-            <div class="form-group">
-              <label for="cardExpiry">Expiry Date *</label>
-              <input type="text" id="cardExpiry" name="cardExpiry" required 
-                     placeholder="MM/YY" 
-                     autocomplete="cc-exp"
-                     maxlength="5">
-            </div>
-            <div class="form-group">
-              <label for="cardCVV">CVV *</label>
-              <input type="text" id="cardCVV" name="cardCVV" required 
-                     placeholder="123" 
-                     autocomplete="cc-csc"
-                     maxlength="4">
-            </div>
-          </div>
-          
-          <div class="card-info" id="cardInfo"></div>
         </div>
 
         <!-- Cabin Selection -->
@@ -379,8 +343,8 @@
 
         <!-- Document Upload -->
         <div class="form-section">
-          <h4>📄 Supporting Documents (Optional)</h4>
-          <p>Upload additional documents if needed for this booking:</p>
+          <h4>📄 Supporting Documents (Required)</h4>
+          <p>Please upload the following documents to complete your booking:</p>
           
           <div class="upload-section" id="passport-upload">
             <div class="upload-icon">📄</div>
@@ -445,9 +409,7 @@
             Your booking request will be sent to the cruise operator for confirmation.
             You'll receive a response within 24-48 hours.
           </p>
-          <p style="margin-top: 0.5rem; color: #666; font-size: 0.8rem;">
-            🔒 Your credit card is validated but never charged or stored.
-          </p>
+
         </div>
       </form>
 
@@ -637,6 +599,17 @@
       
       if (!selectedCabin) {
         showError('Please select a cabin type before submitting.');
+        return;
+      }
+      
+      // Validate required documents
+      if (!uploadedFiles.passport) {
+        showError('Please upload your passport copy before submitting.');
+        return;
+      }
+      
+      if (!uploadedFiles.employment) {
+        showError('Please upload your employment/retirement proof before submitting.');
         return;
       }
       

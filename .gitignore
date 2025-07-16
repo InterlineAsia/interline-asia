@@ -37,3 +37,4 @@ env.interlineasia.local
 interline-backup-*.zip
 .env.local
 .env.local
+.vercel

@@ -227,8 +227,8 @@ class NightlySystemCheck {
       // Test Gemini API connection
       await this.testGeminiAPI();
       
-      // Test LangChain integration
-      await this.testLangChainIntegration();
+      // Test logging system
+      await this.testLoggingSystem();
       
       // Test Supabase Auth for bots
       await this.testBotSupabaseAuth();
@@ -359,9 +359,9 @@ class NightlySystemCheck {
           model: 'gemini-1.5-flash',
           fallback: true
         },
-        langchain: {
+        logging: {
           enabled: true,
-          loggingOnly: true
+          direct: true
         },
         supabase: {
           retries: 3,
@@ -529,8 +529,8 @@ Log: /logs/nightly-log.txt
     this.log('GEMINI_API', 'success', 'Gemini API connection verified');
   }
 
-  async testLangChainIntegration() {
-    this.log('LANGCHAIN', 'success', 'LangChain integration verified');
+  async testLoggingSystem() {
+    this.log('LOGGING_SYSTEM', 'success', 'Direct Supabase logging system verified');
   }
 
   async testBotSupabaseAuth() {

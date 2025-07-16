@@ -2,6 +2,8 @@
 
 A comprehensive cruise deals platform with user authentication, document management, and exclusive travel offers for industry professionals.
 
+**Latest Update (July 16, 2025):** Complete deals page rebuild with performance optimizations and enhanced user experience.
+
 ## Quick Start
 
 This platform includes:

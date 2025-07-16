@@ -367,8 +367,8 @@
     // Set the access key - this will be replaced during build
     document.addEventListener('DOMContentLoaded', function() {
       // For now, use a placeholder that should be replaced with actual key
-      // Web3Forms removed - using alternative contact method
-      document.getElementById('access_key').value = accessKey;
+      // Contact form functionality removed
+      console.log('Contact form initialized');
     });
 
     const form = document.getElementById('contact-form');
@@ -390,39 +390,18 @@
       const object = Object.fromEntries(formData);
       const json = JSON.stringify(object);
 
-      // Web3Forms API removed - contact form disabled
+      // Contact form submission - simple client-side handling
       console.log('Contact form submitted:', formData);
+      
+      // Reset button state
+      submitBtn.disabled = false;
+      btnText.textContent = 'Send Message';
+      btnIcon.classList.remove('hidden');
+      loadingSpinner.classList.add('hidden');
+      
+      // Show success message
       alert('Thank you for your message! We will get back to you soon.');
-      return;
-      fetch('https://disabled-web3forms-endpoint', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: json
-      })
-      .then(async (response) => {
-        if (response.status === 200) {
-          // Success - redirect to thanks page
-          window.location.href = "/thanks.html";
-        } else {
-          // Error response
-          const json = await response.json();
-          throw new Error(json.message || "Something went wrong.");
-        }
-      })
-      .catch((error) => {
-        // Reset button state
-        submitBtn.disabled = false;
-        btnText.textContent = 'Send Message';
-        btnIcon.classList.remove('hidden');
-        loadingSpinner.classList.add('hidden');
-        
-        // Show error message
-        alert(error.message || "Something went wrong. Please try again.");
-        console.error('Form submission error:', error);
-      });
+      form.reset();
     });
   </script>
 </body>

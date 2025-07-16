@@ -6,3 +6,4 @@ Mon Jul 14 12:28:31 +07 2025 - Emergency deals dropdown fix deployed
 Mon Jul 14 12:34:37 +07 2025 - UnifiedDealsLoader fix deployed
 Mon Jul 14 12:50:19 +07 2025 - Admin bot fix deployed
 Mon Jul 14 12:52:51 +07 2025 - Admin bot Supabase client fix deployed
+Wed Jul 16 15:30:00 +07 2025 - Loading spinner added to deals page

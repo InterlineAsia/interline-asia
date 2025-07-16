@@ -30,9 +30,9 @@ class EnhancedCSVLoader {
         console.warn('CSV LOADER: Failed to load river.csv:', error);
       }
 
-      // Load ocean cruise data
+      // Load ocean cruise data from data directory
       try {
-        const oceanResponse = await fetch('/twins.csv?v=' + Date.now());
+        const oceanResponse = await fetch('/data/twins.csv?v=' + Date.now());
         if (oceanResponse.ok) {
           const oceanCSV = await oceanResponse.text();
           const oceanDeals = this.parseCSV(oceanCSV, 'Ocean Cruise');
@@ -40,7 +40,7 @@ class EnhancedCSVLoader {
           console.log(`CSV LOADER: Loaded ${oceanDeals.length} ocean cruise deals`);
         }
       } catch (error) {
-        console.warn('CSV LOADER: Failed to load twins.csv:', error);
+        console.warn('CSV LOADER: Failed to load data/twins.csv:', error);
       }
 
       this.csvData = allDeals;
@@ -113,8 +113,13 @@ class EnhancedCSVLoader {
       actualType = 'Expedition Cruise';
     }
 
+    // Generate consistent ID based on SEQ field
+    const seq = deal.SEQ || deal.seq || Math.random().toString(36).substr(2, 9);
+    const dealId = `${actualType.toLowerCase().replace(/\s+/g, '_')}_${seq}`;
+
     return {
-      id: `${actualType.toLowerCase().replace(/\s+/g, '_')}_${Math.random().toString(36).substr(2, 9)}`,
+      id: dealId,
+      seq: seq,
       cruiseType: actualType,
       cruiseLine: deal['Cruise Line'] || '',
       shipName: deal.Ship || '',
@@ -128,7 +133,11 @@ class EnhancedCSVLoader {
       oceanviewPrice: this.parsePrice(deal.Oceanview),
       balconyPrice: this.parsePrice(deal.Balcony),
       suitePrice: this.parsePrice(deal.Suite),
-      price: this.parsePrice(deal.Inside) || this.parsePrice(deal.Oceanview) || this.parsePrice(deal.Balcony) || 0
+      saleEndDate: this.parseDate(deal.Sale),
+      shipMap: deal.Shipmap || '',
+      cruiseOfferUrl: deal['Cruise Offer URL'] || '',
+      price: this.parsePrice(deal.Inside) || this.parsePrice(deal.Oceanview) || this.parsePrice(deal.Balcony) || 0,
+      cabinTypes: this.getCabinTypes(deal)
     };
   }
 
@@ -161,6 +170,15 @@ class EnhancedCSVLoader {
     const cleaned = priceStr.replace(/[$,]/g, '');
     const price = parseFloat(cleaned);
     return isNaN(price) ? 0 : price;
+  }
+
+  getCabinTypes(deal) {
+    const cabinTypes = [];
+    if (deal.Inside && deal.Inside !== 'Quote Available' && deal.Inside !== '') cabinTypes.push('Interior');
+    if (deal.Oceanview && deal.Oceanview !== 'Quote Available' && deal.Oceanview !== '') cabinTypes.push('Oceanview');
+    if (deal.Balcony && deal.Balcony !== 'Quote Available' && deal.Balcony !== '') cabinTypes.push('Balcony');
+    if (deal.Suite && deal.Suite !== 'Quote Available' && deal.Suite !== '') cabinTypes.push('Suite');
+    return cabinTypes;
   }
 
   async findDealById(dealId) {

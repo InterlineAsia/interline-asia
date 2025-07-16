@@ -848,7 +848,7 @@
 
         // Load ALL ocean cruise data
         try {
-          const oceanResponse = await fetch('/twins.csv?v=' + Date.now()); // Cache bust
+          const oceanResponse = await fetch('/data/twins.csv?v=' + Date.now()); // Cache bust
           if (oceanResponse.ok) {
             const oceanCSV = await oceanResponse.text();
             const oceanDeals = parseCSVComplete(oceanCSV, 'Ocean Cruise');
@@ -941,8 +941,13 @@
 
       const price = parsePrice(deal.Inside) || parsePrice(deal.Oceanview) || parsePrice(deal.Balcony) || 0;
 
+      // Generate consistent ID based on SEQ field
+      const seq = deal.SEQ || deal.seq || Math.random().toString(36).substr(2, 9);
+      const dealId = `${actualType.toLowerCase().replace(/\s+/g, '_')}_${seq}`;
+
       return {
-        id: `${actualType.toLowerCase().replace(/\s+/g, '_')}_${Math.random().toString(36).substr(2, 9)}`,
+        id: dealId,
+        seq: seq,
         cruiseType: actualType,
         cruiseLine: deal['Cruise Line'] || '',
         shipName: deal.Ship || '',
@@ -957,7 +962,10 @@
         insidePrice: deal.Inside || '',
         oceanviewPrice: deal.Oceanview || '',
         balconyPrice: deal.Balcony || '',
-        suitePrice: deal.Suite || ''
+        suitePrice: deal.Suite || '',
+        saleEndDate: parseDate(deal.Sale),
+        shipMap: deal.Shipmap || '',
+        cruiseOfferUrl: deal['Cruise Offer URL'] || ''
       };
     }
 

@@ -9,4 +9,4 @@ Mon Jul 14 12:52:51 +07 2025 - Admin bot Supabase client fix deployed
 Wed Jul 16 15:30:00 +07 2025 - Loading spinner added to deals page
 Wed Jul 16 13:54:00 +07 2025 - Booking buttons and contact form deployedWe
 d Jul 16 15:45:00 +07 2025 - Fixed deals page: limited to 30 deals, fixed filter layout, improved logo mapping, enhanced date filteringWed 
-Jul 16 16:00:00 +07 2025 - COMPLETE DEALS PAGE REBUILD: Fixed all issues - limited to 30 deals, proper filter layout, booking buttons, logo fixes
+Jul 16 16:00:00 +07 2025 - COMPLETE DEALS PAGE REBUILD: Fixed all issues - limited to 30 deals, proper filter layout, booking buttons, logo fixesForce redeploy Wed 16 Jul 2025 14:17:05 +07

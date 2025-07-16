@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard - Interline Asia Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+            color: white;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .chart-container {
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 2px dashed #cbd5e1;
+            color: #64748b;
+        }
+
+        .event-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .event-item {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .event-item:last-child {
+            border-bottom: none;
+        }
+
+        .event-name {
+            font-weight: 500;
+            color: #0f172a;
+        }
+
+        .event-count {
+            background: #3b82f6;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .event-time {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            color: #374151;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #f9fafb;
+            border-color: #9ca3af;
+        }
+
+        .btn.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: #64748b;
+        }
+
+        .loading i {
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .nav-links {
+            margin-bottom: 2rem;
+        }
+
+        .nav-links a {
+            color: #3b82f6;
+            text-decoration: none;
+            margin-right: 1rem;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><i class="ri-bar-chart-line"></i> Analytics Dashboard</h1>
+        <p>Real-time insights into user behavior and system performance</p>
+    </div>
+
+    <div class="container">
+        <div class="nav-links">
+            <a href="/admin.html">← Back to Admin</a>
+            <a href="/admin/users.html">User Management</a>
+            <a href="/admin/support-analytics.html">Support Analytics</a>
+        </div>
+
+        <div class="controls">
+            <button class="btn active" onclick="setTimeRange('24h')" id="btn-24h">Last 24 Hours</button>
+            <button class="btn" onclick="setTimeRange('7d')" id="btn-7d">Last 7 Days</button>
+            <button class="btn" onclick="setTimeRange('30d')" id="btn-30d">Last 30 Days</button>
+            <button class="btn" onclick="refreshData()"><i class="ri-refresh-line"></i> Refresh</button>
+            <button class="btn" onclick="exportData()"><i class="ri-download-line"></i> Export</button>
+        </div>
+
+        <div id="loading" class="loading">
+            <i class="ri-loader-4-line"></i>
+            Loading analytics data...
+        </div>
+
+        <div id="dashboard" style="display: none;">
+            <!-- Overview Stats -->
+            <div class="card">
+                <h3><i class="ri-dashboard-line"></i> Overview</h3>
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="total-events">0</div>
+                        <div class="stat-label">Total Events</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="unique-users">0</div>
+                        <div class="stat-label">Unique Users</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="page-views">0</div>
+                        <div class="stat-label">Page Views</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="conversion-rate">0%</div>
+                        <div class="stat-label">Conversion Rate</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <!-- Top Events -->
+                <div class="card">
+                    <h3><i class="ri-fire-line"></i> Top Events</h3>
+                    <div class="event-list" id="top-events">
+                        <div class="loading">
+                            <i class="ri-loader-4-line"></i>
+                            Loading events...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="card">
+                    <h3><i class="ri-time-line"></i> Recent Activity</h3>
+                    <div class="event-list" id="recent-activity">
+                        <div class="loading">
+                            <i class="ri-loader-4-line"></i>
+                            Loading activity...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Engagement -->
+                <div class="card">
+                    <h3><i class="ri-user-heart-line"></i> User Engagement</h3>
+                    <div class="stat-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="avg-session">0m</div>
+                            <div class="stat-label">Avg Session</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="bounce-rate">0%</div>
+                            <div class="stat-label">Bounce Rate</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Metrics -->
+                <div class="card">
+                    <h3><i class="ri-speed-line"></i> Performance</h3>
+                    <div class="stat-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="avg-load-time">0ms</div>
+                            <div class="stat-label">Avg Load Time</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="error-rate">0%</div>
+                            <div class="stat-label">Error Rate</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3><i class="ri-line-chart-line"></i> Events Over Time</h3>
+                    <div class="chart-container">
+                        <div>
+                            <i class="ri-bar-chart-line" style="font-size: 3rem; opacity: 0.3;"></i>
+                            <p>Chart visualization coming soon</p>
+                            <p style="font-size: 0.875rem; margin-top: 0.5rem;">Integration with Chart.js or similar library</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><i class="ri-pie-chart-line"></i> Event Distribution</h3>
+                    <div class="chart-container">
+                        <div>
+                            <i class="ri-pie-chart-line" style="font-size: 3rem; opacity: 0.3;"></i>
+                            <p>Pie chart visualization coming soon</p>
+                            <p style="font-size: 0.875rem; margin-top: 0.5rem;">Event type breakdown</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/config.js"></script>
+    <script src="/supabase-client.js"></script>
+    <script src="/js/app-enhancements.js"></script>
+
+    <script>
+        let currentTimeRange = '24h';
+        let analyticsData = null;
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('📊 Analytics Dashboard initializing...');
+            
+            // Wait for supabase client
+            if (window.supabaseClient) {
+                await window.supabaseClient.readyPromise;
+                
+                // Check admin access
+                if (!window.supabaseClient.isAdmin()) {
+                    document.body.innerHTML = `
+                        <div style="display: flex; align-items: center; justify-content: center; height: 100vh; flex-direction: column;">
+                            <i class="ri-lock-line" style="font-size: 4rem; color: #dc2626; margin-bottom: 1rem;"></i>
+                            <h2 style="color: #dc2626; margin-bottom: 1rem;">Access Denied</h2>
+                            <p style="color: #64748b; margin-bottom: 2rem;">Admin access required to view analytics dashboard.</p>
+                            <a href="/admin.html" style="color: #3b82f6; text-decoration: none;">← Back to Admin</a>
+                        </div>
+                    `;
+                    return;
+                }
+            }
+
+            await loadAnalyticsData();
+        });
+
+        async function loadAnalyticsData() {
+            try {
+                document.getElementById('loading').style.display = 'flex';
+                document.getElementById('dashboard').style.display = 'none';
+
+                // Get analytics data from multiple sources
+                const [localData, supabaseData, cacheData] = await Promise.all([
+                    getLocalAnalyticsData(),
+                    getSupabaseAnalyticsData(),
+                    getCachedAnalyticsData()
+                ]);
+
+                // Combine and process data
+                analyticsData = combineAnalyticsData(localData, supabaseData, cacheData);
+                
+                // Update dashboard
+                updateDashboard(analyticsData);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+
+                console.log('📊 Analytics data loaded:', analyticsData);
+
+            } catch (error) {
+                console.error('Failed to load analytics:', error);
+                showError('Failed to load analytics data: ' + error.message);
+            }
+        }
+
+        async function getLocalAnalyticsData() {
+            try {
+                // Get data from localStorage (analytics.js)
+                if (window.analytics) {
+                    return window.analytics.exportData();
+                }
+                
+                // Fallback to direct localStorage access
+                const events = JSON.parse(localStorage.getItem('analytics_events') || '[]');
+                return {
+                    events: events,
+                    summary: {
+                        totalEvents: events.length,
+                        source: 'localStorage'
+                    }
+                };
+            } catch (error) {
+                console.warn('Failed to get local analytics:', error);
+                return { events: [], summary: { totalEvents: 0 } };
+            }
+        }
+
+        async function getSupabaseAnalyticsData() {
+            try {
+                if (!window.supabaseClient) return { events: [], summary: { totalEvents: 0 } };
+
+                const timeFilter = getTimeFilter(currentTimeRange);
+                
+                const { data, error } = await window.supabaseClient.supabase
+                    .from('analytics_events')
+                    .select('*')
+                    .gte('timestamp', timeFilter)
+                    .order('timestamp', { ascending: false })
+                    .limit(1000);
+
+                if (error) throw error;
+
+                return {
+                    events: data || [],
+                    summary: {
+                        totalEvents: data?.length || 0,
+                        source: 'supabase'
+                    }
+                };
+            } catch (error) {
+                console.warn('Failed to get Supabase analytics:', error);
+                return { events: [], summary: { totalEvents: 0 } };
+            }
+        }
+
+        async function getCachedAnalyticsData() {
+            try {
+                if (window.cacheManager) {
+                    return window.cacheManager.getCachedAnalyticsData('dashboard') || { events: [], summary: { totalEvents: 0 } };
+                }
+                return { events: [], summary: { totalEvents: 0 } };
+            } catch (error) {
+                console.warn('Failed to get cached analytics:', error);
+                return { events: [], summary: { totalEvents: 0 } };
+            }
+        }
+
+        function combineAnalyticsData(localData, supabaseData, cacheData) {
+            // Combine events from all sources
+            const allEvents = [
+                ...(localData.events || []),
+                ...(supabaseData.events || []),
+                ...(cacheData.events || [])
+            ];
+
+            // Deduplicate by event_id
+            const uniqueEvents = allEvents.filter((event, index, self) => 
+                index === self.findIndex(e => e.event_id === event.event_id || e.id === event.id)
+            );
+
+            // Process events for time range
+            const timeFilter = new Date(getTimeFilter(currentTimeRange));
+            const filteredEvents = uniqueEvents.filter(event => {
+                const eventTime = new Date(event.timestamp);
+                return eventTime >= timeFilter;
+            });
+
+            return {
+                events: filteredEvents,
+                summary: {
+                    totalEvents: filteredEvents.length,
+                    timeRange: currentTimeRange,
+                    sources: {
+                        local: localData.summary.totalEvents,
+                        supabase: supabaseData.summary.totalEvents,
+                        cache: cacheData.summary.totalEvents
+                    }
+                }
+            };
+        }
+
+        function updateDashboard(data) {
+            const events = data.events || [];
+            
+            // Update overview stats
+            updateOverviewStats(events);
+            
+            // Update top events
+            updateTopEvents(events);
+            
+            // Update recent activity
+            updateRecentActivity(events);
+            
+            // Update engagement metrics
+            updateEngagementMetrics(events);
+            
+            // Update performance metrics
+            updatePerformanceMetrics(events);
+        }
+
+        function updateOverviewStats(events) {
+            // Total events
+            document.getElementById('total-events').textContent = events.length.toLocaleString();
+
+            // Unique users (based on session_id or user_id)
+            const uniqueUsers = new Set();
+            events.forEach(event => {
+                if (event.user_id) uniqueUsers.add(event.user_id);
+                else if (event.session_id) uniqueUsers.add(event.session_id);
+            });
+            document.getElementById('unique-users').textContent = uniqueUsers.size.toLocaleString();
+
+            // Page views
+            const pageViews = events.filter(event => event.event_name === 'page_view').length;
+            document.getElementById('page-views').textContent = pageViews.toLocaleString();
+
+            // Conversion rate (bookings / page views)
+            const bookings = events.filter(event => event.event_name === 'booking_submission').length;
+            const conversionRate = pageViews > 0 ? ((bookings / pageViews) * 100).toFixed(1) : '0';
+            document.getElementById('conversion-rate').textContent = conversionRate + '%';
+        }
+
+        function updateTopEvents(events) {
+            const eventCounts = {};
+            events.forEach(event => {
+                eventCounts[event.event_name] = (eventCounts[event.event_name] || 0) + 1;
+            });
+
+            const sortedEvents = Object.entries(eventCounts)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 10);
+
+            const container = document.getElementById('top-events');
+            container.innerHTML = sortedEvents.map(([eventName, count]) => `
+                <div class="event-item">
+                    <span class="event-name">${formatEventName(eventName)}</span>
+                    <span class="event-count">${count}</span>
+                </div>
+            `).join('');
+        }
+
+        function updateRecentActivity(events) {
+            const recentEvents = events
+                .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+                .slice(0, 20);
+
+            const container = document.getElementById('recent-activity');
+            container.innerHTML = recentEvents.map(event => `
+                <div class="event-item">
+                    <div>
+                        <div class="event-name">${formatEventName(event.event_name)}</div>
+                        <div class="event-time">${formatTimeAgo(event.timestamp)}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateEngagementMetrics(events) {
+            // Calculate average session duration (simplified)
+            const sessions = {};
+            events.forEach(event => {
+                const sessionId = event.session_id;
+                if (!sessionId) return;
+                
+                if (!sessions[sessionId]) {
+                    sessions[sessionId] = { start: event.timestamp, end: event.timestamp };
+                } else {
+                    if (event.timestamp > sessions[sessionId].end) {
+                        sessions[sessionId].end = event.timestamp;
+                    }
+                    if (event.timestamp < sessions[sessionId].start) {
+                        sessions[sessionId].start = event.timestamp;
+                    }
+                }
+            });
+
+            const sessionDurations = Object.values(sessions).map(session => {
+                return new Date(session.end) - new Date(session.start);
+            }).filter(duration => duration > 0);
+
+            const avgSession = sessionDurations.length > 0 
+                ? Math.round(sessionDurations.reduce((sum, duration) => sum + duration, 0) / sessionDurations.length / 60000)
+                : 0;
+
+            document.getElementById('avg-session').textContent = avgSession + 'm';
+
+            // Bounce rate (sessions with only one page view)
+            const singlePageSessions = Object.values(sessions).filter(session => {
+                const sessionEvents = events.filter(e => e.session_id === session.sessionId);
+                const pageViews = sessionEvents.filter(e => e.event_name === 'page_view');
+                return pageViews.length === 1;
+            }).length;
+
+            const bounceRate = Object.keys(sessions).length > 0 
+                ? ((singlePageSessions / Object.keys(sessions).length) * 100).toFixed(1)
+                : '0';
+
+            document.getElementById('bounce-rate').textContent = bounceRate + '%';
+        }
+
+        function updatePerformanceMetrics(events) {
+            // Average load time from performance events
+            const performanceEvents = events.filter(event => 
+                event.event_name === 'performance_metric' && 
+                event.properties?.metricName === 'page_load_time'
+            );
+
+            const avgLoadTime = performanceEvents.length > 0
+                ? Math.round(performanceEvents.reduce((sum, event) => sum + (event.properties?.value || 0), 0) / performanceEvents.length)
+                : 0;
+
+            document.getElementById('avg-load-time').textContent = avgLoadTime + 'ms';
+
+            // Error rate
+            const errorEvents = events.filter(event => event.event_name === 'error_occurred').length;
+            const errorRate = events.length > 0 ? ((errorEvents / events.length) * 100).toFixed(2) : '0';
+            document.getElementById('error-rate').textContent = errorRate + '%';
+        }
+
+        function setTimeRange(range) {
+            currentTimeRange = range;
+            
+            // Update button states
+            document.querySelectorAll('.btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-${range}`).classList.add('active');
+            
+            // Reload data
+            loadAnalyticsData();
+        }
+
+        function getTimeFilter(range) {
+            const now = new Date();
+            switch (range) {
+                case '24h':
+                    return new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+                case '7d':
+                    return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+                case '30d':
+                    return new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
+                default:
+                    return new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+            }
+        }
+
+        function formatEventName(eventName) {
+            return eventName
+                .replace(/_/g, ' ')
+                .replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function formatTimeAgo(timestamp) {
+            const now = new Date();
+            const time = new Date(timestamp);
+            const diffMs = now - time;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            return `${diffDays}d ago`;
+        }
+
+        function refreshData() {
+            loadAnalyticsData();
+        }
+
+        function exportData() {
+            if (!analyticsData) {
+                showError('No data to export');
+                return;
+            }
+
+            const exportData = {
+                ...analyticsData,
+                exportedAt: new Date().toISOString(),
+                timeRange: currentTimeRange
+            };
+
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `analytics-${currentTimeRange}-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showSuccess('Analytics data exported successfully');
+        }
+
+        function showError(message) {
+            const container = document.querySelector('.container');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.innerHTML = `<i class="ri-error-warning-line"></i> ${message}`;
+            container.insertBefore(errorDiv, container.firstChild);
+            
+            setTimeout(() => errorDiv.remove(), 5000);
+        }
+
+        function showSuccess(message) {
+            const container = document.querySelector('.container');
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success';
+            successDiv.innerHTML = `<i class="ri-check-line"></i> ${message}`;
+            container.insertBefore(successDiv, container.firstChild);
+            
+            setTimeout(() => successDiv.remove(), 3000);
+        }
+    </script>
+</body>
+</html>

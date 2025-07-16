@@ -244,4 +244,5 @@ if (require.main === module) {
   main();
 }
 
-export { WebhookChecker, WebhookCheckResult };
+export { WebhookChecker };
+export type { WebhookCheckResult };

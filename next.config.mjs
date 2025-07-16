@@ -6,8 +6,8 @@ const nextConfig = {
   experimental: {
     // Enable if needed
   },
-  // Ensure static export if using Vercel static hosting
-  output: 'export',
+  // Remove static export for Vercel deployment
+  // output: 'export',
   trailingSlash: true,
   images: {
     unoptimized: true

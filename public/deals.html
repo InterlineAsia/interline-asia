@@ -29,9 +29,8 @@
     .filters-grid { 
       display: grid; 
       grid-template-columns: repeat(4, 1fr); 
-      grid-template-rows: auto auto; 
       gap: 1rem;
-      width: 100%;
+      margin-bottom: 1rem;
     }
     
     .filter-group { display: flex; flex-direction: column; }
@@ -72,10 +71,8 @@
     }
     
     .clear-filters-row {
-      grid-column: 1 / -1;
       display: flex;
       justify-content: center;
-      margin-top: 1rem;
     }
     
     .btn-clear-filters {
@@ -294,12 +291,24 @@
           <option value="">All Ships</option>
         </select>
       </div>
-      <div class="clear-filters-row">
-        <button id="clear-filters-btn" class="btn-clear-filters" onclick="clearAllFilters()">
-          <i class="ri-refresh-line"></i>
-          Clear All Filters
-        </button>
+      <div class="filter-group">
+        <label for="nights-filter">
+          <i class="ri-time-line"></i>
+          Duration
+        </label>
+        <select id="nights-filter" class="filter-select">
+          <option value="">All Durations</option>
+          <option value="7">7 nights</option>
+          <option value="10">10+ nights</option>
+          <option value="14">14+ nights</option>
+        </select>
       </div>
+    </div>
+    <div class="clear-filters-row">
+      <button id="clear-filters-btn" class="btn-clear-filters" onclick="clearAllFilters()">
+        <i class="ri-refresh-line"></i>
+        Clear All Filters
+      </button>
     </div>
   </div>
 
@@ -312,92 +321,97 @@
   </div>
 
   <script>
+    console.log('🚀 DEALS PAGE: Starting with STRICT 30-deal limit...');
+    
     let allDeals = [];
     let filteredDeals = [];
 
-    // Sample deals for immediate display
-    const sampleDeals = [
-      {
-        id: 'sample_1',
-        cruiseType: 'River Cruise',
-        cruiseLine: 'AmaWaterways',
-        shipName: 'AmaBella',
-        region: 'Europe',
-        nights: 7,
-        departureDate: new Date('2025-07-07'),
-        departurePort: 'Budapest, Hungary',
-        arrivalPort: 'Vilshofen, Germany',
-        itinerary: 'Melodies of the Danube - Experience the beauty of the Danube River through Hungary, Austria, and Germany',
-        price: 3440
-      },
-      {
-        id: 'sample_2',
-        cruiseType: 'Ocean Cruise',
-        cruiseLine: 'Crystal',
-        shipName: 'Crystal Symphony',
-        region: 'Mediterranean',
-        nights: 8,
-        departureDate: new Date('2025-07-10'),
-        departurePort: 'Thessaloniki',
-        arrivalPort: 'Civitavecchia (Rome)',
-        itinerary: 'Greek Isles & Italy - Discover ancient civilizations and stunning coastlines',
-        price: 3340
-      }
-    ];
+    // STRICT DEAL LIMITS - NEVER EXCEED 30 TOTAL
+    const DEAL_LIMITS = {
+      RIVER_MAX: 10,
+      OCEAN_MAX: 20,
+      TOTAL_MAX: 30
+    };
 
-    async function loadLimitedDeals() {
+    async function loadStrictLimitedDeals() {
       try {
-        console.log('Loading limited deals for optimal performance...');
+        console.log('🔒 LOADING: Enforcing strict 30-deal limit...');
+        allDeals = []; // Reset to ensure clean start
         
-        // Load river cruise data (limit to 10)
-        const riverResponse = await fetch('/river.csv');
-        if (riverResponse.ok) {
-          const riverCSV = await riverResponse.text();
-          const riverDeals = parseCSVLimited(riverCSV, 'River Cruise', 10);
-          allDeals = allDeals.concat(riverDeals);
+        // Load river cruise data with STRICT limit
+        try {
+          const riverResponse = await fetch('/river.csv?v=' + Date.now()); // Cache bust
+          if (riverResponse.ok) {
+            const riverCSV = await riverResponse.text();
+            const riverDeals = parseCSVWithStrictLimit(riverCSV, 'River Cruise', DEAL_LIMITS.RIVER_MAX);
+            console.log(`✅ RIVER: Loaded exactly ${riverDeals.length} deals (max ${DEAL_LIMITS.RIVER_MAX})`);
+            allDeals = allDeals.concat(riverDeals);
+          }
+        } catch (error) {
+          console.warn('⚠️ River CSV failed:', error);
         }
 
-        // Load ocean cruise data (limit to 20)
-        const oceanResponse = await fetch('/twins.csv');
-        if (oceanResponse.ok) {
-          const oceanCSV = await oceanResponse.text();
-          const oceanDeals = parseCSVLimited(oceanCSV, 'Ocean Cruise', 20);
-          allDeals = allDeals.concat(oceanDeals);
+        // Load ocean cruise data with STRICT limit
+        try {
+          const oceanResponse = await fetch('/twins.csv?v=' + Date.now()); // Cache bust
+          if (oceanResponse.ok) {
+            const oceanCSV = await oceanResponse.text();
+            const oceanDeals = parseCSVWithStrictLimit(oceanCSV, 'Ocean Cruise', DEAL_LIMITS.OCEAN_MAX);
+            console.log(`✅ OCEAN: Loaded exactly ${oceanDeals.length} deals (max ${DEAL_LIMITS.OCEAN_MAX})`);
+            allDeals = allDeals.concat(oceanDeals);
+          }
+        } catch (error) {
+          console.warn('⚠️ Ocean CSV failed:', error);
         }
 
+        // FINAL SAFETY CHECK - Never exceed 30 deals
+        if (allDeals.length > DEAL_LIMITS.TOTAL_MAX) {
+          console.warn(`🚨 SAFETY: Trimming ${allDeals.length} deals to ${DEAL_LIMITS.TOTAL_MAX}`);
+          allDeals = allDeals.slice(0, DEAL_LIMITS.TOTAL_MAX);
+        }
+
+        console.log(`🎯 FINAL: Loaded exactly ${allDeals.length} deals (STRICT LIMIT ENFORCED)`);
+        
+        // Fallback to sample deals if nothing loaded
         if (allDeals.length === 0) {
-          allDeals = sampleDeals;
+          console.log('📝 FALLBACK: Using sample deals');
+          allDeals = getSampleDeals();
         }
-
-        console.log(`Loaded ${allDeals.length} deals total`);
         
       } catch (error) {
-        console.error('Error loading deals:', error);
-        allDeals = sampleDeals;
+        console.error('❌ ERROR: Loading deals failed:', error);
+        allDeals = getSampleDeals();
       }
     }
 
-    function parseCSVLimited(csvText, cruiseType, maxDeals) {
+    function parseCSVWithStrictLimit(csvText, cruiseType, maxDeals) {
       const lines = csvText.trim().split('\n');
-      if (lines.length < 2) return [];
+      if (lines.length < 2) {
+        console.warn(`⚠️ CSV empty for ${cruiseType}`);
+        return [];
+      }
 
+      console.log(`📊 CSV INFO: ${cruiseType} has ${lines.length - 1} total rows, limiting to ${maxDeals}`);
+      
       const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
       const deals = [];
       
-      const limit = Math.min(lines.length - 1, maxDeals);
+      // STRICT LIMIT - Never exceed maxDeals
+      const strictLimit = Math.min(lines.length - 1, maxDeals);
       
-      for (let i = 1; i <= limit; i++) {
+      for (let i = 1; i <= strictLimit; i++) {
         try {
           const values = parseCSVLine(lines[i]);
-          const deal = createSimpleDeal(headers, values, cruiseType);
-          if (deal.cruiseLine && deal.shipName) {
+          const deal = createDeal(headers, values, cruiseType);
+          if (deal && deal.cruiseLine && deal.shipName) {
             deals.push(deal);
           }
         } catch (error) {
-          console.warn(`Skipping row ${i}:`, error);
+          console.warn(`⚠️ Skipping row ${i} in ${cruiseType}:`, error);
         }
       }
       
+      console.log(`✅ ${cruiseType}: Parsed ${deals.length} valid deals from ${strictLimit} rows`);
       return deals;
     }
 
@@ -421,17 +435,27 @@
       return result;
     }
 
-    function createSimpleDeal(headers, values, cruiseType) {
+    function createDeal(headers, values, cruiseType) {
       const deal = {};
       headers.forEach((header, index) => {
         deal[header] = values[index] || '';
       });
 
+      // Determine actual cruise type
+      let actualType = cruiseType;
+      const region = (deal.Region || '').toLowerCase();
+      const itinerary = (deal.Itinerary || '').toLowerCase();
+      
+      if (region.includes('arctic') || region.includes('antarctic') || 
+          itinerary.includes('expedition') || itinerary.includes('polar')) {
+        actualType = 'Expedition Cruise';
+      }
+
       const price = parsePrice(deal.Inside) || parsePrice(deal.Oceanview) || parsePrice(deal.Balcony) || 0;
 
       return {
-        id: `${cruiseType.toLowerCase().replace(' ', '_')}_${Math.random().toString(36).substr(2, 9)}`,
-        cruiseType: cruiseType,
+        id: `${actualType.toLowerCase().replace(/\s+/g, '_')}_${Math.random().toString(36).substr(2, 9)}`,
+        cruiseType: actualType,
         cruiseLine: deal['Cruise Line'] || '',
         shipName: deal.Ship || '',
         region: deal.Region || '',
@@ -475,6 +499,37 @@
       return isNaN(price) ? 0 : price;
     }
 
+    function getSampleDeals() {
+      return [
+        {
+          id: 'sample_1',
+          cruiseType: 'River Cruise',
+          cruiseLine: 'AmaWaterways',
+          shipName: 'AmaBella',
+          region: 'Europe',
+          nights: 7,
+          departureDate: new Date('2025-07-07'),
+          departurePort: 'Budapest, Hungary',
+          arrivalPort: 'Vilshofen, Germany',
+          itinerary: 'Melodies of the Danube - Experience the beauty of the Danube River through Hungary, Austria, and Germany',
+          price: 3440
+        },
+        {
+          id: 'sample_2',
+          cruiseType: 'Ocean Cruise',
+          cruiseLine: 'Crystal',
+          shipName: 'Crystal Symphony',
+          region: 'Mediterranean',
+          nights: 8,
+          departureDate: new Date('2025-07-10'),
+          departurePort: 'Thessaloniki',
+          arrivalPort: 'Civitavecchia (Rome)',
+          itinerary: 'Greek Isles & Italy - Discover ancient civilizations and stunning coastlines',
+          price: 3340
+        }
+      ];
+    }
+
     function getCruiseLineLogo(cruiseLine) {
       if (!cruiseLine) return 'placeholder.png';
       
@@ -488,7 +543,12 @@
         'scenic': 'scenic.png',
         'amawaterways': 'amawaterways.png',
         'royal caribbean': 'royal-caribbean.png',
-        'crystal': 'crystal.png'
+        'crystal': 'crystal.png',
+        'holland america': 'holland-america.png',
+        'princess cruises': 'princess.png',
+        'norwegian cruise line': 'norwegian.png',
+        'msc cruises': 'msc.png',
+        'celebrity cruises': 'celebrity.png'
       };
       
       const normalizedName = cruiseLine.toLowerCase().trim();
@@ -499,7 +559,7 @@
       const container = document.getElementById('deals-container');
       const summaryElement = document.getElementById('deals-summary');
       
-      summaryElement.textContent = `Showing ${deals.length} deals`;
+      summaryElement.textContent = `Showing ${deals.length} exclusive deals`;
 
       container.innerHTML = deals.map(deal => `
         <div class="deal-card">
@@ -508,7 +568,7 @@
                  alt="${deal.cruiseLine}" 
                  class="cruise-logo"
                  onerror="this.src='/logos/cruiselines/placeholder.png'">
-            <div class="cruise-type-badge ${deal.cruiseType.toLowerCase().replace(' ', '-')}">${deal.cruiseType}</div>
+            <div class="cruise-type-badge ${deal.cruiseType.toLowerCase().replace(/\s+/g, '-')}">${deal.cruiseType}</div>
           </div>
           
           <div class="deal-content">
@@ -582,7 +642,7 @@
     }
 
     function setupFilters() {
-      ['search-input', 'cruise-line-filter', 'cruise-type-filter', 'ship-filter', 'destination-filter', 'date-from-filter', 'date-to-filter'].forEach(id => {
+      ['search-input', 'cruise-line-filter', 'cruise-type-filter', 'ship-filter', 'destination-filter', 'date-from-filter', 'date-to-filter', 'nights-filter'].forEach(id => {
         const element = document.getElementById(id);
         if (element) {
           element.addEventListener(element.type === 'select-one' ? 'change' : 'input', applyFilters);
@@ -598,6 +658,7 @@
       const destination = document.getElementById('destination-filter').value;
       const fromDateStr = document.getElementById('date-from-filter').value;
       const toDateStr = document.getElementById('date-to-filter').value;
+      const nightsFilter = document.getElementById('nights-filter').value;
 
       filteredDeals = allDeals.filter(deal => {
         if (searchTerm && !`${deal.cruiseLine} ${deal.shipName} ${deal.region} ${deal.itinerary}`.toLowerCase().includes(searchTerm)) return false;
@@ -605,6 +666,13 @@
         if (cruiseType && deal.cruiseType !== cruiseType) return false;
         if (ship && deal.shipName !== ship) return false;
         if (destination && deal.region !== destination) return false;
+        
+        if (nightsFilter) {
+          const nights = parseInt(nightsFilter);
+          if (nights === 7 && deal.nights !== 7) return false;
+          if (nights === 10 && deal.nights < 10) return false;
+          if (nights === 14 && deal.nights < 14) return false;
+        }
         
         if (fromDateStr || toDateStr) {
           const dealDate = deal.departureDate;
@@ -636,14 +704,17 @@
       document.getElementById('destination-filter').value = '';
       document.getElementById('date-from-filter').value = '';
       document.getElementById('date-to-filter').value = '';
+      document.getElementById('nights-filter').value = '';
       
       filteredDeals = allDeals;
       renderDeals(filteredDeals);
     }
 
-    // Initialize
+    // Initialize with STRICT limits
     document.addEventListener('DOMContentLoaded', async () => {
-      await loadLimitedDeals();
+      console.log('🚀 INITIALIZING: Deals page with strict 30-deal limit');
+      
+      await loadStrictLimitedDeals();
       filteredDeals = allDeals;
       
       populateFilters();
@@ -652,6 +723,8 @@
       
       document.getElementById('loading-state').style.display = 'none';
       document.getElementById('deals-container').style.display = 'grid';
+      
+      console.log(`✅ COMPLETE: Showing exactly ${allDeals.length} deals`);
     });
   </script>
 </body>

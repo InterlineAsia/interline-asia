@@ -19,16 +19,11 @@
         replaysSessionSampleRate: 0.1, // 10% of sessions
         replaysOnErrorSampleRate: 1.0, // 100% of sessions with errors
         
-        // Enable logging integration
+        // Enable integrations (removed consoleLoggingIntegration as it's not available in this SDK version)
         integrations: [
-          // Send console.log, console.error, and console.warn calls as logs to Sentry
-          Sentry.consoleLoggingIntegration({ levels: ["log", "error", "warn"] }),
+          // Use available integrations
+          new Sentry.BrowserTracing(),
         ],
-        
-        // Enable experimental logging
-        _experiments: {
-          enableLogs: true,
-        },
         
         // Filter out common noise
         beforeSend(event) {
@@ -64,9 +59,6 @@
         }
       });
       
-      // Get logger instance
-      const { logger } = Sentry;
-      
       // Set user context if logged in
       if (window.supabaseClient && window.supabaseClient.currentUser) {
         Sentry.setUser({
@@ -76,10 +68,7 @@
         });
       }
       
-      // Make logger available globally
-      window.sentryLogger = logger;
-      
-      logger.info('Sentry initialized for error tracking', {
+      console.log('✅ Sentry initialized successfully for error tracking', {
         environment: window.location.hostname === 'localhost' ? 'development' : 'production',
         component: 'frontend'
       });

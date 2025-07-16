@@ -6,5 +6,10 @@
     "env": {
       "WEB3FORMS_API_KEY": "@web3forms_api_key"
     }
+  },
+  "functions": {
+    "public/**/*.html": {
+      "maxDuration": 10
+    }
   }
 }

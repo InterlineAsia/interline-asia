@@ -22,7 +22,14 @@
     .filter-input, .filter-select { padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; }
     
     .main-content { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-    .deals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 2rem; }
+    .deals-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
+      gap: 2rem; 
+      width: 100%;
+      max-width: 100%;
+      overflow: hidden;
+    }
     
     .cabin-types { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
     .cabin-type { padding: 0.25rem 0.5rem; background: #f1f5f9; border-radius: 12px; font-size: 0.75rem; color: #64748b; }
@@ -59,6 +66,11 @@
     .loading i { font-size: 3rem; color: #3b82f6; animation: spin 1s linear infinite; }
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     
+    @media (max-width: 1024px) {
+      .filters-grid { grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
+      .deals-grid { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
+    }
+    
     @media (max-width: 768px) {
       .hero { padding: 2rem 1rem; }
       .hero h1 { font-size: 2rem; }
@@ -66,6 +78,11 @@
       .filters-grid { grid-template-columns: 1fr; gap: 1rem; }
       .main-content { padding: 1rem; }
       .deals-grid { grid-template-columns: 1fr; gap: 1rem; }
+    }
+    
+    @media (max-width: 480px) {
+      .deals-grid { grid-template-columns: 1fr; gap: 1rem; }
+      .deal-card { margin: 0; max-width: 100%; }
     }
   </style>
 </head>
@@ -107,7 +124,9 @@
       </div>
       <div class="filter-group">
         <label for="destination-filter">Destination</label>
-        <input type="text" id="destination-filter" class="filter-input" placeholder="Region or destination">
+        <select id="destination-filter" class="filter-select">
+          <option value="">All Destinations</option>
+        </select>
       </div>
       <div class="filter-group">
         <label for="date-from-filter">From Date</label>
@@ -490,6 +509,14 @@
         shipFilter.innerHTML = '<option value="">All Ships</option>' +
           ships.map(ship => `<option value="${ship}">${ship}</option>`).join('');
       }
+
+      // Populate destinations
+      const destinations = [...new Set(allDeals.map(d => d.region))].filter(Boolean).sort();
+      const destinationFilter = document.getElementById('destination-filter');
+      if (destinationFilter) {
+        destinationFilter.innerHTML = '<option value="">All Destinations</option>' +
+          destinations.map(dest => `<option value="${dest}">${dest}</option>`).join('');
+      }
     }
 
     function setupFilters() {
@@ -506,7 +533,7 @@
       const cruiseLine = document.getElementById('cruise-line-filter')?.value || '';
       const cruiseType = document.getElementById('cruise-type-filter')?.value || '';
       const ship = document.getElementById('ship-filter')?.value || '';
-      const destination = document.getElementById('destination-filter')?.value.toLowerCase() || '';
+      const destination = document.getElementById('destination-filter')?.value || '';
       const fromDate = document.getElementById('date-from-filter')?.value ? new Date(document.getElementById('date-from-filter').value) : null;
       const toDate = document.getElementById('date-to-filter')?.value ? new Date(document.getElementById('date-to-filter').value) : null;
 
@@ -528,7 +555,7 @@
         if (ship && deal.shipName !== ship) return false;
         
         // Destination filter
-        if (destination && !`${deal.region} ${deal.departurePort} ${deal.arrivalPort}`.toLowerCase().includes(destination)) return false;
+        if (destination && deal.region !== destination) return false;
         
         // Date filters
         if (deal.departureDate) {

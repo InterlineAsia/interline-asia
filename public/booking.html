@@ -678,18 +678,35 @@
 
     // Populate cabin options
     function populateCabinOptions(deal) {
+      console.log('BOOKING: Populating cabin options for deal:', deal);
       const cabinContainer = document.getElementById('cabin-options');
+      
+      if (!cabinContainer) {
+        console.error('BOOKING: Cabin container not found');
+        return;
+      }
+      
       const cabins = [
-        { type: 'Inside', price: deal.insidePrice, icon: '🏠' },
+        { type: 'Interior', price: deal.insidePrice, icon: '🏠' },
         { type: 'Oceanview', price: deal.oceanviewPrice, icon: '🌅' },
         { type: 'Balcony', price: deal.balconyPrice, icon: '🌊' },
         { type: 'Suite', price: deal.suitePrice, icon: '🏰' }
       ];
 
+      console.log('BOOKING: Available cabins:', cabins);
       cabinContainer.innerHTML = '';
 
+      let cabinCount = 0;
       cabins.forEach(cabin => {
-        if (cabin.price && cabin.price !== 'Quote Available') {
+        // Check if cabin has valid pricing (not empty, not 0, not "Quote Available")
+        const hasValidPrice = cabin.price && 
+                             cabin.price !== 'Quote Available' && 
+                             cabin.price !== '' && 
+                             parseFloat(String(cabin.price).replace(/[$,]/g, '')) > 0;
+        
+        console.log(`BOOKING: Cabin ${cabin.type} - Price: ${cabin.price}, Valid: ${hasValidPrice}`);
+        
+        if (hasValidPrice) {
           const cabinElement = document.createElement('div');
           cabinElement.className = 'cabin-option';
           cabinElement.dataset.type = cabin.type;
@@ -702,22 +719,43 @@
             <div class="cabin-price">${formatPrice(cabin.price)}</div>
           `;
           
-          cabinElement.addEventListener('click', () => selectCabin(cabin.type, cabin.price));
+          cabinElement.addEventListener('click', (e) => selectCabin(cabin.type, cabin.price, e));
           cabinContainer.appendChild(cabinElement);
+          cabinCount++;
         }
       });
+      
+      if (cabinCount === 0) {
+        cabinContainer.innerHTML = `
+          <div style="text-align: center; padding: 2rem; color: #666;">
+            <p>No cabin pricing available for this cruise.</p>
+            <p>Please contact us for a quote.</p>
+          </div>
+        `;
+      }
+      
+      console.log(`BOOKING: Added ${cabinCount} cabin options`);
     }
 
     // Select cabin and update totals
-    function selectCabin(type, price) {
+    function selectCabin(type, price, event) {
+      console.log('BOOKING: Selecting cabin:', type, price);
+      
       // Remove previous selection
       document.querySelectorAll('.cabin-option').forEach(el => el.classList.remove('selected'));
       
       // Add selection to clicked cabin
-      event.target.closest('.cabin-option').classList.add('selected');
+      if (event && event.target) {
+        const cabinElement = event.target.closest('.cabin-option');
+        if (cabinElement) {
+          cabinElement.classList.add('selected');
+        }
+      }
       
       selectedCabin = { type, price };
       updateBookingTotal();
+      
+      console.log('BOOKING: Selected cabin:', selectedCabin);
     }
 
     // Update booking total

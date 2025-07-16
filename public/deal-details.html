@@ -87,14 +87,22 @@
     }
     
     /* Prevent content flash before JavaScript loads */
-    #deal-content {
+    body {
       visibility: hidden;
+    }
+    
+    body.loaded {
+      visibility: visible;
+    }
+    
+    #deal-content {
+      display: none;
       opacity: 0;
       transition: opacity 0.3s ease-in-out;
     }
     
     #deal-content.loaded {
-      visibility: visible;
+      display: block;
       opacity: 1;
     }
     
@@ -1063,6 +1071,9 @@
     // Main initialization function
     async function initializePage() {
       try {
+        // Show body immediately to prevent flash
+        document.body.classList.add('loaded');
+        
         // Ensure loading state is shown and content is hidden
         document.getElementById('loading-state').style.display = 'block';
         document.getElementById('error-state').style.display = 'none';
@@ -1077,9 +1088,6 @@
         }
 
         console.log('DEAL_DETAILS: Loading deal with ID:', dealId);
-        
-        // Add a small delay to ensure smooth loading
-        await new Promise(resolve => setTimeout(resolve, 100));
         
         // Find the deal
         const deal = await findDealById(dealId);

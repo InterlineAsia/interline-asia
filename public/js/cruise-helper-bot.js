@@ -553,13 +553,34 @@ class CruiseHelperBot {
     let relevantDeals = this.cruiseData;
     
     // Filter by cruise line if mentioned
-    const cruiseLines = ['royal caribbean', 'norwegian', 'celebrity', 'princess', 'holland america', 'msc', 'carnival'];
+    const cruiseLines = [
+      'royal caribbean', 'norwegian', 'celebrity', 'princess', 'holland america', 
+      'msc', 'carnival', 'regent', 'regent seven seas', 'oceania', 'crystal', 
+      'seabourn', 'silversea', 'azamara', 'cunard', 'viking', 'amawaterways', 
+      'scenic', 'emerald', 'avalon'
+    ];
     const mentionedLine = cruiseLines.find(line => messageLower.includes(line));
     
     if (mentionedLine) {
       relevantDeals = this.cruiseData.filter(deal => 
         deal.cruiseLine.toLowerCase().includes(mentionedLine)
       );
+    }
+    
+    // Filter by date range if mentioned
+    const dateRange = this.extractDateRange(message);
+    if (dateRange.startDate || dateRange.endDate) {
+      relevantDeals = relevantDeals.filter(deal => {
+        if (!deal.departureDate) return false;
+        
+        const dealDate = this.parseDate(deal.departureDate);
+        if (!dealDate) return false;
+        
+        if (dateRange.startDate && dealDate < dateRange.startDate) return false;
+        if (dateRange.endDate && dealDate > dateRange.endDate) return false;
+        
+        return true;
+      });
     }
     
     // Filter by cruise type if mentioned
@@ -577,7 +598,7 @@ class CruiseHelperBot {
     let response = `🚢 Here are some cruise options I found:\n\n`;
     
     sampleDeals.forEach((deal, index) => {
-      const bestPrice = Math.min(...[deal.insidePrice, deal.oceanviewPrice, deal.balconyPrice, deal.suitePrice].filter(p => p > 0));
+      const bestPrice = this.getBestPrice(deal);
       response += `**${index + 1}. ${deal.shipName}** (${deal.cruiseLine})\n`;
       response += `📍 ${deal.region} • ${deal.nights} nights\n`;
       response += `💰 From $${bestPrice.toLocaleString()} AUD per person\n`;
@@ -817,6 +838,113 @@ What would you like to know about our cruise deals?`;
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  }
+
+  extractDateRange(message) {
+    const messageLower = message.toLowerCase();
+    let startDate = null;
+    let endDate = null;
+    
+    // Look for date patterns like "1st of December 2025", "December 1, 2025", "Dec 2025"
+    const monthNames = {
+      'january': 0, 'jan': 0, 'february': 1, 'feb': 1, 'march': 2, 'mar': 2,
+      'april': 3, 'apr': 3, 'may': 4, 'june': 5, 'jun': 5,
+      'july': 6, 'jul': 6, 'august': 7, 'aug': 7, 'september': 8, 'sep': 8,
+      'october': 9, 'oct': 9, 'november': 10, 'nov': 10, 'december': 11, 'dec': 11
+    };
+    
+    // Pattern for "1st of December 2025" or "December 1, 2025"
+    const datePattern = /(\d{1,2})(?:st|nd|rd|th)?\s+(?:of\s+)?(\w+)\s+(\d{4})|(\w+)\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})/gi;
+    const matches = [...messageLower.matchAll(datePattern)];
+    
+    if (matches.length >= 1) {
+      const match = matches[0];
+      if (match[1] && match[2] && match[3]) {
+        // Format: "1st of December 2025"
+        const day = parseInt(match[1]);
+        const monthName = match[2].toLowerCase();
+        const year = parseInt(match[3]);
+        const month = monthNames[monthName];
+        if (month !== undefined) {
+          startDate = new Date(year, month, day);
+        }
+      } else if (match[4] && match[5] && match[6]) {
+        // Format: "December 1, 2025"
+        const monthName = match[4].toLowerCase();
+        const day = parseInt(match[5]);
+        const year = parseInt(match[6]);
+        const month = monthNames[monthName];
+        if (month !== undefined) {
+          startDate = new Date(year, month, day);
+        }
+      }
+    }
+    
+    if (matches.length >= 2) {
+      const match = matches[1];
+      if (match[1] && match[2] && match[3]) {
+        // Format: "31st of January 2026"
+        const day = parseInt(match[1]);
+        const monthName = match[2].toLowerCase();
+        const year = parseInt(match[3]);
+        const month = monthNames[monthName];
+        if (month !== undefined) {
+          endDate = new Date(year, month, day);
+        }
+      } else if (match[4] && match[5] && match[6]) {
+        // Format: "January 31, 2026"
+        const monthName = match[4].toLowerCase();
+        const day = parseInt(match[5]);
+        const year = parseInt(match[6]);
+        const month = monthNames[monthName];
+        if (month !== undefined) {
+          endDate = new Date(year, month, day);
+        }
+      }
+    }
+    
+    return { startDate, endDate };
+  }
+
+  parseDate(dateStr) {
+    if (!dateStr) return null;
+    
+    // Handle various date formats
+    if (dateStr.includes('-') && dateStr.length <= 9) {
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+        const day = parseInt(parts[0]);
+        const month = parts[1];
+        const year = parts[2].length === 2 ? parseInt('20' + parts[2]) : parseInt(parts[2]);
+        const monthMap = {
+          'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+          'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+        };
+        const monthNum = monthMap[month];
+        if (!isNaN(day) && monthNum !== undefined && !isNaN(year)) {
+          return new Date(year, monthNum, day);
+        }
+      }
+    }
+    
+    const date = new Date(dateStr);
+    return isNaN(date.getTime()) ? null : date;
+  }
+
+  formatDate(dateStr) {
+    const date = this.parseDate(dateStr);
+    if (!date) return dateStr;
+    
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  }
+
+  getBestPrice(deal) {
+    const prices = [deal.insidePrice, deal.oceanviewPrice, deal.balconyPrice, deal.suitePrice].filter(p => p > 0);
+    return prices.length > 0 ? Math.min(...prices) : 0;
   }
 }
 

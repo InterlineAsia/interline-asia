@@ -16,7 +16,15 @@
     .summary { background: rgba(255,255,255,0.1); padding: 1rem 2rem; border-radius: 12px; display: inline-block; }
     
     .filters { background: white; padding: 2rem; margin: -2rem 2rem 2rem; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); max-width: 1200px; margin-left: auto; margin-right: auto; }
-    .filters-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; grid-template-rows: auto auto; gap: 1rem; }
+    .filters-grid { 
+      display: grid; 
+      grid-template-columns: 2fr 1fr 1fr 1fr; 
+      grid-template-rows: auto auto; 
+      gap: 1rem;
+      width: 100%;
+      max-width: 100%;
+      overflow: hidden;
+    }
     .filter-group { display: flex; flex-direction: column; }
     .filter-group label { 
       font-weight: 600; 
@@ -195,14 +203,28 @@
           <i class="ri-calendar-line"></i>
           From Date
         </label>
-        <input type="date" id="date-from-filter" class="filter-input" aria-label="Filter from date">
+        <input type="date" id="date-from-filter" class="filter-input date-picker" 
+               aria-label="Filter from date" 
+               min="2025-01-01" 
+               max="2026-12-31"
+               placeholder="Select start date">
       </div>
       <div class="filter-group">
         <label for="date-to-filter">
           <i class="ri-calendar-check-line"></i>
           To Date
         </label>
-        <input type="date" id="date-to-filter" class="filter-input" aria-label="Filter to date">
+        <input type="date" id="date-to-filter" class="filter-input date-picker" 
+               aria-label="Filter to date"
+               min="2025-01-01" 
+               max="2026-12-31"
+               placeholder="Select end date">
+      </div>
+      <div class="filter-group" style="grid-column: span 1; display: flex; align-items: end;">
+        <button id="clear-filters-btn" class="btn-clear-filters" onclick="clearAllFilters()">
+          <i class="ri-refresh-line"></i>
+          Clear Filters
+        </button>
       </div>
     </div>
   </div>
@@ -318,7 +340,10 @@
       const headers = parseCSVLine(lines[0]);
       const deals = [];
 
-      for (let i = 1; i < lines.length; i++) { // Load ALL deals from CSV
+      // Limit to first 500 deals for performance (like other travel sites)
+      const maxDeals = Math.min(lines.length - 1, 500);
+      
+      for (let i = 1; i <= maxDeals; i++) {
         const values = parseCSVLine(lines[i]);
         if (values.length >= 10) {
           const deal = createDeal(headers, values, cruiseType);
@@ -327,6 +352,8 @@
           }
         }
       }
+      
+      console.log(`CSV_LOADER: Limited to ${deals.length} deals for optimal performance`);
       return deals;
     }
 
@@ -402,19 +429,23 @@
       if (dateStr.includes('-') && dateStr.length <= 9) {
         const parts = dateStr.split('-');
         if (parts.length === 3) {
-          const day = parts[0];
+          const day = parseInt(parts[0]);
           const month = parts[1];
-          const year = parts[2].length === 2 ? '20' + parts[2] : parts[2];
+          const year = parts[2].length === 2 ? parseInt('20' + parts[2]) : parseInt(parts[2]);
           const monthMap = {
-            'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
-            'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
-            'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
+            'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+            'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
           };
-          const monthNum = monthMap[month] || month;
-          return `${year}-${monthNum.padStart(2, '0')}-${day.padStart(2, '0')}`;
+          const monthNum = monthMap[month];
+          if (!isNaN(day) && monthNum !== undefined && !isNaN(year)) {
+            return new Date(year, monthNum, day);
+          }
         }
       }
-      return null;
+      
+      // Try standard date parsing
+      const date = new Date(dateStr);
+      return isNaN(date.getTime()) ? null : date;
     }
 
     function parsePrice(priceStr) {
@@ -605,8 +636,10 @@
       const cruiseType = document.getElementById('cruise-type-filter')?.value || '';
       const ship = document.getElementById('ship-filter')?.value || '';
       const destination = document.getElementById('destination-filter')?.value || '';
-      const fromDate = document.getElementById('date-from-filter')?.value ? new Date(document.getElementById('date-from-filter').value) : null;
-      const toDate = document.getElementById('date-to-filter')?.value ? new Date(document.getElementById('date-to-filter').value) : null;
+      const fromDateStr = document.getElementById('date-from-filter')?.value || '';
+      const toDateStr = document.getElementById('date-to-filter')?.value || '';
+
+      console.log('DEALS: Applying filters...', { fromDateStr, toDateStr });
 
       filteredDeals = allDeals.filter(deal => {
         // Search filter
@@ -628,15 +661,33 @@
         // Destination filter
         if (destination && deal.region !== destination) return false;
         
-        // Date filters
-        if (deal.departureDate) {
-          if (fromDate && deal.departureDate < fromDate) return false;
-          if (toDate && deal.departureDate > toDate) return false;
+        // Enhanced Date filters - fix the date comparison
+        if (fromDateStr || toDateStr) {
+          const dealDate = deal.departureDate;
+          if (!dealDate) return false; // Skip deals without dates when filtering by date
+          
+          if (fromDateStr) {
+            const fromDate = new Date(fromDateStr);
+            if (dealDate < fromDate) {
+              console.log('DEALS: Filtering out deal - too early:', deal.shipName, dealDate, '<', fromDate);
+              return false;
+            }
+          }
+          
+          if (toDateStr) {
+            const toDate = new Date(toDateStr);
+            toDate.setHours(23, 59, 59, 999); // Include the entire end date
+            if (dealDate > toDate) {
+              console.log('DEALS: Filtering out deal - too late:', deal.shipName, dealDate, '>', toDate);
+              return false;
+            }
+          }
         }
         
         return true;
       });
 
+      console.log('DEALS: Filtered from', allDeals.length, 'to', filteredDeals.length, 'deals');
       renderDeals(filteredDeals);
     }
 

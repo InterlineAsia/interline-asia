@@ -738,13 +738,48 @@
       const mapSection = document.getElementById('map-section');
       const routeMapImg = document.getElementById('route-map');
       
-      if (deal.mapImage || deal.shipMap || (deal.metadata && deal.metadata.Shipmap)) {
-        const mapPath = deal.mapImage || deal.shipMap || deal.metadata.Shipmap;
-        if (mapPath && !mapPath.startsWith('http')) { // Security: only local images
-          routeMapImg.src = `/maps/${mapPath}`;
-          routeMapImg.alt = `Route map for ${deal.shipName}`;
-          mapSection.style.display = 'block';
-          console.log('DEAL_DETAILS: Displaying route map:', mapPath);
+      // Check for map in various possible fields
+      const mapPath = deal.mapImage || deal.shipMap || deal.Shipmap || 
+                     (deal.metadata && deal.metadata.Shipmap) || 
+                     (deal.metadata && deal.metadata['Ship Map']);
+      
+      if (mapPath && mapPath.trim()) {
+        // Try multiple possible map locations
+        const mapSources = [
+          `/cruise-logos/${mapPath}`,
+          `/logos/maps/${mapPath}`,
+          `/public/cruise-logos/${mapPath}`,
+          mapPath.startsWith('/') ? mapPath : `/${mapPath}`
+        ];
+        
+        // Test each source and use the first one that works
+        let mapFound = false;
+        for (const src of mapSources) {
+          if (!src.startsWith('http')) { // Security: only local images
+            const testImg = new Image();
+            testImg.onload = function() {
+              if (!mapFound) {
+                routeMapImg.src = src;
+                routeMapImg.alt = `Route map for ${deal.shipName}`;
+                mapSection.style.display = 'block';
+                mapFound = true;
+                console.log('DEAL_DETAILS: Displaying route map from:', src);
+              }
+            };
+            testImg.src = src;
+          }
+        }
+        
+        // Fallback: show map section with placeholder if we have a map reference
+        if (!mapFound) {
+          setTimeout(() => {
+            if (!mapFound) {
+              routeMapImg.src = '/logos/cruiselines/placeholder.png';
+              routeMapImg.alt = `Map not available for ${deal.shipName}`;
+              mapSection.style.display = 'block';
+              console.log('DEAL_DETAILS: Map referenced but not found:', mapPath);
+            }
+          }, 1000);
         }
       }
 

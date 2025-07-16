@@ -1034,7 +1034,10 @@
     function restoreFiltersAndReturn() {
       // This function will be called when user clicks "Back to Search Results"
       window.location.href = '/deals.html';
-    }onyPrice, deal.suitePrice].filter(p => p > 0);
+    }
+
+    function getBestPrice(deal) {
+      const prices = [deal.insidePrice, deal.oceanviewPrice, deal.balconyPrice, deal.suitePrice].filter(p => p > 0);
       return prices.length > 0 ? Math.min(...prices) : 0;
     }
 

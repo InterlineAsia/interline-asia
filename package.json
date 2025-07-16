@@ -5,7 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "setup-triggers": "tsx scripts/setup-db-triggers.ts",
-    "setup-triggers-node": "node --loader ts-node/esm scripts/setup-db-triggers.ts"
+    "setup-triggers-node": "node --loader ts-node/esm scripts/setup-db-triggers.ts",
+    "check-webhook": "tsx scripts/check-webhook.ts",
+    "check-webhook-sh": "./scripts/check-webhook.sh",
+    "create-webhook": "./scripts/create-webhook.sh"
   },
   "dependencies": {
     "@sentry/nextjs": "^9.36.0",

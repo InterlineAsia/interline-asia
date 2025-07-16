@@ -86,7 +86,11 @@ class EnhancedCSVLoader {
         const headers = this._parseCSVLine(lines[0]);
         const deals = [];
 
-        for (let i = 1; i < lines.length; i++) {
+        // Limit to 15 deals per CSV for optimal performance (30 total)
+        const maxDeals = Math.min(lines.length - 1, 15);
+        console.log(`CSV_LOADER: Limiting ${cruiseType} to max ${maxDeals} deals out of ${lines.length-1} total`);
+
+        for (let i = 1; i <= maxDeals; i++) {
             try {
                 const values = this._parseCSVLine(lines[i]);
                 if (values.length >= Math.min(headers.length, 5)) { // Minimum viable columns

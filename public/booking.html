@@ -292,32 +292,62 @@
       <div id="success-message" class="success-message"></div>
 
       <form id="booking-form">
-        <!-- Personal Information -->
+        <!-- Guest Details (2 Guests) -->
         <div class="form-section">
-          <h4>👤 Personal Information</h4>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="firstName">First Name *</label>
-              <input type="text" id="firstName" name="firstName" required>
+          <h4>👤 Guest Details (2 Guests Required)</h4>
+          
+          <!-- Guest 1 Details -->
+          <div class="guest-section">
+            <h5 style="color: #1e40af; margin-bottom: 1rem; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span>🧑</span> Guest 1 (Primary Booker)
+            </h5>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="firstName1">First Name *</label>
+                <input type="text" id="firstName1" name="firstName1" required>
+              </div>
+              <div class="form-group">
+                <label for="lastName1">Last Name *</label>
+                <input type="text" id="lastName1" name="lastName1" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="dateOfBirth1">Date of Birth *</label>
+                <input type="date" id="dateOfBirth1" name="dateOfBirth1" required>
+              </div>
+              <div class="form-group">
+                <label for="phone1">Phone Number *</label>
+                <input type="tel" id="phone1" name="phone1" required>
+              </div>
             </div>
             <div class="form-group">
-              <label for="lastName">Last Name *</label>
-              <input type="text" id="lastName" name="lastName" required>
+              <label for="email1">Email Address *</label>
+              <input type="email" id="email1" name="email1" required>
             </div>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="dateOfBirth">Date of Birth *</label>
-              <input type="date" id="dateOfBirth" name="dateOfBirth" required>
+
+          <!-- Guest 2 Details -->
+          <div class="guest-section" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0;">
+            <h5 style="color: #1e40af; margin-bottom: 1rem; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span>👥</span> Guest 2
+            </h5>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="firstName2">First Name *</label>
+                <input type="text" id="firstName2" name="firstName2" required>
+              </div>
+              <div class="form-group">
+                <label for="lastName2">Last Name *</label>
+                <input type="text" id="lastName2" name="lastName2" required>
+              </div>
             </div>
-            <div class="form-group">
-              <label for="phone">Phone Number *</label>
-              <input type="tel" id="phone" name="phone" required>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="dateOfBirth2">Date of Birth *</label>
+                <input type="date" id="dateOfBirth2" name="dateOfBirth2" required>
+              </div>
             </div>
-          </div>
-          <div class="form-group">
-            <label for="email">Email Address *</label>
-            <input type="email" id="email" name="email" required>
           </div>
         </div>
 
@@ -381,12 +411,7 @@
           </div>
           <div class="total-row">
             <span class="total-label">Number of Guests:</span>
-            <select id="guest-count" style="padding: 0.25rem; border-radius: 4px;">
-              <option value="1">1 Guest</option>
-              <option value="2" selected>2 Guests</option>
-              <option value="3">3 Guests</option>
-              <option value="4">4 Guests</option>
-            </select>
+            <span style="font-weight: 600; color: #166534;">2 Guests (Fixed)</span>
           </div>
           <hr style="margin: 1rem 0; border: 1px solid #22c55e;">
           <div class="total-row">

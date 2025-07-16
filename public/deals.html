@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cruise Deals - Interline Asia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+
+  <!-- Site-wide styles for header/footer consistency -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap');
+
+    /* Header Styles */
+    header {
+      width: 100%;
+      height: 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 40px;
+      background: linear-gradient(to right, rgba(12, 30, 54, 0.95), rgba(8, 21, 43, 0.95));
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .logo {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .logo h1 {
+      color: #fff;
+      font-size: 24px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      margin: 0;
+    }
+
+    .logo span {
+      color: #ccc;
+      font-size: 12px;
+      font-style: italic;
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    nav ul li {
+      margin-left: 30px;
+    }
+
+    nav ul li a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    nav ul li a:hover {
+      color: #FF7F41;
+    }
+
+    .contact-btn {
+      background-color: #FF7F41;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 4px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+
+    .contact-btn:hover {
+      background-color: #e66a2e;
+    }
+
+    /* Page-specific styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+      color: white;
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .summary {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      display: inline-block;
+    }
+
+    .filters {
+      background: white;
+      padding: 2rem;
+      margin: -2rem 2rem 2rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .filter-group label {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #374151;
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .filter-input,
+    .filter-select {
+      padding: 0.75rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s ease;
+      background: white;
+    }
+
+    .filter-input:focus,
+    .filter-select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .filter-select {
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+      background-position: right 0.5rem center;
+      background-repeat: no-repeat;
+      background-size: 1.5em 1.5em;
+      padding-right: 2.5rem;
+      appearance: none;
+    }
+
+    .clear-filters-row {
+      display: flex;
+      justify-content: center;
+    }
+
+    .btn-clear-filters {
+      padding: 0.75rem 2rem;
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-clear-filters:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    }
+
+    .main-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 4rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid #e5e7eb;
+      border-top: 4px solid #3b82f6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .loading-text {
+      font-size: 1.125rem;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .deals-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 1.5rem;
+      padding: 0 1rem;
+      justify-items: center;
+      align-items: start;
+    }
+
+    .deal-card {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 100%;
+      max-width: 380px;
+      height: auto;
+      min-height: 500px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .deal-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .deal-header {
+      padding: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .cruise-logo {
+      height: 40px;
+      width: auto;
+      max-width: 120px;
+      object-fit: contain;
+    }
+
+    .cruise-type-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .cruise-type-badge.river-cruise {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .cruise-type-badge.ocean-cruise {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .cruise-type-badge.expedition-cruise {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .deal-content {
+      padding: 1.5rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ship-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 0.25rem;
+    }
+
+    .cruise-line {
+      color: #64748b;
+      font-weight: 500;
+      margin-bottom: 1rem;
+    }
+
+    .deal-details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .detail-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: #64748b;
+    }
+
+    .detail-item i {
+      color: #3b82f6;
+      width: 16px;
+    }
+
+    .itinerary {
+      font-size: 0.875rem;
+      color: #64748b;
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+
+    .pricing {
+      margin-bottom: 1rem;
+    }
+
+    .price {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #059669;
+    }
+
+    .deal-actions {
+      padding: 0 1.5rem 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+
+    .btn-action {
+      padding: 0.75rem 1rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.875rem;
+    }
+
+    .btn-view-details {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      color: white;
+    }
+
+    .btn-book-now {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      color: white;
+    }
+
+    .btn-action:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    @media (max-width: 1024px) {
+      .filters-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* Enhanced Mobile Optimization */
+    /* Pagination Styles */
+    .pagination-controls {
+      margin-top: 3rem;
+      padding: 2rem;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .pagination-info {
+      color: #64748b;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .pagination-buttons {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .pagination-btn {
+      padding: 0.75rem 1.5rem;
+      border: 2px solid #e5e7eb;
+      background: white;
+      color: #374151;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .pagination-btn:hover:not(:disabled) {
+      border-color: #3b82f6;
+      color: #3b82f6;
+      transform: translateY(-1px);
+    }
+
+    .pagination-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .page-numbers {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .page-number {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #e5e7eb;
+      background: white;
+      color: #374151;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 500;
+      min-width: 40px;
+      text-align: center;
+    }
+
+    .page-number:hover {
+      border-color: #3b82f6;
+      color: #3b82f6;
+    }
+
+    .page-number.active {
+      background: #3b82f6;
+      color: white;
+      border-color: #3b82f6;
+    }
+
+    @media (max-width: 768px) {
+      .pagination-controls {
+        margin-top: 2rem;
+        padding: 1.5rem;
+      }
+
+      .pagination-buttons {
+        flex-direction: column;
+        gap: 1rem;
+        width: 100%;
+      }
+
+      .pagination-btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .page-numbers {
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      header {
+        padding: 0 20px;
+        flex-direction: column;
+        height: auto;
+        padding: 15px 20px;
+      }
+
+      nav ul {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+      }
+
+      nav ul li {
+        margin: 0;
+      }
+
+      .hero {
+        padding: 2rem 1rem;
+      }
+
+      .hero h1 {
+        font-size: 2rem;
+      }
+
+      .filters {
+        margin: -1rem 1rem 1rem;
+        padding: 1.5rem;
+      }
+
+      .filters-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .filter-input,
+      .filter-select {
+        padding: 1rem;
+        font-size: 1rem;
+        min-height: 48px;
+        border-radius: 12px;
+      }
+
+      .btn-clear-filters {
+        padding: 1rem 2rem;
+        font-size: 1rem;
+        min-height: 48px;
+        width: 100%;
+        border-radius: 12px;
+      }
+
+      .main-content {
+        padding: 1rem;
+      }
+
+      .deals-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 0;
+      }
+
+      .deal-card {
+        max-width: 100%;
+        margin: 0 auto;
+      }
+
+      .deal-actions {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+
+      .btn-action {
+        padding: 1rem;
+        font-size: 1rem;
+        min-height: 48px;
+        width: 100%;
+        border-radius: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <h1>INTERLINE ASIA</h1>
+      <span>Luxury Cruises. Verified Access. Exceptional Value for Travel Professionals.</span>
+    </div>
+    <nav>
+      <ul id="main-nav">
+        <li><a href="/">Home</a></li>
+        <li><a href="/#about">About Us</a></li>
+        <li><a href="/#partners">Partners</a></li>
+        <li><a href="/#faq">FAQ</a></li>
+        <li><a href="/terms-and-conditions">Terms & Conditions</a></li>
+        <li><a href="/privacy-policy">Privacy Policy</a></li>
+        <li id="auth-section">
+          <a href="/login">Login / Signup</a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="hero">
+    <h1>Exclusive Cruise Deals</h1>
+    <p>For Interline & Travel Industry Staff</p>
+    <div class="summary">
+      <span id="deals-summary">Loading deals...</span>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label for="search-input">
+          <i class="ri-search-line"></i>
+          Search
+        </label>
+        <input type="text" id="search-input" class="filter-input"
+          placeholder="Search cruise lines, ships, destinations...">
+      </div>
+      <div class="filter-group">
+        <label for="cruise-line-filter">
+          <i class="ri-ship-line"></i>
+          Cruise Line
+        </label>
+        <select id="cruise-line-filter" class="filter-select">
+          <option value="">All Cruise Lines</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="cruise-type-filter">
+          <i class="ri-compass-line"></i>
+          Cruise Type
+        </label>
+        <select id="cruise-type-filter" class="filter-select">
+          <option value="">All Types</option>
+          <option value="Ocean Cruise">Ocean Cruise</option>
+          <option value="River Cruise">River Cruise</option>
+          <option value="Expedition Cruise">Expedition Cruise</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="destination-filter">
+          <i class="ri-map-pin-line"></i>
+          Destination
+        </label>
+        <select id="destination-filter" class="filter-select">
+          <option value="">All Destinations</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="date-from-filter">
+          <i class="ri-calendar-line"></i>
+          From Date
+        </label>
+        <input type="date" id="date-from-filter" class="filter-input">
+      </div>
+      <div class="filter-group">
+        <label for="date-to-filter">
+          <i class="ri-calendar-check-line"></i>
+          To Date
+        </label>
+        <input type="date" id="date-to-filter" class="filter-input">
+      </div>
+      <div class="filter-group">
+        <label for="ship-filter">
+          <i class="ri-anchor-line"></i>
+          Ship
+        </label>
+        <select id="ship-filter" class="filter-select">
+          <option value="">All Ships</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="nights-filter">
+          <i class="ri-time-line"></i>
+          Duration
+        </label>
+        <select id="nights-filter" class="filter-select">
+          <option value="">All Durations</option>
+          <option value="7">7 nights</option>
+          <option value="10">10+ nights</option>
+          <option value="14">14+ nights</option>
+        </select>
+      </div>
+    </div>
+    <div class="clear-filters-row">
+      <button id="clear-filters-btn" class="btn-clear-filters" onclick="clearAllFilters()">
+        <i class="ri-refresh-line"></i>
+        Clear All Filters
+      </button>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div id="loading-state" class="loading">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Loading cruise deals...</div>
+    </div>
+    <div id="deals-container" class="deals-grid" style="display: none;"></div>
+    
+    <!-- Pagination Controls -->
+    <div id="pagination-controls" class="pagination-controls" style="display: none;">
+      <div class="pagination-info">
+        <span id="pagination-info-text">Showing 1-30 of 38 deals</span>
+      </div>
+      <div class="pagination-buttons">
+        <button id="prev-page" class="pagination-btn" onclick="goToPage(currentPage - 1)">
+          <i class="ri-arrow-left-line"></i> Previous
+        </button>
+        <div class="page-numbers" id="page-numbers"></div>
+        <button id="next-page" class="pagination-btn" onclick="goToPage(currentPage + 1)">
+          Next <i class="ri-arrow-right-line"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Social Media Section -->
+  <section style="background-color: #fff; padding: 60px 40px; text-align: center; border-top: 1px solid #e0e0e0;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <h3 style="color: #0C1E36; margin-bottom: 30px; font-size: 28px; font-weight: bold;">Connect With Us</h3>
+      <p style="color: #666; margin-bottom: 30px; font-size: 16px;">Stay updated with the latest cruise deals and travel
+        industry news</p>
+      <div style="display: flex; justify-content: center; gap: 25px; flex-wrap: wrap;">
+        <a href="#"
+          style="background: #1877f2; padding: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; transition: transform 0.3s ease, box-shadow 0.3s ease;"
+          onmouseover="this.style.transform='scale(1.15)'; this.style.boxShadow='0 8px 25px rgba(24, 119, 242, 0.3)'"
+          onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+          <i class="ri-facebook-fill" style="color: white; font-size: 28px;"></i>
+        </a>
+        <a href="#"
+          style="background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); padding: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; transition: transform 0.3s ease, box-shadow 0.3s ease;"
+          onmouseover="this.style.transform='scale(1.15)'; this.style.boxShadow='0 8px 25px rgba(225, 48, 108, 0.3)'"
+          onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+          <i class="ri-instagram-line" style="color: white; font-size: 28px;"></i>
+        </a>
+        <a href="#"
+          style="background: #000000; padding: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; transition: transform 0.3s ease, box-shadow 0.3s ease;"
+          onmouseover="this.style.transform='scale(1.15)'; this.style.boxShadow='0 8px 25px rgba(0, 0, 0, 0.3)'"
+          onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+          <i class="ri-twitter-x-line" style="color: white; font-size: 28px;"></i>
+        </a>
+        <a href="#"
+          style="background: #0077b5; padding: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; transition: transform 0.3s ease, box-shadow 0.3s ease;"
+          onmouseover="this.style.transform='scale(1.15)'; this.style.boxShadow='0 8px 25px rgba(0, 119, 181, 0.3)'"
+          onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+          <i class="ri-linkedin-fill" style="color: white; font-size: 28px;"></i>
+        </a>
+        <a href="#"
+          style="background: #ff0000; padding: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; transition: transform 0.3s ease, box-shadow 0.3s ease;"
+          onmouseover="this.style.transform='scale(1.15)'; this.style.boxShadow='0 8px 25px rgba(255, 0, 0, 0.3)'"
+          onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+          <i class="ri-youtube-fill" style="color: white; font-size: 28px;"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="background-color: #08152B; padding: 40px 20px 30px; color: #fff;">
+    <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
+      <div style="margin-bottom: 25px;">
+        <div
+          style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 20px; font-size: 14px;">
+          <a href="/"
+            style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;"
+            onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'"
+            onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">Home</a>
+          <a href="/#about"
+            style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;"
+            onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'"
+            onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">About Us</a>
+          <a href="/#partners"
+            style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;"
+            onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'"
+            onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">Partners</a>
+          <a href="/#faq"
+            style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;"
+            onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'"
+            onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">FAQ</a>
+          <a href="/terms-and-conditions"
+            style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;"
+            onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'"
+            onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">Terms & Conditions</a>
+          <a href="/privacy-policy"
+            style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;"
+            onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'"
+            onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">Privacy Policy</a>
+          <a href="signup.html"
+            style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;"
+            onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'"
+            onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">Login / Signup</a>
+        </div>
+      </div>
+      <div style="color: #999; font-size: 12px;">
+        <p style="margin: 0;">© 2025 Interline Asia. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    console.log('🚀 DEALS PAGE: Starting with STRICT 30-deal limit...');
+
+    let allDeals = [];
+    let filteredDeals = [];
+
+    // PAGINATION SETTINGS - Load all data, display with pagination
+    const DISPLAY_SETTINGS = {
+      CARDS_PER_PAGE: 30,
+      LOAD_ALL_DATA: true
+    };
+
+    let currentPage = 1;
+    let totalPages = 1;
+
+    async function loadAllDealsData() {
+      try {
+        console.log('📊 LOADING: Full dataset for proper filtering...');
+        allDeals = []; // Reset to ensure clean start
+
+        // Load ALL river cruise data
+        try {
+          const riverResponse = await fetch('/river.csv?v=' + Date.now()); // Cache bust
+          if (riverResponse.ok) {
+            const riverCSV = await riverResponse.text();
+            const riverDeals = parseCSVComplete(riverCSV, 'River Cruise');
+            console.log(`✅ RIVER: Loaded ${riverDeals.length} deals`);
+            allDeals = allDeals.concat(riverDeals);
+          }
+        } catch (error) {
+          console.warn('⚠️ River CSV failed:', error);
+        }
+
+        // Load ALL ocean cruise data
+        try {
+          const oceanResponse = await fetch('/twins.csv?v=' + Date.now()); // Cache bust
+          if (oceanResponse.ok) {
+            const oceanCSV = await oceanResponse.text();
+            const oceanDeals = parseCSVComplete(oceanCSV, 'Ocean Cruise');
+            console.log(`✅ OCEAN: Loaded ${oceanDeals.length} deals`);
+            allDeals = allDeals.concat(oceanDeals);
+          }
+        } catch (error) {
+          console.warn('⚠️ Ocean CSV failed:', error);
+        }
+
+        console.log(`🎯 TOTAL: Loaded ${allDeals.length} deals for filtering`);
+        console.log(`📄 DISPLAY: Will show ${DISPLAY_SETTINGS.CARDS_PER_PAGE} cards at a time`);
+
+        // Fallback to sample deals if nothing loaded
+        if (allDeals.length === 0) {
+          console.log('📝 FALLBACK: Using sample deals');
+          allDeals = getSampleDeals();
+        }
+
+      } catch (error) {
+        console.error('❌ ERROR: Loading deals failed:', error);
+        allDeals = getSampleDeals();
+      }
+    }
+
+    function parseCSVComplete(csvText, cruiseType) {
+      const lines = csvText.trim().split('\n');
+      if (lines.length < 2) {
+        console.warn(`⚠️ CSV empty for ${cruiseType}`);
+        return [];
+      }
+
+      console.log(`📊 CSV INFO: ${cruiseType} has ${lines.length - 1} total rows, loading ALL for filtering`);
+
+      const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+      const deals = [];
+
+      // Load ALL data for proper filtering
+      for (let i = 1; i < lines.length; i++) {
+        try {
+          const values = parseCSVLine(lines[i]);
+          const deal = createDeal(headers, values, cruiseType);
+          if (deal && deal.cruiseLine && deal.shipName) {
+            deals.push(deal);
+          }
+        } catch (error) {
+          console.warn(`⚠️ Skipping row ${i} in ${cruiseType}:`, error);
+        }
+      }
+
+      console.log(`✅ ${cruiseType}: Parsed ${deals.length} valid deals from ${lines.length - 1} rows`);
+      return deals;
+    }
+
+    function parseCSVLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          result.push(current.trim().replace(/"/g, ''));
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      result.push(current.trim().replace(/"/g, ''));
+      return result;
+    }
+
+    function createDeal(headers, values, cruiseType) {
+      const deal = {};
+      headers.forEach((header, index) => {
+        deal[header] = values[index] || '';
+      });
+
+      // Determine actual cruise type
+      let actualType = cruiseType;
+      const region = (deal.Region || '').toLowerCase();
+      const itinerary = (deal.Itinerary || '').toLowerCase();
+
+      if (region.includes('arctic') || region.includes('antarctic') ||
+        itinerary.includes('expedition') || itinerary.includes('polar')) {
+        actualType = 'Expedition Cruise';
+      }
+
+      const price = parsePrice(deal.Inside) || parsePrice(deal.Oceanview) || parsePrice(deal.Balcony) || 0;
+
+      return {
+        id: `${actualType.toLowerCase().replace(/\s+/g, '_')}_${Math.random().toString(36).substr(2, 9)}`,
+        cruiseType: actualType,
+        cruiseLine: deal['Cruise Line'] || '',
+        shipName: deal.Ship || '',
+        region: deal.Region || '',
+        nights: parseInt(deal.Nights || 0),
+        departureDate: parseDate(deal.Date),
+        departurePort: deal.From || '',
+        arrivalPort: deal.To || '',
+        itinerary: deal.Itinerary || '',
+        price: price,
+        // Include pricing details but NOT external URLs
+        insidePrice: deal.Inside || '',
+        oceanviewPrice: deal.Oceanview || '',
+        balconyPrice: deal.Balcony || '',
+        suitePrice: deal.Suite || ''
+      };
+    }
+
+    function parseDate(dateStr) {
+      if (!dateStr) return null;
+
+      if (dateStr.includes('-') && dateStr.length <= 9) {
+        const parts = dateStr.split('-');
+        if (parts.length === 3) {
+          const day = parseInt(parts[0]);
+          const month = parts[1];
+          const year = parts[2].length === 2 ? parseInt('20' + parts[2]) : parseInt(parts[2]);
+          const monthMap = {
+            'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+            'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+          };
+          const monthNum = monthMap[month];
+          if (!isNaN(day) && monthNum !== undefined && !isNaN(year)) {
+            return new Date(year, monthNum, day);
+          }
+        }
+      }
+
+      const date = new Date(dateStr);
+      return isNaN(date.getTime()) ? null : date;
+    }
+
+    function parsePrice(priceStr) {
+      if (!priceStr || priceStr.toLowerCase().includes('quote')) return 0;
+      const cleaned = priceStr.replace(/[$,]/g, '');
+      const price = parseFloat(cleaned);
+      return isNaN(price) ? 0 : price;
+    }
+
+    function getSampleDeals() {
+      return [
+        {
+          id: 'sample_1',
+          cruiseType: 'River Cruise',
+          cruiseLine: 'AmaWaterways',
+          shipName: 'AmaBella',
+          region: 'Europe',
+          nights: 7,
+          departureDate: new Date('2025-07-07'),
+          departurePort: 'Budapest, Hungary',
+          arrivalPort: 'Vilshofen, Germany',
+          itinerary: 'Melodies of the Danube - Experience the beauty of the Danube River through Hungary, Austria, and Germany',
+          price: 3440,
+          insidePrice: '$3,440',
+          oceanviewPrice: '$3,840',
+          balconyPrice: '$4,240',
+          suitePrice: '$5,640'
+        },
+        {
+          id: 'sample_2',
+          cruiseType: 'Ocean Cruise',
+          cruiseLine: 'Crystal',
+          shipName: 'Crystal Symphony',
+          region: 'Mediterranean',
+          nights: 8,
+          departureDate: new Date('2025-07-10'),
+          departurePort: 'Thessaloniki',
+          arrivalPort: 'Civitavecchia (Rome)',
+          itinerary: 'Greek Isles & Italy - Discover ancient civilizations and stunning coastlines',
+          price: 3340,
+          insidePrice: '$3,340',
+          oceanviewPrice: '$3,740',
+          balconyPrice: '$4,140',
+          suitePrice: '$5,540'
+        }
+      ];
+    }
+
+    function getCruiseLineLogo(cruiseLine) {
+      if (!cruiseLine) return 'placeholder.png';
+
+      const logoMap = {
+        'emerald cruises': 'emerald-cruises.png',
+        'emerald': 'emerald-cruises.png',
+        'p&o cruises': 'placeholder.png',
+        'po cruises': 'placeholder.png',
+        'p&o': 'placeholder.png',
+        'po': 'placeholder.png',
+        'scenic': 'scenic.png',
+        'scenic river cruises': 'scenic.png',
+        'amawaterways': 'amawaterways.png',
+        'ama waterways': 'amawaterways.png',
+        'royal caribbean': 'royal-caribbean.png',
+        'royal caribbean international': 'royal-caribbean.png',
+        'crystal': 'crystal.png',
+        'crystal cruises': 'crystal.png',
+        'holland america': 'holland-america.png',
+        'holland america line': 'holland-america.png',
+        'princess cruises': 'princess.png',
+        'princess': 'princess.png',
+        'norwegian cruise line': 'norwegian.png',
+        'norwegian': 'norwegian.png',
+        'msc cruises': 'msc.png',
+        'msc': 'msc.png',
+        'celebrity cruises': 'celebrity.png',
+        'celebrity': 'celebrity.png',
+        'regent seven seas cruises': 'regent.png',
+        'regent': 'regent.png',
+        'oceania cruises': 'oceania.png',
+        'oceania': 'oceania.png',
+        'azamara': 'azamara.png',
+        'cunard': 'cunard.png',
+        'seabourn': 'seabourn.png',
+        'silversea': 'silversea.png',
+        'atlas': 'atlas.png',
+        'hx hurtigruten expeditions': 'hx.png',
+        'hurtigruten expeditions': 'hx.png',
+        'coral expeditions': 'coral-expeditions.png',
+        'heritage expeditions': 'heritage-expeditions.png'
+      };
+
+      const normalizedName = cruiseLine.toLowerCase().trim();
+      return logoMap[normalizedName] || 'placeholder.png';
+    }
+
+    function renderDeals(deals) {
+      const container = document.getElementById('deals-container');
+      const summaryElement = document.getElementById('deals-summary');
+      const paginationControls = document.getElementById('pagination-controls');
+
+      // Show loading spinner during filtering
+      container.style.opacity = '0.6';
+      container.style.filter = 'blur(2px)';
+
+      setTimeout(() => {
+        // Calculate pagination
+        totalPages = Math.ceil(deals.length / DISPLAY_SETTINGS.CARDS_PER_PAGE);
+        const startIndex = (currentPage - 1) * DISPLAY_SETTINGS.CARDS_PER_PAGE;
+        const endIndex = startIndex + DISPLAY_SETTINGS.CARDS_PER_PAGE;
+        const displayDeals = deals.slice(startIndex, endIndex);
+        const totalCount = deals.length;
+
+        if (totalCount === 0) {
+          summaryElement.innerHTML = `<span style="color: #ef4444;">No cruises found for these filters</span> - Try different dates or destinations`;
+          container.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; color: #64748b;">
+              <i class="ri-ship-line" style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+              <h3 style="margin-bottom: 1rem; color: #374151;">No cruises found</h3>
+              <p style="margin-bottom: 2rem;">Try adjusting your filters or search terms</p>
+              <button onclick="clearAllFilters()" style="padding: 0.75rem 1.5rem; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                Clear All Filters
+              </button>
+            </div>
+          `;
+          paginationControls.style.display = 'none';
+        } else {
+          // Update summary with pagination info
+          const startItem = startIndex + 1;
+          const endItem = Math.min(endIndex, totalCount);
+          summaryElement.textContent = `Showing ${startItem}-${endItem} of ${totalCount} deals`;
+          
+          // Show/hide pagination controls
+          if (totalPages > 1) {
+            paginationControls.style.display = 'flex';
+            updatePaginationControls(totalCount, startItem, endItem);
+          } else {
+            paginationControls.style.display = 'none';
+          }
+
+          container.innerHTML = displayDeals.map(deal => `
+            <div class="deal-card">
+              <div class="deal-header">
+                <img src="/logos/cruiselines/${getCruiseLineLogo(deal.cruiseLine)}" 
+                     alt="${deal.cruiseLine}" 
+                     class="cruise-logo"
+                     onerror="this.src='/logos/cruiselines/placeholder.png'">
+                <div class="cruise-type-badge ${deal.cruiseType.toLowerCase().replace(/\s+/g, '-')}">${deal.cruiseType}</div>
+              </div>
+              
+              <div class="deal-content">
+                <h3 class="ship-name">${deal.shipName}</h3>
+                <p class="cruise-line">${deal.cruiseLine}</p>
+                
+                <div class="deal-details">
+                  <div class="detail-item">
+                    <i class="ri-map-pin-line"></i>
+                    <span>${deal.departurePort || deal.region}</span>
+                  </div>
+                  <div class="detail-item">
+                    <i class="ri-calendar-line"></i>
+                    <span>${formatDate(deal.departureDate)}</span>
+                  </div>
+                  <div class="detail-item">
+                    <i class="ri-time-line"></i>
+                    <span>${deal.nights} nights</span>
+                  </div>
+                  <div class="detail-item">
+                    <i class="ri-global-line"></i>
+                    <span>${deal.region}</span>
+                  </div>
+                </div>
+                
+                <div class="itinerary">${deal.itinerary}</div>
+                
+                <div class="pricing">
+                  ${getPricingDisplay(deal)}
+                </div>
+              </div>
+              
+              <div class="deal-actions">
+                <button class="btn-action btn-view-details" onclick="window.location.href='/deal-details.html?id=${deal.id}'">
+                  View Details
+                </button>
+                <button class="btn-action btn-book-now" onclick="window.location.href='/booking.html?deal=${encodeURIComponent(deal.id)}'">
+                  Book Now
+                </button>
+              </div>
+            </div>
+          `).join('');
+        }
+
+        // Remove loading effect
+        container.style.opacity = '1';
+        container.style.filter = 'none';
+      }, 300);
+    }
+
+    function updatePaginationControls(totalCount, startItem, endItem) {
+      const paginationInfo = document.getElementById('pagination-info-text');
+      const pageNumbers = document.getElementById('page-numbers');
+      const prevBtn = document.getElementById('prev-page');
+      const nextBtn = document.getElementById('next-page');
+
+      // Update info text
+      paginationInfo.textContent = `Showing ${startItem}-${endItem} of ${totalCount} deals`;
+
+      // Update button states
+      prevBtn.disabled = currentPage === 1;
+      nextBtn.disabled = currentPage === totalPages;
+
+      // Generate page numbers
+      pageNumbers.innerHTML = '';
+      const maxVisiblePages = 5;
+      let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+      // Adjust start page if we're near the end
+      if (endPage - startPage < maxVisiblePages - 1) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+      }
+
+      // Add first page and ellipsis if needed
+      if (startPage > 1) {
+        pageNumbers.appendChild(createPageButton(1));
+        if (startPage > 2) {
+          const ellipsis = document.createElement('span');
+          ellipsis.textContent = '...';
+          ellipsis.style.padding = '0.5rem';
+          ellipsis.style.color = '#64748b';
+          pageNumbers.appendChild(ellipsis);
+        }
+      }
+
+      // Add visible page numbers
+      for (let i = startPage; i <= endPage; i++) {
+        pageNumbers.appendChild(createPageButton(i));
+      }
+
+      // Add ellipsis and last page if needed
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          const ellipsis = document.createElement('span');
+          ellipsis.textContent = '...';
+          ellipsis.style.padding = '0.5rem';
+          ellipsis.style.color = '#64748b';
+          pageNumbers.appendChild(ellipsis);
+        }
+        pageNumbers.appendChild(createPageButton(totalPages));
+      }
+    }
+
+    function createPageButton(pageNum) {
+      const button = document.createElement('button');
+      button.className = `page-number ${pageNum === currentPage ? 'active' : ''}`;
+      button.textContent = pageNum;
+      button.onclick = () => goToPage(pageNum);
+      return button;
+    }
+
+    function goToPage(page) {
+      if (page < 1 || page > totalPages || page === currentPage) return;
+      
+      currentPage = page;
+      renderDeals(filteredDeals);
+      
+      // Scroll to top of deals section
+      document.getElementById('deals-container').scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      });
+    }
+
+    function getPricingDisplay(deal) {
+      const prices = [];
+      if (deal.insidePrice && !deal.insidePrice.toLowerCase().includes('quote')) {
+        prices.push('Interior: ' + deal.insidePrice);
+      }
+      if (deal.oceanviewPrice && !deal.oceanviewPrice.toLowerCase().includes('quote')) {
+        prices.push('Oceanview: ' + deal.oceanviewPrice);
+      }
+      if (deal.balconyPrice && !deal.balconyPrice.toLowerCase().includes('quote')) {
+        prices.push('Balcony: ' + deal.balconyPrice);
+      }
+      if (deal.suitePrice && !deal.suitePrice.toLowerCase().includes('quote')) {
+        prices.push('Suite: ' + deal.suitePrice);
+      }
+
+      if (prices.length > 0) {
+        return '<div class="price-breakdown" style="font-size: 0.875rem; color: #059669; font-weight: 600;">' +
+          prices.slice(0, 2).join(' • ') +
+          (prices.length > 2 ? '<br>' + prices.slice(2).join(' • ') : '') +
+          '</div>';
+      } else if (deal.price > 0) {
+        return '<span class="price">From $' + deal.price.toLocaleString() + ' per person</span>';
+      } else {
+        return '<span class="price">Quote Available</span>';
+      }
+    }
+
+    function formatDate(date) {
+      if (!date) return 'TBA';
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
+
+    function populateFilters() {
+      const cruiseLines = [...new Set(allDeals.map(d => d.cruiseLine))].filter(Boolean).sort();
+      document.getElementById('cruise-line-filter').innerHTML =
+        '<option value="">All Cruise Lines</option>' +
+        cruiseLines.map(line => `<option value="${line}">${line}</option>`).join('');
+
+      const ships = [...new Set(allDeals.map(d => d.shipName))].filter(Boolean).sort();
+      document.getElementById('ship-filter').innerHTML =
+        '<option value="">All Ships</option>' +
+        ships.map(ship => `<option value="${ship}">${ship}</option>`).join('');
+
+      const destinations = [...new Set(allDeals.map(d => d.region))].filter(Boolean).sort();
+      document.getElementById('destination-filter').innerHTML =
+        '<option value="">All Destinations</option>' +
+        destinations.map(dest => `<option value="${dest}">${dest}</option>`).join('');
+    }
+
+    function setupFilters() {
+      ['search-input', 'cruise-line-filter', 'cruise-type-filter', 'ship-filter', 'destination-filter', 'date-from-filter', 'date-to-filter', 'nights-filter'].forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.addEventListener(element.type === 'select-one' ? 'change' : 'input', applyFilters);
+        }
+      });
+    }
+
+    function applyFilters() {
+      const searchTerm = document.getElementById('search-input').value.toLowerCase();
+      const cruiseLine = document.getElementById('cruise-line-filter').value;
+      const cruiseType = document.getElementById('cruise-type-filter').value;
+      const ship = document.getElementById('ship-filter').value;
+      const destination = document.getElementById('destination-filter').value;
+      const fromDateStr = document.getElementById('date-from-filter').value;
+      const toDateStr = document.getElementById('date-to-filter').value;
+      const nightsFilter = document.getElementById('nights-filter').value;
+
+      filteredDeals = allDeals.filter(deal => {
+        if (searchTerm && !`${deal.cruiseLine} ${deal.shipName} ${deal.region} ${deal.itinerary}`.toLowerCase().includes(searchTerm)) return false;
+        if (cruiseLine && deal.cruiseLine !== cruiseLine) return false;
+        if (cruiseType && deal.cruiseType !== cruiseType) return false;
+        if (ship && deal.shipName !== ship) return false;
+        if (destination && deal.region !== destination) return false;
+
+        if (nightsFilter) {
+          const nights = parseInt(nightsFilter);
+          if (nights === 7 && deal.nights !== 7) return false;
+          if (nights === 10 && deal.nights < 10) return false;
+          if (nights === 14 && deal.nights < 14) return false;
+        }
+
+        // Enhanced date filtering
+        if (fromDateStr || toDateStr) {
+          const dealDate = deal.departureDate;
+          if (!dealDate) return true; // Include deals without dates
+
+          let comparableDate;
+          if (typeof dealDate === 'string') {
+            comparableDate = new Date(dealDate);
+          } else if (dealDate instanceof Date) {
+            comparableDate = dealDate;
+          } else {
+            return true; // Include if we can't parse the date
+          }
+
+          // Skip invalid dates
+          if (isNaN(comparableDate.getTime())) return true;
+
+          if (fromDateStr) {
+            const fromDate = new Date(fromDateStr);
+            fromDate.setHours(0, 0, 0, 0);
+            if (comparableDate < fromDate) {
+              return false;
+            }
+          }
+
+          if (toDateStr) {
+            const toDate = new Date(toDateStr);
+            toDate.setHours(23, 59, 59, 999);
+            if (comparableDate > toDate) {
+              return false;
+            }
+          }
+        }
+
+        return true;
+      });
+
+      renderDeals(filteredDeals);
+    }
+
+    function clearAllFilters() {
+      document.getElementById('search-input').value = '';
+      document.getElementById('cruise-line-filter').value = '';
+      document.getElementById('cruise-type-filter').value = '';
+      document.getElementById('ship-filter').value = '';
+      document.getElementById('destination-filter').value = '';
+      document.getElementById('date-from-filter').value = '';
+      document.getElementById('date-to-filter').value = '';
+      document.getElementById('nights-filter').value = '';
+
+      filteredDeals = allDeals;
+      renderDeals(filteredDeals);
+    }
+
+    // Initialize with FULL dataset for proper filtering
+    document.addEventListener('DOMContentLoaded', async () => {
+      console.log('🚀 INITIALIZING: Loading full dataset for proper filtering...');
+
+      await loadAllDealsData();
+      filteredDeals = allDeals;
+
+      populateFilters();
+      setupFilters();
+      renderDeals(filteredDeals);
+
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('deals-container').style.display = 'grid';
+
+      console.log(`✅ COMPLETE: Loaded ${allDeals.length} deals, showing first ${DISPLAY_SETTINGS.CARDS_PER_PAGE} cards`);
+    });
+
+    // Header authentication management
+    document.addEventListener('DOMContentLoaded', async function () {
+      setTimeout(async () => {
+        try {
+          if (window.supabaseClient) {
+            await window.supabaseClient.readyPromise;
+            updateHeaderAuth();
+          }
+        } catch (error) {
+          console.log('Header auth update skipped:', error.message);
+        }
+      }, 500);
+    });
+
+    function updateHeaderAuth() {
+      const authSection = document.getElementById('auth-section');
+      if (!authSection) return;
+
+      if (window.supabaseClient && window.supabaseClient.isLoggedIn()) {
+        const user = window.supabaseClient.currentUser;
+        const displayName = user?.full_name || user?.email?.split('@')[0] || 'User';
+        const isAdmin = user?.is_admin || user?.is_super_admin || user?.role === 'admin';
+
+        authSection.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+            <a href="/dashboard.html" style="color: #ccc; text-decoration: none; font-size: 14px; transition: color 0.3s;" onmouseover="this.style.color='#FF7F41'" onmouseout="this.style.color='#ccc'">
+              <i class="ri-dashboard-line" style="margin-right: 4px;"></i>Dashboard
+            </a>
+            ${isAdmin ? '<a href="/deals.html" style="color: #ccc; text-decoration: none; font-size: 14px; transition: color 0.3s;" onmouseover="this.style.color=\'#FF7F41\'" onmouseout="this.style.color=\'#ccc\'"><i class="ri-ship-line" style="margin-right: 4px;"></i>Deals</a>' : ''}
+            ${!isAdmin ? '<a href="/deals.html" style="color: #ccc; text-decoration: none; font-size: 14px; transition: color 0.3s;" onmouseover="this.style.color=\'#FF7F41\'" onmouseout="this.style.color=\'#ccc\'"><i class="ri-ship-line" style="margin-right: 4px;"></i>Browse Deals</a>' : ''}
+            ${isAdmin ? '<a href="/admin.html" style="color: #ccc; text-decoration: none; font-size: 14px; transition: color 0.3s;" onmouseover="this.style.color=\'#FF7F41\'" onmouseout="this.style.color=\'#ccc\'"><i class="ri-settings-line" style="margin-right: 4px;"></i>Admin</a>' : ''}
+            <span style="color: #FF7F41; font-size: 14px; font-weight: 500; display: flex; align-items: center;">
+              <i class="ri-user-line" style="margin-right: 4px;"></i>
+              ${displayName}${isAdmin ? ' (Admin)' : ' (Member)'}
+            </span>
+            <button onclick="handleSignOut()" style="background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center;" onmouseover="this.style.background='#c82333'; this.style.transform='scale(1.05)'" onmouseout="this.style.background='#dc3545'; this.style.transform='scale(1)'">
+              <i class="ri-logout-box-line" style="margin-right: 4px;"></i>Sign Out
+            </button>
+          </div>
+        `;
+      } else {
+        authSection.innerHTML = '<a href="/login">Login / Signup</a>';
+      }
+    }
+
+    function handleSignOut() {
+      if (window.supabaseClient) {
+        window.supabaseClient.signOut();
+      } else {
+        window.location.href = '/login';
+      }
+    }
+  </script>
+
+  <!-- CruiseHelper Bot -->
+  <script src="/js/cruise-helper-bot.js"></script>
+</body>
+
+</html>

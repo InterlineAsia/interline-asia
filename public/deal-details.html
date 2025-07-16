@@ -677,8 +677,11 @@
       if (deal.Balcony && deal.Balcony !== 'Quote Available' && deal.Balcony !== '') cabinTypes.push('Balcony');
       if (deal.Suite && deal.Suite !== 'Quote Available' && deal.Suite !== '') cabinTypes.push('Suite');
 
+      const generatedId = `${actualCruiseType.toLowerCase().replace(/\s+/g, '_')}_${deal.SEQ || Math.random().toString(36).substr(2, 9)}`;
+      console.log('DEAL_DETAILS: Generated ID:', generatedId, 'for SEQ:', deal.SEQ, 'Type:', actualCruiseType);
+      
       return {
-        id: `${actualCruiseType.toLowerCase().replace(/\s+/g, '_')}_${deal.SEQ || Math.random().toString(36).substr(2, 9)}`,
+        id: generatedId,
         cruiseType: actualCruiseType,
         cruiseLine: deal['Cruise Line'] || '',
         shipName: deal.Ship || '',
@@ -780,12 +783,8 @@
       return logoMap[cruiseLine.toLowerCase()] || 'placeholder.png';
     }
 
-    function displayDealWithMap(deal) {
-      displayDeal(deal);
-    }
-    
     function displayDeal(deal) {
-      displayDealWithMap(deal);
+      console.log('DEAL_DETAILS: Displaying deal:', deal.id, deal.shipName);
     }
 
     function displayDealWithMap(deal) {
@@ -1008,12 +1007,15 @@
         console.log('DEAL_DETAILS: Looking for ID:', dealId);
         
         // Try to find a deal with similar ID pattern
-        const similarDeal = allDeals.find(d => d.id.includes(dealId.split('_').pop()));
+        const seqNumber = dealId.split('_').pop();
+        const similarDeal = allDeals.find(d => d.id.includes(seqNumber));
         if (similarDeal) {
-          console.log('DEAL_DETAILS: Found similar deal:', similarDeal.id);
-          displayDealWithMap(similarDeal);
+          console.log('DEAL_DETAILS: Found similar deal:', similarDeal.id, 'for SEQ:', seqNumber);
+          displayDeal(similarDeal);
           showDeal();
         } else {
+          console.log('DEAL_DETAILS: No similar deal found for SEQ:', seqNumber);
+          console.log('DEAL_DETAILS: Available deal IDs:', allDeals.slice(0, 10).map(d => d.id));
           showSampleDeal();
         }
       }

@@ -13,3 +13,11 @@ export async function register() {
     });
   }
 }
+
+export async function onRequestError(err: unknown, request: Request, context: { routerKind: string; routePath: string }) {
+  // Only capture errors in production
+  if (process.env.NODE_ENV === 'production') {
+    const { captureRequestError } = await import('@sentry/nextjs');
+    captureRequestError(err, request, context);
+  }
+}

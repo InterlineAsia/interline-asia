@@ -326,51 +326,45 @@
     let allDeals = [];
     let filteredDeals = [];
 
-    // STRICT DEAL LIMITS - NEVER EXCEED 30 TOTAL
-    const DEAL_LIMITS = {
-      RIVER_MAX: 10,
-      OCEAN_MAX: 20,
-      TOTAL_MAX: 30
+    // PERFORMANCE SETTINGS - Load all data, display 30 cards
+    const DISPLAY_SETTINGS = {
+      CARDS_PER_PAGE: 30,
+      LOAD_ALL_DATA: true
     };
 
-    async function loadStrictLimitedDeals() {
+    async function loadAllDealsData() {
       try {
-        console.log('🔒 LOADING: Enforcing strict 30-deal limit...');
+        console.log('📊 LOADING: Full dataset for proper filtering...');
         allDeals = []; // Reset to ensure clean start
         
-        // Load river cruise data with STRICT limit
+        // Load ALL river cruise data
         try {
           const riverResponse = await fetch('/river.csv?v=' + Date.now()); // Cache bust
           if (riverResponse.ok) {
             const riverCSV = await riverResponse.text();
-            const riverDeals = parseCSVWithStrictLimit(riverCSV, 'River Cruise', DEAL_LIMITS.RIVER_MAX);
-            console.log(`✅ RIVER: Loaded exactly ${riverDeals.length} deals (max ${DEAL_LIMITS.RIVER_MAX})`);
+            const riverDeals = parseCSVComplete(riverCSV, 'River Cruise');
+            console.log(`✅ RIVER: Loaded ${riverDeals.length} deals`);
             allDeals = allDeals.concat(riverDeals);
           }
         } catch (error) {
           console.warn('⚠️ River CSV failed:', error);
         }
 
-        // Load ocean cruise data with STRICT limit
+        // Load ALL ocean cruise data
         try {
           const oceanResponse = await fetch('/twins.csv?v=' + Date.now()); // Cache bust
           if (oceanResponse.ok) {
             const oceanCSV = await oceanResponse.text();
-            const oceanDeals = parseCSVWithStrictLimit(oceanCSV, 'Ocean Cruise', DEAL_LIMITS.OCEAN_MAX);
-            console.log(`✅ OCEAN: Loaded exactly ${oceanDeals.length} deals (max ${DEAL_LIMITS.OCEAN_MAX})`);
+            const oceanDeals = parseCSVComplete(oceanCSV, 'Ocean Cruise');
+            console.log(`✅ OCEAN: Loaded ${oceanDeals.length} deals`);
             allDeals = allDeals.concat(oceanDeals);
           }
         } catch (error) {
           console.warn('⚠️ Ocean CSV failed:', error);
         }
 
-        // FINAL SAFETY CHECK - Never exceed 30 deals
-        if (allDeals.length > DEAL_LIMITS.TOTAL_MAX) {
-          console.warn(`🚨 SAFETY: Trimming ${allDeals.length} deals to ${DEAL_LIMITS.TOTAL_MAX}`);
-          allDeals = allDeals.slice(0, DEAL_LIMITS.TOTAL_MAX);
-        }
-
-        console.log(`🎯 FINAL: Loaded exactly ${allDeals.length} deals (STRICT LIMIT ENFORCED)`);
+        console.log(`🎯 TOTAL: Loaded ${allDeals.length} deals for filtering`);
+        console.log(`📄 DISPLAY: Will show ${DISPLAY_SETTINGS.CARDS_PER_PAGE} cards at a time`);
         
         // Fallback to sample deals if nothing loaded
         if (allDeals.length === 0) {
@@ -384,22 +378,20 @@
       }
     }
 
-    function parseCSVWithStrictLimit(csvText, cruiseType, maxDeals) {
+    function parseCSVComplete(csvText, cruiseType) {
       const lines = csvText.trim().split('\n');
       if (lines.length < 2) {
         console.warn(`⚠️ CSV empty for ${cruiseType}`);
         return [];
       }
 
-      console.log(`📊 CSV INFO: ${cruiseType} has ${lines.length - 1} total rows, limiting to ${maxDeals}`);
+      console.log(`📊 CSV INFO: ${cruiseType} has ${lines.length - 1} total rows, loading ALL for filtering`);
       
       const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
       const deals = [];
       
-      // STRICT LIMIT - Never exceed maxDeals
-      const strictLimit = Math.min(lines.length - 1, maxDeals);
-      
-      for (let i = 1; i <= strictLimit; i++) {
+      // Load ALL data for proper filtering
+      for (let i = 1; i < lines.length; i++) {
         try {
           const values = parseCSVLine(lines[i]);
           const deal = createDeal(headers, values, cruiseType);
@@ -411,7 +403,7 @@
         }
       }
       
-      console.log(`✅ ${cruiseType}: Parsed ${deals.length} valid deals from ${strictLimit} rows`);
+      console.log(`✅ ${cruiseType}: Parsed ${deals.length} valid deals from ${lines.length - 1} rows`);
       return deals;
     }
 
@@ -559,9 +551,17 @@
       const container = document.getElementById('deals-container');
       const summaryElement = document.getElementById('deals-summary');
       
-      summaryElement.textContent = `Showing ${deals.length} exclusive deals`;
+      // Show only first 30 cards, but indicate total available
+      const displayDeals = deals.slice(0, DISPLAY_SETTINGS.CARDS_PER_PAGE);
+      const totalCount = deals.length;
+      
+      if (totalCount > DISPLAY_SETTINGS.CARDS_PER_PAGE) {
+        summaryElement.textContent = `Showing ${DISPLAY_SETTINGS.CARDS_PER_PAGE} of ${totalCount} deals`;
+      } else {
+        summaryElement.textContent = `Showing ${totalCount} deals`;
+      }
 
-      container.innerHTML = deals.map(deal => `
+      container.innerHTML = displayDeals.map(deal => `
         <div class="deal-card">
           <div class="deal-header">
             <img src="/logos/cruiselines/${getCruiseLineLogo(deal.cruiseLine)}" 
@@ -674,19 +674,38 @@
           if (nights === 14 && deal.nights < 14) return false;
         }
         
+        // Enhanced date filtering - handle dd/mm/yyyy input and ISO dates
         if (fromDateStr || toDateStr) {
           const dealDate = deal.departureDate;
-          if (!dealDate) return true;
+          if (!dealDate) return true; // Include deals without dates
+          
+          // Convert deal date to comparable format
+          let comparableDate;
+          if (typeof dealDate === 'string') {
+            comparableDate = new Date(dealDate);
+          } else if (dealDate instanceof Date) {
+            comparableDate = dealDate;
+          } else {
+            return true; // Include if we can't parse the date
+          }
+          
+          // Skip invalid dates
+          if (isNaN(comparableDate.getTime())) return true;
           
           if (fromDateStr) {
             const fromDate = new Date(fromDateStr);
-            if (dealDate < fromDate) return false;
+            fromDate.setHours(0, 0, 0, 0); // Start of day
+            if (comparableDate < fromDate) {
+              return false;
+            }
           }
           
           if (toDateStr) {
             const toDate = new Date(toDateStr);
-            toDate.setHours(23, 59, 59, 999);
-            if (dealDate > toDate) return false;
+            toDate.setHours(23, 59, 59, 999); // End of day
+            if (comparableDate > toDate) {
+              return false;
+            }
           }
         }
         
@@ -710,11 +729,11 @@
       renderDeals(filteredDeals);
     }
 
-    // Initialize with STRICT limits
+    // Initialize with FULL dataset for proper filtering
     document.addEventListener('DOMContentLoaded', async () => {
-      console.log('🚀 INITIALIZING: Deals page with strict 30-deal limit');
+      console.log('🚀 INITIALIZING: Loading full dataset for proper filtering...');
       
-      await loadStrictLimitedDeals();
+      await loadAllDealsData();
       filteredDeals = allDeals;
       
       populateFilters();
@@ -724,7 +743,7 @@
       document.getElementById('loading-state').style.display = 'none';
       document.getElementById('deals-container').style.display = 'grid';
       
-      console.log(`✅ COMPLETE: Showing exactly ${allDeals.length} deals`);
+      console.log(`✅ COMPLETE: Loaded ${allDeals.length} deals, showing first ${DISPLAY_SETTINGS.CARDS_PER_PAGE} cards`);
     });
   </script>
 </body>

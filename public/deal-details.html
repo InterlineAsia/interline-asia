@@ -915,69 +915,75 @@
       // Itinerary
       document.getElementById('itinerary').textContent = deal.itinerary || 'Detailed itinerary available upon request.';
 
-      // Map Image (Enhanced CSV Loader feature) - Debug and Display
+      // Map Image - Handle both local and external URLs
       const mapSection = document.getElementById('map-section');
       const routeMapImg = document.getElementById('route-map');
       
-      // Debug: Log all available fields to find map data
-      console.log('DEAL_DETAILS: All deal fields:', Object.keys(deal));
-      console.log('DEAL_DETAILS: Full deal object:', deal);
       console.log('DEAL_DETAILS: Looking for map in deal:', {
-        mapImage: deal.mapImage,
         shipMap: deal.shipMap,
-        Shipmap: deal.Shipmap,
-        'Ship Map': deal['Ship Map'],
-        shipmap: deal.shipmap,
-        metadata: deal.metadata
+        Shipmap: deal.Shipmap
       });
       
-      // Check for map in various possible fields (case-insensitive)
-      const mapPath = deal.mapImage || deal.shipMap || deal.Shipmap || deal['Ship Map'] ||
-                     (deal.metadata && (deal.metadata.Shipmap || deal.metadata['Ship Map'] || deal.metadata.shipmap));
+      // Get map URL from deal data (Shipmap field from CSV)
+      const mapUrl = deal.shipMap || deal.Shipmap;
       
-      if (mapPath && mapPath.trim() && mapPath !== 'Quote Available') {
-        console.log('DEAL_DETAILS: Found map reference:', mapPath);
+      if (mapUrl && mapUrl.trim() && mapUrl !== 'Quote Available' && mapUrl !== '') {
+        console.log('DEAL_DETAILS: Found map URL:', mapUrl);
         
-        // Try multiple possible map locations
-        const mapSources = [
-          `/cruise-logos/${mapPath}`,
-          `/logos/maps/${mapPath}`,
-          `/public/cruise-logos/${mapPath}`,
-          `/maps/${mapPath}`,
-          mapPath.startsWith('/') ? mapPath : `/${mapPath}`
-        ];
-        
-        // Test each source and use the first one that works
-        let mapFound = false;
-        let testCount = 0;
-        
-        mapSources.forEach((src, index) => {
-          if (!src.startsWith('http') && !mapFound) { // Security: only local images
-            const testImg = new Image();
-            testImg.onload = function() {
-              if (!mapFound) {
-                routeMapImg.src = src;
-                routeMapImg.alt = `Route map for ${deal.shipName}`;
-                mapSection.style.display = 'block';
-                mapFound = true;
-                console.log('DEAL_DETAILS: Successfully loaded map from:', src);
-              }
-            };
-            testImg.onerror = function() {
-              testCount++;
-              console.log('DEAL_DETAILS: Map not found at:', src);
-              if (testCount === mapSources.length && !mapFound) {
-                // Show debug info if no map found
-                console.log('DEAL_DETAILS: No map found at any location for:', mapPath);
-                // Optionally show a placeholder or hide section
-                mapSection.style.display = 'none';
-              }
-            };
-            testImg.src = src;
-          }
-        });
+        // Check if it's an external URL (starts with http/https)
+        if (mapUrl.startsWith('http://') || mapUrl.startsWith('https://')) {
+          // External URL - use directly
+          routeMapImg.src = mapUrl;
+          routeMapImg.alt = `Route map for ${deal.shipName}`;
+          mapSection.style.display = 'block';
+          console.log('DEAL_DETAILS: Loading external map from:', mapUrl);
+          
+          // Handle loading errors for external images
+          routeMapImg.onerror = function() {
+            console.log('DEAL_DETAILS: Failed to load external map:', mapUrl);
+            mapSection.style.display = 'none';
+          };
+          
+          routeMapImg.onload = function() {
+            console.log('DEAL_DETAILS: Successfully loaded external map');
+          };
+        } else {
+          // Local file - try multiple locations
+          const mapSources = [
+            `/cruise-logos/${mapUrl}`,
+            `/logos/maps/${mapUrl}`,
+            `/maps/${mapUrl}`,
+            mapUrl.startsWith('/') ? mapUrl : `/${mapUrl}`
+          ];
+          
+          let mapFound = false;
+          let testCount = 0;
+          
+          mapSources.forEach((src) => {
+            if (!mapFound) {
+              const testImg = new Image();
+              testImg.onload = function() {
+                if (!mapFound) {
+                  routeMapImg.src = src;
+                  routeMapImg.alt = `Route map for ${deal.shipName}`;
+                  mapSection.style.display = 'block';
+                  mapFound = true;
+                  console.log('DEAL_DETAILS: Successfully loaded local map from:', src);
+                }
+              };
+              testImg.onerror = function() {
+                testCount++;
+                if (testCount === mapSources.length && !mapFound) {
+                  console.log('DEAL_DETAILS: No local map found for:', mapUrl);
+                  mapSection.style.display = 'none';
+                }
+              };
+              testImg.src = src;
+            }
+          });
+        }
       } else {
-        console.log('DEAL_DETAILS: No map reference found in deal data');
+        console.log('DEAL_DETAILS: No map URL found in deal data');
         mapSection.style.display = 'none';
       }
 

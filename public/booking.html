@@ -439,7 +439,7 @@
       </form>
 
       <div class="auth-links">
-        <p><a href="deals-styled.html">← Back to Cruise Deals</a></p>
+        <p><a href="deals.html">← Back to Cruise Deals</a></p>
         <p><a href="dashboard.html">My Dashboard</a></p>
       </div>
     </div>
@@ -820,11 +820,19 @@
       const passportFile = document.getElementById('passport-file');
       const employmentFile = document.getElementById('employment-file');
       
-      passportFile.addEventListener('change', (e) => handleFileSelect(e, 'passport'));
-      employmentFile.addEventListener('change', (e) => handleFileSelect(e, 'employment'));
+      if (passportFile) {
+        passportFile.addEventListener('change', (e) => handleFileSelect(e, 'passport'));
+      }
       
-      // Guest count change
-      document.getElementById('guest-count').addEventListener('change', updateBookingTotal);
+      if (employmentFile) {
+        employmentFile.addEventListener('change', (e) => handleFileSelect(e, 'employment'));
+      }
+      
+      // Guest count change - check if element exists
+      const guestCountElement = document.getElementById('guest-count');
+      if (guestCountElement) {
+        guestCountElement.addEventListener('change', updateBookingTotal);
+      }
     }
 
     function handleFileSelect(event, type) {
@@ -895,7 +903,7 @@
           // Cabin selection
           cabinType: selectedCabin.type,
           cabinPrice: selectedCabin.price,
-          guestCount: document.getElementById('guest-count').value,
+          guestCount: 2, // Fixed at 2 guests
           totalAmount: document.getElementById('total-amount').textContent,
           
           // Deal details

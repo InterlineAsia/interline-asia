@@ -9,15 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="auth.css">
   
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FYGT92WCXC"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-FYGT92WCXC');
-  </script>
   <!-- Cloudflare Turnstile - properly deferred without preloading -->
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" defer></script>
   <script>
@@ -123,11 +114,6 @@
         const result = await window.supabaseClient.signUp(userData);
         
         if (result.user) {
-          // Track successful signup
-          gtag('event', 'sign_up', {
-            method: 'email'
-          });
-          
           showSuccess('Account created successfully! Please check your email to verify your account, then sign in.');
           
           // Clear form

@@ -436,124 +436,186 @@
         }
     }
     
-    /* Header Travel Tools Styles */
-    .header-travel-tools {
+    /* Two-Row Header Layout */
+    .header-container {
+        flex-direction: column;
+        gap: 0;
+    }
+    
+    .header-row-1 {
         display: flex;
         align-items: center;
-        gap: 1rem;
-        padding: 0 1rem;
-        border-left: 1px solid rgba(255, 255, 255, 0.2);
-        border-right: 1px solid rgba(255, 255, 255, 0.2);
+        justify-content: space-between;
+        width: 100%;
+        padding: 0 2rem;
     }
     
-    .tools-label {
-        font-size: 0.75rem;
-        color: rgba(255, 255, 255, 0.6);
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        white-space: nowrap;
-    }
-    
-    .header-tools-grid {
-        display: flex;
-        gap: 0.5rem;
-    }
-    
-    .header-tool-item {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 32px;
-        height: 32px;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        border-radius: 6px;
-        color: rgba(255, 255, 255, 0.7);
-        text-decoration: none;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        font-size: 14px;
+    .header-row-2 {
+        background: rgba(255, 255, 255, 0.05);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 0.75rem 2rem;
         backdrop-filter: blur(10px);
     }
     
-    .header-tool-item:hover {
-        background: rgba(255, 255, 255, 0.15);
+    /* Travel Tools Row Styles */
+    .travel-tools-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .tools-label {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        white-space: nowrap;
+    }
+    
+    .tools-grid-horizontal {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+    
+    .tool-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: rgba(255, 255, 255, 0.9);
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 0.85rem;
+        font-weight: 500;
+        backdrop-filter: blur(10px);
+        min-width: 80px;
+        justify-content: center;
+    }
+    
+    .tool-button i {
+        font-size: 1.1rem;
+        line-height: 1;
+    }
+    
+    .tool-button span {
+        font-size: 0.75rem;
+        white-space: nowrap;
+    }
+    
+    .tool-button:hover {
+        background: rgba(255, 255, 255, 0.2);
         color: #60a5fa;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(96, 165, 250, 0.2);
-        border-color: rgba(96, 165, 250, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(96, 165, 250, 0.3);
+        border-color: rgba(96, 165, 250, 0.4);
     }
     
     @media (max-width: 1024px) {
-        .header-travel-tools {
-            margin-left: 1rem;
-            padding-left: 1rem;
-        }
-        
         .tools-label {
             display: none;
+        }
+        
+        .tool-button span {
+            display: none;
+        }
+        
+        .tool-button {
+            min-width: 40px;
+            padding: 0.5rem;
         }
     }
     
     @media (max-width: 768px) {
-        .header-travel-tools {
-            display: none; /* Hide in mobile menu for now */
+        .header-row-2 {
+            padding: 0.5rem 1rem;
+        }
+        
+        .tools-grid-horizontal {
+            gap: 0.5rem;
+        }
+        
+        .tool-button {
+            min-width: 36px;
+            padding: 0.4rem;
+        }
+        
+        .tool-button i {
+            font-size: 1rem;
         }
     }
 </style>
 
 <header class="ultra-premium-header" id="ultra-premium-header">
     <div class="header-container">
-        <!-- Ultra-Premium Logo -->
-        <a href="/" class="ultra-premium-logo">
-            <div class="logo-icon">IA</div>
-            <div class="logo-text">
-                <h1 class="logo-title">Interline Asia</h1>
-                <p class="logo-subtitle">Luxury Cruises â€¢ Travel Professionals</p>
-            </div>
-        </a>
-        
-        <!-- Ultra-Premium Navigation -->
-        <nav class="ultra-premium-nav" id="ultra-premium-nav">
-            <ul class="nav-links" id="main-nav">
-                <li><a href="/" class="nav-link">Home</a></li>
-                <li><a href="/#about" class="nav-link">About</a></li>
-                <li><a href="/#partners" class="nav-link">Partners</a></li>
-                <li><a href="/contact.html" class="nav-link">Contact</a></li>
-                <li><a href="/#faq" class="nav-link">FAQ</a></li>
-                <li><a href="/terms-and-conditions" class="nav-link">Terms</a></li>
-                <li><a href="/privacy-policy" class="nav-link">Privacy</a></li>
-            </ul>
-        </nav>
-        
-        <!-- Travel Tools in Header - Moved Outside Nav -->
-        <div class="header-travel-tools">
-            <span class="tools-label">Quick Tools:</span>
-            <div class="header-tools-grid">
-                <a href="https://trip.tpk.mx/qhlnnQh8" target="_blank" rel="noopener" class="header-tool-item" title="Book Flights">
-                    <i class="ri-flight-takeoff-line"></i>
-                </a>
-                <a href="https://kiwitaxi.tpk.mx/NGL3ovB3" target="_blank" rel="noopener" class="header-tool-item" title="Airport Transfer">
-                    <i class="ri-taxi-line"></i>
-                </a>
-                <a href="https://ektatraveling.tpk.mx/IUGS6Ovk" target="_blank" rel="noopener" class="header-tool-item" title="Travel Insurance">
-                    <i class="ri-shield-check-line"></i>
-                </a>
-                <a href="https://airalo.tpk.mx/M99krJZy" target="_blank" rel="noopener" class="header-tool-item" title="eSIM Data">
-                    <i class="ri-wifi-line"></i>
-                </a>
-                <a href="https://getrentacar.tpk.mx/I3FuOWfB" target="_blank" rel="noopener" class="header-tool-item" title="Car Rental">
-                    <i class="ri-car-line"></i>
-                </a>
-                <a href="https://wise.com/invite/ihpc/rodneyowenp" target="_blank" rel="noopener" class="header-tool-item" title="Currency Card">
-                    <i class="ri-bank-card-line"></i>
-                </a>
+        <!-- First Row: Logo, Navigation, Auth -->
+        <div class="header-row-1">
+            <!-- Ultra-Premium Logo -->
+            <a href="/" class="ultra-premium-logo">
+                <div class="logo-icon">IA</div>
+                <div class="logo-text">
+                    <h1 class="logo-title">Interline Asia</h1>
+                    <p class="logo-subtitle">Luxury Cruises • Travel Professionals</p>
+                </div>
+            </a>
+            
+            <!-- Ultra-Premium Navigation -->
+            <nav class="ultra-premium-nav" id="ultra-premium-nav">
+                <ul class="nav-links" id="main-nav">
+                    <li><a href="/" class="nav-link">Home</a></li>
+                    <li><a href="/#about" class="nav-link">About</a></li>
+                    <li><a href="/#partners" class="nav-link">Partners</a></li>
+                    <li><a href="/contact.html" class="nav-link">Contact</a></li>
+                    <li><a href="/#faq" class="nav-link">FAQ</a></li>
+                    <li><a href="/terms-and-conditions" class="nav-link">Terms</a></li>
+                    <li><a href="/privacy-policy" class="nav-link">Privacy</a></li>
+                </ul>
+            </nav>
+            
+            <!-- Auth Section -->
+            <div class="auth-section" id="auth-section">
+                <!-- Auth buttons will be handled by JavaScript - no default orange button -->
             </div>
         </div>
         
-        <!-- Auth Section -->
-        <div class="auth-section" id="auth-section">
-            <!-- Auth buttons will be handled by JavaScript - no default orange button -->
+        <!-- Second Row: Travel Tools -->
+        <div class="header-row-2">
+            <div class="travel-tools-row">
+                <span class="tools-label">Quick Travel Tools:</span>
+                <div class="tools-grid-horizontal">
+                    <a href="https://trip.tpk.mx/qhlnnQh8" target="_blank" rel="noopener" class="tool-button" title="Book Flights">
+                        <i class="ri-flight-takeoff-line"></i>
+                        <span>Flights</span>
+                    </a>
+                    <a href="https://kiwitaxi.tpk.mx/NGL3ovB3" target="_blank" rel="noopener" class="tool-button" title="Airport Transfer">
+                        <i class="ri-taxi-line"></i>
+                        <span>Transfer</span>
+                    </a>
+                    <a href="https://ektatraveling.tpk.mx/IUGS6Ovk" target="_blank" rel="noopener" class="tool-button" title="Travel Insurance">
+                        <i class="ri-shield-check-line"></i>
+                        <span>Insurance</span>
+                    </a>
+                    <a href="https://airalo.tpk.mx/M99krJZy" target="_blank" rel="noopener" class="tool-button" title="eSIM Data">
+                        <i class="ri-wifi-line"></i>
+                        <span>eSIM</span>
+                    </a>
+                    <a href="https://getrentacar.tpk.mx/I3FuOWfB" target="_blank" rel="noopener" class="tool-button" title="Car Rental">
+                        <i class="ri-car-line"></i>
+                        <span>Cars</span>
+                    </a>
+                    <a href="https://wise.com/invite/ihpc/rodneyowenp" target="_blank" rel="noopener" class="tool-button" title="Currency Card">
+                        <i class="ri-bank-card-line"></i>
+                        <span>Currency</span>
+                    </a>
+                </div>
+            </div>
         </div>
         
         <!-- Mobile Menu Toggle -->

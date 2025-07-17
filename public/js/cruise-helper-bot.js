@@ -100,25 +100,26 @@ class CruiseHelperBot {
     styles.textContent = `
       .chat-button {
         position: fixed;
-        bottom: 32px;
-        right: 32px;
+        bottom: 24px;
+        right: 24px;
         background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
         color: white;
         border: none;
-        border-radius: 9999px;
-        padding: 20px 28px;
+        border-radius: 50px;
+        padding: 16px 24px;
         cursor: pointer;
-        box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-        z-index: 9999;
+        box-shadow: 0 8px 32px rgba(15, 23, 42, 0.3);
+        z-index: 10000;
         display: flex;
         align-items: center;
         gap: 12px;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         font-weight: 600;
-        font-size: 15px;
+        font-size: 14px;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         border: 1px solid rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(12px);
+        max-width: calc(100vw - 48px);
       }
       
       .chat-button:hover {
@@ -134,19 +135,20 @@ class CruiseHelperBot {
       
       .chat-window {
         position: fixed;
-        bottom: 110px;
-        right: 30px;
-        width: 400px;
-        height: 550px;
+        bottom: 90px;
+        right: 24px;
+        width: 380px;
+        height: 500px;
         background: white;
-        border-radius: 20px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-        z-index: 9998;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        z-index: 9999;
         display: none;
         flex-direction: column;
         overflow: hidden;
         border: 1px solid rgba(0, 0, 0, 0.08);
         backdrop-filter: blur(20px);
+        max-width: calc(100vw - 48px);
       }
       
       .chat-header {

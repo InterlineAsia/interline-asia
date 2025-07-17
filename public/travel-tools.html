@@ -5,6 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Travel Tools - Interline Asia</title>
     <meta name="description" content="Essential travel tools recommended by Interline Asia to make your cruise journey smooth, safe, and affordable.">
+    <meta name="keywords" content="travel tools, cruise travel, travel insurance, airport transfers, eSIM, car rentals, currency exchange, travel essentials">
+    <meta name="author" content="Interline Asia">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Travel Tools - Interline Asia">
+    <meta property="og:description" content="Essential travel tools recommended by Interline Asia to make your cruise journey smooth, safe, and affordable.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.interlineasia.com/travel-tools.html">
+    <meta property="og:image" content="https://www.interlineasia.com/cruise-ship.png">
+    <meta property="og:site_name" content="Interline Asia">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Travel Tools - Interline Asia">
+    <meta name="twitter:description" content="Essential travel tools for your cruise journey - flights, transfers, insurance, eSIM, and more.">
+    <meta name="twitter:image" content="https://www.interlineasia.com/cruise-ship.png">
+    
+    <!-- Additional SEO Meta Tags -->
+    <meta name="theme-color" content="#0f172a">
+    <meta name="msapplication-TileColor" content="#0f172a">
+    <link rel="canonical" href="https://www.interlineasia.com/travel-tools.html">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -209,16 +231,23 @@
     <!-- Footer -->
     <div id="footer-placeholder"></div>
 
-    <!-- Scripts -->
+    <!-- Core Scripts -->
+    <script src="/js/error-handler.js"></script>
+    <script src="/js/performance-optimizer.js"></script>
+    <script src="/js/accessibility-enhancer.js"></script>
+    
+    <!-- Application Scripts -->
     <script src="/js/main-redesign.js"></script>
     <script src="/js/social-media.js"></script>
     <script>
-        // Load footer
-        fetch('/partials/footer.html')
-            .then(response => response.text())
-            .then(html => {
+        // Load footer with error handling
+        ErrorHandler.safeAsync(async () => {
+            const response = await fetch('/partials/footer.html');
+            if (response.ok) {
+                const html = await response.text();
                 document.getElementById('footer-placeholder').innerHTML = html;
-            });
+            }
+        });
     </script>
 </body>
 </html>

@@ -1,16 +1,207 @@
 <!-- Ultra-Premium Modern Footer -->
 <style>
-    /* Import Google Fonts for Footer */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    /* Import Premium Fonts for Footer */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap');
     
-    /* Ultra-Premium Social Media Section */
-    .ultra-premium-social {
-        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
-        padding: 5rem 2.5rem;
+    /* 🚢 REVOLUTIONARY Social Media Section with WOW Factor */
+    .revolutionary-social {
+        background: 
+            linear-gradient(135deg, 
+                rgba(6, 23, 78, 0.98) 0%, 
+                rgba(15, 32, 89, 0.95) 25%,
+                rgba(24, 41, 100, 0.92) 50%,
+                rgba(33, 50, 111, 0.88) 75%,
+                rgba(42, 59, 122, 0.85) 100%
+            ),
+            radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.3) 0%, transparent 50%),
+            radial-gradient(circle at 80% 70%, rgba(16, 185, 129, 0.2) 0%, transparent 50%),
+            url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"><defs><pattern id="sparkles" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1" fill="%23ffffff" opacity="0.4"><animate attributeName="opacity" values="0.4;0.9;0.4" dur="3s" repeatCount="indefinite"/></circle><circle cx="80" cy="40" r="0.5" fill="%2360a5fa" opacity="0.5"><animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/></circle><circle cx="50" cy="80" r="1.5" fill="%2310b981" opacity="0.3"><animate attributeName="opacity" values="0.3;0.8;0.3" dur="4s" repeatCount="indefinite"/></circle></pattern></defs><rect width="1920" height="1080" fill="url(%23sparkles)"/></svg>');
+        padding: 8rem 2.5rem;
         text-align: center;
         position: relative;
         overflow: hidden;
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-family: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        animation: socialGlow 10s ease-in-out infinite alternate;
+    }
+    
+    @keyframes socialGlow {
+        0% { filter: brightness(1) saturate(1); }
+        100% { filter: brightness(1.08) saturate(1.15); }
+    }
+    
+    .social-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .social-title {
+        position: relative;
+        margin-bottom: 2rem;
+    }
+    
+    .title-gradient {
+        font-size: clamp(3rem, 6vw, 5rem);
+        font-weight: 900;
+        background: linear-gradient(135deg, #ffffff 0%, #60a5fa 30%, #3b82f6 60%, #1d4ed8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: -0.03em;
+        display: inline-block;
+        animation: titleShimmer 3s ease-in-out infinite;
+    }
+    
+    @keyframes titleShimmer {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+    
+    .title-sparkle {
+        position: absolute;
+        top: -20px;
+        right: -30px;
+        font-size: 2rem;
+        animation: sparkle 2s ease-in-out infinite;
+    }
+    
+    @keyframes sparkle {
+        0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.7; }
+        50% { transform: scale(1.2) rotate(180deg); opacity: 1; }
+    }
+    
+    .social-subtitle {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1.3rem;
+        font-weight: 400;
+        max-width: 800px;
+        margin: 0 auto 4rem;
+        line-height: 1.7;
+    }
+    
+    .social-icons-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 2rem;
+        margin-bottom: 5rem;
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .social-icon {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        padding: 2rem 1rem;
+        border-radius: 24px;
+        text-decoration: none;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+    }
+    
+    .icon-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        border-radius: 24px;
+    }
+    
+    .social-icon:hover .icon-bg {
+        opacity: 1;
+    }
+    
+    .social-icon:hover {
+        transform: translateY(-12px) scale(1.05);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+    
+    .social-icon i {
+        font-size: 2.5rem;
+        color: white;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .social-label {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.9rem;
+        font-weight: 600;
+        position: relative;
+        z-index: 2;
+    }
+    
+    /* Brand-specific hover effects */
+    .social-facebook .icon-bg { background: linear-gradient(135deg, #1877f2 0%, #42a5f5 100%); }
+    .social-instagram .icon-bg { background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+    .social-linkedin .icon-bg { background: linear-gradient(135deg, #0077b5 0%, #00a0dc 100%); }
+    .social-youtube .icon-bg { background: linear-gradient(135deg, #ff0000 0%, #ff4444 100%); }
+    .social-twitter .icon-bg { background: linear-gradient(135deg, #000000 0%, #333333 100%); }
+    .social-tiktok .icon-bg { background: linear-gradient(135deg, #000000 0%, #ff0050 50%, #00f2ea 100%); }
+    
+    .social-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .stat-item {
+        text-align: center;
+        padding: 2rem 1rem;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        transition: all 0.3s ease;
+    }
+    
+    .stat-item:hover {
+        transform: translateY(-4px);
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(59, 130, 246, 0.3);
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 900;
+        color: #60a5fa;
+        margin-bottom: 0.5rem;
+        font-family: 'Space Grotesk', sans-serif;
+    }
+    
+    .stat-label {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.95rem;
+        font-weight: 500;
+    }
+    
+    /* Revolutionary Social Media Section */
+    .ultra-premium-social {
+        background: linear-gradient(135deg, 
+            #0f172a 0%, 
+            #1e293b 25%, 
+            #334155 50%, 
+            #475569 75%, 
+            #64748b 100%);
+        padding: 8rem 2.5rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        font-family: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
     
     .ultra-premium-social::before {
@@ -32,26 +223,41 @@
     }
     
     .social-title {
-        color: #0f172a;
+        color: #ffffff;
         margin-bottom: 1.5rem;
-        font-size: 2.5rem;
+        font-size: clamp(2.5rem, 5vw, 4rem);
         font-weight: 800;
-        letter-spacing: -0.5px;
-        background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+        letter-spacing: -0.02em;
+        background: linear-gradient(135deg, #ffffff 0%, #60a5fa 50%, #3b82f6 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
+        position: relative;
+        display: inline-block;
+    }
+    
+    .social-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 120px;
+        height: 4px;
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        border-radius: 2px;
+        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
     }
     
     .social-subtitle {
-        color: #64748b;
-        margin-bottom: 3rem;
-        font-size: 1.125rem;
-        font-weight: 500;
-        max-width: 600px;
+        color: rgba(255, 255, 255, 0.85);
+        margin-bottom: 4rem;
+        font-size: 1.25rem;
+        font-weight: 400;
+        max-width: 700px;
         margin-left: auto;
         margin-right: auto;
-        line-height: 1.6;
+        line-height: 1.7;
     }
     
     .social-icons {
@@ -196,17 +402,19 @@
     }
     
     .footer-logo-icon {
-        width: 48px;
-        height: 48px;
-        background: linear-gradient(135deg, #FF6B35 0%, #FF8E53 50%, #FFB574 100%);
-        border-radius: 12px;
+        width: 56px;
+        height: 56px;
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%);
+        border-radius: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: 800;
-        font-size: 1.5rem;
+        font-size: 1.75rem;
         color: white;
-        box-shadow: 0 8px 32px rgba(255, 107, 53, 0.3);
+        box-shadow: 0 12px 40px rgba(59, 130, 246, 0.4);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.4s ease;
     }
     
     .footer-logo-text {
@@ -260,7 +468,7 @@
     }
     
     .footer-link:hover {
-        color: #FF6B35;
+        color: #3b82f6;
         transform: translateY(-2px);
     }
     
@@ -287,7 +495,7 @@
         font-weight: 500;
         text-transform: uppercase;
         letter-spacing: 1px;
-        background: linear-gradient(90deg, #FF6B35, rgba(255, 255, 255, 0.7));
+        background: linear-gradient(90deg, #3b82f6, #60a5fa, rgba(255, 255, 255, 0.7));
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -370,36 +578,69 @@
     }
 </style>
 
-<!-- Ultra-Premium Social Media Section -->
-<section class="ultra-premium-social">
+<!-- 🌊 STUNNING Social Media Section with WOW Factor -->
+<section class="revolutionary-social">
     <div class="social-container">
-        <h3 class="social-title">Connect With Us</h3>
-        <p class="social-subtitle">Stay updated with the latest cruise deals, travel industry news, and exclusive offers from our luxury cruise partners</p>
-        <div class="social-icons">
-            <!-- Facebook -->
-            <a href="#" class="social-icon social-facebook" aria-label="Follow us on Facebook">
-                <i class="ri-facebook-fill"></i>
-            </a>
-            <!-- Instagram -->
-            <a href="#" class="social-icon social-instagram" aria-label="Follow us on Instagram">
-                <i class="ri-instagram-line"></i>
-            </a>
-            <!-- Twitter/X -->
-            <a href="#" class="social-icon social-twitter" aria-label="Follow us on X (Twitter)">
-                <i class="ri-twitter-x-line"></i>
-            </a>
-            <!-- LinkedIn -->
-            <a href="#" class="social-icon social-linkedin" aria-label="Connect with us on LinkedIn">
-                <i class="ri-linkedin-fill"></i>
-            </a>
-            <!-- YouTube -->
-            <a href="#" class="social-icon social-youtube" aria-label="Subscribe to our YouTube channel">
-                <i class="ri-youtube-fill"></i>
-            </a>
-            <!-- TikTok -->
-            <a href="#" class="social-icon social-tiktok" aria-label="Follow us on TikTok">
-                <i class="ri-music-2-fill"></i>
-            </a>
+        <div class="social-content">
+            <h3 class="social-title">
+                <span class="title-gradient">Connect With Us</span>
+                <div class="title-sparkle">✨</div>
+            </h3>
+            <p class="social-subtitle">Join thousands of travel professionals discovering exclusive cruise deals and industry insights</p>
+            
+            <div class="social-icons-grid">
+                <!-- Facebook -->
+                <a href="#" class="social-icon social-facebook" aria-label="Follow us on Facebook">
+                    <div class="icon-bg"></div>
+                    <i class="ri-facebook-fill"></i>
+                    <span class="social-label">Facebook</span>
+                </a>
+                <!-- Instagram -->
+                <a href="#" class="social-icon social-instagram" aria-label="Follow us on Instagram">
+                    <div class="icon-bg"></div>
+                    <i class="ri-instagram-line"></i>
+                    <span class="social-label">Instagram</span>
+                </a>
+                <!-- LinkedIn -->
+                <a href="#" class="social-icon social-linkedin" aria-label="Connect with us on LinkedIn">
+                    <div class="icon-bg"></div>
+                    <i class="ri-linkedin-fill"></i>
+                    <span class="social-label">LinkedIn</span>
+                </a>
+                <!-- YouTube -->
+                <a href="#" class="social-icon social-youtube" aria-label="Subscribe to our YouTube channel">
+                    <div class="icon-bg"></div>
+                    <i class="ri-youtube-fill"></i>
+                    <span class="social-label">YouTube</span>
+                </a>
+                <!-- Twitter/X -->
+                <a href="#" class="social-icon social-twitter" aria-label="Follow us on X">
+                    <div class="icon-bg"></div>
+                    <i class="ri-twitter-x-line"></i>
+                    <span class="social-label">X (Twitter)</span>
+                </a>
+                <!-- TikTok -->
+                <a href="#" class="social-icon social-tiktok" aria-label="Follow us on TikTok">
+                    <div class="icon-bg"></div>
+                    <i class="ri-music-2-fill"></i>
+                    <span class="social-label">TikTok</span>
+                </a>
+            </div>
+            
+            <div class="social-stats">
+                <div class="stat-item">
+                    <div class="stat-number">15K+</div>
+                    <div class="stat-label">Travel Professionals</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label">Cruise Deals Monthly</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">Cruise Lines</div>
+                </div>
+            </div>
         </div>
     </div>
 </section>

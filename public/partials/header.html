@@ -1,19 +1,39 @@
 <!-- Ultra-Premium Modern Header -->
 <style>
-    /* Import Google Fonts */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    /* Import Premium Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap');
     
-    /* Premium Header Styles */
+    /* Revolutionary Header Styles */
     .ultra-premium-header {
-        background: linear-gradient(135deg, #0a0f1c 0%, #1a2332 30%, #2d3748 60%, #4a5568 100%);
-        backdrop-filter: blur(20px);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        background: linear-gradient(135deg, 
+            rgba(15, 23, 42, 0.98) 0%, 
+            rgba(30, 41, 59, 0.95) 25%, 
+            rgba(51, 65, 85, 0.92) 50%, 
+            rgba(71, 85, 105, 0.95) 75%, 
+            rgba(100, 116, 139, 0.98) 100%);
+        backdrop-filter: blur(40px);
+        border-bottom: 1px solid rgba(59, 130, 246, 0.2);
         position: sticky;
         top: 0;
         z-index: 1000;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 20px 60px rgba(15, 23, 42, 0.3);
+        font-family: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .ultra-premium-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 50%, rgba(147, 197, 253, 0.08) 0%, transparent 50%);
+        pointer-events: none;
     }
     
     .ultra-premium-header.scrolled {
@@ -48,20 +68,21 @@
     }
     
     .logo-icon {
-        width: 56px;
-        height: 56px;
-        background: linear-gradient(135deg, #FF6B35 0%, #FF8E53 50%, #FFB574 100%);
-        border-radius: 16px;
+        width: 64px;
+        height: 64px;
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%);
+        border-radius: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: 900;
-        font-size: 1.75rem;
+        font-size: 2rem;
         color: white;
-        box-shadow: 0 8px 32px rgba(255, 107, 53, 0.4);
+        box-shadow: 0 12px 40px rgba(59, 130, 246, 0.4);
         position: relative;
         overflow: hidden;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 2px solid rgba(255, 255, 255, 0.1);
     }
     
     .logo-icon::before {
@@ -110,7 +131,7 @@
         font-weight: 500;
         letter-spacing: 1px;
         text-transform: uppercase;
-        background: linear-gradient(90deg, #FF6B35, #64748b);
+        background: linear-gradient(90deg, #60a5fa, #3b82f6);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -173,11 +194,12 @@
         bottom: 8px;
         left: 50%;
         width: 0;
-        height: 2px;
-        background: linear-gradient(90deg, #FF6B35, #FF8E53);
+        height: 3px;
+        background: linear-gradient(90deg, #3b82f6, #1d4ed8);
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         transform: translateX(-50%);
-        border-radius: 1px;
+        border-radius: 2px;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
     }
     
     .nav-link:hover::after {
@@ -192,19 +214,7 @@
     }
     
     .auth-button {
-        padding: 1rem 2rem;
-        background: linear-gradient(135deg, #FF6B35 0%, #FF8E53 50%, #FFB574 100%);
-        color: white;
-        text-decoration: none;
-        border-radius: 30px;
-        font-weight: 600;
-        font-size: 0.95rem;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 8px 32px rgba(255, 107, 53, 0.3);
-        border: none;
-        cursor: pointer;
-        position: relative;
-        overflow: hidden;
+        display: none; /* Hide redundant login button - we have one in hero */
     }
     
     .auth-button::before {
@@ -223,9 +233,10 @@
     }
     
     .auth-button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 12px 40px rgba(255, 107, 53, 0.4);
-        background: linear-gradient(135deg, #FF8E53 0%, #FFB574 50%, #FFC794 100%);
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 16px 50px rgba(59, 130, 246, 0.4);
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e3a8a 100%);
+        border-color: rgba(255, 255, 255, 0.2);
     }
     
     .user-menu {
@@ -450,7 +461,7 @@
             </ul>
             
             <div class="auth-section" id="auth-section">
-                <a href="/login" class="auth-button">Login / Signup</a>
+                <!-- Auth buttons will be handled by JavaScript - no default orange button -->
             </div>
         </nav>
         

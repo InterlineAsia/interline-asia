@@ -553,8 +553,8 @@ class CruiseHelperBot {
         headers['Authorization'] = `Bearer ${authToken}`;
       }
 
-      // Call the new cruise intelligence API
-      const response = await fetch('/api/cruise-intelligence-handler', {
+      // Call the enhanced cruise intelligence API
+      const response = await fetch('/api/cruise-intelligence-handler-enhanced', {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({
@@ -564,11 +564,14 @@ class CruiseHelperBot {
         })
       });
 
+      console.log('🧠 CRUISE_BOT: Intelligence API response status:', response.status);
+
       if (!response.ok) {
         throw new Error(`Intelligence API error: ${response.status}`);
       }
 
       const result = await response.json();
+      console.log('🧠 CRUISE_BOT: Intelligence API result:', result);
       
       if (result.success && result.response) {
         // Check if authentication is required
@@ -609,6 +612,7 @@ class CruiseHelperBot {
       return null; // Fall back to original logic
       
     } catch (error) {
+      console.error('CRUISE_BOT: Intelligence system error:', error);
       console.log('CRUISE_BOT: Intelligence system unavailable, using fallback');
       return null; // Fall back to original logic
     }

@@ -1267,6 +1267,366 @@ What would you like to know about our cruise deals?`;
   }
 }
 
+// Smart Route-Based Cruise Intelligence System
+class CruiseIntelligenceSystem {
+  constructor() {
+    this.cruiseData = [];
+    this.regionMapping = {
+      // Countries to regions mapping
+      'japan': 'Asia',
+      'china': 'Asia',
+      'singapore': 'Asia',
+      'thailand': 'Asia',
+      'vietnam': 'Asia',
+      'south korea': 'Asia',
+      'hong kong': 'Asia',
+      'taiwan': 'Asia',
+      'philippines': 'Asia',
+      'indonesia': 'Asia',
+      'malaysia': 'Asia',
+      'india': 'Asia',
+      
+      'uae': 'Middle East',
+      'dubai': 'Middle East',
+      'qatar': 'Middle East',
+      'oman': 'Middle East',
+      'saudi arabia': 'Middle East',
+      'israel': 'Middle East',
+      'jordan': 'Middle East',
+      
+      'egypt': 'Africa',
+      'south africa': 'Africa',
+      'morocco': 'Africa',
+      'tunisia': 'Africa',
+      'kenya': 'Africa',
+      'madagascar': 'Africa',
+      
+      'spain': 'Mediterranean',
+      'italy': 'Mediterranean',
+      'france': 'Mediterranean',
+      'greece': 'Mediterranean',
+      'turkey': 'Mediterranean',
+      'croatia': 'Mediterranean',
+      'montenegro': 'Mediterranean',
+      'cyprus': 'Mediterranean',
+      'malta': 'Mediterranean',
+      
+      'norway': 'Europe',
+      'sweden': 'Europe',
+      'denmark': 'Europe',
+      'finland': 'Europe',
+      'germany': 'Europe',
+      'netherlands': 'Europe',
+      'belgium': 'Europe',
+      'uk': 'Europe',
+      'united kingdom': 'Europe',
+      'ireland': 'Europe',
+      'portugal': 'Europe',
+      'russia': 'Europe',
+      
+      'usa': 'North America',
+      'united states': 'North America',
+      'canada': 'North America',
+      'alaska': 'Alaska',
+      
+      'mexico': 'Caribbean',
+      'bahamas': 'Caribbean',
+      'jamaica': 'Caribbean',
+      'barbados': 'Caribbean',
+      'aruba': 'Caribbean',
+      'curacao': 'Caribbean',
+      'puerto rico': 'Caribbean',
+      'dominican republic': 'Caribbean',
+      'cuba': 'Caribbean',
+      
+      'brazil': 'South America',
+      'argentina': 'South America',
+      'chile': 'South America',
+      'peru': 'South America',
+      'uruguay': 'South America',
+      
+      'australia': 'Australia',
+      'new zealand': 'Australia',
+      
+      'fiji': 'South Pacific',
+      'tahiti': 'South Pacific',
+      'hawaii': 'Hawaii',
+      'french polynesia': 'South Pacific',
+      'vanuatu': 'South Pacific',
+      'new caledonia': 'South Pacific'
+    };
+  }
+
+  async init() {
+    // Load cruise data if available
+    if (window.cruiseData && Array.isArray(window.cruiseData)) {
+      this.cruiseData = window.cruiseData;
+    }
+    console.log('🧠 Intelligence System: Loaded', this.cruiseData.length, 'cruises');
+  }
+
+  async processRouteQuery(message) {
+    try {
+      console.log('🧠 Processing route query:', message);
+      
+      // Extract route information from the message
+      const routeInfo = this.extractRouteInformation(message);
+      console.log('🧠 Extracted route info:', routeInfo);
+      
+      if (!routeInfo.hasRouteQuery) {
+        return { success: false, reason: 'No route detected' };
+      }
+
+      // Find matching cruises
+      const matchingCruises = this.findMatchingCruises(routeInfo);
+      console.log('🧠 Found matching cruises:', matchingCruises.length);
+
+      // Generate response
+      const response = this.generateRouteResponse(routeInfo, matchingCruises);
+      
+      return {
+        success: true,
+        response: response,
+        results: matchingCruises,
+        routeInfo: routeInfo
+      };
+      
+    } catch (error) {
+      console.error('🧠 Error in processRouteQuery:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  extractRouteInformation(query) {
+    const lowerQuery = query.toLowerCase();
+    const routeInfo = {
+      from: null,
+      to: null,
+      viceVersa: false,
+      hasRouteQuery: false,
+      stops: [],
+      originalQuery: query
+    };
+
+    // Check for "vice versa" or "reverse" patterns
+    if (/vice versa|reverse|either way|both ways|both directions|or the other way/i.test(query)) {
+      routeInfo.viceVersa = true;
+    }
+
+    // Route patterns to match
+    const routePatterns = [
+      // "from X to Y" patterns
+      /from\s+([^to]+?)\s+to\s+([^,.!?]+)/i,
+      // "X to Y" patterns  
+      /([a-zA-Z\s]+?)\s+to\s+([a-zA-Z\s]+?)(?:\s|$|[,.!?])/i,
+      // "between X and Y" patterns
+      /between\s+([^and]+?)\s+and\s+([^,.!?]+)/i,
+      // "departing from X" patterns
+      /departing\s+(?:from\s+)?([^,.!?]+)/i,
+      // "sailing to Y" patterns
+      /sailing\s+to\s+([^,.!?]+)/i,
+      // "going to Y" patterns
+      /going\s+to\s+([^,.!?]+)/i
+    ];
+
+    // Try each pattern
+    for (let i = 0; i < routePatterns.length; i++) {
+      const pattern = routePatterns[i];
+      const match = lowerQuery.match(pattern);
+      
+      if (match) {
+        routeInfo.hasRouteQuery = true;
+        
+        if (i === 0 || i === 1) { // "from X to Y" or "X to Y"
+          routeInfo.from = this.cleanLocationName(match[1]);
+          routeInfo.to = this.cleanLocationName(match[2]);
+        } else if (i === 2) { // "between X and Y"
+          routeInfo.from = this.cleanLocationName(match[1]);
+          routeInfo.to = this.cleanLocationName(match[2]);
+          routeInfo.viceVersa = true;
+        } else if (i === 3) { // "departing from X"
+          routeInfo.from = this.cleanLocationName(match[1]);
+        } else if (i === 4 || i === 5) { // "sailing to Y" or "going to Y"
+          routeInfo.to = this.cleanLocationName(match[1]);
+        }
+        
+        console.log('🧠 Matched pattern', i, ':', match);
+        break;
+      }
+    }
+
+    // Extract stops/ports of call
+    const stopsPattern = /stopping at|port(?:s)? of call|visit(?:ing)?|calling at/i;
+    if (stopsPattern.test(query)) {
+      // Extract locations mentioned after stopping phrases
+      const afterStops = query.split(stopsPattern)[1];
+      if (afterStops) {
+        const locations = afterStops.match(/[a-zA-Z\s]+/g);
+        if (locations) {
+          routeInfo.stops = locations.map(loc => this.cleanLocationName(loc)).filter(loc => loc.length > 2);
+        }
+      }
+    }
+
+    return routeInfo;
+  }
+
+  cleanLocationName(name) {
+    if (!name) return null;
+    return name.trim()
+      .replace(/\s+/g, ' ')
+      .replace(/[^\w\s]/g, '')
+      .toLowerCase();
+  }
+
+  findMatchingCruises(routeInfo) {
+    if (!this.cruiseData || this.cruiseData.length === 0) {
+      console.log('🧠 No cruise data available');
+      return [];
+    }
+
+    const matches = [];
+
+    for (const cruise of this.cruiseData) {
+      if (this.matchesCruiseRoute(cruise, routeInfo)) {
+        matches.push(cruise);
+      }
+    }
+
+    console.log('🧠 Route matching found', matches.length, 'cruises');
+    return matches;
+  }
+
+  matchesCruiseRoute(cruise, routeInfo) {
+    // Get cruise text for matching
+    const cruiseDeparture = (cruise.departure_port || '').toLowerCase();
+    const cruiseArrival = (cruise.arrival_port || '').toLowerCase();
+    const cruiseItinerary = (cruise.itinerary || '').toLowerCase();
+    const cruiseRegion = (cruise.region || '').toLowerCase();
+    
+    // Combine all cruise text
+    const allCruiseText = `${cruiseDeparture} ${cruiseArrival} ${cruiseItinerary} ${cruiseRegion}`;
+
+    let fromMatch = true;
+    let toMatch = true;
+
+    // Check FROM location
+    if (routeInfo.from) {
+      fromMatch = this.locationMatches(routeInfo.from, cruiseDeparture, cruiseArrival, cruiseItinerary, cruiseRegion, routeInfo.viceVersa);
+    }
+
+    // Check TO location  
+    if (routeInfo.to) {
+      toMatch = this.locationMatches(routeInfo.to, cruiseArrival, cruiseDeparture, cruiseItinerary, cruiseRegion, routeInfo.viceVersa);
+    }
+
+    // Check stops
+    let stopsMatch = true;
+    if (routeInfo.stops && routeInfo.stops.length > 0) {
+      stopsMatch = routeInfo.stops.some(stop => 
+        allCruiseText.includes(stop) || this.regionMatches(stop, cruiseRegion)
+      );
+    }
+
+    const finalMatch = fromMatch && toMatch && stopsMatch;
+    
+    if (finalMatch) {
+      console.log('🧠 Cruise matched:', cruise.cruise_line, cruise.ship_name, cruise.departure_port, '→', cruise.arrival_port);
+    }
+
+    return finalMatch;
+  }
+
+  locationMatches(searchLocation, primaryPort, secondaryPort, itinerary, region, allowReverse = false) {
+    // Direct text matching
+    if (primaryPort.includes(searchLocation)) return true;
+    if (allowReverse && secondaryPort.includes(searchLocation)) return true;
+    if (itinerary.includes(searchLocation)) return true;
+
+    // Region matching
+    if (this.regionMatches(searchLocation, region)) return true;
+
+    // Country/city to region mapping
+    const mappedRegion = this.regionMapping[searchLocation];
+    if (mappedRegion && region.includes(mappedRegion.toLowerCase())) return true;
+
+    return false;
+  }
+
+  regionMatches(searchLocation, cruiseRegion) {
+    // Direct region match
+    if (cruiseRegion.includes(searchLocation)) return true;
+
+    // Check if search location maps to cruise region
+    const mappedRegion = this.regionMapping[searchLocation];
+    if (mappedRegion && cruiseRegion.includes(mappedRegion.toLowerCase())) return true;
+
+    return false;
+  }
+
+  generateRouteResponse(routeInfo, matchingCruises) {
+    let response = '';
+
+    // Generate route description
+    let routeDescription = '';
+    if (routeInfo.from && routeInfo.to) {
+      routeDescription = `from **${this.capitalizeLocation(routeInfo.from)}** to **${this.capitalizeLocation(routeInfo.to)}**`;
+      if (routeInfo.viceVersa) {
+        routeDescription += ` (or vice versa)`;
+      }
+    } else if (routeInfo.from) {
+      routeDescription = `departing from **${this.capitalizeLocation(routeInfo.from)}**`;
+    } else if (routeInfo.to) {
+      routeDescription = `sailing to **${this.capitalizeLocation(routeInfo.to)}**`;
+    }
+
+    // Generate response based on results
+    if (matchingCruises.length === 0) {
+      response = `I couldn't find any cruises ${routeDescription}. 
+
+**Here are some suggestions:**
+• Try broader region names (e.g., "Asia" instead of specific cities)
+• Check for seasonal availability - some routes are seasonal
+• Consider nearby departure or arrival ports
+• Ask about alternative routes in the same regions
+
+Would you like me to suggest similar routes or help you explore other options?`;
+    } else {
+      response = `🎯 **Found ${matchingCruises.length} cruise${matchingCruises.length !== 1 ? 's' : ''} ${routeDescription}:**
+
+`;
+
+      // Add top 3 cruise results
+      const topCruises = matchingCruises.slice(0, 3);
+      topCruises.forEach((cruise, index) => {
+        response += `**${index + 1}. ${cruise.cruise_line} - ${cruise.ship_name}**
+📍 Route: ${cruise.departure_port} → ${cruise.arrival_port}
+🗓️ Duration: ${cruise.duration} days
+💰 From $${cruise.price_usd?.toLocaleString() || 'N/A'}
+🌍 Region: ${cruise.region}
+
+`;
+      });
+
+      if (matchingCruises.length > 3) {
+        response += `*...and ${matchingCruises.length - 3} more cruise${matchingCruises.length - 3 !== 1 ? 's' : ''} available!*
+
+`;
+      }
+
+      response += `Would you like more details about any of these cruises, or shall I help you refine your search?`;
+    }
+
+    return response;
+  }
+
+  capitalizeLocation(location) {
+    return location.split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+}
+
 // Initialize the bot when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   window.cruiseBot = new CruiseHelperBot();

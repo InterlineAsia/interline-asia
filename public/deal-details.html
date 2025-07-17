@@ -1051,6 +1051,15 @@
         };
       }
 
+      // Set up quote button with proper security token
+      const quoteBtn = document.querySelector('.quote-btn');
+      if (quoteBtn) {
+        // Generate a simple security token (6+ alphanumeric characters as required)
+        const token = generateSecurityToken();
+        quoteBtn.href = `/quote.html?id=${encodeURIComponent(deal.id)}&token=${token}`;
+        console.log('QUOTE: Generated quote URL with token for deal:', deal.id);
+      }
+
       // Show the deal content with smooth transition
       document.getElementById('loading-state').style.display = 'none';
       document.getElementById('error-state').style.display = 'none';
@@ -1117,6 +1126,16 @@
     function restoreFiltersAndReturn() {
       // Restore any saved filters when returning to deals page
       window.location.href = '/deals.html';
+    }
+
+    // Generate a security token for quote access
+    function generateSecurityToken() {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let token = '';
+      for (let i = 0; i < 8; i++) {
+        token += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return token;
     }
 
     // Initialize when page loads

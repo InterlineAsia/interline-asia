@@ -44,15 +44,22 @@ class CruiseHelperBot {
           <div class="bot-message">
             <div class="message-avatar">🚢</div>
             <div class="message-content">
-              <p>Hi! I'm your CruiseHelper bot. I can help you with:</p>
+              <p>Hi! I'm your enhanced CruiseHelper with <strong>Smart Route Intelligence</strong>! 🧠</p>
+              <p><strong>🎯 Ask me about specific routes:</strong></p>
               <ul>
-                <li>🔍 Finding cruise deals</li>
-                <li>📅 Departure dates and itineraries</li>
-                <li>💰 Pricing information</li>
-                <li>🚢 Ship and cruise line details</li>
-                <li>🌍 Destinations and regions</li>
+                <li>"Cruises from Japan to Alaska"</li>
+                <li>"Any sailings from Middle East to Europe?"</li>
+                <li>"Between Asia and Australia - or vice versa"</li>
+                <li>"Departing from Singapore to anywhere"</li>
               </ul>
-              <p>What would you like to know about our cruises?</p>
+              <p><strong>🔍 I can also help with:</strong></p>
+              <ul>
+                <li>💰 Pricing and cabin types</li>
+                <li>📅 Departure dates and schedules</li>
+                <li>🚢 Cruise lines and ship details</li>
+                <li>🌍 Regional cruise options</li>
+              </ul>
+              <p><em>I only show relevant results - no random cruises!</em> What route interests you?</p>
             </div>
           </div>
         </div>
@@ -541,6 +548,78 @@ class CruiseHelperBot {
 
   async processWithIntelligence(message) {
     try {
+      console.log('🧠 CRUISE_BOT: Processing with Smart Route Intelligence...');
+      
+      // Initialize the client-side intelligence system if not already done
+      if (!this.intelligenceSystem) {
+        this.intelligenceSystem = new CruiseIntelligenceSystem();
+        await this.intelligenceSystem.init();
+        console.log('🧠 CRUISE_BOT: Client-side intelligence system initialized');
+      }
+
+      // Check if this is a route-based query
+      const isRouteQuery = this.detectRouteQuery(message);
+      console.log('🧠 CRUISE_BOT: Is route query:', isRouteQuery);
+
+      if (isRouteQuery) {
+        // Process with smart route intelligence
+        const routeResult = await this.intelligenceSystem.processRouteQuery(message);
+        console.log('🧠 CRUISE_BOT: Route intelligence result:', routeResult);
+        
+        if (routeResult.success) {
+          let response = routeResult.response;
+          
+          // Add cruise results if available
+          if (routeResult.results && routeResult.results.length > 0) {
+            response += this.formatCruiseResults(routeResult.results.slice(0, 3));
+          }
+          
+          // Add follow-up questions
+          if (routeResult.followUpQuestions && routeResult.followUpQuestions.length > 0) {
+            response += '\n\n**You might also ask:**\n';
+            routeResult.followUpQuestions.slice(0, 2).forEach(question => {
+              response += `• ${question}\n`;
+            });
+          }
+          
+          // Store conversation context
+          this.updateConversationHistory(message, response, routeResult.intent);
+          
+          return response;
+        }
+      }
+
+      // Fallback to API-based intelligence for non-route queries
+      return await this.processWithAPIIntelligence(message);
+      
+    } catch (error) {
+      console.error('🧠 CRUISE_BOT: Smart intelligence error:', error);
+      console.log('🧠 CRUISE_BOT: Falling back to API intelligence...');
+      return await this.processWithAPIIntelligence(message);
+    }
+  }
+
+  // 🎯 Route Query Detection
+  detectRouteQuery(message) {
+    const routePatterns = [
+      /from\s+.+\s+to\s+/i,
+      /\w+\s+to\s+\w+/i,
+      /between\s+.+\s+and\s+/i,
+      /departing\s+from\s+/i,
+      /sailing\s+to\s+/i,
+      /vice\s+versa/i,
+      /other\s+way\s+around/i,
+      /cruises?\s+from\s+/i,
+      /sailings?\s+from\s+/i,
+      /— or the other way around/i
+    ];
+
+    return routePatterns.some(pattern => pattern.test(message));
+  }
+
+  // 🌐 API-Based Intelligence (Fallback)
+  async processWithAPIIntelligence(message) {
+    try {
       // Get authentication token for member-only access
       const authToken = await this.getAuthToken();
       
@@ -564,23 +643,23 @@ class CruiseHelperBot {
         })
       });
 
-      console.log('🧠 CRUISE_BOT: Intelligence API response status:', response.status);
+      console.log('🧠 CRUISE_BOT: API Intelligence response status:', response.status);
 
       if (!response.ok) {
         throw new Error(`Intelligence API error: ${response.status}`);
       }
 
       const result = await response.json();
-      console.log('🧠 CRUISE_BOT: Intelligence API result:', result);
+      console.log('🧠 CRUISE_BOT: API Intelligence result:', result);
       
       if (result.success && result.response) {
         // Check if authentication is required
         if (result.requiresAuth) {
           // Add sign-in prompt for non-members
           let authResponse = result.response;
-          authResponse += '\n\n**To access cruise search:**\n';
-          authResponse += '• Sign in to your member account\n';
-          authResponse += '• Or create a new account if you\'re in the travel industry\n';
+          authResponse += '\n\n**To access full cruise search:**\n';
+          authResponse += '• [Sign in to your member account](/login)\n';
+          authResponse += '• [Create account if you\'re in travel industry](/signup)\n';
           authResponse += '\nI can still help with general cruise information!';
           
           this.updateConversationHistory(message, authResponse, { type: 'auth_required' });
@@ -612,8 +691,8 @@ class CruiseHelperBot {
       return null; // Fall back to original logic
       
     } catch (error) {
-      console.error('CRUISE_BOT: Intelligence system error:', error);
-      console.log('CRUISE_BOT: Intelligence system unavailable, using fallback');
+      console.error('🧠 CRUISE_BOT: API Intelligence system error:', error);
+      console.log('🧠 CRUISE_BOT: API Intelligence system unavailable, using fallback');
       return null; // Fall back to original logic
     }
   }

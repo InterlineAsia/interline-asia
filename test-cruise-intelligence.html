@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Smart Route-Based Cruise Intelligence</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+        .test-section {
+            background: #f8fafc;
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+            border: 1px solid #e2e8f0;
+        }
+        .test-query {
+            background: #3b82f6;
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-weight: 600;
+        }
+        .test-result {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            margin: 1rem 0;
+            white-space: pre-wrap;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 0.5rem;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧠 Smart Route-Based Cruise Intelligence Test</h1>
+    
+    <div class="test-section">
+        <h2>🎯 Route-Based Query Examples</h2>
+        <p>Test the new Smart Route Intelligence with these example queries:</p>
+        
+        <div class="test-query">
+            "Cruises from Japan to Alaska"
+        </div>
+        <button onclick="testQuery('Cruises from Japan to Alaska')">Test Query</button>
+        <div id="result1" class="test-result" style="display: none;"></div>
+        
+        <div class="test-query">
+            "Any sailings from the Middle East to Europe?"
+        </div>
+        <button onclick="testQuery('Any sailings from the Middle East to Europe?')">Test Query</button>
+        <div id="result2" class="test-result" style="display: none;"></div>
+        
+        <div class="test-query">
+            "Cruises from Africa to Asia — or the other way around"
+        </div>
+        <button onclick="testQuery('Cruises from Africa to Asia — or the other way around')">Test Query</button>
+        <div id="result3" class="test-result" style="display: none;"></div>
+        
+        <div class="test-query">
+            "Between Singapore and Australia - vice versa"
+        </div>
+        <button onclick="testQuery('Between Singapore and Australia - vice versa')">Test Query</button>
+        <div id="result4" class="test-result" style="display: none;"></div>
+        
+        <div class="test-query">
+            "Departing from Dubai to anywhere"
+        </div>
+        <button onclick="testQuery('Departing from Dubai to anywhere')">Test Query</button>
+        <div id="result5" class="test-result" style="display: none;"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🔧 Custom Test</h2>
+        <input type="text" id="customQuery" placeholder="Enter your route query..." style="width: 100%; padding: 1rem; border: 1px solid #d1d5db; border-radius: 8px; margin: 1rem 0;">
+        <button onclick="testCustomQuery()">Test Custom Query</button>
+        <div id="customResult" class="test-result" style="display: none;"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>📊 Intelligence System Status</h2>
+        <div id="systemStatus">Loading...</div>
+    </div>
+
+    <!-- Load the Smart Route Intelligence System -->
+    <script src="/js/cruise-intelligence-system.js"></script>
+    
+    <script>
+        let intelligenceSystem;
+        let testCounter = 0;
+        
+        async function initializeSystem() {
+            try {
+                intelligenceSystem = new CruiseIntelligenceSystem();
+                await intelligenceSystem.init();
+                
+                document.getElementById('systemStatus').innerHTML = `
+                    ✅ Smart Route Intelligence System Initialized<br>
+                    📊 Loaded ${intelligenceSystem.cruiseData.length} cruise records<br>
+                    🗺️ ${Object.keys(intelligenceSystem.regionMappings).length} region mappings configured<br>
+                    🎯 ${intelligenceSystem.routePatterns.length} route patterns active
+                `;
+            } catch (error) {
+                document.getElementById('systemStatus').innerHTML = `
+                    ❌ Error initializing system: ${error.message}
+                `;
+            }
+        }
+        
+        async function testQuery(query) {
+            testCounter++;
+            const resultId = `result${testCounter}`;
+            const resultDiv = document.getElementById(resultId) || document.getElementById('customResult');
+            
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '🔄 Processing query...';
+            
+            try {
+                if (!intelligenceSystem) {
+                    await initializeSystem();
+                }
+                
+                const result = await intelligenceSystem.processRouteQuery(query);
+                
+                let output = `🧠 QUERY ANALYSIS:\n`;
+                output += `Intent: ${result.intent?.type || 'unknown'}\n`;
+                output += `Origin: ${result.intent?.origin || 'not specified'}\n`;
+                output += `Destination: ${result.intent?.destination || 'not specified'}\n`;
+                output += `Vice Versa: ${result.intent?.viceVersa ? 'Yes' : 'No'}\n`;
+                output += `Confidence: ${result.intent?.confidence || 'N/A'}\n\n`;
+                
+                output += `📝 RESPONSE:\n${result.response}\n\n`;
+                
+                if (result.results && result.results.length > 0) {
+                    output += `🚢 MATCHING CRUISES (${result.results.length}):\n`;
+                    result.results.slice(0, 3).forEach((cruise, i) => {
+                        output += `${i + 1}. ${cruise.shipName} (${cruise.cruiseLine})\n`;
+                        output += `   ${cruise.region} • ${cruise.nights} nights\n`;
+                        output += `   ${cruise.departurePort} → ${cruise.arrivalPort}\n`;
+                        output += `   Match Score: ${cruise.matchScore?.toFixed(2) || 'N/A'}\n`;
+                        output += `   Reason: ${cruise.matchReason || 'N/A'}\n\n`;
+                    });
+                }
+                
+                if (result.followUpQuestions && result.followUpQuestions.length > 0) {
+                    output += `💡 FOLLOW-UP QUESTIONS:\n`;
+                    result.followUpQuestions.forEach(q => output += `• ${q}\n`);
+                }
+                
+                resultDiv.innerHTML = output;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+        
+        async function testCustomQuery() {
+            const query = document.getElementById('customQuery').value.trim();
+            if (!query) {
+                alert('Please enter a query to test');
+                return;
+            }
+            
+            await testQuery(query);
+        }
+        
+        // Initialize on page load
+        window.addEventListener('load', initializeSystem);
+    </script>
+</body>
+</html>

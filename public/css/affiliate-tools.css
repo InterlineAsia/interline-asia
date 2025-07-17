@@ -1,6 +1,6 @@
 /* Travel Tools & Affiliate Integration Styles */
 
-/* Travel Tools Bar */
+/* Travel Tools Bar - Updated with Modern Icons */
 .travel-tools-bar {
     background: linear-gradient(to right, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95));
     padding: 1.25rem 0;
@@ -8,6 +8,49 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+}
+
+/* Modern Icon Styles for Travel Tools */
+.travel-tool-icon {
+    font-size: 1.5rem !important;
+    line-height: 1;
+}
+
+/* Replace emoji icons with modern Remix icons */
+.travel-tool-item[href*="trip.tpk.mx"] .travel-tool-icon::before {
+    content: "";
+    font-family: "remixicon";
+    font-size: 1.5rem;
+}
+
+.travel-tool-item[href*="kiwitaxi.tpk.mx"] .travel-tool-icon::before {
+    content: "";
+    font-family: "remixicon";
+    font-size: 1.5rem;
+}
+
+.travel-tool-item[href*="ektatraveling.tpk.mx"] .travel-tool-icon::before {
+    content: "";
+    font-family: "remixicon";
+    font-size: 1.5rem;
+}
+
+.travel-tool-item[href*="airalo.tpk.mx"] .travel-tool-icon::before {
+    content: "";
+    font-family: "remixicon";
+    font-size: 1.5rem;
+}
+
+.travel-tool-item[href*="getrentacar.tpk.mx"] .travel-tool-icon::before {
+    content: "";
+    font-family: "remixicon";
+    font-size: 1.5rem;
+}
+
+.travel-tool-item[href*="wise.com"] .travel-tool-icon::before {
+    content: "";
+    font-family: "remixicon";
+    font-size: 1.5rem;
 }
 
 .travel-tools-container {

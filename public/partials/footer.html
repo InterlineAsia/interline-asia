@@ -1,53 +1,437 @@
-<!-- Social Media Section -->
-<section style="background-color: #fff; padding: 60px 40px; text-align: center; border-top: 1px solid #e0e0e0;">
-    <div style="max-width: 1200px; margin: 0 auto;">
-        <h3 style="color: #0C1E36; margin-bottom: 30px; font-size: 28px; font-weight: bold;">Connect With Us</h3>
-        <p style="color: #666; margin-bottom: 30px; font-size: 16px;">Stay updated with the latest cruise deals and travel industry news</p>
-        <div style="display: flex; justify-content: center; gap: 25px; flex-wrap: wrap;">
-            <!-- High-quality full-color social media icons -->
-            <a href="#" style="background: #1877f2; padding: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='scale(1.15)'; this.style.boxShadow='0 8px 25px rgba(24, 119, 242, 0.3)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
-                <i class="ri-facebook-fill" style="color: white; font-size: 28px;"></i>
+<!-- Ultra-Premium Modern Footer -->
+<style>
+    /* Import Google Fonts for Footer */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    
+    /* Ultra-Premium Social Media Section */
+    .ultra-premium-social {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
+        padding: 5rem 2.5rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    .ultra-premium-social::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="%23000" opacity="0.02"/><circle cx="75" cy="75" r="1" fill="%23000" opacity="0.02"/><circle cx="50" cy="10" r="1" fill="%23000" opacity="0.02"/><circle cx="10" cy="60" r="1" fill="%23000" opacity="0.02"/><circle cx="90" cy="40" r="1" fill="%23000" opacity="0.02"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        opacity: 0.3;
+    }
+    
+    .social-container {
+        max-width: 1440px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .social-title {
+        color: #0f172a;
+        margin-bottom: 1.5rem;
+        font-size: 2.5rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .social-subtitle {
+        color: #64748b;
+        margin-bottom: 3rem;
+        font-size: 1.125rem;
+        font-weight: 500;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        line-height: 1.6;
+    }
+    
+    .social-icons {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+    }
+    
+    .social-icon {
+        width: 72px;
+        height: 72px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .social-icon::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transition: left 0.6s ease;
+    }
+    
+    .social-icon:hover::before {
+        left: 100%;
+    }
+    
+    .social-icon:hover {
+        transform: translateY(-8px) scale(1.1);
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+    }
+    
+    .social-icon i {
+        font-size: 2rem;
+        color: white;
+        transition: all 0.3s ease;
+    }
+    
+    /* Brand-specific colors and hover effects */
+    .social-facebook {
+        background: linear-gradient(135deg, #1877f2 0%, #42a5f5 100%);
+    }
+    
+    .social-facebook:hover {
+        box-shadow: 0 16px 48px rgba(24, 119, 242, 0.4);
+    }
+    
+    .social-instagram {
+        background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    }
+    
+    .social-instagram:hover {
+        box-shadow: 0 16px 48px rgba(225, 48, 108, 0.4);
+    }
+    
+    .social-twitter {
+        background: linear-gradient(135deg, #000000 0%, #333333 100%);
+    }
+    
+    .social-twitter:hover {
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+    }
+    
+    .social-linkedin {
+        background: linear-gradient(135deg, #0077b5 0%, #00a0dc 100%);
+    }
+    
+    .social-linkedin:hover {
+        box-shadow: 0 16px 48px rgba(0, 119, 181, 0.4);
+    }
+    
+    .social-youtube {
+        background: linear-gradient(135deg, #ff0000 0%, #ff4444 100%);
+    }
+    
+    .social-youtube:hover {
+        box-shadow: 0 16px 48px rgba(255, 0, 0, 0.4);
+    }
+    
+    .social-tiktok {
+        background: linear-gradient(135deg, #000000 0%, #ff0050 50%, #00f2ea 100%);
+    }
+    
+    .social-tiktok:hover {
+        box-shadow: 0 16px 48px rgba(255, 0, 80, 0.4);
+    }
+    
+    /* Ultra-Premium Footer */
+    .ultra-premium-footer {
+        background: linear-gradient(135deg, #0a0f1c 0%, #1a2332 30%, #2d3748 60%, #4a5568 100%);
+        padding: 4rem 2.5rem 2rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    .ultra-premium-footer::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    }
+    
+    .footer-container {
+        max-width: 1440px;
+        margin: 0 auto;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .footer-logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin-bottom: 3rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .footer-logo:hover {
+        transform: translateY(-2px);
+    }
+    
+    .footer-logo-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #FF6B35 0%, #FF8E53 50%, #FFB574 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 1.5rem;
+        color: white;
+        box-shadow: 0 8px 32px rgba(255, 107, 53, 0.3);
+    }
+    
+    .footer-logo-text {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: white;
+        margin: 0;
+        letter-spacing: -0.5px;
+        background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .footer-links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+    
+    .footer-link {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.95rem;
+        padding: 0.75rem 1.25rem;
+        border-radius: 12px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .footer-link::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        border-radius: 12px;
+    }
+    
+    .footer-link:hover::before {
+        opacity: 1;
+    }
+    
+    .footer-link:hover {
+        color: #FF6B35;
+        transform: translateY(-2px);
+    }
+    
+    .footer-divider {
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        margin: 2rem 0;
+    }
+    
+    .footer-copyright {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.9rem;
+        font-weight: 400;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .footer-tagline {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        background: linear-gradient(90deg, #FF6B35, rgba(255, 255, 255, 0.7));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .ultra-premium-social {
+            padding: 3rem 1.5rem;
+        }
+        
+        .social-title {
+            font-size: 2rem;
+        }
+        
+        .social-subtitle {
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .social-icons {
+            gap: 1.5rem;
+        }
+        
+        .social-icon {
+            width: 64px;
+            height: 64px;
+        }
+        
+        .social-icon i {
+            font-size: 1.75rem;
+        }
+        
+        .ultra-premium-footer {
+            padding: 3rem 1.5rem 2rem;
+        }
+        
+        .footer-links {
+            gap: 1rem;
+            flex-direction: column;
+        }
+        
+        .footer-link {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .footer-logo {
+            margin-bottom: 2rem;
+        }
+        
+        .footer-logo-text {
+            font-size: 1.25rem;
+        }
+        
+        .footer-logo-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 1.25rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .social-icons {
+            gap: 1rem;
+        }
+        
+        .social-icon {
+            width: 56px;
+            height: 56px;
+        }
+        
+        .social-icon i {
+            font-size: 1.5rem;
+        }
+        
+        .footer-links {
+            gap: 0.5rem;
+        }
+    }
+</style>
+
+<!-- Ultra-Premium Social Media Section -->
+<section class="ultra-premium-social">
+    <div class="social-container">
+        <h3 class="social-title">Connect With Us</h3>
+        <p class="social-subtitle">Stay updated with the latest cruise deals, travel industry news, and exclusive offers from our luxury cruise partners</p>
+        <div class="social-icons">
+            <!-- Facebook -->
+            <a href="#" class="social-icon social-facebook" aria-label="Follow us on Facebook">
+                <i class="ri-facebook-fill"></i>
             </a>
-            <a href="#" style="background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); padding: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='scale(1.15)'; this.style.boxShadow='0 8px 25px rgba(225, 48, 108, 0.3)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
-                <i class="ri-instagram-line" style="color: white; font-size: 28px;"></i>
+            <!-- Instagram -->
+            <a href="#" class="social-icon social-instagram" aria-label="Follow us on Instagram">
+                <i class="ri-instagram-line"></i>
             </a>
-            <a href="#" style="background: #000000; padding: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='scale(1.15)'; this.style.boxShadow='0 8px 25px rgba(0, 0, 0, 0.3)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
-                <i class="ri-twitter-x-line" style="color: white; font-size: 28px;"></i>
+            <!-- Twitter/X -->
+            <a href="#" class="social-icon social-twitter" aria-label="Follow us on X (Twitter)">
+                <i class="ri-twitter-x-line"></i>
             </a>
-            <a href="#" style="background: #0077b5; padding: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='scale(1.15)'; this.style.boxShadow='0 8px 25px rgba(0, 119, 181, 0.3)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
-                <i class="ri-linkedin-fill" style="color: white; font-size: 28px;"></i>
+            <!-- LinkedIn -->
+            <a href="#" class="social-icon social-linkedin" aria-label="Connect with us on LinkedIn">
+                <i class="ri-linkedin-fill"></i>
             </a>
-            <a href="#" style="background: #ff0000; padding: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='scale(1.15)'; this.style.boxShadow='0 8px 25px rgba(255, 0, 0, 0.3)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
-                <i class="ri-youtube-fill" style="color: white; font-size: 28px;"></i>
+            <!-- YouTube -->
+            <a href="#" class="social-icon social-youtube" aria-label="Subscribe to our YouTube channel">
+                <i class="ri-youtube-fill"></i>
             </a>
-            <a href="#" style="background: #000000; padding: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='scale(1.15)'; this.style.boxShadow='0 8px 25px rgba(0, 0, 0, 0.3)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
-                <i class="ri-music-2-fill" style="color: white; font-size: 28px;"></i>
+            <!-- TikTok -->
+            <a href="#" class="social-icon social-tiktok" aria-label="Follow us on TikTok">
+                <i class="ri-music-2-fill"></i>
             </a>
         </div>
     </div>
 </section>
 
-<!-- Footer -->
-<footer style="background-color: #08152B; padding: 40px 20px 30px; color: #fff;">
-    <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
+<!-- Ultra-Premium Footer -->
+<footer class="ultra-premium-footer">
+    <div class="footer-container">
+        <!-- Footer Logo -->
+        <a href="/" class="footer-logo">
+            <div class="footer-logo-icon">IA</div>
+            <h2 class="footer-logo-text">Interline Asia</h2>
+        </a>
         
-        <!-- Quick Links Only -->
-        <div style="margin-bottom: 25px;">
-            <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 20px; font-size: 14px;">
-                <a href="/" style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;" onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">Home</a>
-                <a href="/#about" style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;" onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">About Us</a>
-                <a href="/#partners" style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;" onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">Partners</a>
-                <a href="/contact.html" style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;" onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">Contact</a>
-                <a href="/#faq" style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;" onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">FAQ</a>
-                <a href="/terms-and-conditions" style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;" onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">Terms & Conditions</a>
-                <a href="/privacy-policy" style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;" onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">Privacy Policy</a>
-                <a href="signup.html" style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;" onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">Login / Signup</a>
-            </div>
-        </div>
+        <!-- Footer Navigation Links -->
+        <nav class="footer-links">
+            <a href="/" class="footer-link">Home</a>
+            <a href="/#about" class="footer-link">About Us</a>
+            <a href="/#partners" class="footer-link">Partners</a>
+            <a href="/contact.html" class="footer-link">Contact</a>
+            <a href="/#faq" class="footer-link">FAQ</a>
+            <a href="/terms-and-conditions" class="footer-link">Terms & Conditions</a>
+            <a href="/privacy-policy" class="footer-link">Privacy Policy</a>
+            <a href="/login" class="footer-link">Login / Signup</a>
+        </nav>
         
-        <!-- Copyright -->
-        <div style="color: #999; font-size: 12px;">
-            <p style="margin: 0;">� 2025 Interline Asia. All rights reserved.</p>
+        <!-- Footer Divider -->
+        <div class="footer-divider"></div>
+        
+        <!-- Footer Copyright -->
+        <div class="footer-copyright">
+            <p class="footer-tagline">Luxury Cruises • Travel Professionals</p>
+            <p>© 2025 Interline Asia. All rights reserved.</p>
         </div>
     </div>
 </footer>

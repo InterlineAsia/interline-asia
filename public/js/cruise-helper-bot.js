@@ -89,60 +89,74 @@ class CruiseHelperBot {
       </div>
     `;
 
+    // Load modern design system
+    const modernCSS = document.createElement('link');
+    modernCSS.rel = 'stylesheet';
+    modernCSS.href = '/css/modern-design-system.css';
+    document.head.appendChild(modernCSS);
+
     // Add styles
     const styles = document.createElement('style');
     styles.textContent = `
       .chat-button {
         position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        bottom: 32px;
+        right: 32px;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
         color: white;
         border: none;
-        border-radius: 50px;
-        padding: 15px 20px;
+        border-radius: 9999px;
+        padding: 20px 28px;
         cursor: pointer;
-        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
-        z-index: 1000;
+        box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+        z-index: 9999;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         font-weight: 600;
-        transition: all 0.3s ease;
+        font-size: 15px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(12px);
       }
       
       .chat-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 30px rgba(59, 130, 246, 0.4);
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 32px 64px rgba(15, 23, 42, 0.4);
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
       }
       
       .chat-badge {
-        font-size: 14px;
+        font-size: 13px;
         white-space: nowrap;
       }
       
       .chat-window {
         position: fixed;
-        bottom: 90px;
-        right: 20px;
-        width: 380px;
-        height: 500px;
+        bottom: 110px;
+        right: 30px;
+        width: 400px;
+        height: 550px;
         background: white;
-        border-radius: 16px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-        z-index: 1001;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        z-index: 9998;
         display: none;
         flex-direction: column;
         overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        backdrop-filter: blur(20px);
       }
       
       .chat-header {
-        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
         color: white;
-        padding: 15px 20px;
+        padding: 20px 24px;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       }
       
       .chat-title {
@@ -207,15 +221,18 @@ class CruiseHelperBot {
       
       .message-content {
         background: #f8fafc;
-        padding: 12px 16px;
-        border-radius: 12px;
-        max-width: 280px;
-        line-height: 1.5;
+        padding: 16px 20px;
+        border-radius: 16px;
+        max-width: 300px;
+        line-height: 1.6;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(226, 232, 240, 0.6);
       }
       
       .user-message .message-content {
-        background: #3b82f6;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
         color: white;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.2);
       }
       
       .message-content ul {
@@ -345,15 +362,17 @@ class CruiseHelperBot {
       
       @media (max-width: 480px) {
         .chat-window {
-          width: calc(100vw - 40px);
-          height: calc(100vh - 140px);
-          bottom: 90px;
-          right: 20px;
+          width: calc(100vw - 32px);
+          height: calc(100vh - 120px);
+          bottom: 100px;
+          right: 16px;
+          border-radius: 16px;
         }
         
         .chat-button {
           bottom: 20px;
-          right: 20px;
+          right: 16px;
+          padding: 16px 20px;
         }
         
         .chat-badge {

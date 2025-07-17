@@ -1,155 +1,98 @@
-<!-- Ultra-Premium Modern Footer -->
+<!-- Clean Modern Footer -->
 <style>
-    /* Import Premium Fonts for Footer */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap');
-    
-    /* 🚢 REVOLUTIONARY Social Media Section with WOW Factor */
-    .revolutionary-social {
-        background: 
-            linear-gradient(135deg, 
-                rgba(6, 23, 78, 0.98) 0%, 
-                rgba(15, 32, 89, 0.95) 25%,
-                rgba(24, 41, 100, 0.92) 50%,
-                rgba(33, 50, 111, 0.88) 75%,
-                rgba(42, 59, 122, 0.85) 100%
-            ),
-            radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.3) 0%, transparent 50%),
-            radial-gradient(circle at 80% 70%, rgba(16, 185, 129, 0.2) 0%, transparent 50%),
-            url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"><defs><pattern id="sparkles" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1" fill="%23ffffff" opacity="0.4"><animate attributeName="opacity" values="0.4;0.9;0.4" dur="3s" repeatCount="indefinite"/></circle><circle cx="80" cy="40" r="0.5" fill="%2360a5fa" opacity="0.5"><animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/></circle><circle cx="50" cy="80" r="1.5" fill="%2310b981" opacity="0.3"><animate attributeName="opacity" values="0.3;0.8;0.3" dur="4s" repeatCount="indefinite"/></circle></pattern></defs><rect width="1920" height="1080" fill="url(%23sparkles)"/></svg>');
-        padding: 8rem 2.5rem;
+    /* Clean Social Media Section */
+    .social-section {
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
+        padding: 4rem 2rem;
         text-align: center;
-        position: relative;
-        overflow: hidden;
-        font-family: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        animation: socialGlow 10s ease-in-out infinite alternate;
+        color: white;
     }
     
-    @keyframes socialGlow {
-        0% { filter: brightness(1) saturate(1); }
-        100% { filter: brightness(1.08) saturate(1.15); }
-    }
-    
-    .social-content {
+    .social-container {
         max-width: 1200px;
         margin: 0 auto;
-        position: relative;
-        z-index: 2;
     }
     
     .social-title {
-        position: relative;
-        margin-bottom: 2rem;
-    }
-    
-    .title-gradient {
-        font-size: clamp(3rem, 6vw, 5rem);
-        font-weight: 900;
-        background: linear-gradient(135deg, #ffffff 0%, #60a5fa 30%, #3b82f6 60%, #1d4ed8 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        letter-spacing: -0.03em;
-        display: inline-block;
-        animation: titleShimmer 3s ease-in-out infinite;
-    }
-    
-    @keyframes titleShimmer {
-        0%, 100% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-    }
-    
-    .title-sparkle {
-        position: absolute;
-        top: -20px;
-        right: -30px;
-        font-size: 2rem;
-        animation: sparkle 2s ease-in-out infinite;
-    }
-    
-    @keyframes sparkle {
-        0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.7; }
-        50% { transform: scale(1.2) rotate(180deg); opacity: 1; }
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: white;
     }
     
     .social-subtitle {
-        color: rgba(255, 255, 255, 0.9);
-        font-size: 1.3rem;
-        font-weight: 400;
-        max-width: 800px;
-        margin: 0 auto 4rem;
-        line-height: 1.7;
-    }
-    
-    .social-icons-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 2rem;
-        margin-bottom: 5rem;
-        max-width: 900px;
+        font-size: 1.1rem;
+        margin-bottom: 3rem;
+        opacity: 0.9;
+        max-width: 600px;
         margin-left: auto;
         margin-right: auto;
     }
     
-    .social-icon {
+    .social-icons {
         display: flex;
-        flex-direction: column;
+        justify-content: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 3rem;
+    }
+    
+    .social-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
         align-items: center;
-        gap: 1rem;
-        padding: 2rem 1rem;
-        border-radius: 24px;
+        justify-content: center;
         text-decoration: none;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(20px);
-    }
-    
-    .icon-bg {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        border-radius: 24px;
-    }
-    
-    .social-icon:hover .icon-bg {
-        opacity: 1;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
     }
     
     .social-icon:hover {
-        transform: translateY(-12px) scale(1.05);
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        border-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-4px);
+        background: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
     }
     
-    .social-icon i {
-        font-size: 2.5rem;
-        color: white;
+    .social-icon svg {
+        width: 24px;
+        height: 24px;
+        fill: white;
         transition: all 0.3s ease;
-        position: relative;
-        z-index: 2;
     }
     
-    .social-label {
-        color: rgba(255, 255, 255, 0.9);
-        font-size: 0.9rem;
-        font-weight: 600;
-        position: relative;
-        z-index: 2;
+    /* Social Media Brand Colors */
+    .social-facebook:hover {
+        background: #1877F2;
+        border-color: #1877F2;
     }
     
-    /* Brand-specific hover effects */
-    .social-facebook .icon-bg { background: linear-gradient(135deg, #1877f2 0%, #42a5f5 100%); }
-    .social-instagram .icon-bg { background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
-    .social-linkedin .icon-bg { background: linear-gradient(135deg, #0077b5 0%, #00a0dc 100%); }
-    .social-youtube .icon-bg { background: linear-gradient(135deg, #ff0000 0%, #ff4444 100%); }
-    .social-twitter .icon-bg { background: linear-gradient(135deg, #000000 0%, #333333 100%); }
-    .social-tiktok .icon-bg { background: linear-gradient(135deg, #000000 0%, #ff0050 50%, #00f2ea 100%); }
+    .social-instagram:hover {
+        background: linear-gradient(45deg, #833AB4, #FD1D1D, #FCB045);
+        border-color: #833AB4;
+    }
+    
+    .social-linkedin:hover {
+        background: #0A66C2;
+        border-color: #0A66C2;
+    }
+    
+    .social-youtube:hover {
+        background: #FF0000;
+        border-color: #FF0000;
+    }
+    
+    .social-twitter:hover {
+        background: #000000;
+        border-color: #000000;
+    }
+    
+    .social-tiktok:hover {
+        background: #000000;
+        border-color: #000000;
+    }
     
     .social-stats {
         display: grid;
@@ -161,230 +104,35 @@
     
     .stat-item {
         text-align: center;
-        padding: 2rem 1rem;
-        background: rgba(255, 255, 255, 0.08);
-        border-radius: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(20px);
-        transition: all 0.3s ease;
-    }
-    
-    .stat-item:hover {
-        transform: translateY(-4px);
-        background: rgba(255, 255, 255, 0.12);
-        border-color: rgba(59, 130, 246, 0.3);
-    }
-    
-    .stat-number {
-        font-size: 2.5rem;
-        font-weight: 900;
-        color: #60a5fa;
-        margin-bottom: 0.5rem;
-        font-family: 'Space Grotesk', sans-serif;
-    }
-    
-    .stat-label {
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 0.95rem;
-        font-weight: 500;
-    }
-    
-    /* Revolutionary Social Media Section */
-    .ultra-premium-social {
-        background: linear-gradient(135deg, 
-            #0f172a 0%, 
-            #1e293b 25%, 
-            #334155 50%, 
-            #475569 75%, 
-            #64748b 100%);
-        padding: 8rem 2.5rem;
-        text-align: center;
-        position: relative;
-        overflow: hidden;
-        font-family: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-    
-    .ultra-premium-social::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="%23000" opacity="0.02"/><circle cx="75" cy="75" r="1" fill="%23000" opacity="0.02"/><circle cx="50" cy="10" r="1" fill="%23000" opacity="0.02"/><circle cx="10" cy="60" r="1" fill="%23000" opacity="0.02"/><circle cx="90" cy="40" r="1" fill="%23000" opacity="0.02"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-        opacity: 0.3;
-    }
-    
-    .social-container {
-        max-width: 1440px;
-        margin: 0 auto;
-        position: relative;
-        z-index: 1;
-    }
-    
-    .social-title {
-        color: #ffffff;
-        margin-bottom: 1.5rem;
-        font-size: clamp(2.5rem, 5vw, 4rem);
-        font-weight: 800;
-        letter-spacing: -0.02em;
-        background: linear-gradient(135deg, #ffffff 0%, #60a5fa 50%, #3b82f6 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        position: relative;
-        display: inline-block;
-    }
-    
-    .social-title::after {
-        content: '';
-        position: absolute;
-        bottom: -10px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 120px;
-        height: 4px;
-        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-        border-radius: 2px;
-        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
-    }
-    
-    .social-subtitle {
-        color: rgba(255, 255, 255, 0.85);
-        margin-bottom: 4rem;
-        font-size: 1.25rem;
-        font-weight: 400;
-        max-width: 700px;
-        margin-left: auto;
-        margin-right: auto;
-        line-height: 1.7;
-    }
-    
-    .social-icons {
-        display: flex;
-        justify-content: center;
-        gap: 2rem;
-        flex-wrap: wrap;
-        margin-bottom: 2rem;
-    }
-    
-    .social-icon {
-        width: 72px;
-        height: 72px;
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        backdrop-filter: blur(10px);
+        padding: 1.5rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
         border: 1px solid rgba(255, 255, 255, 0.2);
     }
     
-    .social-icon::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-        transition: left 0.6s ease;
-    }
-    
-    .social-icon:hover::before {
-        left: 100%;
-    }
-    
-    .social-icon:hover {
-        transform: translateY(-8px) scale(1.1);
-        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
-    }
-    
-    .social-icon i {
+    .stat-number {
         font-size: 2rem;
+        font-weight: 700;
         color: white;
-        transition: all 0.3s ease;
+        margin-bottom: 0.5rem;
     }
     
-    /* Brand-specific colors and hover effects */
-    .social-facebook {
-        background: linear-gradient(135deg, #1877f2 0%, #42a5f5 100%);
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
     }
     
-    .social-facebook:hover {
-        box-shadow: 0 16px 48px rgba(24, 119, 242, 0.4);
-    }
-    
-    .social-instagram {
-        background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-    }
-    
-    .social-instagram:hover {
-        box-shadow: 0 16px 48px rgba(225, 48, 108, 0.4);
-    }
-    
-    .social-twitter {
-        background: linear-gradient(135deg, #000000 0%, #333333 100%);
-    }
-    
-    .social-twitter:hover {
-        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
-    }
-    
-    .social-linkedin {
-        background: linear-gradient(135deg, #0077b5 0%, #00a0dc 100%);
-    }
-    
-    .social-linkedin:hover {
-        box-shadow: 0 16px 48px rgba(0, 119, 181, 0.4);
-    }
-    
-    .social-youtube {
-        background: linear-gradient(135deg, #ff0000 0%, #ff4444 100%);
-    }
-    
-    .social-youtube:hover {
-        box-shadow: 0 16px 48px rgba(255, 0, 0, 0.4);
-    }
-    
-    .social-tiktok {
-        background: linear-gradient(135deg, #000000 0%, #ff0050 50%, #00f2ea 100%);
-    }
-    
-    .social-tiktok:hover {
-        box-shadow: 0 16px 48px rgba(255, 0, 80, 0.4);
-    }
-    
-    /* Ultra-Premium Footer */
-    .ultra-premium-footer {
-        background: linear-gradient(135deg, #0a0f1c 0%, #1a2332 30%, #2d3748 60%, #4a5568 100%);
-        padding: 4rem 2.5rem 2rem;
+    /* Clean Footer */
+    .main-footer {
+        background: #1f2937;
+        padding: 3rem 2rem 1.5rem;
         color: white;
-        position: relative;
-        overflow: hidden;
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-    
-    .ultra-premium-footer::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
     }
     
     .footer-container {
-        max-width: 1440px;
+        max-width: 1200px;
         margin: 0 auto;
         text-align: center;
-        position: relative;
-        z-index: 1;
     }
     
     .footer-logo {
@@ -392,118 +140,73 @@
         align-items: center;
         justify-content: center;
         gap: 1rem;
-        margin-bottom: 3rem;
+        margin-bottom: 2rem;
         text-decoration: none;
-        transition: all 0.3s ease;
-    }
-    
-    .footer-logo:hover {
-        transform: translateY(-2px);
     }
     
     .footer-logo-icon {
-        width: 56px;
-        height: 56px;
-        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%);
-        border-radius: 16px;
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: 800;
-        font-size: 1.75rem;
+        font-weight: 700;
+        font-size: 1.5rem;
         color: white;
-        box-shadow: 0 12px 40px rgba(59, 130, 246, 0.4);
-        border: 2px solid rgba(255, 255, 255, 0.1);
-        transition: all 0.4s ease;
     }
     
     .footer-logo-text {
         font-size: 1.5rem;
-        font-weight: 800;
+        font-weight: 700;
         color: white;
         margin: 0;
-        letter-spacing: -0.5px;
-        background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
     }
     
     .footer-links {
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
-        align-items: center;
         gap: 2rem;
-        margin-bottom: 3rem;
+        margin-bottom: 2rem;
     }
     
     .footer-link {
         color: rgba(255, 255, 255, 0.8);
         text-decoration: none;
-        font-weight: 500;
-        font-size: 0.95rem;
-        padding: 0.75rem 1.25rem;
-        border-radius: 12px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .footer-link::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        border-radius: 12px;
-    }
-    
-    .footer-link:hover::before {
-        opacity: 1;
+        font-size: 0.9rem;
+        transition: color 0.3s ease;
     }
     
     .footer-link:hover {
-        color: #3b82f6;
-        transform: translateY(-2px);
+        color: #60a5fa;
     }
     
     .footer-divider {
         width: 100%;
         height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        background: rgba(255, 255, 255, 0.2);
         margin: 2rem 0;
     }
     
     .footer-copyright {
         color: rgba(255, 255, 255, 0.6);
         font-size: 0.9rem;
-        font-weight: 400;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
+        text-align: center;
     }
     
     .footer-tagline {
         color: rgba(255, 255, 255, 0.7);
-        font-size: 0.85rem;
-        font-weight: 500;
+        font-size: 0.8rem;
+        margin-bottom: 0.5rem;
         text-transform: uppercase;
         letter-spacing: 1px;
-        background: linear-gradient(90deg, #3b82f6, #60a5fa, rgba(255, 255, 255, 0.7));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
     }
     
     /* Mobile Responsive */
     @media (max-width: 768px) {
-        .ultra-premium-social {
+        .social-section {
             padding: 3rem 1.5rem;
         }
         
@@ -511,40 +214,27 @@
             font-size: 2rem;
         }
         
-        .social-subtitle {
-            font-size: 1rem;
-            margin-bottom: 2rem;
-        }
-        
         .social-icons {
-            gap: 1.5rem;
+            gap: 1rem;
         }
         
         .social-icon {
-            width: 64px;
-            height: 64px;
+            width: 50px;
+            height: 50px;
         }
         
-        .social-icon i {
-            font-size: 1.75rem;
+        .social-icon svg {
+            width: 20px;
+            height: 20px;
         }
         
-        .ultra-premium-footer {
-            padding: 3rem 1.5rem 2rem;
+        .main-footer {
+            padding: 2rem 1.5rem 1rem;
         }
         
         .footer-links {
-            gap: 1rem;
             flex-direction: column;
-        }
-        
-        .footer-link {
-            padding: 0.5rem 1rem;
-            font-size: 0.9rem;
-        }
-        
-        .footer-logo {
-            margin-bottom: 2rem;
+            gap: 1rem;
         }
         
         .footer-logo-text {
@@ -557,96 +247,72 @@
             font-size: 1.25rem;
         }
     }
-    
-    @media (max-width: 480px) {
-        .social-icons {
-            gap: 1rem;
-        }
-        
-        .social-icon {
-            width: 56px;
-            height: 56px;
-        }
-        
-        .social-icon i {
-            font-size: 1.5rem;
-        }
-        
-        .footer-links {
-            gap: 0.5rem;
-        }
-    }
 </style>
 
-<!-- 🌊 STUNNING Social Media Section with WOW Factor -->
-<section class="revolutionary-social">
+<!-- Clean Social Media Section -->
+<section class="social-section">
     <div class="social-container">
-        <div class="social-content">
-            <h3 class="social-title">
-                <span class="title-gradient">Connect With Us</span>
-                <div class="title-sparkle">✨</div>
-            </h3>
-            <p class="social-subtitle">Join thousands of travel professionals discovering exclusive cruise deals and industry insights</p>
-            
-            <div class="social-icons-grid">
-                <!-- Facebook -->
-                <a href="#" class="social-icon social-facebook" aria-label="Follow us on Facebook">
-                    <div class="icon-bg"></div>
-                    <i class="ri-facebook-fill"></i>
-                    <span class="social-label">Facebook</span>
-                </a>
-                <!-- Instagram -->
-                <a href="#" class="social-icon social-instagram" aria-label="Follow us on Instagram">
-                    <div class="icon-bg"></div>
-                    <i class="ri-instagram-line"></i>
-                    <span class="social-label">Instagram</span>
-                </a>
-                <!-- LinkedIn -->
-                <a href="#" class="social-icon social-linkedin" aria-label="Connect with us on LinkedIn">
-                    <div class="icon-bg"></div>
-                    <i class="ri-linkedin-fill"></i>
-                    <span class="social-label">LinkedIn</span>
-                </a>
-                <!-- YouTube -->
-                <a href="#" class="social-icon social-youtube" aria-label="Subscribe to our YouTube channel">
-                    <div class="icon-bg"></div>
-                    <i class="ri-youtube-fill"></i>
-                    <span class="social-label">YouTube</span>
-                </a>
-                <!-- Twitter/X -->
-                <a href="#" class="social-icon social-twitter" aria-label="Follow us on X">
-                    <div class="icon-bg"></div>
-                    <i class="ri-twitter-x-line"></i>
-                    <span class="social-label">X (Twitter)</span>
-                </a>
-                <!-- TikTok -->
-                <a href="#" class="social-icon social-tiktok" aria-label="Follow us on TikTok">
-                    <div class="icon-bg"></div>
-                    <i class="ri-music-2-fill"></i>
-                    <span class="social-label">TikTok</span>
-                </a>
+        <h3 class="social-title">Connect With Us</h3>
+        <p class="social-subtitle">Join thousands of travel professionals discovering exclusive cruise deals and industry insights</p>
+        
+        <div class="social-icons">
+            <!-- Facebook -->
+            <a href="#" class="social-icon social-facebook" aria-label="Follow us on Facebook">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M13.397 20.997v-8.196h2.765l.411-3.209h-3.176V7.548c0-.926.258-1.56 1.587-1.56h1.684V3.127A22.336 22.336 0 0 0 14.201 3c-2.444 0-4.122 1.492-4.122 4.231v2.355H7.332v3.209h2.753v8.202h3.312z"/>
+                </svg>
+            </a>
+            <!-- Instagram -->
+            <a href="#" class="social-icon social-instagram" aria-label="Follow us on Instagram">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                </svg>
+            </a>
+            <!-- LinkedIn -->
+            <a href="#" class="social-icon social-linkedin" aria-label="Connect with us on LinkedIn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
+                </svg>
+            </a>
+            <!-- YouTube -->
+            <a href="#" class="social-icon social-youtube" aria-label="Subscribe to our YouTube channel">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+                </svg>
+            </a>
+            <!-- Twitter/X -->
+            <a href="#" class="social-icon social-twitter" aria-label="Follow us on X">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+            </a>
+            <!-- TikTok -->
+            <a href="#" class="social-icon social-tiktok" aria-label="Follow us on TikTok">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M16.6 5.82s.51.5 0 0A4.278 4.278 0 0 1 15.54 3h-3.09v12.4a2.592 2.592 0 0 1-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.6 0-1.72 1.66-3.01 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64 0 3.33 2.76 5.7 5.69 5.7 3.14 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3s-1.88.09-3.24-1.48z"/>
+                </svg>
+            </a>
+        </div>
+        
+        <div class="social-stats">
+            <div class="stat-item">
+                <div class="stat-number">15K+</div>
+                <div class="stat-label">Travel Professionals</div>
             </div>
-            
-            <div class="social-stats">
-                <div class="stat-item">
-                    <div class="stat-number">15K+</div>
-                    <div class="stat-label">Travel Professionals</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">500+</div>
-                    <div class="stat-label">Cruise Deals Monthly</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">50+</div>
-                    <div class="stat-label">Cruise Lines</div>
-                </div>
+            <div class="stat-item">
+                <div class="stat-number">500+</div>
+                <div class="stat-label">Cruise Deals Monthly</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">50+</div>
+                <div class="stat-label">Cruise Lines</div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Ultra-Premium Footer -->
-<footer class="ultra-premium-footer">
+<!-- Clean Footer -->
+<footer class="main-footer">
     <div class="footer-container">
         <!-- Footer Logo -->
         <a href="/" class="footer-logo">

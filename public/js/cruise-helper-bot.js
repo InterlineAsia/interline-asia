@@ -871,8 +871,46 @@ class CruiseHelperBot {
     }
   }
 
+  async handleInventoryQuery(message) {
+    const totalCruises = this.cruiseData.length;
+    
+    if (totalCruises === 0) {
+      return "I'm currently loading our cruise inventory. Please try again in a moment!";
+    }
+    
+    let response = `🚢 **We currently have ${totalCruises} exclusive cruise deals available** for verified travel industry professionals!\n\n`;
+    
+    // Add breakdown by region
+    const regionCounts = {};
+    this.cruiseData.forEach(cruise => {
+      const region = cruise.region || 'Other';
+      regionCounts[region] = (regionCounts[region] || 0) + 1;
+    });
+    
+    response += "**By Region:**\n";
+    Object.entries(regionCounts)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 6)
+      .forEach(([region, count]) => {
+        response += `• ${region}: ${count} cruises\n`;
+      });
+    
+    response += "\n**What would you like to explore?**\n";
+    response += "• Ask about specific routes: *\"Cruises from Barcelona to Rome\"*\n";
+    response += "• Browse by region: *\"Show me Mediterranean cruises\"*\n";
+    response += "• Check availability: *\"Any cruises in December?\"*";
+    
+    return response;
+  }
+
   async processWithFallback(message) {
     const messageLower = message.toLowerCase();
+    
+    // Check for inventory/count queries
+    if (messageLower.includes('how many cruises') || messageLower.includes('how many deals') || 
+        messageLower.includes('total cruises') || messageLower.includes('available cruises')) {
+      return await this.handleInventoryQuery(message);
+    }
     
     // Check for cruise-specific queries
     if (messageLower.includes('cruise') || messageLower.includes('ship') || messageLower.includes('deal')) {

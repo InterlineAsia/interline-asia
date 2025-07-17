@@ -7,6 +7,9 @@ class CruiseHelperBot {
     this.cruiseData = [];
     this.isLoading = false;
     this.escalationMode = false;
+    this.userId = null;
+    this.conversationHistory = [];
+    this.intelligenceEnabled = true; // Flag to enable/disable intelligence
     this.init();
   }
 
@@ -520,6 +523,218 @@ class CruiseHelperBot {
   }
 
   async processMessage(message) {
+    try {
+      // First try the intelligent cruise engine
+      const intelligentResponse = await this.processWithIntelligence(message);
+      if (intelligentResponse) {
+        return intelligentResponse;
+      }
+      
+      // Fallback to original logic if intelligence fails
+      return await this.processWithFallback(message);
+      
+    } catch (error) {
+      console.error('CRUISE_BOT: Error in processMessage:', error);
+      return await this.processWithFallback(message);
+    }
+  }
+
+  async processWithIntelligence(message) {
+    try {
+      // Get authentication token for member-only access
+      const authToken = await this.getAuthToken();
+      
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+      
+      // Add authorization header if user is signed in
+      if (authToken) {
+        headers['Authorization'] = `Bearer ${authToken}`;
+      }
+
+      // Call the new cruise intelligence API
+      const response = await fetch('/api/cruise-intelligence-handler', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({
+          message: message,
+          userId: this.getUserId(),
+          conversationHistory: this.getConversationHistory()
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Intelligence API error: ${response.status}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.success && result.response) {
+        // Check if authentication is required
+        if (result.requiresAuth) {
+          // Add sign-in prompt for non-members
+          let authResponse = result.response;
+          authResponse += '\n\n**To access cruise search:**\n';
+          authResponse += '• Sign in to your member account\n';
+          authResponse += '• Or create a new account if you\'re in the travel industry\n';
+          authResponse += '\nI can still help with general cruise information!';
+          
+          this.updateConversationHistory(message, authResponse, { type: 'auth_required' });
+          return authResponse;
+        }
+        
+        // Format the intelligent response for display
+        let formattedResponse = result.response;
+        
+        // Add cruise results if available
+        if (result.results && result.results.length > 0) {
+          formattedResponse += this.formatCruiseResults(result.results.slice(0, 3));
+        }
+        
+        // Add follow-up questions if available
+        if (result.followUpQuestions && result.followUpQuestions.length > 0) {
+          formattedResponse += '\n\n**You might also ask:**\n';
+          result.followUpQuestions.slice(0, 2).forEach(question => {
+            formattedResponse += `• ${question}\n`;
+          });
+        }
+        
+        // Store conversation context
+        this.updateConversationHistory(message, formattedResponse, result.intent);
+        
+        return formattedResponse;
+      }
+      
+      return null; // Fall back to original logic
+      
+    } catch (error) {
+      console.log('CRUISE_BOT: Intelligence system unavailable, using fallback');
+      return null; // Fall back to original logic
+    }
+  }
+
+  formatCruiseResults(results) {
+    if (!results || results.length === 0) return '';
+    
+    let formatted = '\n\n🚢 **Here are some great options:**\n\n';
+    
+    results.forEach((cruise, index) => {
+      const price = this.getDisplayPrice(cruise);
+      formatted += `**${index + 1}. ${cruise.shipName || cruise.cruiseLine}**\n`;
+      formatted += `📍 ${cruise.region} • ${cruise.nights} nights\n`;
+      formatted += `💰 ${price}\n`;
+      if (cruise.departureDate) {
+        formatted += `📅 Departure: ${cruise.departureDate}\n`;
+      }
+      formatted += '\n';
+    });
+    
+    return formatted;
+  }
+
+  getDisplayPrice(cruise) {
+    // Check for actual prices in order of preference
+    const priceFields = ['insidePrice', 'oceanviewPrice', 'balconyPrice', 'suitePrice'];
+    
+    for (const field of priceFields) {
+      const price = cruise[field];
+      if (price && price !== 'Quote Available' && price.toString().includes('$')) {
+        return `from ${price}`;
+      }
+    }
+    
+    return 'Quote Available';
+  }
+
+  getUserId() {
+    // Generate or retrieve user ID for conversation tracking
+    if (!this.userId) {
+      this.userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+    return this.userId;
+  }
+
+  getConversationHistory() {
+    return this.conversationHistory || [];
+  }
+
+  updateConversationHistory(userMessage, botResponse, intent) {
+    if (!this.conversationHistory) {
+      this.conversationHistory = [];
+    }
+    
+    this.conversationHistory.push({
+      user: userMessage,
+      bot: botResponse,
+      intent: intent,
+      timestamp: Date.now()
+    });
+    
+    // Keep only last 10 exchanges
+    if (this.conversationHistory.length > 10) {
+      this.conversationHistory = this.conversationHistory.slice(-10);
+    }
+  }
+
+  // Get authentication token for member-only features
+  async getAuthToken() {
+    try {
+      // Check if Supabase client is available globally
+      if (window.supabaseClient && window.supabaseClient.currentSession) {
+        return window.supabaseClient.currentSession.access_token;
+      }
+      
+      // Check if user is logged in via global supabase
+      if (window.supabase) {
+        const { data: { session } } = await window.supabase.auth.getSession();
+        if (session && session.access_token) {
+          return session.access_token;
+        }
+      }
+      
+      // Check localStorage for session (fallback)
+      const storedSession = localStorage.getItem('supabase.auth.token');
+      if (storedSession) {
+        try {
+          const sessionData = JSON.parse(storedSession);
+          if (sessionData.access_token) {
+            return sessionData.access_token;
+          }
+        } catch (e) {
+          // Invalid stored session
+        }
+      }
+      
+      return null; // No valid authentication found
+      
+    } catch (error) {
+      console.log('CRUISE_BOT: Could not retrieve auth token:', error.message);
+      return null;
+    }
+  }
+
+  // Check if user is signed in (for UI hints)
+  isUserSignedIn() {
+    try {
+      if (window.supabaseClient && window.supabaseClient.currentUser) {
+        return true;
+      }
+      
+      if (window.supabase) {
+        // This is async, but we'll use it as a hint
+        window.supabase.auth.getSession().then(({ data: { session } }) => {
+          this.userSignedIn = !!session;
+        });
+      }
+      
+      return this.userSignedIn || false;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async processWithFallback(message) {
     const messageLower = message.toLowerCase();
     
     // Check for cruise-specific queries

@@ -674,8 +674,8 @@ class CruiseHelperBot {
       console.log('🧠 CRUISE_BOT: API Intelligence result:', result);
       
       if (result.success && result.response) {
-        // Check if authentication is required
-        if (result.requiresAuth) {
+        // Check if authentication is required and user is NOT signed in
+        if (result.requiresAuth && !await this.isUserAuthenticated()) {
           // Add sign-in prompt for non-members
           let authResponse = result.response;
           authResponse += '\n\n**To access full cruise search:**\n';
@@ -834,6 +834,39 @@ class CruiseHelperBot {
       
       return this.userSignedIn || false;
     } catch (error) {
+      return false;
+    }
+  }
+
+  // Async version for proper authentication checking
+  async isUserAuthenticated() {
+    try {
+      // Check if Supabase client is available globally
+      if (window.supabaseClient && window.supabaseClient.currentSession) {
+        return true;
+      }
+      
+      // Check if user is logged in via global supabase
+      if (window.supabase) {
+        const { data: { session } } = await window.supabase.auth.getSession();
+        return !!session;
+      }
+      
+      // Check localStorage for session (fallback)
+      const storedSession = localStorage.getItem('supabase.auth.token');
+      if (storedSession) {
+        try {
+          const sessionData = JSON.parse(storedSession);
+          return !!sessionData.access_token;
+        } catch (e) {
+          return false;
+        }
+      }
+      
+      return false;
+      
+    } catch (error) {
+      console.log('CRUISE_BOT: Could not check authentication:', error.message);
       return false;
     }
   }

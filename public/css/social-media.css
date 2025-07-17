@@ -1,0 +1,78 @@
+/* Floating Social Media Bar */
+.floating-social-bar {
+    position: fixed;
+    left: 20px;
+    bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 999;
+}
+
+.floating-social-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    border-radius: 50%;
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    opacity: 0.9;
+}
+
+.floating-social-icon:hover {
+    transform: translateY(-5px) scale(1.1);
+    opacity: 1;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.floating-social-icon.facebook:hover {
+    background: #1877F2;
+}
+
+.floating-social-icon.instagram:hover {
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+}
+
+.floating-social-icon.twitter:hover {
+    background: #1DA1F2;
+}
+
+.floating-social-icon.linkedin:hover {
+    background: #0A66C2;
+}
+
+.floating-social-icon.youtube:hover {
+    background: #FF0000;
+}
+
+.floating-social-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .floating-social-bar {
+        left: 10px;
+        bottom: 10px;
+    }
+    
+    .floating-social-icon {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media (max-width: 480px) {
+    .floating-social-bar {
+        flex-direction: row;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 15px;
+    }
+}

@@ -389,28 +389,62 @@ class CruiseHelperBot {
 
   async loadCruiseData() {
     try {
-      console.log('CRUISE_BOT: Loading cruise data...');
+      console.log('🚢 CRUISE_BOT: Loading COMPLETE cruise inventory...');
+      
+      // Check if we need to refresh data (weekly refresh)
+      const lastUpdate = localStorage.getItem('cruiseDataLastUpdate');
+      const oneWeek = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+      const shouldRefresh = !lastUpdate || (Date.now() - parseInt(lastUpdate)) > oneWeek;
+      
+      if (shouldRefresh) {
+        console.log('🔄 CRUISE_BOT: Weekly refresh needed, loading fresh data...');
+        localStorage.removeItem('cruiseDataCache');
+      }
+      
+      // Try to load from cache first
+      const cachedData = localStorage.getItem('cruiseDataCache');
+      if (cachedData && !shouldRefresh) {
+        console.log('⚡ CRUISE_BOT: Loading from cache...');
+        this.cruiseData = JSON.parse(cachedData);
+        console.log(`✅ CRUISE_BOT: Loaded ${this.cruiseData.length} cached cruise deals`);
+        return;
+      }
+      
+      // Load fresh data from CSV files
+      this.cruiseData = [];
       
       // Load river cruise data
-      const riverResponse = await fetch('/river.csv');
+      const riverResponse = await fetch('/river.csv?t=' + Date.now());
       if (riverResponse.ok) {
         const riverCSV = await riverResponse.text();
         const riverDeals = this.parseCSV(riverCSV, 'River Cruise');
         this.cruiseData = this.cruiseData.concat(riverDeals);
+        console.log(`🏞️ CRUISE_BOT: Loaded ${riverDeals.length} river cruises`);
       }
 
       // Load ocean cruise data
-      const oceanResponse = await fetch('/twins.csv');
+      const oceanResponse = await fetch('/twins.csv?t=' + Date.now());
       if (oceanResponse.ok) {
         const oceanCSV = await oceanResponse.text();
         const oceanDeals = this.parseCSV(oceanCSV, 'Ocean Cruise');
         this.cruiseData = this.cruiseData.concat(oceanDeals);
+        console.log(`🌊 CRUISE_BOT: Loaded ${oceanDeals.length} ocean cruises`);
       }
 
-      console.log(`CRUISE_BOT: Loaded ${this.cruiseData.length} cruise deals for bot knowledge`);
+      // Load any additional CSV files
+      await this.loadAdditionalCruiseFiles();
+
+      console.log(`✅ CRUISE_BOT: COMPLETE INVENTORY LOADED - ${this.cruiseData.length} total cruise deals`);
+      
+      // Cache the data and update timestamp
+      localStorage.setItem('cruiseDataCache', JSON.stringify(this.cruiseData));
+      localStorage.setItem('cruiseDataLastUpdate', Date.now().toString());
+      
+      // Build search indexes for faster queries
+      this.buildSearchIndexes();
       
     } catch (error) {
-      console.error('CRUISE_BOT: Error loading cruise data:', error);
+      console.error('❌ CRUISE_BOT: Error loading cruise data:', error);
     }
   }
 
@@ -421,10 +455,10 @@ class CruiseHelperBot {
     const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
     const deals = [];
     
-    // Load first 100 deals for bot knowledge
-    const maxDeals = Math.min(lines.length - 1, 100);
+    // Load ALL deals for complete bot knowledge
+    console.log(`CRUISE_BOT: Loading ALL ${lines.length - 1} ${cruiseType} deals...`);
     
-    for (let i = 1; i <= maxDeals; i++) {
+    for (let i = 1; i < lines.length; i++) {
       try {
         const values = this.parseCSVLine(lines[i]);
         const deal = this.createDeal(headers, values, cruiseType);
@@ -436,6 +470,7 @@ class CruiseHelperBot {
       }
     }
     
+    console.log(`CRUISE_BOT: Successfully loaded ${deals.length} ${cruiseType} deals`);
     return deals;
   }
 
@@ -875,32 +910,115 @@ class CruiseHelperBot {
     const totalCruises = this.cruiseData.length;
     
     if (totalCruises === 0) {
-      return "I'm currently loading our cruise inventory. Please try again in a moment!";
+      return "🔄 I'm currently loading our complete cruise inventory. Please try again in a moment!";
     }
     
-    let response = `🚢 **We currently have ${totalCruises} exclusive cruise deals available** for verified travel industry professionals!\n\n`;
+    let response = `🚢 **COMPLETE INVENTORY: ${totalCruises.toLocaleString()} exclusive cruise deals available!**\n\n`;
     
-    // Add breakdown by region
-    const regionCounts = {};
-    this.cruiseData.forEach(cruise => {
-      const region = cruise.region || 'Other';
-      regionCounts[region] = (regionCounts[region] || 0) + 1;
-    });
+    // Add comprehensive breakdown
+    const stats = this.generateInventoryStats();
     
-    response += "**By Region:**\n";
-    Object.entries(regionCounts)
+    response += "**📊 INVENTORY BREAKDOWN:**\n";
+    response += `• **Total Cruises:** ${totalCruises.toLocaleString()}\n`;
+    response += `• **Regions Covered:** ${stats.regions.length}\n`;
+    response += `• **Cruise Lines:** ${stats.cruiseLines.length}\n`;
+    response += `• **Departure Ports:** ${stats.departurePorts.length}\n\n`;
+    
+    response += "**🌍 TOP REGIONS:**\n";
+    Object.entries(stats.regionCounts)
       .sort(([,a], [,b]) => b - a)
-      .slice(0, 6)
+      .slice(0, 8)
       .forEach(([region, count]) => {
-        response += `• ${region}: ${count} cruises\n`;
+        response += `• ${region}: ${count.toLocaleString()} cruises\n`;
       });
     
-    response += "\n**What would you like to explore?**\n";
-    response += "• Ask about specific routes: *\"Cruises from Barcelona to Rome\"*\n";
-    response += "• Browse by region: *\"Show me Mediterranean cruises\"*\n";
-    response += "• Check availability: *\"Any cruises in December?\"*";
+    response += "\n**⚓ TOP CRUISE LINES:**\n";
+    Object.entries(stats.cruiseLineCounts)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 6)
+      .forEach(([line, count]) => {
+        response += `• ${line}: ${count.toLocaleString()} cruises\n`;
+      });
+    
+    response += "\n**💰 PRICE RANGES:**\n";
+    response += `• Budget (Under $1,000): ${stats.priceRanges.budget.toLocaleString()}\n`;
+    response += `• Moderate ($1,000-$2,500): ${stats.priceRanges.moderate.toLocaleString()}\n`;
+    response += `• Luxury ($2,500-$5,000): ${stats.priceRanges.luxury.toLocaleString()}\n`;
+    response += `• Premium ($5,000+): ${stats.priceRanges.premium.toLocaleString()}\n\n`;
+    
+    response += "**🔍 ASK ME ANYTHING:**\n";
+    response += "• *\"Show me Alaska cruises departing from Seattle\"*\n";
+    response += "• *\"Mediterranean cruises under $2000 in September\"*\n";
+    response += "• *\"Royal Caribbean ships to Caribbean\"*\n";
+    response += "• *\"River cruises in Europe next spring\"*\n\n";
+    
+    response += `📅 **Data Updated:** ${this.getLastUpdateTime()}\n`;
+    response += "🔄 **Auto-refresh:** Weekly (every Monday)";
     
     return response;
+  }
+
+  // Generate comprehensive inventory statistics
+  generateInventoryStats() {
+    const stats = {
+      regions: [],
+      cruiseLines: [],
+      departurePorts: [],
+      regionCounts: {},
+      cruiseLineCounts: {},
+      priceRanges: {
+        budget: 0,
+        moderate: 0,
+        luxury: 0,
+        premium: 0
+      }
+    };
+
+    this.cruiseData.forEach(cruise => {
+      // Regions
+      const region = cruise.region || 'Other';
+      if (!stats.regions.includes(region)) {
+        stats.regions.push(region);
+      }
+      stats.regionCounts[region] = (stats.regionCounts[region] || 0) + 1;
+
+      // Cruise Lines
+      const cruiseLine = cruise.cruiseLine || 'Unknown';
+      if (!stats.cruiseLines.includes(cruiseLine)) {
+        stats.cruiseLines.push(cruiseLine);
+      }
+      stats.cruiseLineCounts[cruiseLine] = (stats.cruiseLineCounts[cruiseLine] || 0) + 1;
+
+      // Departure Ports
+      const depPort = cruise.departurePort || 'Unknown';
+      if (!stats.departurePorts.includes(depPort)) {
+        stats.departurePorts.push(depPort);
+      }
+
+      // Price Ranges
+      const lowestPrice = this.getLowestPrice(cruise);
+      if (lowestPrice < 1000) {
+        stats.priceRanges.budget++;
+      } else if (lowestPrice < 2500) {
+        stats.priceRanges.moderate++;
+      } else if (lowestPrice < 5000) {
+        stats.priceRanges.luxury++;
+      } else if (lowestPrice < Infinity) {
+        stats.priceRanges.premium++;
+      }
+    });
+
+    return stats;
+  }
+
+  // Get last update time for display
+  getLastUpdateTime() {
+    const lastUpdate = localStorage.getItem('cruiseDataLastUpdate');
+    if (lastUpdate) {
+      const date = new Date(parseInt(lastUpdate));
+      return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+    }
+    return 'Just now';
   }
 
   async processWithFallback(message) {
@@ -1702,3 +1820,537 @@ Would you like me to suggest similar routes or help you explore other options?`;
 document.addEventListener('DOMContentLoaded', () => {
   window.cruiseBot = new CruiseHelperBot();
 });
+ 
+ // Load additional CSV files for complete inventory
+  async loadAdditionalCruiseFiles() {
+    const additionalFiles = [
+      'atlas.csv',
+      'deals.csv',
+      'cruise-deals.csv',
+      'inventory.csv'
+    ];
+
+    for (const filename of additionalFiles) {
+      try {
+        const response = await fetch(`/${filename}?t=` + Date.now());
+        if (response.ok) {
+          const csvText = await response.text();
+          const deals = this.parseCSV(csvText, 'Additional Cruise');
+          this.cruiseData = this.cruiseData.concat(deals);
+          console.log(`📊 CRUISE_BOT: Loaded ${deals.length} deals from ${filename}`);
+        }
+      } catch (error) {
+        console.log(`📊 CRUISE_BOT: ${filename} not found, skipping...`);
+      }
+    }
+  }
+
+  // Build search indexes for faster queries
+  buildSearchIndexes() {
+    console.log('🔍 CRUISE_BOT: Building search indexes...');
+    
+    this.searchIndexes = {
+      byRegion: {},
+      byCruiseLine: {},
+      byDeparturePort: {},
+      byArrivalPort: {},
+      byMonth: {},
+      byPriceRange: {
+        budget: [],      // Under $1000
+        moderate: [],    // $1000-2500
+        luxury: [],      // $2500-5000
+        premium: []      // Over $5000
+      }
+    };
+
+    this.cruiseData.forEach((cruise, index) => {
+      // Index by region
+      const region = cruise.region?.toLowerCase() || 'other';
+      if (!this.searchIndexes.byRegion[region]) {
+        this.searchIndexes.byRegion[region] = [];
+      }
+      this.searchIndexes.byRegion[region].push(index);
+
+      // Index by cruise line
+      const cruiseLine = cruise.cruiseLine?.toLowerCase() || 'unknown';
+      if (!this.searchIndexes.byCruiseLine[cruiseLine]) {
+        this.searchIndexes.byCruiseLine[cruiseLine] = [];
+      }
+      this.searchIndexes.byCruiseLine[cruiseLine].push(index);
+
+      // Index by departure port
+      const depPort = cruise.departurePort?.toLowerCase() || 'unknown';
+      if (!this.searchIndexes.byDeparturePort[depPort]) {
+        this.searchIndexes.byDeparturePort[depPort] = [];
+      }
+      this.searchIndexes.byDeparturePort[depPort].push(index);
+
+      // Index by arrival port
+      const arrPort = cruise.arrivalPort?.toLowerCase() || 'unknown';
+      if (!this.searchIndexes.byArrivalPort[arrPort]) {
+        this.searchIndexes.byArrivalPort[arrPort] = [];
+      }
+      this.searchIndexes.byArrivalPort[arrPort].push(index);
+
+      // Index by month
+      if (cruise.departureDate) {
+        const month = new Date(cruise.departureDate).getMonth();
+        if (!this.searchIndexes.byMonth[month]) {
+          this.searchIndexes.byMonth[month] = [];
+        }
+        this.searchIndexes.byMonth[month].push(index);
+      }
+
+      // Index by price range
+      const lowestPrice = Math.min(
+        cruise.insidePrice || Infinity,
+        cruise.oceanviewPrice || Infinity,
+        cruise.balconyPrice || Infinity,
+        cruise.suitePrice || Infinity
+      );
+
+      if (lowestPrice < 1000) {
+        this.searchIndexes.byPriceRange.budget.push(index);
+      } else if (lowestPrice < 2500) {
+        this.searchIndexes.byPriceRange.moderate.push(index);
+      } else if (lowestPrice < 5000) {
+        this.searchIndexes.byPriceRange.luxury.push(index);
+      } else if (lowestPrice < Infinity) {
+        this.searchIndexes.byPriceRange.premium.push(index);
+      }
+    });
+
+    console.log('✅ CRUISE_BOT: Search indexes built successfully');
+  }
+
+  // Enhanced cruise query handler with full inventory search
+  async handleCruiseQuery(message) {
+    const messageLower = message.toLowerCase();
+    let relevantDeals = [];
+
+    // Use search indexes for faster queries
+    if (this.searchIndexes) {
+      relevantDeals = this.searchWithIndexes(messageLower);
+    } else {
+      // Fallback to linear search
+      relevantDeals = this.cruiseData.filter(cruise => 
+        this.matchesCruiseQuery(cruise, messageLower)
+      );
+    }
+
+    if (relevantDeals.length === 0) {
+      return "I couldn't find any cruises matching your specific criteria. Let me connect you with our team who can help find exactly what you're looking for!";
+    }
+
+    // Sort by relevance and price
+    relevantDeals.sort((a, b) => {
+      const aPrice = this.getLowestPrice(a);
+      const bPrice = this.getLowestPrice(b);
+      return aPrice - bPrice;
+    });
+
+    let response = `🚢 **Found ${relevantDeals.length} cruises matching your request!**\n\n`;
+    
+    // Show top 5 results
+    const topResults = relevantDeals.slice(0, 5);
+    topResults.forEach((cruise, index) => {
+      const price = this.getDisplayPrice(cruise);
+      response += `**${index + 1}. ${cruise.cruiseLine} - ${cruise.shipName}**\n`;
+      response += `📍 ${cruise.region} • ${cruise.nights} nights\n`;
+      response += `🚢 ${cruise.departurePort} → ${cruise.arrivalPort}\n`;
+      response += `💰 ${price}\n`;
+      if (cruise.departureDate) {
+        response += `📅 ${cruise.departureDate}\n`;
+      }
+      response += '\n';
+    });
+
+    if (relevantDeals.length > 5) {
+      response += `*...and ${relevantDeals.length - 5} more options available!*\n\n`;
+    }
+
+    response += "**Want more details?** Ask me about:\n";
+    response += "• Specific dates or months\n";
+    response += "• Price ranges or cabin types\n";
+    response += "• Particular cruise lines\n";
+    response += "• Different regions or routes";
+
+    return response;
+  }
+
+  // Smart search using indexes
+  searchWithIndexes(query) {
+    let candidateIndexes = new Set();
+    let hasMatches = false;
+
+    // Search by region
+    Object.keys(this.searchIndexes.byRegion).forEach(region => {
+      if (query.includes(region)) {
+        this.searchIndexes.byRegion[region].forEach(idx => candidateIndexes.add(idx));
+        hasMatches = true;
+      }
+    });
+
+    // Search by cruise line
+    Object.keys(this.searchIndexes.byCruiseLine).forEach(line => {
+      if (query.includes(line.replace(/\s+/g, ' '))) {
+        this.searchIndexes.byCruiseLine[line].forEach(idx => candidateIndexes.add(idx));
+        hasMatches = true;
+      }
+    });
+
+    // Search by ports
+    Object.keys(this.searchIndexes.byDeparturePort).forEach(port => {
+      if (query.includes(port)) {
+        this.searchIndexes.byDeparturePort[port].forEach(idx => candidateIndexes.add(idx));
+        hasMatches = true;
+      }
+    });
+
+    Object.keys(this.searchIndexes.byArrivalPort).forEach(port => {
+      if (query.includes(port)) {
+        this.searchIndexes.byArrivalPort[port].forEach(idx => candidateIndexes.add(idx));
+        hasMatches = true;
+      }
+    });
+
+    // Search by price range
+    if (query.includes('budget') || query.includes('cheap') || query.includes('under 1000')) {
+      this.searchIndexes.byPriceRange.budget.forEach(idx => candidateIndexes.add(idx));
+      hasMatches = true;
+    }
+    if (query.includes('luxury') || query.includes('premium') || query.includes('expensive')) {
+      this.searchIndexes.byPriceRange.luxury.forEach(idx => candidateIndexes.add(idx));
+      this.searchIndexes.byPriceRange.premium.forEach(idx => candidateIndexes.add(idx));
+      hasMatches = true;
+    }
+
+    // If no specific matches, return all cruises for general queries
+    if (!hasMatches) {
+      return this.cruiseData;
+    }
+
+    // Convert indexes back to cruise objects
+    return Array.from(candidateIndexes).map(idx => this.cruiseData[idx]);
+  }
+
+  // Check if cruise matches query (fallback method)
+  matchesCruiseQuery(cruise, query) {
+    const searchFields = [
+      cruise.cruiseLine?.toLowerCase(),
+      cruise.shipName?.toLowerCase(),
+      cruise.region?.toLowerCase(),
+      cruise.departurePort?.toLowerCase(),
+      cruise.arrivalPort?.toLowerCase(),
+      cruise.itinerary?.toLowerCase()
+    ].filter(Boolean);
+
+    return searchFields.some(field => 
+      query.split(' ').some(word => field.includes(word))
+    );
+  }
+
+  // Get lowest available price for a cruise
+  getLowestPrice(cruise) {
+    const prices = [
+      cruise.insidePrice,
+      cruise.oceanviewPrice,
+      cruise.balconyPrice,
+      cruise.suitePrice
+    ].filter(price => price && price > 0);
+
+    return prices.length > 0 ? Math.min(...prices) : Infinity;
+  }
+
+  // Enhanced pricing query handler
+  async handlePricingQuery(message) {
+    const messageLower = message.toLowerCase();
+    let priceRange = null;
+
+    // Extract price range from query
+    if (messageLower.includes('under') || messageLower.includes('less than')) {
+      const match = messageLower.match(/(?:under|less than)\s*\$?(\d+)/);
+      if (match) {
+        priceRange = { max: parseInt(match[1]) };
+      }
+    } else if (messageLower.includes('over') || messageLower.includes('more than')) {
+      const match = messageLower.match(/(?:over|more than)\s*\$?(\d+)/);
+      if (match) {
+        priceRange = { min: parseInt(match[1]) };
+      }
+    } else if (messageLower.includes('between')) {
+      const match = messageLower.match(/between\s*\$?(\d+).*?(\d+)/);
+      if (match) {
+        priceRange = { min: parseInt(match[1]), max: parseInt(match[2]) };
+      }
+    }
+
+    let relevantCruises = this.cruiseData;
+
+    // Filter by price range if specified
+    if (priceRange) {
+      relevantCruises = this.cruiseData.filter(cruise => {
+        const lowestPrice = this.getLowestPrice(cruise);
+        if (lowestPrice === Infinity) return false;
+
+        if (priceRange.min && lowestPrice < priceRange.min) return false;
+        if (priceRange.max && lowestPrice > priceRange.max) return false;
+        return true;
+      });
+    }
+
+    if (relevantCruises.length === 0) {
+      return "I couldn't find cruises in that price range. Let me show you our best available deals or connect you with our team for personalized pricing!";
+    }
+
+    // Sort by price
+    relevantCruises.sort((a, b) => this.getLowestPrice(a) - this.getLowestPrice(b));
+
+    let response = `💰 **Found ${relevantCruises.length} cruises`;
+    if (priceRange) {
+      if (priceRange.min && priceRange.max) {
+        response += ` between $${priceRange.min} - $${priceRange.max}`;
+      } else if (priceRange.min) {
+        response += ` over $${priceRange.min}`;
+      } else if (priceRange.max) {
+        response += ` under $${priceRange.max}`;
+      }
+    }
+    response += `!**\n\n`;
+
+    // Show price breakdown
+    const priceRanges = {
+      'Budget (Under $1,000)': relevantCruises.filter(c => this.getLowestPrice(c) < 1000).length,
+      'Moderate ($1,000-$2,500)': relevantCruises.filter(c => {
+        const price = this.getLowestPrice(c);
+        return price >= 1000 && price < 2500;
+      }).length,
+      'Luxury ($2,500-$5,000)': relevantCruises.filter(c => {
+        const price = this.getLowestPrice(c);
+        return price >= 2500 && price < 5000;
+      }).length,
+      'Premium ($5,000+)': relevantCruises.filter(c => this.getLowestPrice(c) >= 5000).length
+    };
+
+    response += "**Price Breakdown:**\n";
+    Object.entries(priceRanges).forEach(([range, count]) => {
+      if (count > 0) {
+        response += `• ${range}: ${count} cruises\n`;
+      }
+    });
+
+    // Show top 3 best deals
+    response += "\n🏆 **Best Deals:**\n\n";
+    relevantCruises.slice(0, 3).forEach((cruise, index) => {
+      const price = this.getDisplayPrice(cruise);
+      response += `**${index + 1}. ${cruise.cruiseLine} - ${cruise.shipName}**\n`;
+      response += `📍 ${cruise.region} • ${cruise.nights} nights\n`;
+      response += `💰 ${price}\n\n`;
+    });
+
+    response += "Want to see more options or need help choosing? Just ask!";
+
+    return response;
+  }
+
+  // Enhanced date query handler
+  async handleDateQuery(message) {
+    const messageLower = message.toLowerCase();
+    const months = [
+      'january', 'february', 'march', 'april', 'may', 'june',
+      'july', 'august', 'september', 'october', 'november', 'december'
+    ];
+
+    let targetMonth = null;
+    let targetYear = null;
+
+    // Find mentioned month
+    months.forEach((month, index) => {
+      if (messageLower.includes(month)) {
+        targetMonth = index;
+      }
+    });
+
+    // Find mentioned year
+    const yearMatch = messageLower.match(/20\d{2}/);
+    if (yearMatch) {
+      targetYear = parseInt(yearMatch[0]);
+    }
+
+    let relevantCruises = this.cruiseData.filter(cruise => {
+      if (!cruise.departureDate) return false;
+      
+      const cruiseDate = new Date(cruise.departureDate);
+      if (isNaN(cruiseDate.getTime())) return false;
+
+      if (targetMonth !== null && cruiseDate.getMonth() !== targetMonth) return false;
+      if (targetYear !== null && cruiseDate.getFullYear() !== targetYear) return false;
+
+      return true;
+    });
+
+    if (relevantCruises.length === 0) {
+      return "I couldn't find cruises for that specific time period. Let me show you what's available nearby or connect you with our team for more options!";
+    }
+
+    // Sort by date
+    relevantCruises.sort((a, b) => new Date(a.departureDate) - new Date(b.departureDate));
+
+    let response = `📅 **Found ${relevantCruises.length} cruises`;
+    if (targetMonth !== null) {
+      response += ` in ${months[targetMonth]}`;
+    }
+    if (targetYear !== null) {
+      response += ` ${targetYear}`;
+    }
+    response += `!**\n\n`;
+
+    // Group by month
+    const monthlyBreakdown = {};
+    relevantCruises.forEach(cruise => {
+      const month = new Date(cruise.departureDate).getMonth();
+      const monthName = months[month];
+      if (!monthlyBreakdown[monthName]) {
+        monthlyBreakdown[monthName] = 0;
+      }
+      monthlyBreakdown[monthName]++;
+    });
+
+    response += "**Available by Month:**\n";
+    Object.entries(monthlyBreakdown).forEach(([month, count]) => {
+      response += `• ${month.charAt(0).toUpperCase() + month.slice(1)}: ${count} cruises\n`;
+    });
+
+    // Show upcoming departures
+    response += "\n🚢 **Upcoming Departures:**\n\n";
+    relevantCruises.slice(0, 4).forEach((cruise, index) => {
+      const price = this.getDisplayPrice(cruise);
+      response += `**${index + 1}. ${cruise.cruiseLine} - ${cruise.shipName}**\n`;
+      response += `📅 ${cruise.departureDate} • ${cruise.nights} nights\n`;
+      response += `📍 ${cruise.region}\n`;
+      response += `💰 ${price}\n\n`;
+    });
+
+    if (relevantCruises.length > 4) {
+      response += `*...and ${relevantCruises.length - 4} more departures available!*\n\n`;
+    }
+
+    response += "Need help choosing the perfect departure date? Just ask!";
+
+    return response;
+  }
+
+  // Enhanced destination query handler
+  async handleDestinationQuery(message) {
+    const messageLower = message.toLowerCase();
+    let relevantCruises = [];
+
+    // Use search indexes for destination queries
+    if (this.searchIndexes) {
+      relevantCruises = this.searchWithIndexes(messageLower);
+    } else {
+      relevantCruises = this.cruiseData.filter(cruise => 
+        this.matchesDestinationQuery(cruise, messageLower)
+      );
+    }
+
+    if (relevantCruises.length === 0) {
+      return "I couldn't find cruises to that destination. Let me connect you with our team who can help find the perfect cruise for your dream destination!";
+    }
+
+    // Group by region
+    const regionBreakdown = {};
+    relevantCruises.forEach(cruise => {
+      const region = cruise.region || 'Other';
+      if (!regionBreakdown[region]) {
+        regionBreakdown[region] = [];
+      }
+      regionBreakdown[region].push(cruise);
+    });
+
+    let response = `🌍 **Found ${relevantCruises.length} cruises to your destination!**\n\n`;
+
+    response += "**By Region:**\n";
+    Object.entries(regionBreakdown)
+      .sort(([,a], [,b]) => b.length - a.length)
+      .forEach(([region, cruises]) => {
+        response += `• ${region}: ${cruises.length} cruises\n`;
+      });
+
+    // Show featured destinations
+    response += "\n🏖️ **Featured Options:**\n\n";
+    const featuredCruises = relevantCruises
+      .sort((a, b) => this.getLowestPrice(a) - this.getLowestPrice(b))
+      .slice(0, 4);
+
+    featuredCruises.forEach((cruise, index) => {
+      const price = this.getDisplayPrice(cruise);
+      response += `**${index + 1}. ${cruise.cruiseLine} - ${cruise.shipName}**\n`;
+      response += `📍 ${cruise.region} • ${cruise.nights} nights\n`;
+      response += `🚢 ${cruise.departurePort} → ${cruise.arrivalPort}\n`;
+      response += `💰 ${price}\n\n`;
+    });
+
+    if (relevantCruises.length > 4) {
+      response += `*...and ${relevantCruises.length - 4} more options to explore!*\n\n`;
+    }
+
+    response += "**Want to narrow it down?** Ask about:\n";
+    response += "• Specific departure dates\n";
+    response += "• Price ranges\n";
+    response += "• Cruise line preferences\n";
+    response += "• Cabin types";
+
+    return response;
+  }
+
+  // Check if cruise matches destination query
+  matchesDestinationQuery(cruise, query) {
+    const destinationFields = [
+      cruise.region?.toLowerCase(),
+      cruise.arrivalPort?.toLowerCase(),
+      cruise.itinerary?.toLowerCase()
+    ].filter(Boolean);
+
+    return destinationFields.some(field => 
+      query.split(' ').some(word => field.includes(word))
+    );
+  }
+
+  // Enhanced general query handler
+  async handleGeneralQuery(message) {
+    const messageLower = message.toLowerCase();
+    
+    // Handle common questions
+    if (messageLower.includes('hello') || messageLower.includes('hi')) {
+      return `Hello! 👋 I'm your CruiseHelper with access to **${this.cruiseData.length} exclusive cruise deals**! I can help you find the perfect cruise by route, destination, price, or dates. What are you looking for?`;
+    }
+
+    if (messageLower.includes('help')) {
+      return `🚢 **I'm here to help you find the perfect cruise!**\n\n**I can help with:**\n• Route-based searches: "Cruises from Miami to Caribbean"\n• Destination queries: "Mediterranean cruises"\n• Price comparisons: "Cruises under $2000"\n• Date availability: "December 2025 departures"\n• Cruise line info: "Royal Caribbean ships"\n\n**Current Inventory:** ${this.cruiseData.length} exclusive deals\n\nWhat would you like to explore?`;
+    }
+
+    if (messageLower.includes('thank')) {
+      return "You're welcome! 😊 I'm always here to help you find amazing cruise deals. Is there anything else you'd like to know about our cruises?";
+    }
+
+    // Default response with inventory showcase
+    const totalCruises = this.cruiseData.length;
+    const regions = [...new Set(this.cruiseData.map(c => c.region).filter(Boolean))];
+    const cruiseLines = [...new Set(this.cruiseData.map(c => c.cruiseLine).filter(Boolean))];
+
+    let response = `🚢 **Welcome to our cruise intelligence system!**\n\n`;
+    response += `📊 **Current Inventory:** ${totalCruises} exclusive deals\n`;
+    response += `🌍 **Regions:** ${regions.length} destinations worldwide\n`;
+    response += `⚓ **Cruise Lines:** ${cruiseLines.length} premium partners\n\n`;
+    
+    response += "**Popular Searches:**\n";
+    response += "• \"Mediterranean cruises in September\"\n";
+    response += "• \"Alaska cruises from Seattle\"\n";
+    response += "• \"Caribbean deals under $1500\"\n";
+    response += "• \"River cruises in Europe\"\n\n";
+    
+    response += "What type of cruise experience are you looking for?";
+
+    return response;
+  }

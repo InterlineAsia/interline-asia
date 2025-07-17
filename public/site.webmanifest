@@ -1,0 +1,32 @@
+{
+    "name": "Interline Asia - Exclusive Cruise Experiences",
+    "short_name": "Interline Asia",
+    "description": "The world's most exclusive cruise booking platform for verified travel industry professionals.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0f172a",
+    "theme_color": "#0f172a",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/favicon.ico",
+            "sizes": "16x16 32x32 48x48",
+            "type": "image/x-icon"
+        },
+        {
+            "src": "/cruise-ship.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/cruise-ship.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": ["travel", "business", "productivity"],
+    "lang": "en",
+    "dir": "ltr"
+}

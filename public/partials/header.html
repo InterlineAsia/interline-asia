@@ -441,9 +441,9 @@
         display: flex;
         align-items: center;
         gap: 1rem;
-        margin-left: 2rem;
-        padding-left: 2rem;
+        padding: 0 1rem;
         border-left: 1px solid rgba(255, 255, 255, 0.2);
+        border-right: 1px solid rgba(255, 255, 255, 0.2);
     }
     
     .tools-label {
@@ -524,36 +524,37 @@
                 <li><a href="/terms-and-conditions" class="nav-link">Terms</a></li>
                 <li><a href="/privacy-policy" class="nav-link">Privacy</a></li>
             </ul>
-            
-            <div class="auth-section" id="auth-section">
-                <!-- Auth buttons will be handled by JavaScript - no default orange button -->
-            </div>
-            
-            <!-- Travel Tools in Header -->
-            <div class="header-travel-tools">
-                <span class="tools-label">Quick Tools:</span>
-                <div class="header-tools-grid">
-                    <a href="https://trip.tpk.mx/qhlnnQh8" target="_blank" rel="noopener" class="header-tool-item" title="Book Flights">
-                        <i class="ri-flight-takeoff-line"></i>
-                    </a>
-                    <a href="https://kiwitaxi.tpk.mx/NGL3ovB3" target="_blank" rel="noopener" class="header-tool-item" title="Airport Transfer">
-                        <i class="ri-taxi-line"></i>
-                    </a>
-                    <a href="https://ektatraveling.tpk.mx/IUGS6Ovk" target="_blank" rel="noopener" class="header-tool-item" title="Travel Insurance">
-                        <i class="ri-shield-check-line"></i>
-                    </a>
-                    <a href="https://airalo.tpk.mx/M99krJZy" target="_blank" rel="noopener" class="header-tool-item" title="eSIM Data">
-                        <i class="ri-wifi-line"></i>
-                    </a>
-                    <a href="https://getrentacar.tpk.mx/I3FuOWfB" target="_blank" rel="noopener" class="header-tool-item" title="Car Rental">
-                        <i class="ri-car-line"></i>
-                    </a>
-                    <a href="https://wise.com/invite/ihpc/rodneyowenp" target="_blank" rel="noopener" class="header-tool-item" title="Currency Card">
-                        <i class="ri-bank-card-line"></i>
-                    </a>
-                </div>
-            </div>
         </nav>
+        
+        <!-- Travel Tools in Header - Moved Outside Nav -->
+        <div class="header-travel-tools">
+            <span class="tools-label">Quick Tools:</span>
+            <div class="header-tools-grid">
+                <a href="https://trip.tpk.mx/qhlnnQh8" target="_blank" rel="noopener" class="header-tool-item" title="Book Flights">
+                    <i class="ri-flight-takeoff-line"></i>
+                </a>
+                <a href="https://kiwitaxi.tpk.mx/NGL3ovB3" target="_blank" rel="noopener" class="header-tool-item" title="Airport Transfer">
+                    <i class="ri-taxi-line"></i>
+                </a>
+                <a href="https://ektatraveling.tpk.mx/IUGS6Ovk" target="_blank" rel="noopener" class="header-tool-item" title="Travel Insurance">
+                    <i class="ri-shield-check-line"></i>
+                </a>
+                <a href="https://airalo.tpk.mx/M99krJZy" target="_blank" rel="noopener" class="header-tool-item" title="eSIM Data">
+                    <i class="ri-wifi-line"></i>
+                </a>
+                <a href="https://getrentacar.tpk.mx/I3FuOWfB" target="_blank" rel="noopener" class="header-tool-item" title="Car Rental">
+                    <i class="ri-car-line"></i>
+                </a>
+                <a href="https://wise.com/invite/ihpc/rodneyowenp" target="_blank" rel="noopener" class="header-tool-item" title="Currency Card">
+                    <i class="ri-bank-card-line"></i>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Auth Section -->
+        <div class="auth-section" id="auth-section">
+            <!-- Auth buttons will be handled by JavaScript - no default orange button -->
+        </div>
         
         <!-- Mobile Menu Toggle -->
         <button class="mobile-menu-toggle" id="mobile-menu-toggle">

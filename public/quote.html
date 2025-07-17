@@ -318,8 +318,49 @@
             }
         });
 
-        // Enhanced quote form security
-        document.addEventListener('DOMContentLoaded', () => {
+        // Enhanced secure quote form processing
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Get quote ID and token from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const quoteId = urlParams.get('id');
+            const token = urlParams.get('token');
+            
+            // Validate token and load quote details
+            if (!quoteId || !token) {
+                document.getElementById('access-denied').style.display = 'block';
+                document.getElementById('loading-state').style.display = 'none';
+                return;
+            }
+            
+            try {
+                // Verify quote request and load details
+                const response = await fetch('/api/verify-quote', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ quoteId, token })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Invalid or expired quote request');
+                }
+                
+                const quoteData = await response.json();
+                
+                // Hide loading and show quote form
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('quote-content').style.display = 'block';
+                
+                // Populate cruise details
+                populateCruiseDetails(quoteData.cruise);
+                
+            } catch (error) {
+                console.error('Quote verification error:', error);
+                document.getElementById('access-denied').style.display = 'block';
+                document.getElementById('loading-state').style.display = 'none';
+                return;
+            }
+            
+            // Handle quote form submission
             const quoteForm = document.getElementById('quote-form');
             if (quoteForm) {
                 quoteForm.addEventListener('submit', async (e) => {
@@ -330,7 +371,7 @@
                     const data = Object.fromEntries(formData.entries());
                     
                     // Validate pricing inputs
-                    const priceFields = ['interior-price', 'oceanview-price', 'balcony-price', 'suite-price'];
+                    const priceFields = ['interiorPrice', 'oceanviewPrice', 'balconyPrice', 'suitePrice'];
                     let hasValidPrice = false;
                     
                     for (const field of priceFields) {
@@ -340,14 +381,14 @@
                             // Validate price format
                             const validation = InputValidator.validate(value, 'numeric');
                             if (!validation.isValid) {
-                                alert(`Invalid price format for ${field.replace('-', ' ')}`);
+                                showError(`Invalid price format for ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`);
                                 return;
                             }
                         }
                     }
                     
                     if (!hasValidPrice) {
-                        alert('Please enter at least one cabin price');
+                        showError('Please enter at least one cabin price');
                         return;
                     }
                     
@@ -355,16 +396,9 @@
                     if (data.notes) {
                         const notesValidation = InputValidator.validate(data.notes, 'text', { maxLength: 1000 });
                         if (!notesValidation.isValid) {
-                            alert('Notes contain invalid content or exceed maximum length');
+                            showError('Notes contain invalid content or exceed maximum length');
                             return;
                         }
-                    }
-                    
-                    // Check authentication
-                    if (!SecureAuth.isAuthenticated()) {
-                        alert('You must be logged in to send quotes');
-                        window.location.href = '/login.html';
-                        return;
                     }
                     
                     // Disable submit button
@@ -374,9 +408,26 @@
                     submitBtn.innerHTML = '<i class="ri-loader-4-line"></i> Sending Quote...';
                     
                     try {
-                        // Here you would normally send the quote data to your backend
-                        // For now, we'll simulate success
-                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        // Send quote to client
+                        const response = await fetch('/api/send-quote', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                quoteId,
+                                token,
+                                interiorPrice: data.interiorPrice || null,
+                                oceanviewPrice: data.oceanviewPrice || null,
+                                balconyPrice: data.balconyPrice || null,
+                                suitePrice: data.suitePrice || null,
+                                notes: data.notes || null,
+                                validUntil: data.validUntil || null
+                            })
+                        });
+                        
+                        if (!response.ok) {
+                            const error = await response.json();
+                            throw new Error(error.error || 'Failed to send quote');
+                        }
                         
                         // Show success
                         document.getElementById('success-panel').style.display = 'block';
@@ -384,13 +435,48 @@
                         
                     } catch (error) {
                         console.error('Quote submission error:', error);
-                        alert('Failed to send quote. Please try again.');
+                        showError(error.message || 'Failed to send quote. Please try again.');
                     } finally {
                         // Re-enable submit button
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = originalText;
                     }
                 });
+            }
+            
+            function populateCruiseDetails(cruise) {
+                // Update cruise information in the form
+                const cruiseInfo = document.getElementById('cruise-info');
+                if (cruiseInfo) {
+                    cruiseInfo.innerHTML = `
+                        <h3>${cruise.cruise_line} - ${cruise.ship_name}</h3>
+                        <p><strong>Departure:</strong> ${new Date(cruise.departure_date).toLocaleDateString()}</p>
+                        <p><strong>Duration:</strong> ${cruise.nights} nights</p>
+                        <p><strong>Region:</strong> ${cruise.region}</p>
+                        <p><strong>Route:</strong> ${cruise.departure_port} → ${cruise.arrival_port}</p>
+                    `;
+                }
+            }
+            
+            function showError(message) {
+                const errorDiv = document.getElementById('error-message') || createErrorDiv();
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+                setTimeout(() => {
+                    errorDiv.style.display = 'none';
+                }, 5000);
+            }
+            
+            function createErrorDiv() {
+                const errorDiv = document.createElement('div');
+                errorDiv.id = 'error-message';
+                errorDiv.style.cssText = `
+                    background: #fee; color: #c53030; padding: 1rem; 
+                    border-radius: 8px; margin: 1rem 0; border: 1px solid #feb2b2;
+                    display: none;
+                `;
+                document.getElementById('quote-content').insertBefore(errorDiv, document.getElementById('quote-form'));
+                return errorDiv;
             }
             
             // Auto-save functionality with validation

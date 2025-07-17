@@ -77,7 +77,21 @@ class EnhancedDealsLoader {
         return this.getSampleDeals();
       }
 
-      const processedDeals = this.processDeals(data);
+      let processedDeals = this.processDeals(data);
+      
+      // 🔁 FILTER OUT PAST CRUISES
+      const now = new Date();
+      const beforeFiltering = processedDeals.length;
+      processedDeals = processedDeals.filter(deal => {
+        if (!deal.departure_date_obj) return true; // Keep deals without dates
+        return deal.departure_date_obj >= now;
+      });
+      console.log(`🗓️ FILTERED: Removed ${beforeFiltering - processedDeals.length} past cruises, ${processedDeals.length} upcoming deals remain`);
+
+      // 🎲 RANDOMIZE DEAL ORDER
+      processedDeals = processedDeals.sort(() => 0.5 - Math.random());
+      console.log(`🎲 RANDOMIZED: Shuffled ${processedDeals.length} deals for varied display`);
+      
       this.dealsCache = processedDeals;
       this.lastUpdated = Date.now();
       return processedDeals;
@@ -208,16 +222,16 @@ class EnhancedDealsLoader {
   }
 
   getSampleDeals() {
-    return [
+    const sampleDeals = [
       {
         id: 'sample-1',
         ship: 'AmaBella',
         cruise_line: 'AmaWaterways',
         destination: 'Danube River',
         cruise_type: 'River Cruise',
-        departure_date: '2025-07-15',
-        departure_date_formatted: '7/15/2025',
-        departure_date_obj: new Date('2025-07-15'),
+        departure_date: '2025-08-15',
+        departure_date_formatted: '8/15/2025',
+        departure_date_obj: new Date('2025-08-15'),
         duration_nights: 7,
         from_price: 3440,
         itinerary: 'Budapest - Bratislava - Vienna - Melk - Passau',
@@ -230,9 +244,9 @@ class EnhancedDealsLoader {
         cruise_line: 'Regent Seven Seas Cruises',
         destination: 'Mediterranean',
         cruise_type: 'Ocean Cruise',
-        departure_date: '2025-08-10',
-        departure_date_formatted: '8/10/2025',
-        departure_date_obj: new Date('2025-08-10'),
+        departure_date: '2025-09-10',
+        departure_date_formatted: '9/10/2025',
+        departure_date_obj: new Date('2025-09-10'),
         duration_nights: 14,
         from_price: 4999,
         itinerary: 'Barcelona - Monaco - Florence - Rome - Naples',
@@ -245,16 +259,42 @@ class EnhancedDealsLoader {
         cruise_line: 'Atlas Ocean Voyages',
         destination: 'Arctic',
         cruise_type: 'Expedition Cruise',
-        departure_date: '2025-07-20',
-        departure_date_formatted: '7/20/2025',
-        departure_date_obj: new Date('2025-07-20'),
+        departure_date: '2025-07-25',
+        departure_date_formatted: '7/25/2025',
+        departure_date_obj: new Date('2025-07-25'),
         duration_nights: 11,
         from_price: 6879,
         itinerary: 'Reykjavik - Isafjordur - Akureyri - Bergen - Oslo',
         cruise_line_normalized: 'atlas-ocean-voyages',
         search_text: 'world explorer atlas ocean voyages arctic expedition cruise'
+      },
+      {
+        id: 'sample-4',
+        ship: 'Symphony of the Seas',
+        cruise_line: 'Royal Caribbean',
+        destination: 'Caribbean',
+        cruise_type: 'Ocean Cruise',
+        departure_date: '2025-08-20',
+        departure_date_formatted: '8/20/2025',
+        departure_date_obj: new Date('2025-08-20'),
+        duration_nights: 7,
+        from_price: 2890,
+        itinerary: 'Miami - Perfect Day at CocoCay - St. Thomas - St. Maarten',
+        cruise_line_normalized: 'royal-caribbean',
+        search_text: 'symphony of the seas royal caribbean caribbean ocean cruise'
       }
     ];
+
+    // 🔁 FILTER OUT PAST CRUISES
+    const now = new Date();
+    const upcomingDeals = sampleDeals.filter(deal => deal.departure_date_obj >= now);
+    console.log(`🗓️ SAMPLE DEALS: Filtered to ${upcomingDeals.length} upcoming deals`);
+
+    // 🎲 RANDOMIZE DEAL ORDER
+    const shuffledDeals = upcomingDeals.sort(() => 0.5 - Math.random());
+    console.log(`🎲 SAMPLE DEALS: Randomized ${shuffledDeals.length} deals`);
+
+    return shuffledDeals;
   }
 
   getLastUpdated() {

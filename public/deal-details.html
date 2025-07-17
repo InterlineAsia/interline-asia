@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deal Details | Interline Asia</title>
+  
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+  
+  <!-- Affiliate Tools CSS -->
+  <link rel="stylesheet" href="/css/affiliate-tools.css">
+  
+  <!-- Load partials -->
+  <script src="/js/loadPartials.js"></script>
+  
+  <!-- Analytics & Tracking -->
+  <script src="/js/vercel-analytics.js"></script>
+  <script src="/js/affiliate-tracker.js"></script>
+  
+  <!-- Supabase (optional for auth) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+  
+  <style>
+    /* Header styles */
+    header {
+      background: linear-gradient(135deg, #0C1E36 0%, #1a365d 100%);
+      color: white;
+      padding: 1rem 2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    header .logo h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin: 0;
+      color: #FF7F41;
+    }
+    
+    header .logo span {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      display: block;
+      margin-top: 0.25rem;
+    }
+    
+    header nav ul {
+      list-style: none;
+      display: flex;
+      gap: 2rem;
+      margin: 1rem 0 0 0;
+      padding: 0;
+      flex-wrap: wrap;
+    }
+    
+    header nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+    
+    header nav a:hover {
+      color: #FF7F41;
+    }
+    
+    @media (max-width: 768px) {
+      header {
+        padding: 1rem;
+      }
+      
+      header nav ul {
+        gap: 1rem;
+        font-size: 0.9rem;
+      }
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      color: #1e293b;
+      line-height: 1.6;
+      min-height: 100vh;
+      visibility: hidden;
+    }
+    
+    body.loaded {
+      visibility: visible;
+    }
+    
+    #deal-content {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    }
+    
+    #deal-content.loaded {
+      display: block;
+      opacity: 1;
+    }
+    
+    /* Header */
+    .detail-header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+      color: white;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .header-content {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 2rem;
+      align-items: center;
+    }
+    
+    .cruise-logo-large {
+      height: 60px;
+      width: auto;
+      max-width: 150px;
+      object-fit: contain;
+    }
+    
+    .header-info h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+    
+    .header-info p {
+      font-size: 1.25rem;
+      opacity: 0.9;
+    }
+    
+    .cruise-type-badge {
+      padding: 0.5rem 1rem;
+      border-radius: 25px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .cruise-type-badge.river-cruise { background: #dcfce7; color: #166534; }
+    .cruise-type-badge.ocean-cruise { background: #dbeafe; color: #1e40af; }
+    .cruise-type-badge.expedition-cruise { background: #fef3c7; color: #92400e; }
+    
+    /* Main Content */
+    .detail-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 2rem;
+    }
+    
+    .main-details {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    
+    .detail-section {
+      background: white;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #1e293b;
+    }
+    
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .detail-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem;
+      background: #f8fafc;
+      border-radius: 12px;
+    }
+    
+    .detail-item i {
+      color: #3b82f6;
+      font-size: 1.25rem;
+      width: 20px;
+    }
+    
+    .detail-item-content {
+      flex: 1;
+    }
+    
+    .detail-label {
+      font-size: 0.75rem;
+      color: #64748b;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    
+    .detail-value {
+      font-weight: 600;
+      color: #1e293b;
+    }
+    
+    .pricing-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    
+    .pricing-table th,
+    .pricing-table td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .pricing-table th {
+      background: #f8fafc;
+      font-weight: 600;
+      color: #374151;
+    }
+    
+    .price {
+      font-weight: 700;
+      color: #059669;
+    }
+    
+    .price.quote {
+      color: #64748b;
+      font-style: italic;
+    }
+    
+    .cabin-types {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    
+    .cabin-type {
+      padding: 0.5rem 1rem;
+      background: #f1f5f9;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      color: #64748b;
+      font-weight: 500;
+    }
+    
+    .booking-section {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      border-radius: 16px;
+      padding: 2rem;
+      text-align: center;
+      color: white;
+      margin-bottom: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .booking-section h3 {
+      color: white;
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+    }
+    
+    .booking-section p {
+      opacity: 0.9;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+    
+    .book-now-btn {
+      width: 100%;
+      background: white;
+      color: #1d4ed8;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.125rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+    
+    .book-now-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+      background: #f8fafc;
+    }
+    
+    .book-now-btn i {
+      font-size: 1.25rem;
+    }
+    
+    .quote-btn {
+      width: 100%;
+      background: transparent;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      margin-top: 1rem;
+    }
+    
+    .quote-btn:hover {
+      border-color: white;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .itinerary-text {
+      background: #f8fafc;
+      padding: 1.5rem;
+      border-radius: 12px;
+      border-left: 4px solid #3b82f6;
+      margin-top: 1rem;
+    }
+    
+    /* Map Section Styles */
+    .map-section {
+      margin-top: 2rem;
+    }
+    
+    .map-container {
+      background: #f8fafc;
+      padding: 1.5rem;
+      border-radius: 12px;
+      border-left: 4px solid #22c55e;
+      text-align: center;
+    }
+    
+    .route-map-image {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+    
+    .route-map-image:hover {
+      transform: scale(1.02);
+    }
+    
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      background: #3b82f6;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      margin-bottom: 2rem;
+    }
+    
+    .back-button:hover {
+      background: #2563eb;
+      transform: translateY(-1px);
+    }
+    
+    .back-to-search-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      background: #6b7280;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .back-to-search-btn:hover {
+      background: #4b5563;
+      transform: translateY(-1px);
+    }
+    
+    .booking-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+    }
+    
+    .loading, .error {
+      text-align: center;
+      padding: 4rem 2rem;
+    }
+    
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid #e5e7eb;
+      border-top: 4px solid #3b82f6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
+    .error {
+      color: #dc2626;
+    }
+    
+    @media (max-width: 768px) {
+      .header-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+      
+      .detail-content {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+      }
+      
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header -->
+  <div id="header-placeholder"></div>
+  
+  <div id="loading-state" class="loading">
+    <div class="loading-spinner"></div>
+    <p>Loading deal details...</p>
+  </div>
+  
+  <div id="error-state" class="error" style="display: none;">
+    <h2>Deal Not Found</h2>
+    <p>The requested deal could not be found.</p>
+    <a href="/deals.html" class="back-button">
+      <i class="ri-arrow-left-line"></i>
+      Back to Deals
+    </a>
+  </div>
+
+  <div id="deal-content" style="display: none;">
+    <div class="detail-header">
+      <div class="header-content">
+        <img id="cruise-logo" src="" alt="" class="cruise-logo-large">
+        <div class="header-info">
+          <h1 id="ship-name">Loading...</h1>
+          <p id="cruise-line">Loading...</p>
+        </div>
+        <div id="cruise-type-badge" class="cruise-type-badge">Loading...</div>
+      </div>
+    </div>
+
+    <div class="detail-content">
+      <div class="main-details">
+        <a href="/deals.html" class="back-button">
+          <i class="ri-arrow-left-line"></i>
+          Back to Deals
+        </a>
+        
+        <h2 class="section-title">Cruise Details</h2>
+        
+        <div class="detail-grid">
+          <div class="detail-item">
+            <i class="ri-map-pin-line"></i>
+            <div class="detail-item-content">
+              <div class="detail-label">Departure Port</div>
+              <div class="detail-value" id="departure-port">Loading...</div>
+            </div>
+          </div>
+          
+          <div class="detail-item">
+            <i class="ri-map-pin-2-line"></i>
+            <div class="detail-item-content">
+              <div class="detail-label">Arrival Port</div>
+              <div class="detail-value" id="arrival-port">Loading...</div>
+            </div>
+          </div>
+          
+          <div class="detail-item">
+            <i class="ri-calendar-line"></i>
+            <div class="detail-item-content">
+              <div class="detail-label">Departure Date</div>
+              <div class="detail-value" id="departure-date">Loading...</div>
+            </div>
+          </div>
+          
+          <div class="detail-item">
+            <i class="ri-time-line"></i>
+            <div class="detail-item-content">
+              <div class="detail-label">Duration</div>
+              <div class="detail-value" id="duration">Loading...</div>
+            </div>
+          </div>
+          
+          <div class="detail-item">
+            <i class="ri-global-line"></i>
+            <div class="detail-item-content">
+              <div class="detail-label">Region</div>
+              <div class="detail-value" id="region">Loading...</div>
+            </div>
+          </div>
+          
+          <div class="detail-item" id="sale-end-item" style="display: none;">
+            <i class="ri-alarm-line"></i>
+            <div class="detail-item-content">
+              <div class="detail-label">Sale Ends</div>
+              <div class="detail-value" id="sale-end">Loading...</div>
+            </div>
+          </div>
+        </div>
+        
+        <h3 class="section-title">Available Cabin Types</h3>
+        <div id="cabin-types" class="cabin-types">
+          Loading...
+        </div>
+        
+        <h3 class="section-title">Itinerary</h3>
+        <div id="itinerary" class="itinerary-text">
+          Loading itinerary details...
+        </div>
+        
+        <!-- Map Image Section -->
+        <div id="map-section" class="map-section" style="display: none;">
+          <h3 class="section-title">Route Map</h3>
+          <div class="map-container">
+            <img id="route-map" src="" alt="Cruise Route Map" class="route-map-image">
+          </div>
+        </div>
+      </div>
+      
+      <div class="sidebar">
+        <!-- Back to Search Button -->
+        <div class="detail-section">
+          <a href="/deals.html" class="back-to-search-btn" onclick="restoreFiltersAndReturn()">
+            <i class="ri-arrow-left-line"></i>
+            Back to Search Results
+          </a>
+        </div>
+
+        <!-- Booking Section -->
+        <div class="booking-section">
+          <h3>Ready to Book?</h3>
+          <p>Secure your spot on this amazing cruise adventure</p>
+          <div class="booking-buttons">
+            <a href="#" class="book-now-btn" id="book-now-btn">
+              <i class="ri-ship-line"></i>
+              Book This Cruise
+            </a>
+            <a href="/quote.html" class="quote-btn">
+              <i class="ri-message-line"></i>
+              Request Quote
+            </a>
+          </div>
+        </div>
+        
+        <div class="detail-section">
+          <h3 class="section-title">Pricing</h3>
+          <table class="pricing-table">
+            <thead>
+              <tr>
+                <th>Cabin Type</th>
+                <th>Price</th>
+              </tr>
+            </thead>
+            <tbody id="pricing-table-body">
+              <tr><td colspan="2">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="detail-section">
+          <h3 class="section-title">Quick Info</h3>
+          <div class="detail-item">
+            <i class="ri-ship-line"></i>
+            <div class="detail-item-content">
+              <div class="detail-label">Ship</div>
+              <div class="detail-value" id="ship-name-sidebar">Loading...</div>
+            </div>
+          </div>
+          <div class="detail-item">
+            <i class="ri-anchor-line"></i>
+            <div class="detail-item-content">
+              <div class="detail-label">Cruise Line</div>
+              <div class="detail-value" id="cruise-line-sidebar">Loading...</div>
+            </div>
+          </div>
+          <div class="detail-item">
+            <i class="ri-compass-line"></i>
+            <div class="detail-item-content">
+              <div class="detail-label">Cruise Type</div>
+              <div class="detail-value" id="cruise-type-sidebar">Loading...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div id="footer-placeholder"></div>
+
+  <!-- Enhanced CSV Loader -->
+  <script src="/js/enhanced-csv-loader.js"></script>
+  
+  <script>
+    let allDeals = [];
+
+    async function loadCSVDeals() {
+      try {
+        console.log('DEAL_DETAILS: Loading CSV data using enhanced loader...');
+        
+        // Use the enhanced CSV loader
+        if (window.csvLoader) {
+          allDeals = await window.csvLoader.loadCSVData();
+          console.log('DEAL_DETAILS: Loaded', allDeals.length, 'total deals');
+          return allDeals;
+        } else {
+          console.error('DEAL_DETAILS: Enhanced CSV loader not available');
+          return await loadCSVFallback();
+        }
+      } catch (error) {
+        console.error('DEAL_DETAILS: Error loading CSV data:', error);
+        return await loadCSVFallback();
+      }
+    }
+
+    async function findDealById(dealId) {
+      console.log('DEAL_DETAILS: Looking for deal ID:', dealId);
+      
+      if (window.csvLoader) {
+        const deal = await window.csvLoader.findDealById(dealId);
+        if (deal) {
+          console.log('DEAL_DETAILS: Found deal:', deal);
+          return deal;
+        }
+      }
+      
+      // Fallback: search through loaded deals
+      const deals = await loadCSVDeals();
+      const foundDeal = deals.find(deal => deal.id === dealId);
+      
+      if (!foundDeal) {
+        console.log('DEAL_DETAILS: Deal not found, available IDs:', deals.map(d => d.id).slice(0, 10));
+      }
+      
+      return foundDeal;
+    }
+
+    async function loadCSVFallback() {
+      try {
+        console.log('DEAL_DETAILS: Using fallback CSV loading...');
+        
+        // Load river cruise data
+        const riverResponse = await fetch('/river.csv?v=' + Date.now());
+        if (riverResponse.ok) {
+          const riverCSV = await riverResponse.text();
+          const riverDeals = parseCSV(riverCSV, 'River Cruise');
+          console.log('DEAL_DETAILS: Loaded', riverDeals.length, 'river cruise deals');
+          allDeals = allDeals.concat(riverDeals);
+        } else {
+          console.log('DEAL_DETAILS: Could not load river.csv, status:', riverResponse.status);
+        }
+
+        // Load ocean cruise data
+        const oceanResponse = await fetch('/data/twins.csv?v=' + Date.now());
+        if (oceanResponse.ok) {
+          const oceanCSV = await oceanResponse.text();
+          const oceanDeals = parseCSV(oceanCSV, 'Ocean Cruise');
+          console.log('DEAL_DETAILS: Loaded', oceanDeals.length, 'ocean cruise deals');
+          allDeals = allDeals.concat(oceanDeals);
+        } else {
+          console.log('DEAL_DETAILS: Could not load twins.csv, status:', oceanResponse.status);
+        }
+
+        console.log('DEAL_DETAILS: Loaded', allDeals.length, 'total deals');
+        return allDeals;
+      } catch (error) {
+        console.error('DEAL_DETAILS: Error loading CSV data:', error);
+        return [];
+      }
+    }
+
+    function parseCSV(csvText, cruiseType) {
+      const lines = csvText.trim().split('\n');
+      const headers = parseCSVLine(lines[0]);
+      const deals = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const values = parseCSVLine(lines[i]);
+        if (values.length >= 10) {
+          const deal = createDeal(headers, values, cruiseType);
+          if (deal.cruiseLine && deal.shipName) {
+            deals.push(deal);
+          }
+        }
+      }
+      return deals;
+    }
+
+    function parseCSVLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          result.push(current.trim());
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      result.push(current.trim());
+      return result;
+    }
+
+    function createDeal(headers, values, cruiseType) {
+      const deal = {};
+      headers.forEach((header, index) => {
+        deal[header] = values[index] || '';
+      });
+
+      // Determine actual cruise type based on region and other factors
+      let actualCruiseType = cruiseType;
+      const region = (deal.Region || '').toLowerCase();
+      const itinerary = (deal.Itinerary || '').toLowerCase();
+      
+      // Check for expedition cruises
+      if (region.includes('arctic') || region.includes('antarctic') || 
+          itinerary.includes('expedition') || itinerary.includes('arctic') || 
+          itinerary.includes('antarctic') || itinerary.includes('polar')) {
+        actualCruiseType = 'Expedition Cruise';
+      }
+
+      // Generate consistent ID based on SEQ field
+      const seq = deal.SEQ || deal.seq || Math.random().toString(36).substr(2, 9);
+      const dealId = `${actualCruiseType.toLowerCase().replace(/\s+/g, '_')}_${seq}`;
+      
+      return {
+        id: dealId,
+        seq: seq,
+        cruiseType: actualCruiseType,
+        cruiseLine: deal['Cruise Line'] || '',
+        shipName: deal.Ship || '',
+        region: deal.Region || '',
+        nights: parseInt(deal.Nights || 0),
+        departureDate: parseDate(deal.Date),
+        departurePort: deal.From || '',
+        arrivalPort: deal.To || '',
+        itinerary: deal.Itinerary || '',
+        insidePrice: parsePrice(deal.Inside),
+        oceanviewPrice: parsePrice(deal.Oceanview),
+        balconyPrice: parsePrice(deal.Balcony),
+        suitePrice: parsePrice(deal.Suite),
+        saleEndDate: parseDate(deal.Sale),
+        shipMap: deal.Shipmap || '',
+        cruiseOfferUrl: deal['Cruise Offer URL'] || ''
+      };
+    }
+
+    function parseDate(dateStr) {
+      if (!dateStr) return null;
+      
+      // Handle DD-MMM-YY format (e.g., "07-Jul-25")
+      if (dateStr.includes('-') && dateStr.length <= 9) {
+        const parts = dateStr.split('-');
+        if (parts.length === 3) {
+          const day = parseInt(parts[0]);
+          const monthMap = {
+            'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5,
+            'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11
+          };
+          const month = monthMap[parts[1].toLowerCase()];
+          let year = parseInt(parts[2]);
+          if (year < 100) year += 2000; // Convert 2-digit year
+          
+          if (!isNaN(day) && month !== undefined && !isNaN(year)) {
+            return new Date(year, month, day);
+          }
+        }
+      }
+      
+      // Try standard date parsing
+      const date = new Date(dateStr);
+      return isNaN(date.getTime()) ? null : date;
+    }
+
+    function parsePrice(priceStr) {
+      if (!priceStr || priceStr === 'Quote Available') return 0;
+      const price = parseFloat(priceStr.replace(/[$,]/g, ''));
+      return isNaN(price) ? 0 : price;
+    }
+
+    function formatPrice(price) {
+      return price > 0 ? `$${price.toLocaleString()}` : 'Quote Available';
+    }
+
+    function formatDate(date) {
+      if (!date) return 'TBA';
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+    }
+
+    function getCruiseLineLogo(cruiseLine) {
+      const logoMap = {
+        'emerald cruises': 'emerald-cruises.png',
+        'emerald': 'emerald-cruises.png',
+        'p&o cruises': 'placeholder.png',
+        'po cruises': 'placeholder.png',
+        'p&o': 'placeholder.png',
+        'po': 'placeholder.png',
+        'scenic': 'scenic.png',
+        'scenic river cruises': 'scenic.png',
+        'amawaterways': 'amawaterways.png',
+        'ama waterways': 'amawaterways.png',
+        'royal caribbean': 'royal-caribbean.png',
+        'royal caribbean international': 'royal-caribbean.png',
+        'crystal': 'crystal.png',
+        'crystal cruises': 'crystal.png',
+        'holland america': 'holland-america.png',
+        'holland america line': 'holland-america.png',
+        'princess cruises': 'princess.png',
+        'princess': 'princess.png',
+        'norwegian cruise line': 'norwegian.png',
+        'norwegian': 'norwegian.png',
+        'msc cruises': 'msc.png',
+        'msc': 'msc.png',
+        'celebrity cruises': 'celebrity.png',
+        'celebrity': 'celebrity.png',
+        'regent seven seas cruises': 'regent.png',
+        'regent': 'regent.png',
+        'oceania cruises': 'oceania.png',
+        'oceania': 'oceania.png',
+        'azamara': 'azamara.png',
+        'cunard': 'cunard.png',
+        'seabourn': 'seabourn.png',
+        'silversea': 'silversea.png',
+        'atlas': 'atlas.png',
+        'hx hurtigruten expeditions': 'hx.png',
+        'hurtigruten expeditions': 'hx.png',
+        'coral expeditions': 'coral-expeditions.png',
+        'heritage expeditions': 'heritage-expeditions.png'
+      };
+      
+      return logoMap[cruiseLine.toLowerCase()] || 'placeholder.png';
+    }
+
+    function displayDealWithMap(deal) {
+      // Header
+      document.getElementById('cruise-logo').src = `/logos/cruiselines/${getCruiseLineLogo(deal.cruiseLine)}`;
+      document.getElementById('cruise-logo').alt = deal.cruiseLine;
+      document.getElementById('ship-name').textContent = deal.shipName;
+      document.getElementById('cruise-line').textContent = deal.cruiseLine;
+      
+      const badge = document.getElementById('cruise-type-badge');
+      badge.textContent = deal.cruiseType;
+      badge.className = `cruise-type-badge ${deal.cruiseType.toLowerCase().replace(/\s+/g, '-')}`;
+
+      // Main details
+      document.getElementById('departure-port').textContent = deal.departurePort || 'TBA';
+      document.getElementById('arrival-port').textContent = deal.arrivalPort || 'TBA';
+      document.getElementById('departure-date').textContent = formatDate(deal.departureDate);
+      document.getElementById('duration').textContent = `${deal.nights} nights`;
+      document.getElementById('region').textContent = deal.region || 'TBA';
+
+      // Sale end date
+      if (deal.saleEndDate) {
+        document.getElementById('sale-end').textContent = formatDate(deal.saleEndDate);
+        document.getElementById('sale-end-item').style.display = 'flex';
+      }
+
+      // Cabin types
+      const cabinTypesContainer = document.getElementById('cabin-types');
+      if (deal.cabinTypes && deal.cabinTypes.length > 0) {
+        cabinTypesContainer.innerHTML = deal.cabinTypes.map(type => 
+          `<span class="cabin-type">${type}</span>`
+        ).join('');
+      } else {
+        cabinTypesContainer.innerHTML = '<span class="cabin-type">Contact for details</span>';
+      }
+
+      // Itinerary
+      document.getElementById('itinerary').textContent = deal.itinerary || 'Detailed itinerary available upon request.';
+
+      // Map Image - Handle both local and external URLs
+      const mapSection = document.getElementById('map-section');
+      const routeMapImg = document.getElementById('route-map');
+      
+      console.log('DEAL_DETAILS: Looking for map in deal:', {
+        shipMap: deal.shipMap,
+        Shipmap: deal.Shipmap
+      });
+      
+      // Get map URL from deal data (Shipmap field from CSV)
+      const mapUrl = deal.shipMap || deal.Shipmap;
+      
+      if (mapUrl && mapUrl.trim() && mapUrl !== 'Quote Available' && mapUrl !== '') {
+        console.log('DEAL_DETAILS: Found map URL:', mapUrl);
+        
+        // Check if it's an external URL (starts with http/https)
+        if (mapUrl.startsWith('http://') || mapUrl.startsWith('https://')) {
+          // External URL - use directly
+          routeMapImg.src = mapUrl;
+          routeMapImg.alt = `Route map for ${deal.shipName}`;
+          mapSection.style.display = 'block';
+          console.log('DEAL_DETAILS: Loading external map from:', mapUrl);
+          
+          // Handle loading errors for external images
+          routeMapImg.onerror = function() {
+            console.log('DEAL_DETAILS: Failed to load external map:', mapUrl);
+            mapSection.style.display = 'none';
+          };
+          
+          routeMapImg.onload = function() {
+            console.log('DEAL_DETAILS: Successfully loaded external map');
+          };
+        } else {
+          // Local file - try multiple locations
+          const mapSources = [
+            `/cruise-logos/${mapUrl}`,
+            `/logos/maps/${mapUrl}`,
+            `/maps/${mapUrl}`,
+            mapUrl.startsWith('/') ? mapUrl : `/${mapUrl}`
+          ];
+          
+          let mapFound = false;
+          let testCount = 0;
+          
+          mapSources.forEach((src) => {
+            if (!mapFound) {
+              const testImg = new Image();
+              testImg.onload = function() {
+                if (!mapFound) {
+                  routeMapImg.src = src;
+                  routeMapImg.alt = `Route map for ${deal.shipName}`;
+                  mapSection.style.display = 'block';
+                  mapFound = true;
+                  console.log('DEAL_DETAILS: Successfully loaded local map from:', src);
+                }
+              };
+              testImg.onerror = function() {
+                testCount++;
+                if (testCount === mapSources.length && !mapFound) {
+                  console.log('DEAL_DETAILS: No local map found for:', mapUrl);
+                  mapSection.style.display = 'none';
+                }
+              };
+              testImg.src = src;
+            }
+          });
+        }
+      } else {
+        console.log('DEAL_DETAILS: No map URL found in deal data');
+        mapSection.style.display = 'none';
+      }
+
+      // Pricing table
+      const pricingBody = document.getElementById('pricing-table-body');
+      const prices = [
+        { type: 'Interior', price: deal.insidePrice },
+        { type: 'Oceanview', price: deal.oceanviewPrice },
+        { type: 'Balcony', price: deal.balconyPrice },
+        { type: 'Suite', price: deal.suitePrice }
+      ];
+
+      pricingBody.innerHTML = prices.map(({ type, price }) => `
+        <tr>
+          <td>${type}</td>
+          <td class="price ${price > 0 ? '' : 'quote'}">${formatPrice(price)}</td>
+        </tr>
+      `).join('');
+
+      // Sidebar
+      document.getElementById('ship-name-sidebar').textContent = deal.shipName;
+      document.getElementById('cruise-line-sidebar').textContent = deal.cruiseLine;
+      document.getElementById('cruise-type-sidebar').textContent = deal.cruiseType;
+
+      // Update page title
+      document.title = `${deal.shipName} - ${deal.cruiseLine} | Interline Asia`;
+      
+      // Set up booking button
+      const bookNowBtn = document.getElementById('book-now-btn');
+      if (bookNowBtn) {
+        bookNowBtn.href = `/booking.html?deal=${encodeURIComponent(JSON.stringify(deal))}`;
+        bookNowBtn.onclick = function(e) {
+          // Track booking attempt
+          console.log('BOOKING: Redirecting to booking page for deal:', deal.id);
+        };
+      }
+
+      // Show the deal content with smooth transition
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('error-state').style.display = 'none';
+      document.getElementById('deal-content').style.display = 'block';
+      
+      // Add smooth fade-in effect
+      setTimeout(() => {
+        document.getElementById('deal-content').classList.add('loaded');
+      }, 50);
+    }
+
+    // Main initialization function
+    async function initializePage() {
+      try {
+        // Show body immediately to prevent flash
+        document.body.classList.add('loaded');
+        
+        // Ensure loading state is shown and content is hidden
+        document.getElementById('loading-state').style.display = 'block';
+        document.getElementById('error-state').style.display = 'none';
+        document.getElementById('deal-content').style.display = 'none';
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const dealId = urlParams.get('id');
+        
+        if (!dealId) {
+          showError('No deal ID provided');
+          return;
+        }
+
+        console.log('DEAL_DETAILS: Loading deal with ID:', dealId);
+        
+        // Find the deal
+        const deal = await findDealById(dealId);
+        
+        if (deal) {
+          console.log('DEAL_DETAILS: Found deal:', deal);
+          displayDealWithMap(deal);
+        } else {
+          console.log('DEAL_DETAILS: Deal not found for ID:', dealId);
+          showError('Deal not found');
+        }
+        
+      } catch (error) {
+        console.error('DEAL_DETAILS: Error initializing page:', error);
+        showError('Error loading deal details');
+      }
+    }
+
+    function showError(message) {
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('deal-content').style.display = 'none';
+      document.getElementById('error-state').style.display = 'block';
+      document.getElementById('error-state').innerHTML = `
+        <h2>Deal Not Found</h2>
+        <p>${message}</p>
+        <a href="/deals.html" class="back-button">
+          <i class="ri-arrow-left-line"></i>
+          Back to Deals
+        </a>
+      `;
+    }
+
+    function restoreFiltersAndReturn() {
+      // Restore any saved filters when returning to deals page
+      window.location.href = '/deals.html';
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', initializePage);
+  </script>
+
+</body>
+</html>

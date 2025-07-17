@@ -1,25 +1,472 @@
-<header>
-    <div class="logo">
-        <h1>INTERLINE ASIA</h1>
-        <span>Luxury Cruises. Verified Access. Exceptional Value for Travel Professionals.</span>
+<!-- Ultra-Premium Modern Header -->
+<style>
+    /* Import Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    
+    /* Premium Header Styles */
+    .ultra-premium-header {
+        background: linear-gradient(135deg, #0a0f1c 0%, #1a2332 30%, #2d3748 60%, #4a5568 100%);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    .ultra-premium-header.scrolled {
+        background: rgba(10, 15, 28, 0.95);
+        backdrop-filter: blur(30px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+    }
+    
+    .header-container {
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 0 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 88px;
+        position: relative;
+    }
+    
+    /* Ultra-Premium Logo Design */
+    .ultra-premium-logo {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        text-decoration: none;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+    }
+    
+    .ultra-premium-logo:hover {
+        transform: translateY(-3px);
+    }
+    
+    .logo-icon {
+        width: 56px;
+        height: 56px;
+        background: linear-gradient(135deg, #FF6B35 0%, #FF8E53 50%, #FFB574 100%);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 1.75rem;
+        color: white;
+        box-shadow: 0 8px 32px rgba(255, 107, 53, 0.4);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .logo-icon::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transition: left 0.6s ease;
+    }
+    
+    .ultra-premium-logo:hover .logo-icon::before {
+        left: 100%;
+    }
+    
+    .ultra-premium-logo:hover .logo-icon {
+        transform: scale(1.05);
+        box-shadow: 0 12px 40px rgba(255, 107, 53, 0.5);
+    }
+    
+    .logo-text {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .logo-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: white;
+        margin: 0;
+        letter-spacing: -0.8px;
+        background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 50%, #e2e8f0 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        transition: all 0.3s ease;
+    }
+    
+    .logo-subtitle {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.65);
+        margin: 0;
+        font-weight: 500;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        background: linear-gradient(90deg, #FF6B35, #64748b);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    /* Ultra-Premium Navigation */
+    .ultra-premium-nav {
+        display: flex;
+        align-items: center;
+        gap: 2.5rem;
+    }
+    
+    .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .nav-link {
+        position: relative;
+        padding: 1rem 1.5rem;
+        color: rgba(255, 255, 255, 0.85);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.95rem;
+        border-radius: 12px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        white-space: nowrap;
+        overflow: hidden;
+    }
+    
+    .nav-link::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        border-radius: 12px;
+    }
+    
+    .nav-link:hover::before {
+        opacity: 1;
+    }
+    
+    .nav-link:hover {
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .nav-link::after {
+        content: '';
+        position: absolute;
+        bottom: 8px;
+        left: 50%;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #FF6B35, #FF8E53);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: translateX(-50%);
+        border-radius: 1px;
+    }
+    
+    .nav-link:hover::after {
+        width: 70%;
+    }
+    
+    /* Ultra-Premium Auth Section */
+    .auth-section {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+    }
+    
+    .auth-button {
+        padding: 1rem 2rem;
+        background: linear-gradient(135deg, #FF6B35 0%, #FF8E53 50%, #FFB574 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 8px 32px rgba(255, 107, 53, 0.3);
+        border: none;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .auth-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.6s ease;
+    }
+    
+    .auth-button:hover::before {
+        left: 100%;
+    }
+    
+    .auth-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 40px rgba(255, 107, 53, 0.4);
+        background: linear-gradient(135deg, #FF8E53 0%, #FFB574 50%, #FFC794 100%);
+    }
+    
+    .user-menu {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        padding: 0.75rem 1.5rem;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 30px;
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .user-menu:hover {
+        background: rgba(255, 255, 255, 0.12);
+        transform: translateY(-1px);
+    }
+    
+    .user-name {
+        color: #FF6B35;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+    
+    .user-links {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .user-link {
+        color: rgba(255, 255, 255, 0.85);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        padding: 0.6rem 1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .user-link:hover {
+        color: white;
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-1px);
+    }
+    
+    .sign-out-btn {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        border: none;
+        padding: 0.6rem 1.25rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .sign-out-btn:hover {
+        background: linear-gradient(135deg, #dc2626, #b91c1c);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
+    }
+    
+    /* Mobile Menu Toggle */
+    .mobile-menu-toggle {
+        display: none;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0.75rem;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+    
+    .mobile-menu-toggle:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: scale(1.05);
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 1200px) {
+        .nav-links {
+            gap: 0.1rem;
+        }
+        
+        .nav-link {
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .header-container {
+            padding: 0 2rem;
+        }
+    }
+    
+    @media (max-width: 1024px) {
+        .logo-title {
+            font-size: 1.75rem;
+        }
+        
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            font-size: 1.5rem;
+        }
+        
+        .header-container {
+            padding: 0 1.5rem;
+            min-height: 80px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .mobile-menu-toggle {
+            display: block;
+        }
+        
+        .ultra-premium-nav {
+            display: none;
+        }
+        
+        .ultra-premium-nav.mobile-open {
+            display: flex;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, rgba(10, 15, 28, 0.98) 0%, rgba(26, 35, 50, 0.98) 100%);
+            backdrop-filter: blur(30px);
+            flex-direction: column;
+            padding: 2.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .nav-links {
+            flex-direction: column;
+            width: 100%;
+            gap: 0.75rem;
+        }
+        
+        .nav-link {
+            width: 100%;
+            text-align: center;
+            padding: 1.25rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .auth-section {
+            margin-top: 1.5rem;
+            justify-content: center;
+        }
+        
+        .logo-subtitle {
+            display: none;
+        }
+        
+        .header-container {
+            min-height: 72px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .header-container {
+            padding: 0 1rem;
+        }
+        
+        .logo-title {
+            font-size: 1.5rem;
+        }
+        
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            font-size: 1.25rem;
+        }
+        
+        .ultra-premium-logo {
+            gap: 1rem;
+        }
+    }
+</style>
+
+<header class="ultra-premium-header" id="ultra-premium-header">
+    <div class="header-container">
+        <!-- Ultra-Premium Logo -->
+        <a href="/" class="ultra-premium-logo">
+            <div class="logo-icon">IA</div>
+            <div class="logo-text">
+                <h1 class="logo-title">Interline Asia</h1>
+                <p class="logo-subtitle">Luxury Cruises • Travel Professionals</p>
+            </div>
+        </a>
+        
+        <!-- Ultra-Premium Navigation -->
+        <nav class="ultra-premium-nav" id="ultra-premium-nav">
+            <ul class="nav-links" id="main-nav">
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/#about" class="nav-link">About</a></li>
+                <li><a href="/#partners" class="nav-link">Partners</a></li>
+                <li><a href="/contact.html" class="nav-link">Contact</a></li>
+                <li><a href="/#faq" class="nav-link">FAQ</a></li>
+                <li><a href="/terms-and-conditions" class="nav-link">Terms</a></li>
+                <li><a href="/privacy-policy" class="nav-link">Privacy</a></li>
+            </ul>
+            
+            <div class="auth-section" id="auth-section">
+                <a href="/login" class="auth-button">Login / Signup</a>
+            </div>
+        </nav>
+        
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle">
+            <i class="ri-menu-line"></i>
+        </button>
     </div>
-    <nav>
-        <ul id="main-nav">
-            <li><a href="/">Home</a></li>
-            <li><a href="/#about">About Us</a></li>
-            <li><a href="/#partners">Partners</a></li>
-            <li><a href="/contact.html">Contact</a></li>
-            <li><a href="/#faq">FAQ</a></li>
-            <li><a href="/terms-and-conditions">Terms & Conditions</a></li>
-            <li><a href="/privacy-policy">Privacy Policy</a></li>
-            <li id="auth-section">
-                <a href="/login">Login / Signup</a>
-            </li>
-        </ul>
-    </nav>
+</header>
     
     <script>
         document.addEventListener('DOMContentLoaded', async function() {
+            // Initialize header functionality
+            initializeHeader();
+            
+            // Initialize auth
             setTimeout(async () => {
                 try {
                     if (window.supabaseClient) {
@@ -32,6 +479,59 @@
             }, 500);
         });
         
+        function initializeHeader() {
+            const header = document.getElementById('ultra-premium-header');
+            const mobileToggle = document.getElementById('mobile-menu-toggle');
+            const nav = document.getElementById('ultra-premium-nav');
+            
+            // Scroll effect
+            let lastScrollY = window.scrollY;
+            
+            window.addEventListener('scroll', () => {
+                const currentScrollY = window.scrollY;
+                
+                if (currentScrollY > 50) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+                
+                lastScrollY = currentScrollY;
+            });
+            
+            // Mobile menu toggle
+            if (mobileToggle && nav) {
+                mobileToggle.addEventListener('click', () => {
+                    nav.classList.toggle('mobile-open');
+                    
+                    // Update icon
+                    const icon = mobileToggle.querySelector('i');
+                    if (nav.classList.contains('mobile-open')) {
+                        icon.className = 'ri-close-line';
+                    } else {
+                        icon.className = 'ri-menu-line';
+                    }
+                });
+                
+                // Close mobile menu when clicking nav links
+                const navLinks = nav.querySelectorAll('.nav-link');
+                navLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                        nav.classList.remove('mobile-open');
+                        mobileToggle.querySelector('i').className = 'ri-menu-line';
+                    });
+                });
+                
+                // Close mobile menu when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!header.contains(e.target) && nav.classList.contains('mobile-open')) {
+                        nav.classList.remove('mobile-open');
+                        mobileToggle.querySelector('i').className = 'ri-menu-line';
+                    }
+                });
+            }
+        }
+        
         function updateHeaderAuth() {
             const authSection = document.getElementById('auth-section');
             if (!authSection) return;
@@ -42,16 +542,18 @@
                 const isAdmin = user?.is_admin || user?.is_super_admin || user?.role === 'admin';
                 
                 authSection.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <a href="/dashboard.html" style="color: #fff; text-decoration: none;">Dashboard</a>
-                        ${isAdmin ? '<a href="/public/deals.html" style="color: #fff; text-decoration: none;">Deals</a>' : ''}
-                        ${isAdmin ? '<a href="/public/admin.html" style="color: #fff; text-decoration: none;">Admin</a>' : ''}
-                        <span style="color: #FF7F41;">${displayName}${isAdmin ? ' (Admin)' : ''}</span>
-                        <button onclick="handleSignOut()" style="background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Sign Out</button>
+                    <div class="user-menu">
+                        <div class="user-links">
+                            <a href="/dashboard.html" class="user-link">Dashboard</a>
+                            ${isAdmin ? '<a href="/public/deals.html" class="user-link">Deals</a>' : ''}
+                            ${isAdmin ? '<a href="/public/admin.html" class="user-link">Admin</a>' : ''}
+                        </div>
+                        <span class="user-name">${displayName}${isAdmin ? ' (Admin)' : ''}</span>
+                        <button onclick="handleSignOut()" class="sign-out-btn">Sign Out</button>
                     </div>
                 `;
             } else {
-                authSection.innerHTML = '<a href="/login">Login / Signup</a>';
+                authSection.innerHTML = '<a href="/login" class="auth-button">Login / Signup</a>';
             }
         }
         

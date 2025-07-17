@@ -1013,19 +1013,34 @@ Most cruise lines allow bookings for companions. We'll clearly state any restric
     <script src="/js/loadPartials.js" defer></script>
     
     <script>
-        // Load travel tools bar
+        // Load travel tools bar with retry mechanism
         document.addEventListener('DOMContentLoaded', function() {
-            const travelToolsPlaceholder = document.getElementById('travel-tools-placeholder');
-            if (travelToolsPlaceholder) {
-                fetch('/partials/travel-tools-bar.html')
-                    .then(response => response.text())
-                    .then(html => {
-                        travelToolsPlaceholder.innerHTML = html;
-                    })
-                    .catch(error => {
-                        console.error('Error loading travel tools bar:', error);
-                    });
+            function loadTravelTools() {
+                const travelToolsPlaceholder = document.getElementById('travel-tools-placeholder');
+                if (travelToolsPlaceholder) {
+                    console.log('Loading travel tools...');
+                    fetch('/partials/travel-tools-bar.html')
+                        .then(response => {
+                            if (!response.ok) throw new Error('Failed to load travel tools');
+                            return response.text();
+                        })
+                        .then(html => {
+                            travelToolsPlaceholder.innerHTML = html;
+                            console.log('Travel tools loaded successfully');
+                        })
+                        .catch(error => {
+                            console.error('Error loading travel tools bar:', error);
+                            // Retry after 2 seconds
+                            setTimeout(loadTravelTools, 2000);
+                        });
+                } else {
+                    console.error('Travel tools placeholder not found');
+                }
             }
+            
+            // Try loading immediately and with delay
+            loadTravelTools();
+            setTimeout(loadTravelTools, 1000);
         });
     </script>
     

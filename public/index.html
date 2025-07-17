@@ -224,5 +224,27 @@
     <script src="/js/main-redesign.js"></script>
     <script src="/js/cruise-data.js"></script>
     <script src="/js/cruise-helper-bot.js"></script>
+    
+    <!-- Force load travel tools -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Force load travel tools if not already loaded
+            setTimeout(function() {
+                const travelToolsPlaceholder = document.getElementById('travel-tools-placeholder');
+                if (travelToolsPlaceholder && !travelToolsPlaceholder.innerHTML.trim()) {
+                    console.log('Force loading travel tools...');
+                    fetch('/partials/travel-tools-bar.html')
+                        .then(response => response.text())
+                        .then(html => {
+                            travelToolsPlaceholder.innerHTML = html;
+                            console.log('Travel tools loaded successfully');
+                        })
+                        .catch(error => {
+                            console.error('Error loading travel tools:', error);
+                        });
+                }
+            }, 1000);
+        });
+    </script>
 </body>
 </html>

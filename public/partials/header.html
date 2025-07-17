@@ -435,6 +435,71 @@
             gap: 1rem;
         }
     }
+    
+    /* Header Travel Tools Styles */
+    .header-travel-tools {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-left: 2rem;
+        padding-left: 2rem;
+        border-left: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .tools-label {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.6);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        white-space: nowrap;
+    }
+    
+    .header-tools-grid {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .header-tool-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 6px;
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 14px;
+        backdrop-filter: blur(10px);
+    }
+    
+    .header-tool-item:hover {
+        background: rgba(255, 255, 255, 0.15);
+        color: #60a5fa;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(96, 165, 250, 0.2);
+        border-color: rgba(96, 165, 250, 0.3);
+    }
+    
+    @media (max-width: 1024px) {
+        .header-travel-tools {
+            margin-left: 1rem;
+            padding-left: 1rem;
+        }
+        
+        .tools-label {
+            display: none;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .header-travel-tools {
+            display: none; /* Hide in mobile menu for now */
+        }
+    }
 </style>
 
 <header class="ultra-premium-header" id="ultra-premium-header">
@@ -462,6 +527,31 @@
             
             <div class="auth-section" id="auth-section">
                 <!-- Auth buttons will be handled by JavaScript - no default orange button -->
+            </div>
+            
+            <!-- Travel Tools in Header -->
+            <div class="header-travel-tools">
+                <span class="tools-label">Quick Tools:</span>
+                <div class="header-tools-grid">
+                    <a href="https://trip.tpk.mx/qhlnnQh8" target="_blank" rel="noopener" class="header-tool-item" title="Book Flights">
+                        <i class="ri-flight-takeoff-line"></i>
+                    </a>
+                    <a href="https://kiwitaxi.tpk.mx/NGL3ovB3" target="_blank" rel="noopener" class="header-tool-item" title="Airport Transfer">
+                        <i class="ri-taxi-line"></i>
+                    </a>
+                    <a href="https://ektatraveling.tpk.mx/IUGS6Ovk" target="_blank" rel="noopener" class="header-tool-item" title="Travel Insurance">
+                        <i class="ri-shield-check-line"></i>
+                    </a>
+                    <a href="https://airalo.tpk.mx/M99krJZy" target="_blank" rel="noopener" class="header-tool-item" title="eSIM Data">
+                        <i class="ri-wifi-line"></i>
+                    </a>
+                    <a href="https://getrentacar.tpk.mx/I3FuOWfB" target="_blank" rel="noopener" class="header-tool-item" title="Car Rental">
+                        <i class="ri-car-line"></i>
+                    </a>
+                    <a href="https://wise.com/invite/ihpc/rodneyowenp" target="_blank" rel="noopener" class="header-tool-item" title="Currency Card">
+                        <i class="ri-bank-card-line"></i>
+                    </a>
+                </div>
             </div>
         </nav>
         

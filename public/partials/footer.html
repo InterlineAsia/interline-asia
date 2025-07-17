@@ -1,150 +1,141 @@
-<!-- Clean Modern Footer -->
+<!-- Professional Footer Section -->
+<footer class="professional-footer">
+    <div class="footer-content">
+        <div class="footer-grid">
+            <!-- Company Info -->
+            <div class="footer-section">
+                <div class="footer-brand">
+                    <div class="brand-logo">
+                        <span class="logo-icon">IA</span>
+                        <span class="logo-text">Interline Asia</span>
+                    </div>
+                    <p class="brand-tagline">Luxury Cruise Experiences</p>
+                    <p class="brand-description">The world's most exclusive cruise booking platform for verified travel
+                        industry professionals.</p>
+                </div>
+            </div>
+
+            <!-- Quick Access -->
+            <div class="footer-section">
+                <h4 class="section-title">Quick Access</h4>
+                <ul class="footer-nav">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/#about">About Us</a></li>
+                    <li><a href="/#partners">Partners</a></li>
+                    <li><a href="/#faq">FAQ</a></li>
+                </ul>
+            </div>
+
+            <!-- Legal & Privacy -->
+            <div class="footer-section">
+                <h4 class="section-title">Legal & Privacy</h4>
+                <ul class="footer-nav">
+                    <li><a href="/terms-and-conditions">Terms & Conditions</a></li>
+                    <li><a href="/privacy-policy">Privacy Policy</a></li>
+                    <li><a href="/member-portal">Member Portal</a></li>
+                </ul>
+            </div>
+
+            <!-- Get In Touch -->
+            <div class="footer-section">
+                <h4 class="section-title">Get In Touch</h4>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <svg class="contact-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+                        </svg>
+                        <span>hello@interlineasia.com</span>
+                    </div>
+                    <div class="contact-item">
+                        <svg class="contact-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
+                        </svg>
+                        <span>+65 8888 8888</span>
+                    </div>
+                    <div class="contact-item">
+                        <svg class="contact-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                        </svg>
+                        <span>Singapore, Asia Pacific</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Bottom -->
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <div class="trust-badges">
+                    <span class="badge">🔒 Secure Platform</span>
+                    <span class="badge">✈️ Industry Verified</span>
+                    <span class="badge">🌟 Premium Service</span>
+                </div>
+                <div class="copyright">
+                    <p>© 2025 Interline Asia. All rights reserved. Crafted with ❤️ for travel professionals.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
 <style>
-    /* Clean Social Media Section */
-    .social-section {
-        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
-        padding: 4rem 2rem;
-        text-align: center;
-        color: white;
+    .professional-footer {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        color: #e2e8f0;
+        padding: 4rem 0 0;
+        position: relative;
+        overflow: hidden;
     }
-    
-    .social-container {
+
+    .professional-footer::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
+        pointer-events: none;
+    }
+
+    .footer-content {
         max-width: 1200px;
         margin: 0 auto;
+        padding: 0 2rem;
+        position: relative;
+        z-index: 2;
     }
-    
-    .social-title {
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin-bottom: 1rem;
-        color: white;
-    }
-    
-    .social-subtitle {
-        font-size: 1.1rem;
+
+    .footer-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1.5fr;
+        gap: 3rem;
         margin-bottom: 3rem;
-        opacity: 0.9;
-        max-width: 600px;
-        margin-left: auto;
-        margin-right: auto;
     }
-    
-    .social-icons {
+
+    .footer-section {
         display: flex;
-        justify-content: center;
-        gap: 1.5rem;
-        flex-wrap: wrap;
-        margin-bottom: 3rem;
+        flex-direction: column;
     }
-    
-    .social-icon {
-        width: 60px;
-        height: 60px;
-        border-radius: 12px;
+
+    .footer-brand {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .brand-logo {
         display: flex;
         align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    
-    .social-icon:hover {
-        transform: translateY(-4px);
-        background: rgba(255, 255, 255, 0.2);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-    }
-    
-    .social-icon svg {
-        width: 24px;
-        height: 24px;
-        fill: white;
-        transition: all 0.3s ease;
-    }
-    
-    /* Social Media Brand Colors */
-    .social-facebook:hover {
-        background: #1877F2;
-        border-color: #1877F2;
-    }
-    
-    .social-instagram:hover {
-        background: linear-gradient(45deg, #833AB4, #FD1D1D, #FCB045);
-        border-color: #833AB4;
-    }
-    
-    .social-linkedin:hover {
-        background: #0A66C2;
-        border-color: #0A66C2;
-    }
-    
-    .social-youtube:hover {
-        background: #FF0000;
-        border-color: #FF0000;
-    }
-    
-    .social-twitter:hover {
-        background: #000000;
-        border-color: #000000;
-    }
-    
-    .social-tiktok:hover {
-        background: #000000;
-        border-color: #000000;
-    }
-    
-    .social-stats {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 2rem;
-        max-width: 800px;
-        margin: 0 auto;
-    }
-    
-    .stat-item {
-        text-align: center;
-        padding: 1.5rem;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    
-    .stat-number {
-        font-size: 2rem;
-        font-weight: 700;
-        color: white;
+        gap: 0.75rem;
         margin-bottom: 0.5rem;
     }
-    
-    .stat-label {
-        font-size: 0.9rem;
-        opacity: 0.9;
-    }
-    
-    /* Clean Footer */
-    .main-footer {
-        background: #1f2937;
-        padding: 3rem 2rem 1.5rem;
-        color: white;
-    }
-    
-    .footer-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        text-align: center;
-    }
-    
-    .footer-logo {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 1rem;
-        margin-bottom: 2rem;
-        text-decoration: none;
-    }
-    
-    .footer-logo-icon {
+
+    .logo-icon {
         width: 48px;
         height: 48px;
         background: linear-gradient(135deg, #3b82f6, #1d4ed8);
@@ -152,193 +143,189 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: 700;
-        font-size: 1.5rem;
+        font-weight: 800;
+        font-size: 1.25rem;
         color: white;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
-    
-    .footer-logo-text {
+
+    .logo-text {
         font-size: 1.5rem;
         font-weight: 700;
         color: white;
+        letter-spacing: -0.025em;
+    }
+
+    .brand-tagline {
+        font-size: 0.875rem;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 500;
         margin: 0;
     }
-    
-    .footer-links {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 2rem;
-        margin-bottom: 2rem;
+
+    .brand-description {
+        color: #cbd5e1;
+        line-height: 1.6;
+        max-width: 300px;
+        margin: 0;
     }
-    
-    .footer-link {
-        color: rgba(255, 255, 255, 0.8);
+
+    .section-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: white;
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -0.5rem;
+        left: 0;
+        width: 30px;
+        height: 2px;
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        border-radius: 1px;
+    }
+
+    .footer-nav {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .footer-nav a {
+        color: #cbd5e1;
         text-decoration: none;
         font-size: 0.9rem;
-        transition: color 0.3s ease;
+        transition: all 0.3s ease;
+        padding: 0.25rem 0;
+        border-radius: 4px;
     }
-    
-    .footer-link:hover {
+
+    .footer-nav a:hover {
         color: #60a5fa;
+        transform: translateX(4px);
     }
-    
-    .footer-divider {
-        width: 100%;
-        height: 1px;
-        background: rgba(255, 255, 255, 0.2);
-        margin: 2rem 0;
+
+    .contact-info {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
     }
-    
-    .footer-copyright {
-        color: rgba(255, 255, 255, 0.6);
+
+    .contact-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: #cbd5e1;
         font-size: 0.9rem;
-        text-align: center;
     }
-    
-    .footer-tagline {
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 0.8rem;
-        margin-bottom: 0.5rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
+
+    .contact-icon {
+        width: 18px;
+        height: 18px;
+        color: #60a5fa;
+        flex-shrink: 0;
     }
-    
-    /* Mobile Responsive */
+
+    .footer-bottom {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 2rem 0;
+        background: rgba(0, 0, 0, 0.2);
+    }
+
+    .footer-bottom-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+
+    .trust-badges {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .badge {
+        font-size: 0.875rem;
+        color: #94a3b8;
+        font-weight: 500;
+    }
+
+    .copyright {
+        color: #64748b;
+        font-size: 0.875rem;
+        text-align: right;
+    }
+
+    .copyright p {
+        margin: 0;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .footer-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+    }
+
     @media (max-width: 768px) {
-        .social-section {
-            padding: 3rem 1.5rem;
+        .professional-footer {
+            padding: 3rem 0 0;
         }
-        
-        .social-title {
-            font-size: 2rem;
+
+        .footer-content {
+            padding: 0 1.5rem;
         }
-        
-        .social-icons {
-            gap: 1rem;
+
+        .footer-grid {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
         }
-        
-        .social-icon {
-            width: 50px;
-            height: 50px;
-        }
-        
-        .social-icon svg {
-            width: 20px;
-            height: 20px;
-        }
-        
-        .main-footer {
-            padding: 2rem 1.5rem 1rem;
-        }
-        
-        .footer-links {
+
+        .footer-bottom-content {
             flex-direction: column;
+            text-align: center;
             gap: 1rem;
         }
-        
-        .footer-logo-text {
-            font-size: 1.25rem;
+
+        .trust-badges {
+            justify-content: center;
         }
-        
-        .footer-logo-icon {
-            width: 40px;
-            height: 40px;
-            font-size: 1.25rem;
+
+        .copyright {
+            text-align: center;
+        }
+
+        .brand-description {
+            max-width: none;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .trust-badges {
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .contact-info {
+            gap: 0.75rem;
+        }
+
+        .contact-item {
+            font-size: 0.85rem;
         }
     }
 </style>
-
-<!-- Clean Social Media Section -->
-<section class="social-section">
-    <div class="social-container">
-        <h3 class="social-title">Connect With Us</h3>
-        <p class="social-subtitle">Join thousands of travel professionals discovering exclusive cruise deals and industry insights</p>
-        
-        <div class="social-icons">
-            <!-- Facebook -->
-            <a href="#" class="social-icon social-facebook" aria-label="Follow us on Facebook">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M13.397 20.997v-8.196h2.765l.411-3.209h-3.176V7.548c0-.926.258-1.56 1.587-1.56h1.684V3.127A22.336 22.336 0 0 0 14.201 3c-2.444 0-4.122 1.492-4.122 4.231v2.355H7.332v3.209h2.753v8.202h3.312z"/>
-                </svg>
-            </a>
-            <!-- Instagram -->
-            <a href="#" class="social-icon social-instagram" aria-label="Follow us on Instagram">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                </svg>
-            </a>
-            <!-- LinkedIn -->
-            <a href="#" class="social-icon social-linkedin" aria-label="Connect with us on LinkedIn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
-                </svg>
-            </a>
-            <!-- YouTube -->
-            <a href="#" class="social-icon social-youtube" aria-label="Subscribe to our YouTube channel">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
-                </svg>
-            </a>
-            <!-- Twitter/X -->
-            <a href="#" class="social-icon social-twitter" aria-label="Follow us on X">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                </svg>
-            </a>
-            <!-- TikTok -->
-            <a href="#" class="social-icon social-tiktok" aria-label="Follow us on TikTok">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M16.6 5.82s.51.5 0 0A4.278 4.278 0 0 1 15.54 3h-3.09v12.4a2.592 2.592 0 0 1-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.6 0-1.72 1.66-3.01 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64 0 3.33 2.76 5.7 5.69 5.7 3.14 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3s-1.88.09-3.24-1.48z"/>
-                </svg>
-            </a>
-        </div>
-        
-        <div class="social-stats">
-            <div class="stat-item">
-                <div class="stat-number">15K+</div>
-                <div class="stat-label">Travel Professionals</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number">500+</div>
-                <div class="stat-label">Cruise Deals Monthly</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number">50+</div>
-                <div class="stat-label">Cruise Lines</div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Clean Footer -->
-<footer class="main-footer">
-    <div class="footer-container">
-        <!-- Footer Logo -->
-        <a href="/" class="footer-logo">
-            <div class="footer-logo-icon">IA</div>
-            <h2 class="footer-logo-text">Interline Asia</h2>
-        </a>
-        
-        <!-- Footer Navigation Links -->
-        <nav class="footer-links">
-            <a href="/" class="footer-link">Home</a>
-            <a href="/#about" class="footer-link">About Us</a>
-            <a href="/#partners" class="footer-link">Partners</a>
-            <a href="/contact.html" class="footer-link">Contact</a>
-            <a href="/#faq" class="footer-link">FAQ</a>
-            <a href="/terms-and-conditions" class="footer-link">Terms & Conditions</a>
-            <a href="/privacy-policy" class="footer-link">Privacy Policy</a>
-            <a href="/login" class="footer-link">Login / Signup</a>
-        </nav>
-        
-        <!-- Footer Divider -->
-        <div class="footer-divider"></div>
-        
-        <!-- Footer Copyright -->
-        <div class="footer-copyright">
-            <p class="footer-tagline">Luxury Cruises • Travel Professionals</p>
-            <p>© 2025 Interline Asia. All rights reserved.</p>
-        </div>
-    </div>
-</footer>

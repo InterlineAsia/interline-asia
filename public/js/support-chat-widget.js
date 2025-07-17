@@ -87,7 +87,7 @@ class SupportChatWidget {
         .support-chat-widget {
           position: fixed;
           bottom: 20px;
-          right: 20px;
+          left: 20px;
           z-index: 1000;
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
@@ -117,7 +117,7 @@ class SupportChatWidget {
         .support-chat-window {
           position: absolute;
           bottom: 70px;
-          right: 0;
+          left: 0;
           width: 350px;
           height: 500px;
           background: white;
@@ -328,15 +328,14 @@ class SupportChatWidget {
         @media (max-width: 480px) {
           .support-chat-widget {
             bottom: 10px;
-            right: 10px;
             left: 10px;
           }
 
           .support-chat-window {
-            width: 100%;
+            width: calc(100vw - 20px);
             height: 400px;
             bottom: 60px;
-            right: 0;
+            left: 0;
           }
 
           .support-chat-trigger .support-chat-text {

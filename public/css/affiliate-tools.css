@@ -1,5 +1,131 @@
 /* Travel Tools & Affiliate Integration Styles */
 
+/* Travel Tools Header Bar */
+.travel-tools-header {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-bottom: 1px solid #cbd5e1;
+    padding: 0.75rem 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.travel-tools-header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.travel-tools-header-label {
+    flex-shrink: 0;
+}
+
+.tools-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.travel-tools-header-grid {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    flex: 1;
+    justify-content: center;
+}
+
+.header-tool-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #334155;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.header-tool-item:hover {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.header-tool-icon {
+    font-size: 1.125rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-tool-label {
+    white-space: nowrap;
+}
+
+/* Responsive Design for Header Tools */
+@media (max-width: 1024px) {
+    .travel-tools-header-container {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .travel-tools-header-grid {
+        justify-content: center;
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .travel-tools-header {
+        padding: 0.5rem 0;
+    }
+    
+    .travel-tools-header-container {
+        padding: 0 1rem;
+    }
+    
+    .travel-tools-header-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+        width: 100%;
+    }
+    
+    .header-tool-item {
+        padding: 0.5rem;
+        font-size: 0.75rem;
+        flex-direction: column;
+        text-align: center;
+        gap: 0.25rem;
+    }
+    
+    .header-tool-label {
+        white-space: normal;
+        line-height: 1.2;
+    }
+}
+
+@media (max-width: 480px) {
+    .travel-tools-header-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .tools-label {
+        font-size: 0.75rem;
+    }
+}
+
 /* Travel Tools Bar - Updated with Modern Icons */
 .travel-tools-bar {
     background: linear-gradient(to right, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95));

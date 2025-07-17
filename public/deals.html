@@ -866,7 +866,20 @@
           console.warn('⚠️ Ocean CSV failed:', error);
         }
 
-        console.log(`🎯 TOTAL: Loaded ${allDeals.length} deals for filtering`);
+        // 🔁 FILTER OUT PAST CRUISES
+        const now = new Date();
+        const beforeFiltering = allDeals.length;
+        allDeals = allDeals.filter(deal => {
+          if (!deal.departureDate) return true; // Keep deals without dates
+          return deal.departureDate >= now;
+        });
+        console.log(`🗓️ FILTERED: Removed ${beforeFiltering - allDeals.length} past cruises, ${allDeals.length} upcoming deals remain`);
+
+        // 🎲 RANDOMIZE DEAL ORDER
+        allDeals = allDeals.sort(() => 0.5 - Math.random());
+        console.log(`🎲 RANDOMIZED: Shuffled ${allDeals.length} deals for varied display`);
+
+        console.log(`🎯 TOTAL: Loaded ${allDeals.length} upcoming deals for filtering`);
         console.log(`📄 DISPLAY: Will show ${DISPLAY_SETTINGS.CARDS_PER_PAGE} cards at a time`);
 
         // Fallback to sample deals if nothing loaded
@@ -1008,7 +1021,7 @@
     }
 
     function getSampleDeals() {
-      return [
+      const sampleDeals = [
         {
           id: 'sample_1',
           cruiseType: 'River Cruise',
@@ -1016,7 +1029,7 @@
           shipName: 'AmaBella',
           region: 'Europe',
           nights: 7,
-          departureDate: new Date('2025-07-07'),
+          departureDate: new Date('2025-08-15'),
           departurePort: 'Budapest, Hungary',
           arrivalPort: 'Vilshofen, Germany',
           itinerary: 'Melodies of the Danube - Experience the beauty of the Danube River through Hungary, Austria, and Germany',
@@ -1033,7 +1046,7 @@
           shipName: 'Crystal Symphony',
           region: 'Mediterranean',
           nights: 8,
-          departureDate: new Date('2025-07-10'),
+          departureDate: new Date('2025-09-10'),
           departurePort: 'Thessaloniki',
           arrivalPort: 'Civitavecchia (Rome)',
           itinerary: 'Greek Isles & Italy - Discover ancient civilizations and stunning coastlines',
@@ -1042,8 +1055,53 @@
           oceanviewPrice: '$3,740',
           balconyPrice: '$4,140',
           suitePrice: '$5,540'
+        },
+        {
+          id: 'sample_3',
+          cruiseType: 'Ocean Cruise',
+          cruiseLine: 'Royal Caribbean',
+          shipName: 'Symphony of the Seas',
+          region: 'Caribbean',
+          nights: 7,
+          departureDate: new Date('2025-08-20'),
+          departurePort: 'Miami, Florida',
+          arrivalPort: 'Miami, Florida',
+          itinerary: 'Eastern Caribbean - Perfect Day at CocoCay, St. Thomas, St. Maarten',
+          price: 2890,
+          insidePrice: '$2,890',
+          oceanviewPrice: '$3,290',
+          balconyPrice: '$3,690',
+          suitePrice: '$4,990'
+        },
+        {
+          id: 'sample_4',
+          cruiseType: 'Expedition Cruise',
+          cruiseLine: 'Atlas Ocean Voyages',
+          shipName: 'World Explorer',
+          region: 'Arctic',
+          nights: 11,
+          departureDate: new Date('2025-07-25'),
+          departurePort: 'Reykjavik, Iceland',
+          arrivalPort: 'Oslo, Norway',
+          itinerary: 'Arctic Adventure - Spitsbergen, Bear Island, North Cape exploration',
+          price: 6879,
+          insidePrice: '$6,879',
+          oceanviewPrice: '$7,279',
+          balconyPrice: '$7,679',
+          suitePrice: '$9,079'
         }
       ];
+
+      // 🔁 FILTER OUT PAST CRUISES
+      const now = new Date();
+      const upcomingDeals = sampleDeals.filter(deal => deal.departureDate >= now);
+      console.log(`🗓️ SAMPLE DEALS: Filtered to ${upcomingDeals.length} upcoming deals`);
+
+      // 🎲 RANDOMIZE DEAL ORDER
+      const shuffledDeals = upcomingDeals.sort(() => 0.5 - Math.random());
+      console.log(`🎲 SAMPLE DEALS: Randomized ${shuffledDeals.length} deals`);
+
+      return shuffledDeals;
     }
 
     function getCruiseLineLogo(cruiseLine) {

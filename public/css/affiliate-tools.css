@@ -1,0 +1,334 @@
+/* Travel Tools & Affiliate Integration Styles */
+
+/* Travel Tools Bar */
+.travel-tools-bar {
+    background: linear-gradient(to right, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95));
+    padding: 1.25rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.travel-tools-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.travel-tools-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+}
+
+.travel-tools-grid {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    width: 100%;
+}
+
+.travel-tool-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.travel-tool-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    color: white;
+}
+
+.travel-tool-icon {
+    font-size: 1.25rem;
+}
+
+.travel-tool-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Travel Essentials Cards */
+.travel-essentials {
+    background: #f8fafc;
+    padding: 3rem 0;
+    border-top: 1px solid #e2e8f0;
+}
+
+.essentials-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.essentials-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.essentials-title {
+    font-family: var(--font-display, 'Playfair Display', serif);
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.75rem;
+}
+
+.essentials-subtitle {
+    font-size: 1.125rem;
+    color: #64748b;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.essentials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.essential-card {
+    background: white;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+}
+
+.essential-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+.essential-header {
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.essential-icon {
+    font-size: 1.75rem;
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    border-radius: 0.75rem;
+    flex-shrink: 0;
+}
+
+.essential-title {
+    font-weight: 600;
+    font-size: 1.25rem;
+    color: #0f172a;
+    margin: 0;
+}
+
+.essential-content {
+    padding: 1.5rem;
+    flex: 1;
+}
+
+.essential-description {
+    color: #64748b;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.essential-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    text-decoration: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+}
+
+.essential-cta:hover {
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    transform: translateY(-2px);
+}
+
+/* Quote Confirmation Essentials */
+.quote-essentials {
+    background: #f8fafc;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    border: 1px solid #e2e8f0;
+}
+
+.quote-essentials-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.quote-essentials-icon {
+    font-size: 1.5rem;
+    color: #3b82f6;
+}
+
+.quote-essentials-title {
+    font-weight: 600;
+    font-size: 1.125rem;
+    color: #0f172a;
+    margin: 0;
+}
+
+.quote-essentials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.quote-essential-item {
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.quote-essential-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+.quote-essential-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.quote-essential-label {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #0f172a;
+    margin-bottom: 0.25rem;
+}
+
+.quote-essential-text {
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+/* Deal Page Essentials */
+.deal-essentials {
+    margin-top: 2rem;
+    background: #f8fafc;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    border: 1px solid #e2e8f0;
+}
+
+.deal-essentials-header {
+    margin-bottom: 1.25rem;
+}
+
+.deal-essentials-title {
+    font-weight: 600;
+    font-size: 1.125rem;
+    color: #0f172a;
+    margin-bottom: 0.5rem;
+}
+
+.deal-essentials-subtitle {
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+.deal-essentials-grid {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.deal-essential-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    border-radius: 2rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.deal-essential-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.deal-essential-icon {
+    font-size: 1.25rem;
+}
+
+.deal-essential-label {
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: #0f172a;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .travel-tools-grid {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .travel-tool-item {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .essentials-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .quote-essentials-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .deal-essentials-grid {
+        flex-direction: column;
+    }
+    
+    .deal-essential-pill {
+        width: 100%;
+        justify-content: center;
+    }
+}

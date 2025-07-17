@@ -222,8 +222,9 @@ function initScrollEffects() {
     });
 }
 
-// Load footer
+// Load footer and travel tools
 function initFooter() {
+    // Load footer
     const footerPlaceholder = document.getElementById('footer-placeholder');
     if (footerPlaceholder) {
         fetch('/partials/footer.html')
@@ -233,6 +234,19 @@ function initFooter() {
             })
             .catch(error => {
                 console.error('Error loading footer:', error);
+            });
+    }
+    
+    // Load travel tools bar
+    const travelToolsPlaceholder = document.getElementById('travel-tools-placeholder');
+    if (travelToolsPlaceholder) {
+        fetch('/partials/travel-tools-bar.html')
+            .then(response => response.text())
+            .then(html => {
+                travelToolsPlaceholder.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error loading travel tools bar:', error);
             });
     }
 }

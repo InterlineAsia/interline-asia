@@ -3,6 +3,16 @@
 
 import { createClient } from '@supabase/supabase-js';
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb', // Increase body size limit
+    },
+    responseLimit: false,
+  },
+  maxDuration: 30, // 30 second timeout
+}
+
 export default async function handler(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -15,6 +25,15 @@ export default async function handler(req, res) {
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Check content length early
+  const contentLength = req.headers['content-length'];
+  if (contentLength && parseInt(contentLength) > 10 * 1024 * 1024) {
+    return res.status(413).json({ 
+      success: false, 
+      error: 'File too large. Maximum size is 10MB. Please split your CSV into smaller files.' 
+    });
   }
 
   try {

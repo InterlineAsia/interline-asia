@@ -455,6 +455,42 @@
     border-top-color: #1f2937;
 }
 
+/* Hero Section Overlap Fix */
+.hero-section {
+    padding-top: 140px !important; /* Ensure adequate space below fixed nav */
+    min-height: 100vh;
+}
+
+.hero-title {
+    margin-top: 2rem !important;
+    position: relative;
+    z-index: 1;
+}
+
+/* Mobile hero adjustments */
+@media (max-width: 768px) {
+    .hero-section {
+        padding-top: 160px !important; /* More space on mobile for nav + tools */
+    }
+    
+    .hero-title {
+        font-size: 2.5rem !important;
+        line-height: 1.2 !important;
+        margin-top: 1rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-section {
+        padding-top: 180px !important; /* Even more space on small mobile */
+    }
+    
+    .hero-title {
+        font-size: 2rem !important;
+        margin-top: 0.5rem !important;
+    }
+}
+
 /* Enhanced Mobile Responsiveness */
 @media (max-width: 768px) {
     .btn {

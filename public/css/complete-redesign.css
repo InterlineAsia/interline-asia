@@ -940,6 +940,10 @@ body {
         display: flex;
     }
     
+    .hero-content {
+        padding: calc(120px + var(--space-3xl)) 0 var(--space-3xl) 0;
+    }
+    
     .hero-actions {
         flex-direction: column;
         align-items: flex-start;

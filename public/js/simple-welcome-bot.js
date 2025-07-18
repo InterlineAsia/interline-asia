@@ -40,9 +40,8 @@ class SimpleWelcomeBot {
         
         <div class="welcome-bot-content">
           <div class="welcome-message">
-            <p><strong>Hi there! I'm your Interline Asia assistant.</strong></p>
-            <p>I'm here to help our members with cruise questions.</p>
-            <p>Not a member yet? Feel free to join — we'd love to have you onboard!</p>
+            <p><strong>👋 Hi there! I'm here to assist Interline Asia Members.</strong></p>
+            <p>Not a member yet? Join Now to unlock access.</p>
           </div>
           
           <div class="welcome-actions">

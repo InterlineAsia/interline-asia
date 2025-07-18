@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "api/admin/process-csv-text.js": {
+      "maxDuration": 30
+    }
+  },
+  "limits": {
+    "duration": 30000
+  }
+}

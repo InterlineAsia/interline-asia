@@ -14,7 +14,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { message, userId, conversationHistory, action } = req.body;
+    const { action } = req.body;
 
     // Handle different types of requests
     if (action === 'data-integration') {
@@ -36,7 +36,7 @@ export default async function handler(req, res) {
 // Handle cruise data integration
 async function handleDataIntegration(req, res) {
   try {
-    const { operation, data } = req.body;
+    const { operation } = req.body;
 
     switch (operation) {
       case 'sync-deals':
@@ -101,10 +101,10 @@ async function processIntelligentQuery(message, userId, conversationHistory) {
   const intent = detectQueryIntent(query);
 
   // Get relevant cruise data
-  const cruises = await searchCruises(query, intent);
+  const cruises = await searchCruises(intent);
 
   // Generate intelligent response
-  const response = generateIntelligentResponse(query, intent, cruises);
+  const response = generateIntelligentResponse(intent, cruises);
 
   // Generate follow-up questions
   const followUpQuestions = generateFollowUpQuestions(intent, cruises);
@@ -171,8 +171,8 @@ function detectQueryIntent(query) {
   return intent;
 }
 
-// Search for relevant cruises based on query and intent
-async function searchCruises(query, intent) {
+// Search for relevant cruises based on intent
+async function searchCruises(intent) {
   try {
     let queryBuilder = supabase
       .from('cruise_deals')
@@ -216,8 +216,8 @@ async function searchCruises(query, intent) {
   }
 }
 
-// Generate intelligent response based on query and results
-function generateIntelligentResponse(query, intent, cruises) {
+// Generate intelligent response based on intent and results
+function generateIntelligentResponse(intent, cruises) {
   if (cruises.length === 0) {
     return generateNoResultsResponse(intent);
   }

@@ -246,7 +246,7 @@ body {
     position: relative;
     z-index: 3;
     width: 100%;
-    padding: calc(80px + var(--space-4xl)) 0 var(--space-4xl) 0;
+    padding: calc(140px + var(--space-2xl)) 0 var(--space-4xl) 0;
 }
 
 .hero-container {
@@ -941,7 +941,7 @@ body {
     }
     
     .hero-content {
-        padding: calc(120px + var(--space-3xl)) 0 var(--space-3xl) 0;
+        padding: calc(120px + var(--space-2xl)) 0 var(--space-3xl) 0;
     }
     
     .hero-actions {

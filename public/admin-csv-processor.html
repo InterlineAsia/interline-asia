@@ -230,8 +230,16 @@
         
         statusDiv.innerHTML = '<div class="status info"><i class="ri-time-line"></i> Processing CSV files... This may take a few minutes.</div>';
         
-        // Call the CSV processing API
-        const result = await window.supabaseClient.processCsvDeals();
+        // Call the process-csv-deals API endpoint
+        const response = await fetch('/api/process-csv-deals', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${window.supabaseClient.currentSession?.access_token}`
+          }
+        });
+        
+        const result = await response.json();
         
         statusDiv.innerHTML = `<div class="status success">
           <i class="ri-check-circle-line"></i> 
@@ -262,8 +270,14 @@
         const statusDiv = document.getElementById('db-status');
         statusDiv.innerHTML = '<div class="loading show"><i class="ri-loader-4-line" style="font-size: 2rem; animation: spin 1s linear infinite;"></i><p>Checking database...</p></div>';
         
-        // Get deals count from database
-        const deals = await window.supabaseClient.getAllDeals();
+        // Get deals count directly from Supabase
+        const { data: deals, error } = await window.supabaseClient.supabase
+          .from('cruise_deals')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(100);
+          
+        if (error) throw error;
         
         let html = '<div class="file-info">';
         html += `<strong>Database Status:</strong><br>`;

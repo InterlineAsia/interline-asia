@@ -270,12 +270,38 @@
         const statusDiv = document.getElementById('db-status');
         statusDiv.innerHTML = '<div class="loading show"><i class="ri-loader-4-line" style="font-size: 2rem; animation: spin 1s linear infinite;"></i><p>Checking database...</p></div>';
         
-        // Get deals count directly from Supabase
-        const { data: deals, error } = await window.supabaseClient.supabase
-          .from('cruise_deals')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(100);
+        // Get deals count directly from Supabase - try both table names
+        let deals = [];
+        let error = null;
+        
+        try {
+          // First try cruise_deals
+          const { data: cruiseDeals, error: cruiseError } = await window.supabaseClient.supabase
+            .from('cruise_deals')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(100);
+            
+          if (cruiseError) {
+            console.log('Error with cruise_deals table, trying deals_table:', cruiseError);
+            // Try deals_table as fallback
+            const { data: dealsTable, error: dealsError } = await window.supabaseClient.supabase
+              .from('deals_table')
+              .select('*')
+              .order('created_at', { ascending: false })
+              .limit(100);
+              
+            if (dealsError) {
+              error = dealsError;
+            } else {
+              deals = dealsTable || [];
+            }
+          } else {
+            deals = cruiseDeals || [];
+          }
+        } catch (e) {
+          error = e;
+        }
           
         if (error) throw error;
         

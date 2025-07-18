@@ -1,0 +1,24 @@
+{
+  "name": "lead-generation-bot",
+  "version": "1.0.0",
+  "description": "Lead Generation Bot #1 - Singapore Travel Industry",
+  "main": "scrape.js",
+  "scripts": {
+    "start": "node scrape.js",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": [
+    "lead-generation",
+    "travel",
+    "singapore",
+    "serpapi",
+    "supabase"
+  ],
+  "author": "Interline Asia",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.52.0",
+    "axios": "^1.10.0",
+    "dotenv": "^17.2.0"
+  }
+}

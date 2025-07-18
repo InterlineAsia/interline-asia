@@ -184,7 +184,55 @@
     </div>
   </div>
 
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+
   <script>
+    // Check authentication and admin access on page load
+    async function initializeAdmin() {
+      try {
+        // Wait for Supabase client to be ready
+        await window.supabaseClient.readyPromise;
+        
+        // Check if user is logged in
+        if (!window.supabaseClient.isLoggedIn()) {
+          window.location.href = '/login.html';
+          return;
+        }
+        
+        // Check if user is admin
+        if (!window.supabaseClient.isAdmin()) {
+          document.body.innerHTML = `
+            <div class="container">
+              <div class="status error">
+                <h2>🚫 Access Denied</h2>
+                <p>Admin privileges required to access this page.</p>
+                <p><a href="/login.html">Login as Admin</a> | <a href="/">Go Home</a></p>
+              </div>
+            </div>
+          `;
+          return;
+        }
+        
+        // If we get here, user is authenticated and is admin
+        console.log('Admin access granted for:', window.supabaseClient.currentUser?.email);
+        
+      } catch (error) {
+        console.error('Admin initialization error:', error);
+        document.body.innerHTML = `
+          <div class="container">
+            <div class="status error">
+              <h2>⚠️ Authentication Error</h2>
+              <p>Failed to verify admin access: ${error.message}</p>
+              <p><a href="/login.html">Try Login Again</a></p>
+            </div>
+          </div>
+        `;
+      }
+    }
+
     function handleFileSelected() {
       const fileInput = document.getElementById('csv-file');
       const uploadBtn = document.getElementById('upload-btn');
@@ -304,8 +352,9 @@
       }
     }
     
-    // Check database status on page load
-    document.addEventListener('DOMContentLoaded', () => {
+    // Initialize admin authentication and check database status on page load
+    document.addEventListener('DOMContentLoaded', async () => {
+      await initializeAdmin();
       checkDatabase();
     });
   </script>

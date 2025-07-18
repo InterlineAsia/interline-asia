@@ -8,6 +8,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+  
+  <!-- Consistent Styles -->
+  <link rel="stylesheet" href="/css/complete-redesign.css">
 
   <!-- Site-wide styles for header/footer consistency -->
   <style>
@@ -599,25 +602,7 @@
 
 <body>
   <!-- Header -->
-  <header>
-    <div class="logo">
-      <h1>INTERLINE ASIA</h1>
-      <span>Luxury Cruises. Verified Access. Exceptional Value for Travel Professionals.</span>
-    </div>
-    <nav>
-      <ul id="main-nav">
-        <li><a href="/">Home</a></li>
-        <li><a href="/#about">About Us</a></li>
-        <li><a href="/#partners">Partners</a></li>
-        <li><a href="/#faq">FAQ</a></li>
-        <li><a href="/terms-and-conditions">Terms & Conditions</a></li>
-        <li><a href="/privacy-policy">Privacy Policy</a></li>
-        <li id="auth-section">
-          <a href="/login">Login / Signup</a>
-        </li>
-      </ul>
-    </nav>
-  </header>
+  <div id="header-placeholder"></div>
 
   <div class="hero">
     <h1>Exclusive Cruise Deals</h1>
@@ -785,46 +770,7 @@
   </section>
 
   <!-- Footer -->
-  <footer style="background-color: #08152B; padding: 40px 20px 30px; color: #fff;">
-    <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
-      <div style="margin-bottom: 25px;">
-        <div
-          style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 20px; font-size: 14px;">
-          <a href="/"
-            style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;"
-            onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'"
-            onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">Home</a>
-          <a href="/#about"
-            style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;"
-            onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'"
-            onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">About Us</a>
-          <a href="/#partners"
-            style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;"
-            onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'"
-            onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">Partners</a>
-          <a href="/#faq"
-            style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;"
-            onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'"
-            onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">FAQ</a>
-          <a href="/terms-and-conditions"
-            style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;"
-            onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'"
-            onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">Terms & Conditions</a>
-          <a href="/privacy-policy"
-            style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;"
-            onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'"
-            onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">Privacy Policy</a>
-          <a href="signup.html"
-            style="color: #ccc; text-decoration: none; transition: color 0.3s ease, transform 0.2s ease; padding: 8px 12px; border-radius: 6px;"
-            onmouseover="this.style.color='#FF7F41'; this.style.transform='translateY(-2px)'"
-            onmouseout="this.style.color='#ccc'; this.style.transform='translateY(0)'">Login / Signup</a>
-        </div>
-      </div>
-      <div style="color: #999; font-size: 12px;">
-        <p style="margin: 0;">© 2025 Interline Asia. All rights reserved.</p>
-      </div>
-    </div>
-  </footer>
+  <div id="footer-placeholder"></div>
 
   <script>
     console.log('🚀 DEALS PAGE: Starting with STRICT 30-deal limit...');
@@ -1656,6 +1602,9 @@
     }
   </script>
 
+  <!-- Load Partials -->
+  <script src="/js/load-partials.js"></script>
+  
   <!-- CruiseHelper Bot -->
   <script src="/js/cruise-helper-bot.js"></script>
 </body>

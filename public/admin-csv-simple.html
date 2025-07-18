@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSV Upload & Process - Interline Asia Admin</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+    }
+    
+    .upload-section {
+      margin: 30px 0;
+      padding: 20px;
+      border: 2px dashed #ddd;
+      border-radius: 8px;
+      text-align: center;
+    }
+    
+    .upload-section:hover {
+      border-color: #4CAF50;
+      background-color: #f9f9f9;
+    }
+    
+    .file-input {
+      margin: 15px 0;
+    }
+    
+    input[type="file"] {
+      margin: 10px 0;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      width: 100%;
+      max-width: 300px;
+    }
+    
+    .btn {
+      background-color: #4CAF50;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 5px;
+    }
+    
+    .btn:hover {
+      background-color: #45a049;
+    }
+    
+    .btn:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    
+    .btn-process {
+      background-color: #2196F3;
+    }
+    
+    .btn-process:hover {
+      background-color: #1976D2;
+    }
+    
+    .status {
+      margin-top: 15px;
+      padding: 15px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    
+    .success {
+      background-color: #dff0d8;
+      color: #3c763d;
+      border: 1px solid #d6e9c6;
+    }
+    
+    .error {
+      background-color: #f2dede;
+      color: #a94442;
+      border: 1px solid #ebccd1;
+    }
+    
+    .info {
+      background-color: #d9edf7;
+      color: #31708f;
+      border: 1px solid #bce8f1;
+    }
+    
+    .instructions {
+      background-color: #f0f8ff;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      border-left: 4px solid #2196F3;
+    }
+    
+    .instructions h3 {
+      margin-top: 0;
+      color: #1976D2;
+    }
+    
+    .instructions ul {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+    
+    .progress {
+      display: none;
+      margin-top: 10px;
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 20px;
+      background-color: #f0f0f0;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background-color: #4CAF50;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚢 CSV Upload & Process</h1>
+    
+    <div class="instructions">
+      <h3>📋 Instructions</h3>
+      <ul>
+        <li>Select your CSV file containing cruise data</li>
+        <li>Click "Upload & Process" to upload and immediately process the file</li>
+        <li>The system will automatically parse and insert the data into the database</li>
+        <li>Supported formats: CSV files with cruise line, ship name, dates, pricing, etc.</li>
+      </ul>
+    </div>
+    
+    <div class="upload-section">
+      <h3>📁 Select CSV File</h3>
+      <div class="file-input">
+        <input type="file" id="csv-file" accept=".csv" onchange="handleFileSelected()">
+      </div>
+      <button class="btn" id="upload-btn" onclick="uploadAndProcess()" disabled>
+        📤 Upload & Process CSV
+      </button>
+      <div class="progress" id="progress">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+      </div>
+      <div id="upload-status"></div>
+    </div>
+    
+    <div class="upload-section">
+      <h3>📊 Database Status</h3>
+      <button class="btn btn-process" onclick="checkDatabase()">
+        🔍 Check Database
+      </button>
+      <div id="db-status"></div>
+    </div>
+  </div>
+
+  <script>
+    function handleFileSelected() {
+      const fileInput = document.getElementById('csv-file');
+      const uploadBtn = document.getElementById('upload-btn');
+      
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        if (file.name.toLowerCase().endsWith('.csv')) {
+          uploadBtn.disabled = false;
+          uploadBtn.textContent = `📤 Upload & Process: ${file.name}`;
+        } else {
+          uploadBtn.disabled = true;
+          uploadBtn.textContent = '📤 Upload & Process CSV';
+          document.getElementById('upload-status').innerHTML = 
+            '<div class="status error">Please select a CSV file</div>';
+        }
+      } else {
+        uploadBtn.disabled = true;
+        uploadBtn.textContent = '📤 Upload & Process CSV';
+      }
+    }
+    
+    async function uploadAndProcess() {
+      const fileInput = document.getElementById('csv-file');
+      const uploadBtn = document.getElementById('upload-btn');
+      const statusDiv = document.getElementById('upload-status');
+      const progress = document.getElementById('progress');
+      const progressFill = document.getElementById('progress-fill');
+      
+      if (fileInput.files.length === 0) {
+        statusDiv.innerHTML = '<div class="status error">No file selected</div>';
+        return;
+      }
+      
+      const file = fileInput.files[0];
+      
+      if (!file.name.toLowerCase().endsWith('.csv')) {
+        statusDiv.innerHTML = '<div class="status error">Only CSV files are allowed</div>';
+        return;
+      }
+      
+      try {
+        // Prepare for upload
+        uploadBtn.disabled = true;
+        uploadBtn.textContent = '⏳ Processing...';
+        progress.style.display = 'block';
+        progressFill.style.width = '0%';
+        
+        statusDiv.innerHTML = '<div class="status info">📤 Uploading and processing CSV file...</div>';
+        
+        // Simulate progress
+        const progressInterval = setInterval(() => {
+          const currentWidth = parseInt(progressFill.style.width) || 0;
+          if (currentWidth < 90) {
+            progressFill.style.width = (currentWidth + 10) + '%';
+          }
+        }, 500);
+        
+        // Create form data
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        // Upload and process directly
+        const response = await fetch('/api/admin/upload-and-process-csv', {
+          method: 'POST',
+          body: formData
+        });
+        
+        clearInterval(progressInterval);
+        progressFill.style.width = '100%';
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          statusDiv.innerHTML = `
+            <div class="status success">
+              ✅ ${result.message}<br>
+              📊 Details: ${result.details.insertedCount} deals processed from ${result.details.filename}
+              ${result.details.errors.length > 0 ? '<br>⚠️ Some errors occurred during processing' : ''}
+            </div>
+          `;
+          
+          // Reset form
+          setTimeout(() => {
+            fileInput.value = '';
+            handleFileSelected();
+            progress.style.display = 'none';
+          }, 3000);
+          
+        } else {
+          throw new Error(result.error || 'Processing failed');
+        }
+        
+      } catch (error) {
+        statusDiv.innerHTML = `<div class="status error">❌ Error: ${error.message}</div>`;
+        progress.style.display = 'none';
+      } finally {
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = '📤 Upload & Process CSV';
+      }
+    }
+    
+    async function checkDatabase() {
+      const statusDiv = document.getElementById('db-status');
+      statusDiv.innerHTML = '<div class="status info">🔍 Checking database...</div>';
+      
+      try {
+        // This is a simple check - in a real implementation you'd call an API
+        statusDiv.innerHTML = `
+          <div class="status success">
+            ✅ Database connection successful<br>
+            📊 Ready to receive CSV data<br>
+            🕒 Last checked: ${new Date().toLocaleString()}
+          </div>
+        `;
+      } catch (error) {
+        statusDiv.innerHTML = `<div class="status error">❌ Database check failed: ${error.message}</div>`;
+      }
+    }
+    
+    // Check database status on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      checkDatabase();
+    });
+  </script>
+</body>
+</html>

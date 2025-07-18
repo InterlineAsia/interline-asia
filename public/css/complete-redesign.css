@@ -246,7 +246,7 @@ body {
     position: relative;
     z-index: 3;
     width: 100%;
-    padding: var(--space-4xl) 0;
+    padding: calc(80px + var(--space-4xl)) 0 var(--space-4xl) 0;
 }
 
 .hero-container {

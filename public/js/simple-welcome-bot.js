@@ -84,6 +84,7 @@ class SimpleWelcomeBot {
         backdrop-filter: blur(12px);
         max-width: calc(100vw - 48px);
         animation: gentle-pulse 3s ease-in-out infinite;
+        pointer-events: auto;
       }
       
       .welcome-bot-button:hover {

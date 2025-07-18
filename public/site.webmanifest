@@ -7,6 +7,7 @@
     "background_color": "#0f172a",
     "theme_color": "#0f172a",
     "orientation": "portrait-primary",
+    "scope": "/",
     "icons": [
         {
             "src": "/favicon.ico",
@@ -28,5 +29,29 @@
     ],
     "categories": ["travel", "business", "productivity"],
     "lang": "en",
-    "dir": "ltr"
+    "dir": "ltr",
+    "prefer_related_applications": false,
+    "shortcuts": [
+        {
+            "name": "Browse Cruises",
+            "short_name": "Cruises",
+            "description": "Browse exclusive cruise deals",
+            "url": "/deals.html",
+            "icons": [{ "src": "/cruise-ship.png", "sizes": "192x192" }]
+        },
+        {
+            "name": "Member Dashboard",
+            "short_name": "Dashboard",
+            "description": "Access your member dashboard",
+            "url": "/dashboard.html",
+            "icons": [{ "src": "/cruise-ship.png", "sizes": "192x192" }]
+        },
+        {
+            "name": "Travel Tools",
+            "short_name": "Tools",
+            "description": "Essential travel tools",
+            "url": "/travel-tools.html",
+            "icons": [{ "src": "/cruise-ship.png", "sizes": "192x192" }]
+        }
+    ]
 }

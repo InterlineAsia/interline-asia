@@ -1,21 +1,24 @@
 // Enhanced Service Worker for Interline Asia PWA
 // Advanced caching, offline functionality, and background sync
 
-const CACHE_NAME = 'interline-asia-v2.0';
-const STATIC_CACHE = 'interline-static-v2.0';
-const DYNAMIC_CACHE = 'interline-dynamic-v2.0';
-const API_CACHE = 'interline-api-v2.0';
+const CACHE_NAME = 'interline-asia-v2.1';
+const STATIC_CACHE = 'interline-static-v2.1';
+const DYNAMIC_CACHE = 'interline-dynamic-v2.1';
+const API_CACHE = 'interline-api-v2.1';
 
 // Static assets to cache immediately
 const STATIC_ASSETS = [
   '/',
   '/index.html',
+  '/deals.html',
+  '/member-dashboard.html',
   '/dashboard.html',
   '/travel-tools.html',
   '/login.html',
   '/signup.html',
   '/quote.html',
   '/booking.html',
+  '/admin/verifications.html',
   '/css/complete-redesign.css',
   '/css/affiliate-tools.css',
   '/css/social-media.css',
@@ -28,7 +31,9 @@ const STATIC_ASSETS = [
   '/js/cruise-query-service.js',
   '/js/sync-worker.js',
   '/js/social-media.js',
-  '/js/cruise-helper-bot.js',
+  '/js/simple-welcome-bot.js',
+  '/js/enhanced-deals-loader.js',
+  '/js/enhanced-deals-system.js',
   '/cruise-ship.png',
   '/favicon.ico',
   '/site.webmanifest'

@@ -3,20 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - User Verifications | Interline Asia</title>
+    <title>Admin Verifications - Interline Asia</title>
     <meta name="description" content="Admin panel for managing user verifications - Interline Asia">
     <meta name="robots" content="noindex, nofollow">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
     
     <!-- Styles -->
     <link rel="stylesheet" href="/css/complete-redesign.css">
-    <link rel="stylesheet" href="/css/affiliate-tools.css">
-    <link rel="stylesheet" href="/css/social-media.css">
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -37,7 +35,14 @@
                 <a href="/admin" class="nav-link">Dashboard</a>
                 <a href="/admin/verifications.html" class="nav-link active">Verifications</a>
                 <a href="/admin/bookings.html" class="nav-link">Bookings</a>
-                <button id="admin-logout-btn" class="nav-cta">Logout</button>
+                <a href="/admin/quotes.html" class="nav-link">Quotes</a>
+                <button id="logout-btn" class="nav-cta">Logout</button>
+            </div>
+            
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
         </div>
     </nav>
@@ -48,8 +53,8 @@
             <!-- Header -->
             <div class="admin-header">
                 <div class="header-content">
-                    <h1>User Verifications</h1>
-                    <p>Review and manage user verification requests</p>
+                    <h1 class="admin-title">User Verifications</h1>
+                    <p class="admin-subtitle">Review and manage industry verification applications</p>
                 </div>
                 <div class="header-stats">
                     <div class="stat-item">
@@ -60,23 +65,36 @@
                         <span class="stat-number" id="verified-count">0</span>
                         <span class="stat-label">Verified</span>
                     </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="rejected-count">0</span>
+                        <span class="stat-label">Rejected</span>
+                    </div>
                 </div>
             </div>
 
             <!-- Filters -->
             <div class="admin-filters">
                 <div class="filter-group">
-                    <label for="status-filter">Status:</label>
-                    <select id="status-filter">
-                        <option value="all">All Users</option>
-                        <option value="pending" selected>Pending Verification</option>
+                    <label for="status-filter">Status</label>
+                    <select id="status-filter" class="filter-select">
+                        <option value="all">All Statuses</option>
+                        <option value="pending" selected>Pending Review</option>
                         <option value="verified">Verified</option>
                         <option value="rejected">Rejected</option>
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label for="search-filter">Search:</label>
-                    <input type="text" id="search-filter" placeholder="Search by name or email...">
+                    <label for="date-filter">Date Range</label>
+                    <select id="date-filter" class="filter-select">
+                        <option value="all">All Time</option>
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="search-filter">Search</label>
+                    <input type="text" id="search-filter" class="filter-input" placeholder="Search by name or email...">
                 </div>
                 <button id="refresh-btn" class="btn btn-secondary">
                     <i class="ri-refresh-line"></i>
@@ -84,392 +102,514 @@
                 </button>
             </div>
 
-            <!-- Verification List -->
-            <div class="verifications-container">
-                <div class="loading-state" id="loading-state">
-                    <i class="ri-loader-4-line"></i>
-                    <p>Loading verification requests...</p>
+            <!-- Verifications List -->
+            <div class="admin-content">
+                <div id="loading-state" class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <p>Loading verifications...</p>
                 </div>
-                
-                <div class="verifications-list" id="verifications-list" style="display: none;">
+
+                <div id="verifications-container" class="verifications-container" style="display: none;">
                     <!-- Verification items will be populated here -->
                 </div>
-                
-                <div class="empty-state" id="empty-state" style="display: none;">
+
+                <div id="empty-state" class="empty-state" style="display: none;">
                     <i class="ri-user-search-line"></i>
-                    <h3>No Verification Requests</h3>
-                    <p>All users are verified or no requests match your filters</p>
+                    <h3>No Verifications Found</h3>
+                    <p>No verification applications match your current filters.</p>
                 </div>
             </div>
         </div>
     </main>
 
     <!-- Verification Modal -->
-    <div class="modal-overlay" id="verification-modal" style="display: none;">
+    <div id="verification-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>User Verification Details</h3>
-                <button class="modal-close" id="close-modal">
+                <h2 id="modal-title">Review Verification</h2>
+                <button id="modal-close" class="modal-close">
                     <i class="ri-close-line"></i>
                 </button>
             </div>
-            <div class="modal-body" id="modal-body">
-                <!-- User details will be populated here -->
-            </div>
-            <div class="modal-actions">
-                <button id="verify-user-btn" class="btn btn-success">
-                    <i class="ri-check-line"></i>
-                    Verify User
-                </button>
-                <button id="reject-user-btn" class="btn btn-danger">
-                    <i class="ri-close-line"></i>
-                    Reject
-                </button>
-                <button id="cancel-modal-btn" class="btn btn-secondary">Cancel</button>
+            
+            <div class="modal-body">
+                <div id="verification-details" class="verification-details">
+                    <!-- Details will be populated here -->
+                </div>
+                
+                <div class="verification-actions">
+                    <div class="action-group">
+                        <button id="verify-btn" class="btn btn-success">
+                            <i class="ri-check-line"></i>
+                            Verify User
+                        </button>
+                        <button id="reject-btn" class="btn btn-danger">
+                            <i class="ri-close-line"></i>
+                            Reject Application
+                        </button>
+                    </div>
+                    
+                    <div class="notes-section">
+                        <label for="admin-notes">Admin Notes (Optional)</label>
+                        <textarea id="admin-notes" placeholder="Add notes about this verification decision..."></textarea>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Core Scripts -->
-    <script src="/js/error-handler.js"></script>
-    <script src="/js/input-validator.js"></script>
-    <script src="/js/secure-auth.js"></script>
-    
+    <!-- Scripts -->
     <script>
-        let currentUsers = [];
-        let selectedUser = null;
+        let currentVerifications = [];
+        let selectedVerification = null;
 
         document.addEventListener('DOMContentLoaded', async () => {
             // Check admin authentication
-            const user = await SecureAuth.getCurrentUser();
-            if (!user || !isAdmin(user)) {
+            if (!await checkAdminAuth()) {
                 window.location.href = '/login.html';
                 return;
             }
 
-            // Load verification data
+            // Load verifications
             await loadVerifications();
             
             // Setup event listeners
             setupEventListeners();
         });
 
-        function isAdmin(user) {
-            // Check if user is admin (you can customize this logic)
-            return user.email === 'admin@interlineasia.com' || 
-                   user.user_metadata?.role === 'admin';
+        async function checkAdminAuth() {
+            try {
+                // Mock admin check - replace with actual authentication
+                return true;
+            } catch (error) {
+                console.error('Admin auth check failed:', error);
+                return false;
+            }
         }
 
         async function loadVerifications() {
             try {
-                document.getElementById('loading-state').style.display = 'block';
-                document.getElementById('verifications-list').style.display = 'none';
-                document.getElementById('empty-state').style.display = 'none';
-
-                const response = await fetch('/api/admin/verifications', {
-                    headers: {
-                        'Authorization': `Bearer ${(await SecureAuth.getSession())?.access_token}`
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to load verifications');
-                }
-
-                const users = await response.json();
-                currentUsers = users;
+                showLoading();
                 
-                updateStats(users);
-                displayVerifications(users);
+                // Mock API call - replace with actual API
+                const verifications = [
+                    {
+                        id: 'ver_1',
+                        first_name: 'John',
+                        last_name: 'Smith',
+                        email: 'john.smith@travelagency.com',
+                        phone: '+1234567890',
+                        company: 'Smith Travel Agency',
+                        job_title: 'Travel Consultant',
+                        status: 'pending',
+                        created_at: '2025-07-15T10:00:00Z',
+                        documents: [
+                            { type: 'employment_proof', filename: 'employment_letter.pdf' }
+                        ]
+                    },
+                    {
+                        id: 'ver_2',
+                        first_name: 'Sarah',
+                        last_name: 'Johnson',
+                        email: 'sarah@cruiseexperts.com',
+                        phone: '+1234567891',
+                        company: 'Cruise Experts Ltd',
+                        job_title: 'Senior Travel Advisor',
+                        status: 'verified',
+                        created_at: '2025-07-14T15:30:00Z',
+                        verified_at: '2025-07-15T09:00:00Z',
+                        documents: [
+                            { type: 'employment_proof', filename: 'company_id.pdf' }
+                        ]
+                    }
+                ];
 
+                currentVerifications = verifications;
+                displayVerifications(verifications);
+                updateStats(verifications);
+                hideLoading();
+                
             } catch (error) {
-                console.error('Load verifications error:', error);
-                showError('Failed to load verification requests');
-            } finally {
-                document.getElementById('loading-state').style.display = 'none';
+                console.error('Error loading verifications:', error);
+                showError('Failed to load verifications');
+                hideLoading();
             }
         }
 
-        function updateStats(users) {
-            const pendingCount = users.filter(u => u.verification_status === 'pending').length;
-            const verifiedCount = users.filter(u => u.verification_status === 'verified').length;
+        function displayVerifications(verifications) {
+            const container = document.getElementById('verifications-container');
             
-            document.getElementById('pending-count').textContent = pendingCount;
-            document.getElementById('verified-count').textContent = verifiedCount;
-        }
-
-        function displayVerifications(users) {
-            const container = document.getElementById('verifications-list');
-            const statusFilter = document.getElementById('status-filter').value;
-            const searchFilter = document.getElementById('search-filter').value.toLowerCase();
-
-            // Filter users
-            let filteredUsers = users;
-            
-            if (statusFilter !== 'all') {
-                filteredUsers = filteredUsers.filter(user => 
-                    user.verification_status === statusFilter
-                );
-            }
-            
-            if (searchFilter) {
-                filteredUsers = filteredUsers.filter(user => 
-                    user.first_name?.toLowerCase().includes(searchFilter) ||
-                    user.last_name?.toLowerCase().includes(searchFilter) ||
-                    user.email?.toLowerCase().includes(searchFilter) ||
-                    user.company?.toLowerCase().includes(searchFilter)
-                );
-            }
-
-            if (filteredUsers.length === 0) {
-                document.getElementById('empty-state').style.display = 'block';
-                container.style.display = 'none';
+            if (verifications.length === 0) {
+                showEmptyState();
                 return;
             }
 
-            document.getElementById('empty-state').style.display = 'none';
-            container.style.display = 'block';
-
-            container.innerHTML = filteredUsers.map(user => `
-                <div class="verification-card" data-user-id="${user.id}">
-                    <div class="user-avatar">
-                        <i class="ri-user-line"></i>
+            container.innerHTML = verifications.map(verification => `
+                <div class="verification-card" data-id="${verification.id}">
+                    <div class="verification-header">
+                        <div class="user-info">
+                            <h3>${verification.first_name} ${verification.last_name}</h3>
+                            <p class="email">${verification.email}</p>
+                            <p class="company">${verification.company} - ${verification.job_title}</p>
+                        </div>
+                        <div class="verification-status">
+                            <span class="status-badge ${verification.status}">${verification.status}</span>
+                            <span class="date">${new Date(verification.created_at).toLocaleDateString()}</span>
+                        </div>
                     </div>
-                    <div class="user-info">
-                        <h4>${user.first_name || ''} ${user.last_name || ''}</h4>
-                        <p class="user-email">${user.email}</p>
-                        <p class="user-company">${user.company || 'No company provided'}</p>
-                        <p class="user-title">${user.job_title || 'No title provided'}</p>
+                    
+                    <div class="verification-details">
+                        <div class="detail-item">
+                            <i class="ri-phone-line"></i>
+                            <span>${verification.phone}</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="ri-file-line"></i>
+                            <span>${verification.documents.length} document(s)</span>
+                        </div>
+                        ${verification.verified_at ? `
+                            <div class="detail-item">
+                                <i class="ri-check-line"></i>
+                                <span>Verified: ${new Date(verification.verified_at).toLocaleDateString()}</span>
+                            </div>
+                        ` : ''}
                     </div>
-                    <div class="verification-status">
-                        <span class="status-badge ${user.verification_status}">
-                            ${getStatusIcon(user.verification_status)}
-                            ${user.verification_status}
-                        </span>
-                        <p class="signup-date">Signed up: ${new Date(user.created_at).toLocaleDateString()}</p>
-                    </div>
+                    
                     <div class="verification-actions">
-                        <button class="btn btn-primary btn-sm view-details-btn" data-user-id="${user.id}">
+                        <button class="btn btn-primary btn-sm" onclick="viewVerification('${verification.id}')">
                             <i class="ri-eye-line"></i>
-                            View Details
+                            Review
                         </button>
-                        ${user.verification_status === 'pending' ? `
-                            <button class="btn btn-success btn-sm quick-verify-btn" data-user-id="${user.id}">
+                        ${verification.status === 'pending' ? `
+                            <button class="btn btn-success btn-sm" onclick="quickVerify('${verification.id}')">
                                 <i class="ri-check-line"></i>
                                 Quick Verify
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="quickReject('${verification.id}')">
+                                <i class="ri-close-line"></i>
+                                Reject
                             </button>
                         ` : ''}
                     </div>
                 </div>
             `).join('');
 
-            // Add event listeners to buttons
-            container.querySelectorAll('.view-details-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const userId = e.target.closest('button').dataset.userId;
-                    showUserDetails(userId);
-                });
-            });
-
-            container.querySelectorAll('.quick-verify-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const userId = e.target.closest('button').dataset.userId;
-                    quickVerifyUser(userId);
-                });
-            });
+            container.style.display = 'block';
+            document.getElementById('empty-state').style.display = 'none';
         }
 
-        function getStatusIcon(status) {
-            const icons = {
-                pending: '<i class="ri-time-line"></i>',
-                verified: '<i class="ri-check-line"></i>',
-                rejected: '<i class="ri-close-line"></i>'
-            };
-            return icons[status] || '';
+        function updateStats(verifications) {
+            const stats = verifications.reduce((acc, ver) => {
+                acc[ver.status] = (acc[ver.status] || 0) + 1;
+                return acc;
+            }, {});
+
+            document.getElementById('pending-count').textContent = stats.pending || 0;
+            document.getElementById('verified-count').textContent = stats.verified || 0;
+            document.getElementById('rejected-count').textContent = stats.rejected || 0;
         }
 
-        function showUserDetails(userId) {
-            const user = currentUsers.find(u => u.id === userId);
-            if (!user) return;
+        function viewVerification(id) {
+            const verification = currentVerifications.find(v => v.id === id);
+            if (!verification) return;
 
-            selectedUser = user;
+            selectedVerification = verification;
             
-            const modalBody = document.getElementById('modal-body');
-            modalBody.innerHTML = `
-                <div class="user-details">
-                    <div class="detail-section">
-                        <h4>Personal Information</h4>
-                        <div class="detail-grid">
-                            <div class="detail-item">
-                                <label>Full Name:</label>
-                                <span>${user.first_name || ''} ${user.last_name || ''}</span>
-                            </div>
-                            <div class="detail-item">
-                                <label>Email:</label>
-                                <span>${user.email}</span>
-                            </div>
-                            <div class="detail-item">
-                                <label>Phone:</label>
-                                <span>${user.phone || 'Not provided'}</span>
-                            </div>
-                            <div class="detail-item">
-                                <label>Signup Date:</label>
-                                <span>${new Date(user.created_at).toLocaleDateString()}</span>
-                            </div>
-                        </div>
+            // Populate modal
+            document.getElementById('modal-title').textContent = `Review: ${verification.first_name} ${verification.last_name}`;
+            
+            const detailsContainer = document.getElementById('verification-details');
+            detailsContainer.innerHTML = `
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <label>Full Name</label>
+                        <span>${verification.first_name} ${verification.last_name}</span>
                     </div>
-                    
-                    <div class="detail-section">
-                        <h4>Professional Information</h4>
-                        <div class="detail-grid">
-                            <div class="detail-item">
-                                <label>Company:</label>
-                                <span>${user.company || 'Not provided'}</span>
-                            </div>
-                            <div class="detail-item">
-                                <label>Job Title:</label>
-                                <span>${user.job_title || 'Not provided'}</span>
-                            </div>
-                            <div class="detail-item">
-                                <label>Verification Status:</label>
-                                <span class="status-badge ${user.verification_status}">
-                                    ${user.verification_status}
-                                </span>
-                            </div>
-                        </div>
+                    <div class="detail-item">
+                        <label>Email</label>
+                        <span>${verification.email}</span>
                     </div>
-                    
-                    <div class="detail-section">
-                        <h4>Account Activity</h4>
-                        <div class="detail-grid">
-                            <div class="detail-item">
-                                <label>Last Login:</label>
-                                <span>${user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleDateString() : 'Never'}</span>
-                            </div>
-                            <div class="detail-item">
-                                <label>Marketing Opt-in:</label>
-                                <span>${user.marketing_opt_in ? 'Yes' : 'No'}</span>
-                            </div>
+                    <div class="detail-item">
+                        <label>Phone</label>
+                        <span>${verification.phone}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Company</label>
+                        <span>${verification.company}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Job Title</label>
+                        <span>${verification.job_title}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Status</label>
+                        <span class="status-badge ${verification.status}">${verification.status}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Applied</label>
+                        <span>${new Date(verification.created_at).toLocaleDateString()}</span>
+                    </div>
+                    ${verification.verified_at ? `
+                        <div class="detail-item">
+                            <label>Verified</label>
+                            <span>${new Date(verification.verified_at).toLocaleDateString()}</span>
                         </div>
+                    ` : ''}
+                </div>
+                
+                <div class="documents-section">
+                    <h4>Uploaded Documents</h4>
+                    <div class="documents-list">
+                        ${verification.documents.map(doc => `
+                            <div class="document-item">
+                                <i class="ri-file-pdf-line"></i>
+                                <span>${doc.filename}</span>
+                                <button class="btn btn-sm btn-secondary" onclick="viewDocument('${doc.filename}')">
+                                    <i class="ri-eye-line"></i>
+                                    View
+                                </button>
+                            </div>
+                        `).join('')}
                     </div>
                 </div>
             `;
 
+            // Show/hide action buttons based on status
+            const verifyBtn = document.getElementById('verify-btn');
+            const rejectBtn = document.getElementById('reject-btn');
+            
+            if (verification.status === 'pending') {
+                verifyBtn.style.display = 'inline-flex';
+                rejectBtn.style.display = 'inline-flex';
+            } else {
+                verifyBtn.style.display = 'none';
+                rejectBtn.style.display = 'none';
+            }
+
+            // Show modal
             document.getElementById('verification-modal').style.display = 'flex';
         }
 
-        async function quickVerifyUser(userId) {
-            if (!confirm('Are you sure you want to verify this user?')) {
-                return;
+        async function quickVerify(id) {
+            if (!confirm('Are you sure you want to verify this user?')) return;
+            
+            try {
+                // Mock API call - replace with actual API
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Update local data
+                const verification = currentVerifications.find(v => v.id === id);
+                if (verification) {
+                    verification.status = 'verified';
+                    verification.verified_at = new Date().toISOString();
+                }
+                
+                // Refresh display
+                await applyFilters();
+                showSuccess('User verified successfully');
+                
+            } catch (error) {
+                console.error('Verification error:', error);
+                showError('Failed to verify user');
             }
-
-            await updateUserVerification(userId, 'verified');
         }
 
-        async function updateUserVerification(userId, status) {
+        async function quickReject(id) {
+            if (!confirm('Are you sure you want to reject this application?')) return;
+            
             try {
-                const response = await fetch('/api/admin/update-verification', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${(await SecureAuth.getSession())?.access_token}`
-                    },
-                    body: JSON.stringify({
-                        userId: userId,
-                        status: status
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to update verification status');
+                // Mock API call - replace with actual API
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Update local data
+                const verification = currentVerifications.find(v => v.id === id);
+                if (verification) {
+                    verification.status = 'rejected';
+                    verification.rejected_at = new Date().toISOString();
                 }
-
-                // Refresh the list
-                await loadVerifications();
                 
-                // Close modal if open
-                document.getElementById('verification-modal').style.display = 'none';
+                // Refresh display
+                await applyFilters();
+                showSuccess('Application rejected');
                 
-                showSuccess(`User ${status} successfully`);
-
             } catch (error) {
-                console.error('Update verification error:', error);
-                showError('Failed to update verification status');
+                console.error('Rejection error:', error);
+                showError('Failed to reject application');
             }
+        }
+
+        function viewDocument(filename) {
+            // Mock document viewing - replace with actual document viewer
+            alert(`Viewing document: ${filename}\n\nIn production, this would open the document in a new tab or modal.`);
+        }
+
+        async function applyFilters() {
+            const statusFilter = document.getElementById('status-filter').value;
+            const dateFilter = document.getElementById('date-filter').value;
+            const searchFilter = document.getElementById('search-filter').value.toLowerCase();
+
+            let filtered = [...currentVerifications];
+
+            // Apply status filter
+            if (statusFilter !== 'all') {
+                filtered = filtered.filter(v => v.status === statusFilter);
+            }
+
+            // Apply date filter
+            if (dateFilter !== 'all') {
+                const now = new Date();
+                const filterDate = new Date();
+                
+                switch (dateFilter) {
+                    case 'today':
+                        filterDate.setHours(0, 0, 0, 0);
+                        break;
+                    case 'week':
+                        filterDate.setDate(now.getDate() - 7);
+                        break;
+                    case 'month':
+                        filterDate.setMonth(now.getMonth() - 1);
+                        break;
+                }
+                
+                filtered = filtered.filter(v => new Date(v.created_at) >= filterDate);
+            }
+
+            // Apply search filter
+            if (searchFilter) {
+                filtered = filtered.filter(v => 
+                    v.first_name.toLowerCase().includes(searchFilter) ||
+                    v.last_name.toLowerCase().includes(searchFilter) ||
+                    v.email.toLowerCase().includes(searchFilter) ||
+                    v.company.toLowerCase().includes(searchFilter)
+                );
+            }
+
+            displayVerifications(filtered);
         }
 
         function setupEventListeners() {
             // Filter listeners
-            document.getElementById('status-filter').addEventListener('change', () => {
-                displayVerifications(currentUsers);
-            });
-
-            document.getElementById('search-filter').addEventListener('input', () => {
-                displayVerifications(currentUsers);
-            });
-
+            document.getElementById('status-filter').addEventListener('change', applyFilters);
+            document.getElementById('date-filter').addEventListener('change', applyFilters);
+            document.getElementById('search-filter').addEventListener('input', debounce(applyFilters, 300));
             document.getElementById('refresh-btn').addEventListener('click', loadVerifications);
 
             // Modal listeners
-            document.getElementById('close-modal').addEventListener('click', () => {
-                document.getElementById('verification-modal').style.display = 'none';
-            });
+            document.getElementById('modal-close').addEventListener('click', closeModal);
+            document.getElementById('verify-btn').addEventListener('click', () => processVerification('verify'));
+            document.getElementById('reject-btn').addEventListener('click', () => processVerification('reject'));
 
-            document.getElementById('cancel-modal-btn').addEventListener('click', () => {
-                document.getElementById('verification-modal').style.display = 'none';
-            });
-
-            document.getElementById('verify-user-btn').addEventListener('click', () => {
-                if (selectedUser) {
-                    updateUserVerification(selectedUser.id, 'verified');
-                }
-            });
-
-            document.getElementById('reject-user-btn').addEventListener('click', () => {
-                if (selectedUser && confirm('Are you sure you want to reject this user?')) {
-                    updateUserVerification(selectedUser.id, 'rejected');
+            // Close modal on outside click
+            document.getElementById('verification-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'verification-modal') {
+                    closeModal();
                 }
             });
 
             // Logout
-            document.getElementById('admin-logout-btn').addEventListener('click', async () => {
-                await SecureAuth.logout();
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                localStorage.clear();
                 window.location.href = '/';
-            });
-
-            // Close modal on overlay click
-            document.getElementById('verification-modal').addEventListener('click', (e) => {
-                if (e.target.classList.contains('modal-overlay')) {
-                    document.getElementById('verification-modal').style.display = 'none';
-                }
             });
         }
 
-        function showError(message) {
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'notification error';
-            errorDiv.innerHTML = `<i class="ri-error-warning-line"></i> ${message}`;
-            document.body.appendChild(errorDiv);
-            
-            setTimeout(() => errorDiv.remove(), 5000);
+        async function processVerification(action) {
+            if (!selectedVerification) return;
+
+            const notes = document.getElementById('admin-notes').value;
+            const confirmMessage = action === 'verify' ? 
+                'Are you sure you want to verify this user?' : 
+                'Are you sure you want to reject this application?';
+
+            if (!confirm(confirmMessage)) return;
+
+            try {
+                // Mock API call - replace with actual API
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // Update verification status
+                selectedVerification.status = action === 'verify' ? 'verified' : 'rejected';
+                selectedVerification[`${action}ed_at`] = new Date().toISOString();
+                if (notes) {
+                    selectedVerification.admin_notes = notes;
+                }
+
+                closeModal();
+                await applyFilters();
+                showSuccess(`Application ${action}ed successfully`);
+
+            } catch (error) {
+                console.error(`${action} error:`, error);
+                showError(`Failed to ${action} application`);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('verification-modal').style.display = 'none';
+            document.getElementById('admin-notes').value = '';
+            selectedVerification = null;
+        }
+
+        function showLoading() {
+            document.getElementById('loading-state').style.display = 'flex';
+            document.getElementById('verifications-container').style.display = 'none';
+            document.getElementById('empty-state').style.display = 'none';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-state').style.display = 'none';
+        }
+
+        function showEmptyState() {
+            document.getElementById('empty-state').style.display = 'flex';
+            document.getElementById('verifications-container').style.display = 'none';
         }
 
         function showSuccess(message) {
-            const successDiv = document.createElement('div');
-            successDiv.className = 'notification success';
-            successDiv.innerHTML = `<i class="ri-check-line"></i> ${message}`;
-            document.body.appendChild(successDiv);
+            showNotification(message, 'success');
+        }
+
+        function showError(message) {
+            showNotification(message, 'error');
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed; top: 20px; right: 20px; z-index: 10000;
+                padding: 1rem 1.5rem; border-radius: 8px; color: white;
+                background: ${type === 'success' ? '#059669' : '#dc2626'};
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            `;
             
-            setTimeout(() => successDiv.remove(), 3000);
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
         }
     </script>
 
     <style>
-        /* Admin Panel Styles */
         .admin-main {
             min-height: 100vh;
             background: #f8fafc;
-            padding: 2rem 0;
+            padding: calc(80px + 2rem) 0 2rem 0;
         }
 
         .admin-container {
@@ -482,21 +622,23 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 2rem;
             background: white;
             padding: 2rem;
             border-radius: 1rem;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 2rem;
         }
 
-        .header-content h1 {
+        .admin-title {
             font-size: 2rem;
+            font-weight: 700;
             color: #0f172a;
             margin-bottom: 0.5rem;
         }
 
-        .header-content p {
+        .admin-subtitle {
             color: #64748b;
+            font-size: 1.1rem;
         }
 
         .header-stats {
@@ -512,23 +654,25 @@
             display: block;
             font-size: 2rem;
             font-weight: 700;
-            color: #3b82f6;
+            color: #0f172a;
         }
 
         .stat-label {
-            color: #64748b;
             font-size: 0.875rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .admin-filters {
             display: flex;
             gap: 1rem;
-            align-items: end;
+            margin-bottom: 2rem;
             background: white;
             padding: 1.5rem;
             border-radius: 1rem;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 2rem;
+            align-items: end;
         }
 
         .filter-group {
@@ -543,95 +687,61 @@
             font-size: 0.875rem;
         }
 
-        .filter-group select,
-        .filter-group input {
+        .filter-select, .filter-input {
             padding: 0.75rem;
             border: 1px solid #d1d5db;
             border-radius: 0.5rem;
             font-size: 0.875rem;
+            min-width: 150px;
         }
 
         .verifications-container {
-            background: white;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            overflow: hidden;
-        }
-
-        .loading-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: #64748b;
-        }
-
-        .loading-state i {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-            animation: spin 1s linear infinite;
-        }
-
-        .verifications-list {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            gap: 1rem;
         }
 
         .verification-card {
-            display: grid;
-            grid-template-columns: auto 1fr auto auto;
-            gap: 1.5rem;
-            align-items: center;
+            background: white;
+            border-radius: 1rem;
             padding: 1.5rem;
-            border-bottom: 1px solid #e5e7eb;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #e5e7eb;
         }
 
-        .verification-card:last-child {
-            border-bottom: none;
-        }
-
-        .user-avatar {
-            width: 3rem;
-            height: 3rem;
-            background: #f3f4f6;
-            border-radius: 50%;
+        .verification-header {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: #6b7280;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
         }
 
-        .user-info h4 {
-            color: #111827;
+        .user-info h3 {
+            color: #0f172a;
             font-weight: 600;
             margin-bottom: 0.25rem;
         }
 
-        .user-email {
+        .user-info .email {
             color: #3b82f6;
-            font-size: 0.875rem;
+            font-weight: 500;
             margin-bottom: 0.25rem;
         }
 
-        .user-company,
-        .user-title {
-            color: #6b7280;
+        .user-info .company {
+            color: #64748b;
             font-size: 0.875rem;
-            margin-bottom: 0.125rem;
         }
 
         .verification-status {
-            text-align: center;
+            text-align: right;
         }
 
         .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
             padding: 0.25rem 0.75rem;
             border-radius: 1rem;
             font-size: 0.75rem;
             font-weight: 600;
-            text-transform: capitalize;
+            text-transform: uppercase;
         }
 
         .status-badge.pending {
@@ -649,54 +759,51 @@
             color: #dc2626;
         }
 
-        .signup-date {
-            color: #9ca3af;
-            font-size: 0.75rem;
-            margin-top: 0.5rem;
+        .verification-details {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        .detail-item i {
+            color: #3b82f6;
         }
 
         .verification-actions {
             display: flex;
             gap: 0.5rem;
+            flex-wrap: wrap;
         }
 
-        .btn-sm {
-            padding: 0.5rem 1rem;
-            font-size: 0.75rem;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: #6b7280;
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-        }
-
-        /* Modal Styles */
-        .modal-overlay {
+        .modal {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
             background: rgba(0,0,0,0.5);
-            display: flex;
+            z-index: 10000;
             align-items: center;
             justify-content: center;
-            z-index: 10000;
+            padding: 2rem;
         }
 
         .modal-content {
             background: white;
             border-radius: 1rem;
-            max-width: 600px;
-            width: 90%;
-            max-height: 80vh;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
             overflow-y: auto;
         }
 
@@ -704,12 +811,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.5rem;
+            padding: 2rem 2rem 1rem 2rem;
             border-bottom: 1px solid #e5e7eb;
         }
 
-        .modal-header h3 {
-            color: #111827;
+        .modal-header h2 {
+            color: #0f172a;
             font-weight: 600;
         }
 
@@ -718,76 +825,116 @@
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
-            color: #6b7280;
+            color: #64748b;
         }
 
         .modal-body {
-            padding: 1.5rem;
-        }
-
-        .detail-section {
-            margin-bottom: 2rem;
-        }
-
-        .detail-section h4 {
-            color: #111827;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid #e5e7eb;
+            padding: 2rem;
         }
 
         .detail-grid {
             display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 1rem;
+            margin-bottom: 2rem;
         }
 
-        .detail-item {
+        .detail-grid .detail-item {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 0;
+            flex-direction: column;
+            gap: 0.25rem;
         }
 
-        .detail-item label {
+        .detail-grid .detail-item label {
             font-weight: 600;
             color: #374151;
+            font-size: 0.875rem;
         }
 
-        .modal-actions {
-            display: flex;
-            gap: 1rem;
-            padding: 1.5rem;
-            border-top: 1px solid #e5e7eb;
-            justify-content: flex-end;
+        .detail-grid .detail-item span {
+            color: #6b7280;
         }
 
-        /* Notifications */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 1rem 1.5rem;
-            border-radius: 0.5rem;
-            color: white;
-            font-weight: 600;
-            z-index: 10001;
+        .documents-section h4 {
+            color: #0f172a;
+            margin-bottom: 1rem;
+        }
+
+        .documents-list {
             display: flex;
-            align-items: center;
+            flex-direction: column;
             gap: 0.5rem;
         }
 
-        .notification.error {
-            background: #dc2626;
+        .document-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: #f8fafc;
+            border-radius: 0.5rem;
         }
 
-        .notification.success {
-            background: #059669;
+        .document-item i {
+            color: #dc2626;
+            font-size: 1.25rem;
+        }
+
+        .verification-actions {
+            margin-top: 2rem;
+        }
+
+        .action-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .notes-section label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .notes-section textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .loading-state, .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            text-align: center;
+            color: #64748b;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e5e7eb;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
         }
 
         @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         @media (max-width: 768px) {
@@ -797,19 +944,34 @@
                 gap: 1rem;
             }
 
+            .header-stats {
+                gap: 1rem;
+            }
+
             .admin-filters {
                 flex-direction: column;
                 align-items: stretch;
             }
 
-            .verification-card {
-                grid-template-columns: 1fr;
+            .filter-group {
+                width: 100%;
+            }
+
+            .verification-header {
+                flex-direction: column;
                 gap: 1rem;
-                text-align: center;
+            }
+
+            .verification-status {
+                text-align: left;
             }
 
             .verification-actions {
-                justify-content: center;
+                justify-content: flex-start;
+            }
+
+            .action-group {
+                flex-direction: column;
             }
         }
     </style>

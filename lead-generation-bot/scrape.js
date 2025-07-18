@@ -9,6 +9,9 @@ require('dotenv').config({ path: '../.env.local' });
 const { createClient } = require('@supabase/supabase-js');
 const axios = require('axios');
 const cheerio = require('cheerio');
+const fs = require('fs');
+const path = require('path');
+const { Parser } = require('json2csv');
 
 // Environment validation
 if (!process.env.SERPAPI_API_KEY) {
@@ -118,7 +121,7 @@ function extractEmails(text) {
  */
 async function scrapeWebsiteForEmails(url, retries = 0) {
   try {
-    console.log(`🔍 Scraping website: ${url}`);
+    // console.log(`🔍 Scraping website: ${url}`);
     
     const response = await axios.get(url, {
       timeout: 10000,
@@ -138,17 +141,17 @@ async function scrapeWebsiteForEmails(url, retries = 0) {
     // Extract emails
     const emails = extractEmails(textContent);
     
-    console.log(`📧 Found ${emails.length} emails on ${url}`);
+    // console.log(`📧 Found ${emails.length} emails on ${url}`);
     return emails;
     
   } catch (error) {
     if (retries < MAX_RETRIES) {
-      console.log(`⚠️ Retrying ${url} (attempt ${retries + 1}/${MAX_RETRIES})`);
+      // console.log(`⚠️ Retrying ${url} (attempt ${retries + 1}/${MAX_RETRIES})`);
       await sleep(RATE_LIMIT_DELAY);
       return scrapeWebsiteForEmails(url, retries + 1);
     }
     
-    console.log(`❌ Failed to scrape ${url}: ${error.message}`);
+    // console.log(`❌ Failed to scrape ${url}: ${error.message}`);
     return [];
   }
 }
@@ -158,7 +161,7 @@ async function scrapeWebsiteForEmails(url, retries = 0) {
  */
 async function searchGoogle(query, category) {
   try {
-    console.log(`🔎 Searching: "${query}" (${category})`);
+    // console.log(`🔎 Searching: "${query}" (${category})`);
     
     const params = {
       ...SERPAPI_CONFIG,
@@ -175,7 +178,7 @@ async function searchGoogle(query, category) {
     return response.data.organic_results || [];
     
   } catch (error) {
-    console.error(`❌ Search error for "${query}":`, error.message);
+    // console.error(`❌ Search error for "${query}":`, error.message);
     return [];
   }
 }
@@ -202,7 +205,7 @@ async function processSearchResults(results, query, category) {
         continue;
       }
       
-      console.log(`📄 Processing: ${title}`);
+      // console.log(`📄 Processing: ${title}`);
       
       // Extract emails from snippet first
       let emails = extractEmails(snippet);
@@ -221,11 +224,12 @@ async function processSearchResults(results, query, category) {
           email: email.toLowerCase(),
           source_url: link,
           category: category,
+          search_query: query,
           timestamp: new Date().toISOString()
         };
         
         leads.push(lead);
-        console.log(`✅ Lead found: ${lead.company_name} - ${lead.email}`);
+        // console.log(`✅ Lead found: ${lead.company_name} - ${lead.email}`);
       }
       
       // Even if no emails found, save the company info
@@ -236,15 +240,16 @@ async function processSearchResults(results, query, category) {
           email: null,
           source_url: link,
           category: category,
+          search_query: query,
           timestamp: new Date().toISOString()
         };
         
         leads.push(lead);
-        console.log(`📝 Company saved (no email): ${lead.company_name}`);
+        // console.log(`📝 Company saved (no email): ${lead.company_name}`);
       }
       
     } catch (error) {
-      console.error(`❌ Error processing result:`, error.message);
+      // console.error(`❌ Error processing result:`, error.message);
     }
   }
   
@@ -252,17 +257,82 @@ async function processSearchResults(results, query, category) {
 }
 
 /**
+ * Convert leads to CSV format using json2csv
+ */
+function convertLeadsToCSV(leads) {
+  if (leads.length === 0) return '';
+  
+  // Define CSV fields
+  const fields = [
+    { label: 'company_name', value: 'company_name' },
+    { label: 'email', value: 'email' },
+    { label: 'source_url', value: 'source_url' },
+    { label: 'category', value: 'category' },
+    { label: 'search_query', value: 'search_query' },
+    { label: 'timestamp', value: 'timestamp' }
+  ];
+  
+  // Create parser
+  const parser = new Parser({ fields });
+  
+  // Convert to CSV
+  return parser.parse(leads);
+}
+
+/**
+ * Save leads to CSV file
+ */
+async function saveLeadsToCSV(leads, filePath = 'output/leads_singapore.csv') {
+  try {
+    console.log(`🔄 Preparing to save ${leads.length} leads to CSV...`);
+    
+    // Ensure output directory exists
+    const outputDir = path.dirname(filePath);
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
+      console.log(`📁 Created directory: ${outputDir}`);
+    }
+    
+    // Remove existing file if it exists
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+      console.log(`🗑️  Removed existing file: ${filePath}`);
+    }
+    
+    // Convert leads to CSV using json2csv
+    let csvContent;
+    if (leads.length === 0) {
+      // Create empty CSV with headers only
+      csvContent = 'company_name,email,source_url,category,search_query,timestamp\n';
+    } else {
+      csvContent = convertLeadsToCSV(leads);
+    }
+    
+    // Write to file
+    fs.writeFileSync(filePath, csvContent, 'utf8');
+    
+    // Verify file was created
+    if (fs.existsSync(filePath)) {
+      console.log(`✅ Saved ${leads.length} leads to ${filePath}`);
+    } else {
+      console.error(`❌ Failed to create file: ${filePath}`);
+    }
+    
+  } catch (error) {
+    console.error(`❌ Error saving CSV file: ${error.message}`);
+    console.error(`❌ Stack trace:`, error.stack);
+  }
+}
+
+/**
  * Save leads to Supabase
  */
 async function saveLeadsToSupabase(leads) {
   if (leads.length === 0) {
-    console.log('📭 No leads to save');
     return;
   }
   
   try {
-    console.log(`💾 Saving ${leads.length} leads to Supabase...`);
-    
     // Create table if it doesn't exist
     const createTableQuery = `
       CREATE TABLE IF NOT EXISTS leads_singapore (
@@ -272,6 +342,7 @@ async function saveLeadsToSupabase(leads) {
         email TEXT,
         source_url TEXT,
         category TEXT,
+        search_query TEXT,
         timestamp TIMESTAMPTZ DEFAULT NOW(),
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
@@ -298,14 +369,14 @@ async function saveLeadsToSupabase(leads) {
         });
       
       if (error) {
-        console.error(`❌ Batch insert error:`, error);
+        // console.error(`❌ Batch insert error:`, error);
       } else {
         successCount += batch.length;
-        console.log(`✅ Saved batch ${Math.floor(i/batchSize) + 1}: ${batch.length} leads`);
+        // console.log(`✅ Saved batch ${Math.floor(i/batchSize) + 1}: ${batch.length} leads`);
       }
     }
     
-    console.log(`🎉 Successfully saved ${successCount}/${leads.length} leads to Supabase!`);
+    console.log(`💾 Saved ${successCount} leads to Supabase`);
     
   } catch (error) {
     console.error('❌ Error saving to Supabase:', error);
@@ -339,7 +410,7 @@ async function main() {
         
         categoryLeads = categoryLeads.concat(leads);
         
-        console.log(`📊 Query "${query}" found ${leads.length} leads`);
+        // console.log(`📊 Query "${query}" found ${leads.length} leads`);
       }
       
       // Remove duplicates within category
@@ -347,7 +418,7 @@ async function main() {
         index === self.findIndex(l => l.email === lead.email && l.website === lead.website)
       );
       
-      console.log(`📈 Category "${category.name}" total: ${uniqueLeads.length} unique leads`);
+      console.log(`📈 ${category.name}: ${uniqueLeads.length} leads`);
       totalLeads = totalLeads.concat(uniqueLeads);
     }
     
@@ -360,6 +431,9 @@ async function main() {
     
     // Save to Supabase
     await saveLeadsToSupabase(finalLeads);
+    
+    // Save to CSV file
+    await saveLeadsToCSV(finalLeads, 'output/leads_singapore.csv');
     
     // Summary
     const endTime = Date.now();
@@ -407,4 +481,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { main, searchGoogle, processSearchResults, saveLeadsToSupabase };
+module.exports = { main, searchGoogle, processSearchResults, saveLeadsToSupabase, saveLeadsToCSV, convertLeadsToCSV };

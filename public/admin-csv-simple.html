@@ -290,14 +290,24 @@
           }
         }, 500);
         
-        // Create form data
-        const formData = new FormData();
-        formData.append('file', file);
+        // Read file content as text
+        const fileContent = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.onerror = (e) => reject(e);
+          reader.readAsText(file);
+        });
         
-        // Upload and process directly
-        const response = await fetch('/api/admin/upload-and-process-csv', {
+        // Send CSV content as JSON
+        const response = await fetch('/api/admin/process-csv-text', {
           method: 'POST',
-          body: formData
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            csvContent: fileContent,
+            filename: file.name
+          })
         });
         
         clearInterval(progressInterval);

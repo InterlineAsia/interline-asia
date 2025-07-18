@@ -171,6 +171,105 @@
       border-radius: 4px;
       font-weight: 600;
     }
+    
+    /* File upload styles */
+    .upload-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    
+    .upload-card {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .upload-card h3 {
+      margin: 0;
+      color: #1e293b;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .file-input-container {
+      position: relative;
+      width: 100%;
+      height: 120px;
+      border: 2px dashed #cbd5e1;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+    
+    .file-input-container:hover {
+      border-color: #3b82f6;
+      background: #f0f9ff;
+    }
+    
+    .file-input-container input[type="file"] {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+    
+    .file-input-icon {
+      font-size: 2rem;
+      color: #64748b;
+      margin-bottom: 0.5rem;
+    }
+    
+    .file-input-text {
+      color: #64748b;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+    
+    .file-input-container.has-file {
+      border-style: solid;
+      border-color: #22c55e;
+      background: #f0fdf4;
+    }
+    
+    .file-input-container.has-file .file-input-icon {
+      color: #22c55e;
+    }
+    
+    .file-input-container.has-file .file-input-text {
+      color: #166534;
+    }
+    
+    .upload-progress {
+      height: 6px;
+      width: 100%;
+      background: #e2e8f0;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 0.5rem;
+    }
+    
+    .upload-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
   </style>
 </head>
 
@@ -187,6 +286,60 @@
           <p>Initializing file detection...</p>
         </div>
       </div>
+    </div>
+    
+    <div class="section">
+      <h2><i class="ri-upload-cloud-line"></i> Upload CSV Files</h2>
+      <p>Upload your CSV files directly to the storage bucket:</p>
+      
+      <div class="upload-section">
+        <div class="upload-card">
+          <h3><i class="ri-file-list-3-line"></i> Cabin Types</h3>
+          <div class="file-input-container" id="cabin-types-container">
+            <input type="file" id="cabin-types-file" accept=".csv" onchange="handleFileSelected('cabin-types')">
+            <div class="file-input-icon"><i class="ri-upload-cloud-line"></i></div>
+            <div class="file-input-text">Drop cabin types CSV file here<br>or click to browse</div>
+          </div>
+          <button class="btn" onclick="uploadFile('cabin-types')" id="cabin-types-btn" disabled>
+            <i class="ri-upload-2-line"></i> Upload Cabin Types
+          </button>
+          <div class="upload-progress" id="cabin-types-progress" style="display: none;">
+            <div class="upload-progress-bar" id="cabin-types-progress-bar"></div>
+          </div>
+        </div>
+        
+        <div class="upload-card">
+          <h3><i class="ri-ship-line"></i> Ocean Cruises</h3>
+          <div class="file-input-container" id="ocean-container">
+            <input type="file" id="ocean-file" accept=".csv" onchange="handleFileSelected('ocean')">
+            <div class="file-input-icon"><i class="ri-upload-cloud-line"></i></div>
+            <div class="file-input-text">Drop ocean cruises CSV file here<br>or click to browse</div>
+          </div>
+          <button class="btn" onclick="uploadFile('ocean')" id="ocean-btn" disabled>
+            <i class="ri-upload-2-line"></i> Upload Ocean Cruises
+          </button>
+          <div class="upload-progress" id="ocean-progress" style="display: none;">
+            <div class="upload-progress-bar" id="ocean-progress-bar"></div>
+          </div>
+        </div>
+        
+        <div class="upload-card">
+          <h3><i class="ri-sailboat-line"></i> River Cruises</h3>
+          <div class="file-input-container" id="river-container">
+            <input type="file" id="river-file" accept=".csv" onchange="handleFileSelected('river')">
+            <div class="file-input-icon"><i class="ri-upload-cloud-line"></i></div>
+            <div class="file-input-text">Drop river cruises CSV file here<br>or click to browse</div>
+          </div>
+          <button class="btn" onclick="uploadFile('river')" id="river-btn" disabled>
+            <i class="ri-upload-2-line"></i> Upload River Cruises
+          </button>
+          <div class="upload-progress" id="river-progress" style="display: none;">
+            <div class="upload-progress-bar" id="river-progress-bar"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="upload-status" style="margin-top: 1rem;"></div>
     </div>
     
     <div class="section">
@@ -266,6 +419,120 @@
             Initialization failed: ${error.message}
           </div>
         `;
+      }
+    }
+
+    function handleFileSelected(type) {
+      const fileInput = document.getElementById(`${type}-file`);
+      const container = document.getElementById(`${type}-container`);
+      const button = document.getElementById(`${type}-btn`);
+      
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        container.classList.add('has-file');
+        container.querySelector('.file-input-text').textContent = file.name;
+        button.disabled = false;
+      } else {
+        container.classList.remove('has-file');
+        container.querySelector('.file-input-text').innerHTML = `Drop ${type} CSV file here<br>or click to browse`;
+        button.disabled = true;
+      }
+    }
+
+    async function uploadFile(type) {
+      const fileInput = document.getElementById(`${type}-file`);
+      const button = document.getElementById(`${type}-btn`);
+      const progressContainer = document.getElementById(`${type}-progress`);
+      const progressBar = document.getElementById(`${type}-progress-bar`);
+      const uploadStatus = document.getElementById('upload-status');
+      
+      if (fileInput.files.length === 0) {
+        uploadStatus.innerHTML = `
+          <div class="status error">
+            <i class="ri-error-warning-line"></i>
+            No file selected for upload
+          </div>
+        `;
+        return;
+      }
+      
+      const file = fileInput.files[0];
+      
+      // Validate file type
+      if (!file.name.toLowerCase().endsWith('.csv')) {
+        uploadStatus.innerHTML = `
+          <div class="status error">
+            <i class="ri-error-warning-line"></i>
+            Only CSV files are allowed
+          </div>
+        `;
+        return;
+      }
+      
+      try {
+        // Prepare for upload
+        button.disabled = true;
+        button.innerHTML = '<i class="ri-loader-4-line"></i> Uploading...';
+        progressContainer.style.display = 'block';
+        progressBar.style.width = '0%';
+        
+        // Simulate progress (in a real implementation, you'd use actual upload progress)
+        const progressInterval = setInterval(() => {
+          const currentWidth = parseInt(progressBar.style.width) || 0;
+          if (currentWidth < 90) {
+            progressBar.style.width = (currentWidth + 10) + '%';
+          }
+        }, 300);
+        
+        // Upload to Supabase storage
+        const { data, error } = await window.supabaseClient.supabase.storage
+          .from('uploads')
+          .upload(`${Date.now()}_${file.name}`, file, {
+            cacheControl: '3600',
+            upsert: true
+          });
+        
+        clearInterval(progressInterval);
+        
+        if (error) {
+          throw error;
+        }
+        
+        // Complete progress bar
+        progressBar.style.width = '100%';
+        
+        // Show success message
+        uploadStatus.innerHTML = `
+          <div class="status success">
+            <i class="ri-checkbox-circle-line"></i>
+            File "${file.name}" uploaded successfully!
+          </div>
+        `;
+        
+        // Reset file input after successful upload
+        setTimeout(() => {
+          fileInput.value = '';
+          handleFileSelected(type);
+          progressContainer.style.display = 'none';
+          button.innerHTML = '<i class="ri-upload-2-line"></i> Upload File';
+          button.disabled = true;
+          
+          // Refresh file list
+          checkFiles();
+        }, 2000);
+        
+      } catch (error) {
+        console.error('Upload error:', error);
+        uploadStatus.innerHTML = `
+          <div class="status error">
+            <i class="ri-error-warning-line"></i>
+            Upload failed: ${error.message}
+          </div>
+        `;
+        
+        button.disabled = false;
+        button.innerHTML = '<i class="ri-upload-2-line"></i> Try Again';
+        progressContainer.style.display = 'none';
       }
     }
 
@@ -510,23 +777,37 @@
         processBtn.innerHTML = '<i class="ri-loader-4-line"></i> Processing...';
         
         statusDiv.innerHTML = `
-          <div class="loading">
-            <i class="ri-loader-4-line"></i>
-            <p>Processing CSV files and updating database...</p>
+          <div class="status info" style="background: #e0f2fe; color: #0369a1; border-color: #bae6fd;">
+            <i class="ri-time-line"></i>
+            Processing CSV files... This may take a few minutes.
           </div>
         `;
         
-        // Here you would implement the actual CSV processing
-        // For now, we'll simulate the process
+        // Call the process-csv-deals API endpoint
+        const response = await fetch('/api/process-csv-deals', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${window.supabaseClient.currentSession?.access_token}`
+          }
+        });
         
-        await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate processing
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status} ${response.statusText}`);
+        }
         
-        statusDiv.innerHTML = `
-          <div class="status success">
-            <i class="ri-checkbox-circle-line"></i>
-            CSV files processed successfully! Database has been updated.
-          </div>
-        `;
+        const result = await response.json();
+        
+        if (result.success) {
+          statusDiv.innerHTML = `
+            <div class="status success">
+              <i class="ri-checkbox-circle-line"></i>
+              ${result.message || 'CSV files processed successfully!'}
+            </div>
+          `;
+        } else {
+          throw new Error(result.error || 'Unknown processing error');
+        }
         
         // Refresh database status
         await checkDatabase();

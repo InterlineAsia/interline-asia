@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Deals Filtering</title>
+</head>
+<body>
+    <h1>Test Deals Filtering & Randomization</h1>
+    <div id="test-results"></div>
+
+    <script>
+        // Test the date parsing and filtering logic
+        function parseDate(dateStr) {
+            if (!dateStr) return null;
+
+            if (dateStr.includes('-') && dateStr.length <= 9) {
+                const parts = dateStr.split('-');
+                if (parts.length === 3) {
+                    const day = parseInt(parts[0]);
+                    const month = parts[1];
+                    const year = parts[2].length === 2 ? parseInt('20' + parts[2]) : parseInt(parts[2]);
+                    const monthMap = {
+                        'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+                        'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+                    };
+                    const monthNum = monthMap[month];
+                    if (!isNaN(day) && monthNum !== undefined && !isNaN(year)) {
+                        return new Date(year, monthNum, day);
+                    }
+                }
+            }
+
+            const date = new Date(dateStr);
+            return isNaN(date.getTime()) ? null : date;
+        }
+
+        // Test data with various date formats
+        const testDeals = [
+            { id: 1, name: 'Past Cruise 1', departureDate: parseDate('15-Jan-24') },
+            { id: 2, name: 'Past Cruise 2', departureDate: parseDate('20-Dec-24') },
+            { id: 3, name: 'Future Cruise 1', departureDate: parseDate('15-Aug-25') },
+            { id: 4, name: 'Future Cruise 2', departureDate: parseDate('20-Sep-25') },
+            { id: 5, name: 'Future Cruise 3', departureDate: parseDate('10-Oct-25') },
+            { id: 6, name: 'No Date Cruise', departureDate: null }
+        ];
+
+        console.log('Original deals:', testDeals);
+
+        // Filter out past cruises
+        const now = new Date();
+        const upcomingDeals = testDeals.filter(deal => {
+            if (!deal.departureDate) return true; // Keep deals without dates
+            return deal.departureDate >= now;
+        });
+
+        console.log('After filtering past cruises:', upcomingDeals);
+
+        // Randomize order
+        const shuffledDeals = upcomingDeals.sort(() => 0.5 - Math.random());
+        console.log('After randomization:', shuffledDeals);
+
+        // Display results
+        const resultsDiv = document.getElementById('test-results');
+        resultsDiv.innerHTML = `
+            <h2>Test Results</h2>
+            <p><strong>Original deals:</strong> ${testDeals.length}</p>
+            <p><strong>After filtering:</strong> ${upcomingDeals.length}</p>
+            <p><strong>After randomization:</strong> ${shuffledDeals.length}</p>
+            
+            <h3>Filtered & Randomized Deals:</h3>
+            <ul>
+                ${shuffledDeals.map(deal => `
+                    <li>${deal.name} - ${deal.departureDate ? deal.departureDate.toLocaleDateString() : 'No date'}</li>
+                `).join('')}
+            </ul>
+            
+            <p><em>Refresh the page to see different randomization results!</em></p>
+        `;
+    </script>
+</body>
+</html>

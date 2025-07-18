@@ -1346,13 +1346,13 @@ img {
     outline-offset: 2px;
 }
 
-/* Travel Tools Bar - Integrated Header Design */
+/* Travel Tools Bar - Fully Integrated Navigation Style */
 .travel-tools-bar {
     background: rgba(15, 23, 42, 0.95);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 0.75rem 0;
+    padding: var(--space-md) 0;
 }
 
 .travel-tools-container {
@@ -1361,20 +1361,21 @@ img {
     padding: 0 var(--space-lg);
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 1.5rem;
+    justify-content: center;
+    gap: var(--space-lg);
 }
 
 .tools-intro {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.8rem;
     font-weight: 500;
     flex-shrink: 0;
+    margin-right: var(--space-md);
 }
 
 .tools-grid {
     display: flex;
-    gap: 0.75rem;
+    gap: var(--space-sm);
     align-items: center;
     flex-wrap: wrap;
 }
@@ -1382,30 +1383,26 @@ img {
 .tool-link {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
-    padding: 0.5rem 0.75rem;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: var(--radius-lg);
-    color: rgba(255, 255, 255, 0.9);
+    gap: 0.3rem;
+    padding: var(--space-sm) var(--space-md);
+    color: rgba(255, 255, 255, 0.8);
     text-decoration: none;
-    font-size: 0.8rem;
     font-weight: 500;
+    font-size: 0.8rem;
+    border-radius: var(--radius-lg);
     transition: all 0.3s ease;
     white-space: nowrap;
-    box-shadow: var(--shadow-sm);
+    position: relative;
 }
 
 .tool-link:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.3);
     color: white;
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .tool-icon {
-    font-size: 1rem;
+    font-size: 0.9rem;
+    opacity: 0.9;
 }
 
 .tool-text {
@@ -1424,12 +1421,12 @@ img {
 /* Mobile responsive for travel tools bar */
 @media (max-width: 768px) {
     .travel-tools-bar {
-        padding: 0.5rem 0;
+        padding: var(--space-sm) 0;
     }
     
     .travel-tools-container {
         flex-direction: column;
-        gap: 0.75rem;
+        gap: var(--space-md);
         text-align: center;
     }
     
@@ -1438,26 +1435,26 @@ img {
     }
     
     .tools-grid {
-        gap: 0.5rem;
+        gap: var(--space-xs);
         justify-content: center;
     }
     
     .tool-link {
-        font-size: 0.7rem;
-        padding: 0.35rem 0.6rem;
-        gap: 0.3rem;
+        font-size: 0.75rem;
+        padding: var(--space-xs) var(--space-sm);
+        gap: 0.25rem;
     }
     
     .tool-icon {
-        font-size: 0.85rem;
+        font-size: 0.8rem;
     }
     
     .tool-text {
-        font-size: 0.7rem;
+        font-size: 0.75rem;
     }
     
     .hero-content {
-        padding: calc(180px + var(--space-xl)) 0 var(--space-2xl) 0;
+        padding: calc(160px + var(--space-xl)) 0 var(--space-2xl) 0;
     }
 }
 

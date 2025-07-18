@@ -98,7 +98,7 @@ body {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    padding: var(--space-sm) 0;
+    padding: 0.5rem 0;
 }
 
 .travel-tools-header-container {
@@ -107,55 +107,50 @@ body {
     padding: 0 var(--space-lg);
     display: flex;
     align-items: center;
-    gap: var(--space-xl);
-}
-
-.travel-tools-header-label {
-    flex-shrink: 0;
+    gap: 1rem;
 }
 
 .tools-label {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.75rem;
     font-weight: 500;
+    flex-shrink: 0;
 }
 
 .travel-tools-header-grid {
     display: flex;
-    gap: var(--space-lg);
-    flex-wrap: wrap;
+    gap: 0.5rem;
     align-items: center;
 }
 
 .header-tool-item {
     display: flex;
     align-items: center;
-    gap: var(--space-xs);
-    padding: var(--space-xs) var(--space-sm);
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: var(--radius-lg);
-    color: rgba(255, 255, 255, 0.9);
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.85);
     text-decoration: none;
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     font-weight: 500;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
+    transition: all 0.2s ease;
+    white-space: nowrap;
 }
 
 .header-tool-item:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
     color: white;
-    transform: translateY(-1px);
 }
 
 .header-tool-icon {
-    font-size: 1rem;
+    font-size: 0.8rem;
 }
 
 .header-tool-label {
-    white-space: nowrap;
+    font-size: 0.7rem;
 }
 
 .nav-container {
@@ -312,7 +307,7 @@ body {
     position: relative;
     z-index: 3;
     width: 100%;
-    padding: calc(180px + var(--space-2xl)) 0 var(--space-4xl) 0;
+    padding: calc(140px + var(--space-2xl)) 0 var(--space-4xl) 0;
 }
 
 .hero-container {
@@ -1287,24 +1282,35 @@ body {
         display: flex;
     }
     
+    .travel-tools-header {
+        padding: 0.25rem 0;
+    }
+    
     .travel-tools-header-container {
         flex-direction: column;
-        gap: var(--space-md);
+        gap: 0.5rem;
         text-align: center;
     }
     
     .travel-tools-header-grid {
         justify-content: center;
-        gap: var(--space-sm);
+        gap: 0.25rem;
+        flex-wrap: wrap;
     }
     
     .header-tool-item {
-        font-size: 0.75rem;
-        padding: var(--space-xs);
+        font-size: 0.6rem;
+        padding: 0.2rem 0.4rem;
+        gap: 0.2rem;
+    }
+    
+    .header-tool-icon {
+        font-size: 0.7rem;
     }
     
     .tools-label {
-        font-size: 0.8rem;
+        font-size: 0.65rem;
+        display: none;
     }
     
     .hero-content {

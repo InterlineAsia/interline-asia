@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test Deals Filtering</title>
 </head>
+
 <body>
     <h1>Test Deals Filtering & Randomization</h1>
     <div id="test-results"></div>
@@ -35,14 +37,18 @@
             return isNaN(date.getTime()) ? null : date;
         }
 
-        // Test data with various date formats
+        // Test data with various date formats (including actual CSV format)
         const testDeals = [
-            { id: 1, name: 'Past Cruise 1', departureDate: parseDate('15-Jan-24') },
-            { id: 2, name: 'Past Cruise 2', departureDate: parseDate('20-Dec-24') },
-            { id: 3, name: 'Future Cruise 1', departureDate: parseDate('15-Aug-25') },
-            { id: 4, name: 'Future Cruise 2', departureDate: parseDate('20-Sep-25') },
-            { id: 5, name: 'Future Cruise 3', departureDate: parseDate('10-Oct-25') },
-            { id: 6, name: 'No Date Cruise', departureDate: null }
+            { id: 1, name: 'Past Cruise 1 (Jan 2024)', departureDate: parseDate('15-Jan-24') },
+            { id: 2, name: 'Past Cruise 2 (Dec 2024)', departureDate: parseDate('20-Dec-24') },
+            { id: 3, name: 'Past Cruise 3 (June 2025)', departureDate: parseDate('28-Jun-25') },
+            { id: 4, name: 'Past Cruise 4 (July 1, 2025)', departureDate: parseDate('01-Jul-25') },
+            { id: 5, name: 'Past Cruise 5 (July 15, 2025)', departureDate: parseDate('15-Jul-25') },
+            { id: 6, name: 'Future Cruise 1 (July 20, 2025)', departureDate: parseDate('20-Jul-25') },
+            { id: 7, name: 'Future Cruise 2 (Aug 2025)', departureDate: parseDate('15-Aug-25') },
+            { id: 8, name: 'Future Cruise 3 (Sep 2025)', departureDate: parseDate('20-Sep-25') },
+            { id: 9, name: 'Future Cruise 4 (Oct 2025)', departureDate: parseDate('10-Oct-25') },
+            { id: 10, name: 'No Date Cruise', departureDate: null }
         ];
 
         console.log('Original deals:', testDeals);
@@ -79,4 +85,5 @@
         `;
     </script>
 </body>
+
 </html>

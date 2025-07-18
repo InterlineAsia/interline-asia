@@ -397,6 +397,11 @@
       color: white;
     }
 
+    .btn-request-quote {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: white;
+    }
+
     .btn-action:hover {
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -1037,7 +1042,8 @@
           insidePrice: '$3,440',
           oceanviewPrice: '$3,840',
           balconyPrice: '$4,240',
-          suitePrice: '$5,640'
+          suitePrice: '$5,640',
+          pricingStatus: 'Available'
         },
         {
           id: 'sample_2',
@@ -1054,7 +1060,8 @@
           insidePrice: '$3,340',
           oceanviewPrice: '$3,740',
           balconyPrice: '$4,140',
-          suitePrice: '$5,540'
+          suitePrice: '$5,540',
+          pricingStatus: 'Quote Available'
         },
         {
           id: 'sample_3',
@@ -1071,7 +1078,8 @@
           insidePrice: '$2,890',
           oceanviewPrice: '$3,290',
           balconyPrice: '$3,690',
-          suitePrice: '$4,990'
+          suitePrice: '$4,990',
+          pricingStatus: 'Available'
         },
         {
           id: 'sample_4',
@@ -1080,7 +1088,7 @@
           shipName: 'World Explorer',
           region: 'Arctic',
           nights: 11,
-          departureDate: new Date('2025-07-25'),
+          departureDate: new Date('2025-08-25'),
           departurePort: 'Reykjavik, Iceland',
           arrivalPort: 'Oslo, Norway',
           itinerary: 'Arctic Adventure - Spitsbergen, Bear Island, North Cape exploration',
@@ -1088,7 +1096,8 @@
           insidePrice: '$6,879',
           oceanviewPrice: '$7,279',
           balconyPrice: '$7,679',
-          suitePrice: '$9,079'
+          suitePrice: '$9,079',
+          pricingStatus: 'Quote Available'
         }
       ];
 
@@ -1102,6 +1111,96 @@
       console.log(`🎲 SAMPLE DEALS: Randomized ${shuffledDeals.length} deals`);
 
       return shuffledDeals;
+    }
+
+    // Determine if quote button should be shown
+    function shouldShowQuoteButton(deal) {
+      // Show quote button if pricing is not directly available
+      const hasDirectPricing = deal.insidePrice && 
+                              !deal.insidePrice.toLowerCase().includes('quote') &&
+                              !deal.insidePrice.toLowerCase().includes('available') &&
+                              parseFloat(deal.insidePrice.replace(/[$,]/g, '')) > 0;
+      
+      return !hasDirectPricing || deal.pricingStatus === 'Quote Available';
+    }
+
+    // Request quote functionality
+    async function requestQuote(dealId, cruiseLine, shipName) {
+      try {
+        // Check if user is logged in
+        const user = await getCurrentUser();
+        if (!user) {
+          alert('Please log in to request a quote.');
+          window.location.href = '/login.html';
+          return;
+        }
+
+        // Get user's full name
+        const fullName = `${user.user_metadata?.firstName || ''} ${user.user_metadata?.middleName || ''} ${user.user_metadata?.lastName || ''}`.trim();
+        
+        if (!fullName || fullName === '') {
+          alert('Please complete your profile with your full name before requesting a quote.');
+          window.location.href = '/dashboard.html';
+          return;
+        }
+
+        // Show loading state
+        const button = event.target;
+        const originalText = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<i class="ri-loader-4-line"></i> Requesting...';
+
+        // Send quote request
+        const response = await fetch('/api/request-quote', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.access_token}`
+          },
+          body: JSON.stringify({
+            cruiseId: dealId,
+            clientName: fullName,
+            userId: user.id
+          })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Failed to request quote');
+        }
+
+        const result = await response.json();
+        
+        // Show success message
+        alert('Quote request sent successfully! You will receive an email with pricing details within 24-48 hours.');
+        
+        // Optionally redirect to dashboard
+        if (confirm('Would you like to view your quote requests in your dashboard?')) {
+          window.location.href = '/dashboard.html';
+        }
+
+      } catch (error) {
+        console.error('Quote request error:', error);
+        alert(error.message || 'Failed to request quote. Please try again.');
+      } finally {
+        // Restore button state
+        if (button) {
+          button.disabled = false;
+          button.innerHTML = originalText;
+        }
+      }
+    }
+
+    // Get current user (simplified version)
+    async function getCurrentUser() {
+      try {
+        // This would typically use Supabase auth
+        // For now, return null to indicate not logged in
+        return null;
+      } catch (error) {
+        console.error('Auth check error:', error);
+        return null;
+      }
     }
 
     function getCruiseLineLogo(cruiseLine) {
@@ -1237,11 +1336,21 @@
               
               <div class="deal-actions">
                 <button class="btn-action btn-view-details" onclick="window.location.href='/deal-details.html?id=${deal.id}'">
+                  <i class="ri-eye-line"></i>
                   View Details
                 </button>
-                <button class="btn-action btn-book-now" onclick="window.location.href='/booking.html?deal=${encodeURIComponent(deal.id)}'">
-                  Book Now
-                </button>
+                ${shouldShowQuoteButton(deal) ? `
+                  <button class="btn-action btn-request-quote" onclick="requestQuote('${deal.id}', '${deal.cruiseLine}', '${deal.shipName}')">
+                    <i class="ri-mail-line"></i>
+                    Request Quote
+                  </button>
+                ` : `
+                  <button class="btn-action btn-book-now" onclick="window.location.href='/booking.html?deal=${encodeURIComponent(deal.id)}'">
+                    <i class="ri-ship-line"></i>
+                    Book Now
+                  </button>
+                `}
+              </div>
               </div>
             </div>
           `).join('');

@@ -87,6 +87,7 @@ class SyncWorker {
             this.lastSync = Date.now();
             this.addToHistory(syncResult);
 
+            console.log(`✅ Sync completed successfully in ${syncResult.duration}ms`);
             
             // Notify other components
             this.notifyComponents('sync:complete', syncResult);
@@ -138,7 +139,8 @@ class SyncWorker {
                     size: csvText.length
                 };
 
-                
+                console.log(`✅ ${source.file}: ${recordCount} records`);
+
             } catch (error) {
                 console.error(`❌ Failed to sync ${source.file}:`, error);
                 
@@ -178,7 +180,8 @@ class SyncWorker {
                     timestamp: Date.now()
                 };
 
-                
+                console.log(`✅ ${api.name}: ${data.length || 0} records`);
+
             } catch (error) {
                 console.error(`❌ Failed to sync ${api.name}:`, error);
                 
@@ -216,7 +219,8 @@ class SyncWorker {
                 await window.cruiseHelperBot.loadCruiseData();
             }
 
-            
+            console.log('✅ Cache updated successfully');
+
         } catch (error) {
             console.error('❌ Failed to update cache:', error);
             syncResult.errors.push(`Cache update: ${error.message}`);

@@ -406,7 +406,7 @@ class CruiseHelperBot {
       if (cachedData && !shouldRefresh) {
         console.log('⚡ CRUISE_BOT: Loading from cache...');
         this.cruiseData = JSON.parse(cachedData);
-        
+        console.log(`✅ CRUISE_BOT: Loaded ${this.cruiseData.length} cached cruise deals`);
         return;
       }
       
@@ -434,6 +434,7 @@ class CruiseHelperBot {
       // Load any additional CSV files
       await this.loadAdditionalCruiseFiles();
 
+      console.log(`✅ CRUISE_BOT: COMPLETE INVENTORY LOADED - ${this.cruiseData.length} total cruise deals`);
       
       // Cache the data and update timestamp
       localStorage.setItem('cruiseDataCache', JSON.stringify(this.cruiseData));
@@ -1836,10 +1837,10 @@ document.addEventListener('DOMContentLoaded', () => {
           const csvText = await response.text();
           const deals = this.parseCSV(csvText, 'Additional Cruise');
           this.cruiseData = this.cruiseData.concat(deals);
-          
+          console.log(`📊 CRUISE_BOT: Loaded ${deals.length} deals from ${filename}`);
         }
       } catch (error) {
-        
+        console.log(`📊 CRUISE_BOT: ${filename} not found, skipping...`);
       }
     }
   }
@@ -1919,7 +1920,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    
+    console.log('✅ CRUISE_BOT: Search indexes built successfully');
   }
 
   // Enhanced cruise query handler with full inventory search

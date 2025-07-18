@@ -29,6 +29,7 @@
     script.src = 'https://va.vercel-scripts.com/v1/script.js';
     script.defer = true;
     script.onload = function() {
+      console.log('✅ Vercel Analytics loaded');
       
       // Initialize analytics
       if (window.va) {
@@ -36,7 +37,7 @@
         window.va('track', 'pageview');
         
         if (VERCEL_ANALYTICS_CONFIG.debug) {
-          
+          console.log('📊 Vercel Analytics: Page view tracked');
         }
       }
     };

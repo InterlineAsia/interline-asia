@@ -22,7 +22,7 @@ class CruiseQueryService {
                 return;
             }
 
-            
+            console.log('Loading fresh cruise data...');
             this.cruiseData = [];
 
             // Load from CSV files

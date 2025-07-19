@@ -145,21 +145,26 @@ class SimpleWelcomeBot {
       }
       
       .welcome-bot-close {
-        background: none;
-        border: none;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
         color: white;
         cursor: pointer;
-        padding: 5px;
-        border-radius: 4px;
-        transition: background 0.2s;
-        font-size: 18px;
+        padding: 8px;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+        font-size: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
+        width: 32px;
+        height: 32px;
+        flex-shrink: 0;
       }
       
       .welcome-bot-close:hover {
-        background: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.4);
+        transform: scale(1.1);
       }
       
       .welcome-bot-content {

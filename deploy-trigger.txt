@@ -1,1 +1,8 @@
-Homepage redesign deployment - 1752812313
+DEPLOY_TRIGGER_LOGIN_FIX_URGENT_2025_01_19_16_15
+- URGENT: Fixed login functionality that was broken due to conflicting scripts
+- Removed problematic JavaScript files causing authentication errors
+- Simplified login system to use only essential Supabase authentication
+- Fixed consistent luxury header and footer on login page
+- Login page now matches design of all other pages
+- Authentication should work properly now
+- CRITICAL FIX - Deploy immediately

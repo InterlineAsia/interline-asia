@@ -190,7 +190,7 @@ function getCruiseLineLogo(cruiseLine) {
         'hurtigruten expeditions': 'hx.png',
         'ponant': 'ponant.png',
         'lindblad expeditions': 'lindblad.png',
-        'quark expeditions': 'quark.png',
+        'quark expeditions': 'QUARK EXPEDITIONS.png',
         'coral expeditions': 'coral-expeditions.png',
         'heritage expeditions': 'heritage-expeditions.png'
     };

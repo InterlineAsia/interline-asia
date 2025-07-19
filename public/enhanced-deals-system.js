@@ -153,7 +153,8 @@ class EnhancedDealsSystem {
       'royal-caribbean': 'royal-caribbean.png',
       'scenic': 'scenic.png',
       'seabourn': 'seabourn.png',
-      'silversea': 'silversea.png'
+      'silversea': 'silversea.png',
+      'quark-expeditions': 'QUARK EXPEDITIONS.png'
     };
 
     const logoFile = logoMap[cruiseLineNormalized] || `${cruiseLineNormalized}.png`;

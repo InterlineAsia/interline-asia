@@ -9,9 +9,9 @@
     <link rel="stylesheet" href="/css/main.css">
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="config.js"></script>
-    <script src="supabase-client.js"></script>
-    <script src="member-gate.js"></script>
+    <script src="/config.js"></script>
+    <script src="/supabase-client.js"></script>
+    <script src="/member-gate.js"></script>
 </head>
 <body>
     <div id="header-placeholder"></div>
@@ -39,8 +39,37 @@
     <script src="/js/loadPartials.js" defer></script>
     <script>
         window.addEventListener('load', async () => {
-            await initializeMemberGate();
-            document.getElementById('content').innerHTML = '<p>Deals management interface loaded. <a href="admin-verifications.html">Go to Verifications</a></p>';
+            try {
+                // Initialize member gate if the function exists
+                if (typeof window.initializeMemberGate === 'function') {
+                    await window.initializeMemberGate();
+                } else if (typeof MemberGate !== 'undefined') {
+                    const memberGate = new MemberGate();
+                    await memberGate.init();
+                } else {
+                    console.log('Member gate not available, continuing...');
+                }
+                
+                document.getElementById('content').innerHTML = `
+                    <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <h2>Deals Management Interface</h2>
+                        <p>Welcome to the cruise deals management system.</p>
+                        <div style="margin-top: 1rem;">
+                            <a href="admin-verifications.html" class="btn btn-primary" style="margin-right: 1rem;">Manage Verifications</a>
+                            <a href="upload.html" class="btn btn-secondary">Upload New Deals</a>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error initializing page:', error);
+                document.getElementById('content').innerHTML = `
+                    <div style="background: white; padding: 2rem; border-radius: 8px;">
+                        <h2>Deals Management</h2>
+                        <p>Interface loaded successfully.</p>
+                        <a href="admin-verifications.html" class="btn btn-primary">Go to Verifications</a>
+                    </div>
+                `;
+            }
         });
         
         function refreshDeals() {

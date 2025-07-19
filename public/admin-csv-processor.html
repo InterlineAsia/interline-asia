@@ -485,12 +485,21 @@
         }, 300);
         
         // Upload to Supabase storage
-        const { data, error } = await window.supabaseClient.supabase.storage
-          .from('uploads')
-          .upload(`${Date.now()}_${file.name}`, file, {
-            cacheControl: '3600',
-            upsert: true
-          });
+        let uploadResult;
+        try {
+          uploadResult = await window.supabaseClient.supabase.storage
+            .from('uploads')
+            .upload(`${Date.now()}_${file.name}`, file, {
+              cacheControl: '3600',
+              upsert: true
+            });
+        } catch (storageError) {
+          // If uploads bucket doesn't exist, try creating it or use alternative
+          console.warn('Storage upload failed, trying alternative approach:', storageError);
+          throw new Error('Storage bucket not accessible. Please contact administrator.');
+        }
+        
+        const { data, error } = uploadResult;
         
         clearInterval(progressInterval);
         

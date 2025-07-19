@@ -8,8 +8,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="auth.css">
   
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tailwind CSS - Using local build for production -->
+  <link rel="stylesheet" href="/css/complete-redesign.css">
   <!-- Remix Icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
   
@@ -148,6 +148,9 @@
             <option value="pending">Pending</option>
             <option value="rejected">Rejected</option>
           </select>
+          <button onclick="showAddMemberModal()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-medium transition-colors duration-200">
+            <i class="ri-user-add-line mr-2"></i>Add Member
+          </button>
           <button onclick="refreshData()" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-medium transition-colors duration-200">
             <i class="ri-refresh-line mr-2"></i>Refresh
           </button>
@@ -186,6 +189,135 @@
     <div id="users-container" class="hidden">
       <div id="users-grid" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         <!-- User cards will be populated here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Member Modal -->
+  <div id="addMemberModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-2xl p-8 max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
+          <i class="ri-user-add-line text-3xl text-blue-500"></i>
+        </div>
+        <h3 class="text-xl font-bold text-slate-800 mb-2">Add New Member</h3>
+        <p class="text-slate-600">Create a new verified member account</p>
+      </div>
+      
+      <form id="addMemberForm" class="space-y-4">
+        <div>
+          <label for="memberEmail" class="block text-sm font-semibold text-slate-700 mb-2">
+            Email Address *
+          </label>
+          <input 
+            type="email" 
+            id="memberEmail" 
+            required
+            class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            placeholder="member@example.com"
+          >
+        </div>
+        
+        <div>
+          <label for="memberFullName" class="block text-sm font-semibold text-slate-700 mb-2">
+            Full Name *
+          </label>
+          <input 
+            type="text" 
+            id="memberFullName" 
+            required
+            class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            placeholder="John Doe"
+          >
+        </div>
+        
+        <div>
+          <label for="memberCompany" class="block text-sm font-semibold text-slate-700 mb-2">
+            Company Name
+          </label>
+          <input 
+            type="text" 
+            id="memberCompany" 
+            class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            placeholder="Travel Agency Ltd"
+          >
+        </div>
+        
+        <div>
+          <label for="memberPhone" class="block text-sm font-semibold text-slate-700 mb-2">
+            Phone Number
+          </label>
+          <input 
+            type="tel" 
+            id="memberPhone" 
+            class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            placeholder="+1 234 567 8900"
+          >
+        </div>
+        
+        <div>
+          <label for="memberCountry" class="block text-sm font-semibold text-slate-700 mb-2">
+            Country
+          </label>
+          <select 
+            id="memberCountry" 
+            class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          >
+            <option value="">Select Country</option>
+            <option value="Australia">Australia</option>
+            <option value="Singapore">Singapore</option>
+            <option value="Malaysia">Malaysia</option>
+            <option value="Thailand">Thailand</option>
+            <option value="Indonesia">Indonesia</option>
+            <option value="Philippines">Philippines</option>
+            <option value="Vietnam">Vietnam</option>
+            <option value="Hong Kong">Hong Kong</option>
+            <option value="Japan">Japan</option>
+            <option value="South Korea">South Korea</option>
+            <option value="India">India</option>
+            <option value="United States">United States</option>
+            <option value="United Kingdom">United Kingdom</option>
+            <option value="Canada">Canada</option>
+            <option value="New Zealand">New Zealand</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        
+        <div>
+          <label for="memberNotes" class="block text-sm font-semibold text-slate-700 mb-2">
+            Admin Notes
+          </label>
+          <textarea 
+            id="memberNotes" 
+            rows="3" 
+            class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            placeholder="Internal notes about this member..."
+          ></textarea>
+        </div>
+        
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+          <div class="flex items-start gap-3">
+            <i class="ri-information-line text-blue-500 mt-0.5"></i>
+            <div class="text-sm text-blue-700">
+              <p class="font-medium mb-1">Member Creation Notes:</p>
+              <ul class="list-disc list-inside space-y-1 text-xs">
+                <li>Member will be created with "verified" status</li>
+                <li>A temporary password will be generated</li>
+                <li>Welcome email with login details will be sent</li>
+                <li>Member can change password on first login</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </form>
+      
+      <div class="flex gap-4 mt-6">
+        <button onclick="closeAddMemberModal()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 px-6 py-3 rounded-xl font-medium transition-colors">
+          Cancel
+        </button>
+        <button onclick="createMember()" id="createMemberBtn" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-medium transition-colors">
+          <i class="ri-user-add-line mr-2"></i>Create Member
+        </button>
       </div>
     </div>
   </div>
@@ -545,9 +677,89 @@
     async function refreshData() {
       await loadPendingVerifications();
     }
+    
+    // Add Member Modal Functions
+    function showAddMemberModal() {
+      document.getElementById('addMemberModal').classList.remove('hidden');
+      // Clear form
+      document.getElementById('addMemberForm').reset();
+    }
+    
+    function closeAddMemberModal() {
+      document.getElementById('addMemberModal').classList.add('hidden');
+      document.getElementById('addMemberForm').reset();
+    }
+    
+    async function createMember() {
+      const form = document.getElementById('addMemberForm');
+      const createBtn = document.getElementById('createMemberBtn');
+      const originalText = createBtn.innerHTML;
+      
+      // Validate required fields
+      const email = document.getElementById('memberEmail').value.trim();
+      const fullName = document.getElementById('memberFullName').value.trim();
+      
+      if (!email || !fullName) {
+        alert('Please fill in all required fields (Email and Full Name)');
+        return;
+      }
+      
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        alert('Please enter a valid email address');
+        return;
+      }
+      
+      try {
+        createBtn.innerHTML = '<i class="ri-loader-4-line mr-2 animate-spin"></i>Creating...';
+        createBtn.disabled = true;
+        
+        const memberData = {
+          email: email,
+          fullName: fullName,
+          company: document.getElementById('memberCompany').value.trim(),
+          phone: document.getElementById('memberPhone').value.trim(),
+          country: document.getElementById('memberCountry').value,
+          notes: document.getElementById('memberNotes').value.trim()
+        };
+        
+        const session = window.supabaseClient.currentSession;
+        const response = await fetch('/api/admin-verifications', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            action: 'create_member',
+            memberData: memberData
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (!data.success) {
+          throw new Error(data.error || 'Failed to create member');
+        }
+        
+        // Show success message
+        alert(`Member created successfully!\n\nEmail: ${email}\nTemporary Password: ${data.tempPassword}\n\nWelcome email has been sent to the member.`);
+        
+        // Close modal and refresh data
+        closeAddMemberModal();
+        await loadPendingVerifications();
+        
+      } catch (error) {
+        console.error('Error creating member:', error);
+        alert(`Failed to create member: ${error.message}`);
+      } finally {
+        createBtn.innerHTML = originalText;
+        createBtn.disabled = false;
+      }
+    }
   </script>
   
   <div id="footer-placeholder"></div>
-  <script src="/js/loadPartials.js" defer></script>
 </body>
 </html>

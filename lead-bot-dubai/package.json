@@ -1,0 +1,27 @@
+{
+  "name": "lead-bot-dubai",
+  "version": "1.0.0",
+  "description": "Dubai Travel Lead Bot with Puppeteer + Supabase + CSV Backup",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm install --silent && node index.js"
+  },
+  "keywords": [
+    "puppeteer",
+    "lead-generation",
+    "dubai",
+    "travel",
+    "scraping"
+  ],
+  "author": "Interline Asia",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.52.0",
+    "cheerio": "^1.1.0",
+    "csv-writer": "^1.6.0",
+    "dotenv": "^16.6.1",
+    "puppeteer": "^24.14.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  }
+}

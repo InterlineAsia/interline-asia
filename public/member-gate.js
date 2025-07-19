@@ -50,6 +50,27 @@ class MemberGate {
     this.showAccessMessages();
   }
 
+  showAccessMessages() {
+    // Show login/verification messages where appropriate
+    const messageContainers = document.querySelectorAll('.access-message-container');
+    
+    messageContainers.forEach(container => {
+      if (!this.isLoggedIn) {
+        container.innerHTML = `
+          <div class="access-message login-required">
+            <p>🔒 Please <a href="/login.html">login</a> to access pricing and booking.</p>
+          </div>
+        `;
+      } else if (this.userProfile && this.userProfile.verification_status !== 'verified') {
+        container.innerHTML = `
+          <div class="access-message verification-required">
+            <p>📋 Document verification required for booking access.</p>
+          </div>
+        `;
+      }
+    });
+  }
+
   gatePricing() {
     const priceElements = document.querySelectorAll('.price-value, .quote-available');
     

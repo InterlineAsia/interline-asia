@@ -24,8 +24,8 @@
     <meta name="twitter:image" content="https://www.interlineasia.com/cruise-ship.png">
     
     <!-- Additional SEO Meta Tags -->
-    <meta name="theme-color" content="#0f172a">
-    <meta name="msapplication-TileColor" content="#0f172a">
+    <meta name="theme-color" content="#0ea5e9">
+    <meta name="msapplication-TileColor" content="#0ea5e9">
     <link rel="canonical" href="https://www.interlineasia.com">
     
     <!-- Fonts -->
@@ -33,232 +33,146 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Preload Critical Resources -->
-    <link rel="preload" href="/css/complete-redesign.css" as="style">
-    <link rel="preload" href="/js/simple-welcome-bot.js" as="script">
-    
-    <!-- Styles -->
-    <link rel="stylesheet" href="/css/complete-redesign.css">
-    <link rel="stylesheet" href="/css/affiliate-tools.css">
-    <link rel="stylesheet" href="/css/social-media.css">
-    <link rel="stylesheet" href="/css/design-enhancements.css">
-    
     <!-- Favicon and App Icons -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico">
     <link rel="manifest" href="/site.webmanifest">
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="main-nav">
-        <!-- Main Navigation Row -->
-        <div class="nav-container">
-            <div class="nav-brand">
-                <div class="brand-icon">IA</div>
-                <div class="brand-text">
-                    <span class="brand-name">Interline Asia</span>
-                    <span class="brand-subtitle">Luxury Cruise Experiences</span>
-                </div>
-            </div>
-            
-            <div class="nav-menu">
-                <a href="#home" class="nav-link active">Home</a>
-                <a href="#about" class="nav-link">About</a>
-                <a href="#partners" class="nav-link">Partners</a>
-                <a href="/login.html" class="nav-cta">Member Login</a>
-            </div>
-            
-            <div class="nav-toggle">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </div>
-        
-        <!-- Travel Tools Row - Affiliate Members Section -->
-        <div class="travel-tools-bar">
-            <div class="travel-tools-container">
-                <span class="tools-intro">Complete your travel experience:</span>
-                <div class="tools-grid">
-                    <a href="https://trip.tpk.mx/qhlnnQh8" target="_blank" rel="noopener noreferrer" class="tool-link">
-                        <span class="tool-icon">✈️</span>
-                        <span class="tool-text">Flights</span>
-                    </a>
-                    <a href="https://kiwitaxi.tpk.mx/NGL3ovB3" target="_blank" rel="noopener noreferrer" class="tool-link">
-                        <span class="tool-icon">🚖</span>
-                        <span class="tool-text">Transfers</span>
-                    </a>
-                    <a href="https://ektatraveling.tpk.mx/IUGS6Ovk" target="_blank" rel="noopener noreferrer" class="tool-link">
-                        <span class="tool-icon">🛡️</span>
-                        <span class="tool-text">Insurance</span>
-                    </a>
-                    <a href="https://airalo.tpk.mx/M99krJZy" target="_blank" rel="noopener noreferrer" class="tool-link">
-                        <span class="tool-icon">📶</span>
-                        <span class="tool-text">eSIM</span>
-                    </a>
-                    <a href="https://getrentacar.tpk.mx/I3FuOWfB" target="_blank" rel="noopener noreferrer" class="tool-link">
-                        <span class="tool-icon">🚗</span>
-                        <span class="tool-text">Cars</span>
-                    </a>
-                    <a href="https://wise.com/invite/ihpc/rodneyowenp" target="_blank" rel="noopener noreferrer" class="tool-link">
-                        <span class="tool-icon">💳</span>
-                        <span class="tool-text">Currency</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <div id="header-placeholder"></div>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero-section">
-        <div class="hero-background">
-            <div class="hero-overlay"></div>
-        </div>
-        
-        <div class="hero-content">
-            <div class="hero-container">
-                <div class="hero-text">
-                    <h1 class="hero-title">
-                        Exclusive Cruise Experiences<br>
-                        <span class="hero-highlight">For Travel Professionals</span>
+    <main class="min-h-screen">
+        <!-- Hero Section -->
+        <section id="home" class="relative h-screen flex items-center justify-center overflow-hidden">
+            <img src="/images/hero.jpg" alt="Luxury cruise ship at sunset" class="absolute inset-0 w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-br from-blue-900/90 to-blue-800/90"></div>
+            
+            <div class="relative z-10 text-center text-white px-4 sm:px-6 lg:px-8">
+                <div class="max-w-4xl mx-auto">
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6" style="font-family: 'Playfair Display', serif;">
+                        Exclusive Cruise Experiences
+                        <br />
+                        <span class="bg-gradient-to-r from-yellow-300 to-yellow-500 bg-clip-text text-transparent">
+                            For Travel Professionals
+                        </span>
                     </h1>
-                    <p class="hero-description">
+                    <p class="text-xl sm:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto leading-relaxed">
                         The world's most exclusive cruise booking platform for verified travel industry professionals. 
                         Unlock extraordinary experiences at unbeatable interline rates and discover destinations like never before.
                     </p>
-                    <div class="hero-actions">
-                        <a href="/signup.html" class="btn btn-primary">Join Now</a>
-                        <a href="#partners" class="btn btn-secondary">View Partners</a>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <a href="/signup.html" class="inline-flex items-center justify-center px-8 py-4 text-lg font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                            Join Now
+                        </a>
+                        <a href="#partners" class="inline-flex items-center justify-center px-8 py-4 text-lg font-medium rounded-lg bg-white text-blue-600 border-blue-600 hover:bg-blue-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                            View Partners
+                        </a>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Partners Section -->
-    <section id="partners" class="partners-section">
-        <div class="section-container">
-            <div class="section-header">
-                <h2 class="section-title">Our Cruise Line Partners</h2>
-                <p class="section-description">
-                    We work with the world's leading cruise lines to bring you 
-                    exclusive interline rates and extraordinary experiences.
-                </p>
-            </div>
-            
-            <div class="partners-grid">
-                <div class="partner-item">
-                    <div class="partner-logo">
-                        <span class="partner-name">Royal Caribbean</span>
-                    </div>
-                </div>
-                <div class="partner-item">
-                    <div class="partner-logo">
-                        <span class="partner-name">Celebrity Cruises</span>
-                    </div>
-                </div>
-                <div class="partner-item">
-                    <div class="partner-logo">
-                        <span class="partner-name">Princess Cruises</span>
-                    </div>
-                </div>
-                <div class="partner-item">
-                    <div class="partner-logo">
-                        <span class="partner-name">Holland America</span>
-                    </div>
-                </div>
-                <div class="partner-item">
-                    <div class="partner-logo">
-                        <span class="partner-name">Norwegian Cruise Line</span>
-                    </div>
-                </div>
-                <div class="partner-item">
-                    <div class="partner-logo">
-                        <span class="partner-name">MSC Cruises</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- About Section -->
-    <section id="about" class="about-section">
-        <div class="section-container">
-            <div class="about-content">
-                <div class="about-text">
-                    <h2 class="section-title">About Interline Asia</h2>
-                    <p class="section-description">
-                        Join thousands of travel professionals who trust Interline Asia 
-                        for exclusive cruise experiences at unbeatable rates.
+        <!-- Partners Section -->
+        <section id="partners" class="py-20 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Our Cruise Line Partners</h2>
+                    <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
+                        We work with the world's leading cruise lines to bring you 
+                        exclusive interline rates and extraordinary experiences.
                     </p>
-                    <div class="about-features">
-                        <div class="feature-item">
-                            <div class="feature-icon">🎯</div>
-                            <div class="feature-content">
-                                <h3>Verified Professionals Only</h3>
-                                <p>Exclusive access for verified travel industry professionals</p>
-                            </div>
-                        </div>
-                        <div class="feature-item">
-                            <div class="feature-icon">💎</div>
-                            <div class="feature-content">
-                                <h3>Premium Experiences</h3>
-                                <p>Luxury cruise experiences at exceptional value</p>
-                            </div>
-                        </div>
-                        <div class="feature-item">
-                            <div class="feature-icon">🌏</div>
-                            <div class="feature-content">
-                                <h3>Global Network</h3>
-                                <p>Partnerships with leading cruise lines worldwide</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="main-footer">
-        <div class="footer-container">
-            <div class="footer-content">
-                <div class="footer-brand">
-                    <h3>Interline Asia</h3>
-                    <p>The world's most exclusive cruise booking platform for verified travel industry professionals.</p>
                 </div>
                 
-                <div class="footer-links">
-                    <div class="footer-column">
-                        <h4>Company</h4>
-                        <ul>
-                            <li><a href="/about.html">About Us</a></li>
-                            <li><a href="/partners.html">Partners</a></li>
-                            <li><a href="/contact.html">Contact</a></li>
-                        </ul>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
+                    <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 flex items-center justify-center">
+                        <span class="text-gray-700 font-semibold text-center text-sm sm:text-base">Royal Caribbean</span>
                     </div>
-                    
-                    <div class="footer-column">
-                        <h4>Legal</h4>
-                        <ul>
-                            <li><a href="/terms-and-conditions.html">Terms & Conditions</a></li>
-                            <li><a href="/privacy-policy.html">Privacy Policy</a></li>
-                        </ul>
+                    <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 flex items-center justify-center">
+                        <span class="text-gray-700 font-semibold text-center text-sm sm:text-base">Celebrity Cruises</span>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 flex items-center justify-center">
+                        <span class="text-gray-700 font-semibold text-center text-sm sm:text-base">Princess Cruises</span>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 flex items-center justify-center">
+                        <span class="text-gray-700 font-semibold text-center text-sm sm:text-base">Holland America</span>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 flex items-center justify-center">
+                        <span class="text-gray-700 font-semibold text-center text-sm sm:text-base">Norwegian Cruise Line</span>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 flex items-center justify-center">
+                        <span class="text-gray-700 font-semibold text-center text-sm sm:text-base">MSC Cruises</span>
                     </div>
                 </div>
             </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; 2024 Interline Asia. All rights reserved.</p>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">About Interline Asia</h2>
+                        <p class="mt-4 text-lg text-gray-600 max-w-3xl">
+                            Join thousands of travel professionals who trust Interline Asia 
+                            for exclusive cruise experiences at unbeatable rates.
+                        </p>
+                        
+                        <div class="mt-12 space-y-8">
+                            <div class="flex items-start space-x-4">
+                                <div class="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-2xl">
+                                    🎯
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold text-gray-900 mb-2">
+                                        Verified Professionals Only
+                                    </h3>
+                                    <p class="text-gray-600">
+                                        Exclusive access for verified travel industry professionals
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-4">
+                                <div class="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-2xl">
+                                    💎
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold text-gray-900 mb-2">
+                                        Premium Experiences
+                                    </h3>
+                                    <p class="text-gray-600">
+                                        Luxury cruise experiences at exceptional value
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-4">
+                                <div class="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-2xl">
+                                    🌏
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold text-gray-900 mb-2">
+                                        Global Network
+                                    </h3>
+                                    <p class="text-gray-600">
+                                        Partnerships with leading cruise lines worldwide
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="relative h-96 lg:h-full">
+                        <img src="/images/travel-mood.jpg" alt="Travel planning and cruise experiences" class="w-full h-full object-cover rounded-2xl shadow-2xl">
+                    </div>
+                </div>
             </div>
-        </div>
-    </footer>
+        </section>
+    </main>
+
+    <div id="footer-placeholder"></div>
 
     <!-- Scripts -->
+    <script src="/js/modern-layout-injector.js"></script>
     <script src="/js/affiliate-tracker.js"></script>
-    <script src="/js/main-redesign.js"></script>
     <script src="/js/cruise-data.js"></script>
     <script src="/js/simple-welcome-bot.js"></script>
     <script src="/js/social-media.js"></script>

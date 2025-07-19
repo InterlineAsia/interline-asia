@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Interline Asia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Supabase and Config Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/config.js"></script>
+  <script src="/supabase-client.js"></script>
+  
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      color: #f8fafc;
+    }
+    .admin-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    .admin-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .admin-title {
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .admin-subtitle {
+      font-size: 1.2rem;
+      opacity: 0.8;
+      margin-bottom: 2rem;
+    }
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+    .dashboard-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+    .card-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #60a5fa;
+    }
+    .card-description {
+      opacity: 0.8;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+    .card-button {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .card-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(59, 130, 246, 0.4);
+    }
+    .chat-container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 2rem;
+      margin-top: 2rem;
+    }
+    .chat-header {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #60a5fa;
+    }
+    .chat-messages {
+      height: 300px;
+      overflow-y: auto;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .chat-input-container {
+      display: flex;
+      gap: 1rem;
+    }
+    .chat-input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 0.75rem;
+      color: white;
+      font-size: 1rem;
+    }
+    .chat-input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+    .chat-send {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .chat-send:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(16, 185, 129, 0.4);
+    }
+    .message {
+      margin: 0.5rem 0;
+      padding: 0.75rem;
+      border-radius: 8px;
+      line-height: 1.5;
+    }
+    .user-message {
+      background: rgba(59, 130, 246, 0.3);
+      margin-left: 2rem;
+    }
+    .bot-message {
+      background: rgba(16, 185, 129, 0.3);
+      margin-right: 2rem;
+    }
+    .thinking {
+      background: rgba(255, 255, 255, 0.1);
+      font-style: italic;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <div class="admin-container">
+    <div class="admin-header">
+      <h1 class="admin-title">Admin Dashboard</h1>
+      <p class="admin-subtitle">Comprehensive system management and monitoring</p>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="dashboard-card">
+        <h3 class="card-title">👥 User Management</h3>
+        <p class="card-description">Manage user accounts, verifications, and access permissions</p>
+        <a href="/admin-verifications.html" class="card-button">Manage Users</a>
+      </div>
+
+      <div class="dashboard-card">
+        <h3 class="card-title">📊 Deals Management</h3>
+        <p class="card-description">View and manage cruise deals, pricing, and inventory</p>
+        <a href="/admin-deals.html" class="card-button">Manage Deals</a>
+      </div>
+
+      <div class="dashboard-card">
+        <h3 class="card-title">📁 File Uploads</h3>
+        <p class="card-description">Monitor CSV uploads, document processing, and file management</p>
+        <a href="/admin-uploads.html" class="card-button">View Uploads</a>
+      </div>
+
+      <div class="dashboard-card">
+        <h3 class="card-title">📈 System Monitor</h3>
+        <p class="card-description">Real-time system health, performance metrics, and analytics</p>
+        <a href="/monitoring.html" class="card-button">View Monitor</a>
+      </div>
+
+      <div class="dashboard-card">
+        <h3 class="card-title">📋 CSV Processor</h3>
+        <p class="card-description">Advanced CSV processing tools and data management</p>
+        <a href="/admin-csv-processor.html" class="card-button">Process CSV</a>
+      </div>
+
+      <div class="dashboard-card">
+        <h3 class="card-title">⚙️ Admin Tools</h3>
+        <p class="card-description">Advanced administrative tools and system configuration</p>
+        <a href="/admin/analytics-dashboard.html" class="card-button">Admin Tools</a>
+      </div>
+    </div>
+
+    <div class="chat-container">
+      <h3 class="chat-header">🤖 Admin Helper Bot</h3>
+      <p style="opacity: 0.8; margin-bottom: 1rem;">Ask me anything about system administration, user management, or technical issues.</p>
+      
+      <div id="chatMessages" class="chat-messages">
+        <div class="message bot-message">
+          <strong>Admin Helper Bot:</strong> Admin Helper Bot is ready. How can I assist you today?
+        </div>
+      </div>
+      
+      <div class="chat-input-container">
+        <input 
+          type="text" 
+          id="chatInput" 
+          class="chat-input" 
+          placeholder="Type your admin question here..." 
+          onkeypress="handleChatKeyPress(event)"
+        >
+        <button onclick="sendChatMessage()" class="chat-send">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="/js/loadPartials.js" defer></script>
+  <script>
+    async function sendChatMessage() {
+      const chatInput = document.getElementById('chatInput');
+      const chatMessages = document.getElementById('chatMessages');
+      const message = chatInput.value.trim();
+      
+      if (!message) return;
+      
+      // Add user message
+      const userDiv = document.createElement('div');
+      userDiv.className = 'message user-message';
+      userDiv.innerHTML = `<strong>You:</strong> ${message}`;
+      chatMessages.appendChild(userDiv);
+      
+      chatInput.value = '';
+      
+      // Add thinking indicator
+      const thinkingDiv = document.createElement('div');
+      thinkingDiv.className = 'message thinking';
+      thinkingDiv.innerHTML = 'Admin Helper is thinking...';
+      chatMessages.appendChild(thinkingDiv);
+      
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      
+      try {
+        // Call the fixed admin bot endpoint
+        const response = await fetch('/api/support-bot-handler', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: message,
+            botType: 'admin',
+            action: 'chat'
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        if (thinkingDiv.parentNode) {
+          chatMessages.removeChild(thinkingDiv);
+        }
+        
+        const botDiv = document.createElement('div');
+        botDiv.className = 'message bot-message';
+        botDiv.innerHTML = `<strong>Admin Helper:</strong> ${result.response || 'I apologize, but I encountered an issue processing your request. Please try again.'}`;
+        chatMessages.appendChild(botDiv);
+        
+      } catch (error) {
+        console.error('Chat error:', error);
+        
+        if (thinkingDiv.parentNode) {
+          chatMessages.removeChild(thinkingDiv);
+        }
+        
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'message bot-message';
+        errorDiv.innerHTML = '<strong>Admin Helper:</strong> I apologize, but I am currently experiencing technical difficulties. Please try again later.';
+        chatMessages.appendChild(errorDiv);
+      }
+      
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    function handleChatKeyPress(event) {
+      if (event.key === 'Enter') {
+        sendChatMessage();
+      }
+    }
+
+    // Initialize page
+    window.addEventListener('load', async () => {
+      try {
+        // Wait for Supabase client to be ready
+        if (window.supabaseClient) {
+          await window.supabaseClient.readyPromise;
+          
+          // Check if user is admin
+          if (!window.supabaseClient.isLoggedIn()) {
+            window.location.href = '/login.html';
+            return;
+          }
+          
+          const profile = await window.supabaseClient.getProfile();
+          if (!profile || (!profile.is_admin && !profile.is_super_admin)) {
+            alert('Admin access required.');
+            window.location.href = '/dashboard.html';
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('Admin check failed:', error);
+      }
+    });
+  </script>
+</body>
+</html>

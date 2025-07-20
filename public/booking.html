@@ -58,6 +58,9 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   
+  <!-- CSV Loader for deal data -->
+  <script src="/js/enhanced-csv-loader.js"></script>
+  
   <style>
     .booking-container {
       max-width: 800px;
@@ -417,8 +420,9 @@
                 <input type="date" id="dateOfBirth1" name="dateOfBirth1" required>
               </div>
               <div class="form-group">
-                <label for="phone1">Phone Number *</label>
-                <input type="tel" id="phone1" name="phone1" required>
+                <label for="phone1">Phone Number (with country code) *</label>
+                <input type="tel" id="phone1" name="phone1" placeholder="+61 400 123 456" required>
+                <small style="color: #6b7280; font-size: 0.875rem;">Include country code (e.g., +61 for Australia, +1 for USA)</small>
               </div>
             </div>
             <div class="form-group">
@@ -502,21 +506,10 @@
             <div class="file-list" id="passport2-files"></div>
           </div>
 
-          <div class="upload-section" id="travel-id-upload">
-            <div class="upload-icon">🆔</div>
-            <h4>Travel Industry ID</h4>
-            <p>Upload your travel industry identification or credentials</p>
-            <input type="file" id="travel-id-file" accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
-            <button type="button" class="btn btn-secondary" onclick="document.getElementById('travel-id-file').click()">
-              Choose File
-            </button>
-            <div class="file-list" id="travel-id-files"></div>
-          </div>
-
           <div class="upload-section" id="employment-upload">
             <div class="upload-icon">💼</div>
-            <h4>Employment/Retirement Proof</h4>
-            <p>Industry credentials or retirement documentation</p>
+            <h4>Travel Industry ID/Employment/Retirement Proof</h4>
+            <p>Upload your travel industry identification, employment credentials, or retirement documentation</p>
             <input type="file" id="employment-file" accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
             <button type="button" class="btn btn-secondary" onclick="document.getElementById('employment-file').click()">
               Choose File
@@ -609,16 +602,21 @@
     // Load deal by ID from CSV data
     async function loadDealById(dealId) {
       try {
-        // Use the enhanced CSV loader if available
-        if (window.csvLoader) {
-          const deal = await window.csvLoader.findDealById(dealId);
-          if (deal) {
-            selectedDeal = deal;
-            console.log('BOOKING: Loaded deal by ID:', selectedDeal);
-            populateDealDetails(selectedDeal);
-            populateCabinOptions(selectedDeal);
-            return;
-          }
+        // Initialize the CSV loader if not available
+        if (!window.csvLoader) {
+          console.log('BOOKING: Initializing CSV loader...');
+          window.csvLoader = new EnhancedCSVLoader();
+          await window.csvLoader.loadAllDeals();
+        }
+        
+        // Use the enhanced CSV loader
+        const deal = await window.csvLoader.findDealById(dealId);
+        if (deal) {
+          selectedDeal = deal;
+          console.log('BOOKING: Loaded deal by ID:', selectedDeal);
+          populateDealDetails(selectedDeal);
+          populateCabinOptions(selectedDeal);
+          return;
         }
         
         // Fallback: load CSV data manually
@@ -1403,6 +1401,15 @@
       submitButton.disabled = true;
       
       try {
+        // Validate that we have deal data before submitting
+        if (!selectedDeal) {
+          throw new Error('No cruise data found. Please return to the deals page and select a cruise.');
+        }
+        
+        if (!selectedCabin) {
+          throw new Error('Please select a cabin type before submitting.');
+        }
+        
         const formData = new FormData(this);
         
         // Add selected cabin and deal info

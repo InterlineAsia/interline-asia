@@ -4,5 +4,27 @@
     "api/process-csv-text.js": {
       "maxDuration": 30
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/admin",
+      "destination": "/admin.html"
+    },
+    {
+      "source": "/deals",
+      "destination": "/deals.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/login.html"
+    },
+    {
+      "source": "/signup",
+      "destination": "/signup.html"
+    },
+    {
+      "source": "/((?!api|_next|favicon.ico).*)",
+      "destination": "/$1.html"
+    }
+  ]
 }

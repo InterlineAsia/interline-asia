@@ -110,10 +110,16 @@
                     <h1 class="dashboard-title">Welcome back, <span id="user-name">Member</span></h1>
                     <p class="dashboard-subtitle">Manage your cruise bookings and quotes</p>
                 </div>
-                <div class="verification-status" id="verification-status">
-                    <div class="status-badge pending">
-                        <i class="ri-time-line"></i>
-                        <span>Verification Pending</span>
+                <div class="header-actions">
+                    <a href="/deals.html" class="btn btn-primary btn-prominent">
+                        <i class="ri-ship-line"></i>
+                        Browse Cruises
+                    </a>
+                    <div class="verification-status" id="verification-status">
+                        <div class="status-badge pending">
+                            <i class="ri-time-line"></i>
+                            <span>Verification Pending</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -164,7 +170,7 @@
                 <div class="dashboard-section">
                     <div class="section-header">
                         <h2>Recent Quotes</h2>
-                        <a href="/deals.html" class="section-link">Browse Cruises</a>
+                        <span class="section-badge" id="quotes-badge">0 Active</span>
                     </div>
                     <div class="quotes-container" id="quotes-container">
                         <div class="loading-skeleton">
@@ -294,9 +300,9 @@
                 const response = await fetch('/partials/footer.html');
                 if (response.ok) {
                     const html = await response.text();
-                    const validation = InputValidator.validateText(html, { required: true });
-                    if (validation.isValid) {
-                        document.getElementById('footer-placeholder').innerHTML = validation.sanitized;
+                    // Simple validation without InputValidator to avoid errors
+                    if (html && html.trim().length > 0) {
+                        document.getElementById('footer-placeholder').innerHTML = html;
                     }
                 }
             });
@@ -555,6 +561,7 @@
             min-height: 100vh;
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             padding: 2rem 0;
+            margin-top: 120px; /* Add space below the header */
         }
 
         .dashboard-container {
@@ -572,6 +579,37 @@
             padding: 2rem;
             border-radius: 1rem;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .btn-prominent {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+            color: white !important;
+            padding: 1rem 2rem !important;
+            font-size: 1.1rem !important;
+            font-weight: 600 !important;
+            border-radius: 0.75rem !important;
+            text-decoration: none !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
+            transition: all 0.3s ease !important;
+            border: none !important;
+        }
+
+        .btn-prominent:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4) !important;
+        }
+
+        .btn-prominent i {
+            font-size: 1.2rem;
         }
 
         .dashboard-title {

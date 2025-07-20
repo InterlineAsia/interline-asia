@@ -10,11 +10,8 @@ class SecureAuthService {
     async init() {
         try {
             // Initialize Supabase client securely
-            if (window.supabase) {
-                this.supabase = window.supabase;
-            } else {
-                const { createClient } = window.supabase;
-                this.supabase = createClient(
+            if (window.supabase && window.supabase.createClient) {
+                this.supabase = window.supabase.createClient(
                     window.SUPABASE_URL,
                     window.SUPABASE_ANON_KEY,
                     {
@@ -25,6 +22,8 @@ class SecureAuthService {
                         }
                     }
                 );
+            } else {
+                throw new Error('Supabase library not loaded');
             }
 
             // Set up auth state listener
@@ -146,10 +145,13 @@ class SecureAuthService {
     // Secure logout
     async logout() {
         try {
-            const { error } = await this.supabase.auth.signOut();
-            
-            if (error) {
-                throw error;
+            // Only attempt signOut if supabase client is initialized
+            if (this.supabase && this.supabase.auth) {
+                const { error } = await this.supabase.auth.signOut();
+                
+                if (error) {
+                    throw error;
+                }
             }
 
             this.currentUser = null;
@@ -160,6 +162,9 @@ class SecureAuthService {
 
         } catch (error) {
             console.error('Logout failed:', error);
+            // Still clear local state even if remote logout fails
+            this.currentUser = null;
+            this.clearSecureStorage();
             return {
                 success: false,
                 error: error.message

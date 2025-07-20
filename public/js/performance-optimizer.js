@@ -49,13 +49,21 @@ class PerformanceOptimizer {
         });
     }
 
-    // Preload critical resources
+    // Preload critical resources based on page context
     setupCriticalResourcePreloading() {
-        const criticalResources = [
-            '/css/complete-redesign.css',
-            '/js/cruise-helper-bot.js',
-            '/cruise-ship.png'
-        ];
+        const currentPage = window.location.pathname;
+        let criticalResources = [];
+
+        // Only preload resources that will be used on the current page
+        if (currentPage.includes('deals') || currentPage.includes('index')) {
+            criticalResources.push('/js/cruise-helper-bot.js');
+            criticalResources.push('/cruise-ship.png');
+        }
+        
+        // Always preload main CSS if not already loaded
+        if (!document.querySelector('link[href*="complete-redesign.css"]')) {
+            criticalResources.push('/css/complete-redesign.css');
+        }
 
         criticalResources.forEach(resource => {
             const link = document.createElement('link');

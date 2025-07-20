@@ -34,6 +34,13 @@ h1, h2, h3, h4, h5 {
   position: sticky;
   top: 0;
   z-index: 1000;
+  height: 80px;
+}
+
+/* Ensure content doesn't overlap with sticky header */
+.luxury-header + * {
+  margin-top: 0;
+  padding-top: 2rem;
 }
 
 .luxury-nav {

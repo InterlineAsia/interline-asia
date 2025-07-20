@@ -41,8 +41,6 @@
   
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js"></script>
-  <script src="supabase-client.js"></script>
   
   <!-- Favicon and App Icons -->
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -58,9 +56,10 @@
     gtag('config', 'G-FYGT92WCXC');
   </script>
   
-  <!-- Supabase -->
+  <!-- Configuration and Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
 </head>
 <body>
   <!-- Travel Tools Bar -->
@@ -351,11 +350,21 @@
             loginMethod: 'global_client'
           }));
           
-          // Small delay to ensure session is fully established in global client
-          setTimeout(() => {
-            console.log('LOGIN: Redirecting to dashboard choice');
+          // Force redirect with multiple fallbacks
+          console.log('LOGIN: Attempting redirect to dashboard choice');
+          
+          // Try immediate redirect first
+          try {
             window.location.href = '/dashboard-choice.html';
-          }, 500);
+          } catch (redirectError) {
+            console.error('LOGIN: Immediate redirect failed:', redirectError);
+            
+            // Fallback with timeout
+            setTimeout(() => {
+              console.log('LOGIN: Fallback redirect attempt');
+              window.location.replace('/dashboard-choice.html');
+            }, 100);
+          }
           
         } catch (error) {
           console.error('LOGIN: Error:', error);

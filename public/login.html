@@ -326,15 +326,9 @@
           showSuccess('Login successful! Redirecting...');
           console.log('LOGIN: SUCCESS MESSAGE SHOWN');
           
-          // Force immediate redirect - no delays, no conditions
-          console.log('LOGIN: FORCING IMMEDIATE REDIRECT');
-          window.location.href = '/dashboard-choice.html';
-          
-          // Additional fallback (should not be needed)
-          setTimeout(() => {
-            console.log('LOGIN: EMERGENCY FALLBACK REDIRECT');
-            window.location.replace('/dashboard-choice.html');
-          }, 50);
+          // Simple, direct redirect - no complex logic
+          console.log('LOGIN: REDIRECTING TO DASHBOARD');
+          window.location = '/dashboard-choice.html';
           
         } catch (error) {
           console.error('LOGIN: Error:', error);

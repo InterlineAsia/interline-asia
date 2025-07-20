@@ -334,6 +334,29 @@
         // If we only have an ID (old format), we need to fetch the deal data
         const needsDataFetch = cruiseData.dealId && !cruiseData.cruiseLine;
 
+        // Format date to show only the date part
+        function formatDate(dateString) {
+            if (!dateString || dateString === 'N/A') return 'N/A';
+            
+            try {
+                // Handle various date formats
+                const date = new Date(dateString);
+                
+                // Check if date is valid
+                if (isNaN(date.getTime())) return dateString;
+                
+                // Format as readable date (e.g., "October 23, 2025")
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            } catch (error) {
+                console.warn('Date formatting error:', error);
+                return dateString;
+            }
+        }
+
         // Populate cruise details
         function populateCruiseDetails() {
             const cruiseInfoDiv = document.getElementById('cruise-info');
@@ -349,7 +372,7 @@
                 </div>
                 <div class="cruise-info-item">
                     <div class="cruise-info-label">Departure Date</div>
-                    <div class="cruise-info-value">${cruiseData.departureDate || 'N/A'}</div>
+                    <div class="cruise-info-value">${formatDate(cruiseData.departureDate) || 'N/A'}</div>
                 </div>
                 <div class="cruise-info-item">
                     <div class="cruise-info-label">Duration</div>

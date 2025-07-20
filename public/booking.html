@@ -479,15 +479,37 @@
           <h4>📄 Supporting Documents (Required)</h4>
           <p>Please upload the following documents to complete your booking:</p>
           
-          <div class="upload-section" id="passport-upload">
+          <div class="upload-section" id="passport1-upload">
             <div class="upload-icon">📄</div>
-            <h4>Passport Copy</h4>
-            <p>Drag and drop your passport copy here, or click to browse</p>
-            <input type="file" id="passport-file" accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
-            <button type="button" class="btn btn-secondary" onclick="document.getElementById('passport-file').click()">
+            <h4>Passenger 1 - Passport Copy</h4>
+            <p>Drag and drop the first passenger's passport copy here, or click to browse</p>
+            <input type="file" id="passport1-file" accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('passport1-file').click()">
               Choose File
             </button>
-            <div class="file-list" id="passport-files"></div>
+            <div class="file-list" id="passport1-files"></div>
+          </div>
+
+          <div class="upload-section" id="passport2-upload">
+            <div class="upload-icon">📄</div>
+            <h4>Passenger 2 - Passport Copy</h4>
+            <p>Drag and drop the second passenger's passport copy here, or click to browse</p>
+            <input type="file" id="passport2-file" accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('passport2-file').click()">
+              Choose File
+            </button>
+            <div class="file-list" id="passport2-files"></div>
+          </div>
+
+          <div class="upload-section" id="travel-id-upload">
+            <div class="upload-icon">🆔</div>
+            <h4>Travel Industry ID</h4>
+            <p>Upload your travel industry identification or credentials</p>
+            <input type="file" id="travel-id-file" accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('travel-id-file').click()">
+              Choose File
+            </button>
+            <div class="file-list" id="travel-id-files"></div>
           </div>
 
           <div class="upload-section" id="employment-upload">
@@ -555,7 +577,9 @@
     let selectedDeal = null;
     let selectedCabin = null;
     let uploadedFiles = {
-      passport: null,
+      passport1: null,
+      passport2: null,
+      travelId: null,
       employment: null
     };
 
@@ -801,28 +825,36 @@
 
       let cabinCount = 0;
       cabins.forEach(cabin => {
-        // Check if cabin has valid pricing (not empty, not 0, not "Quote Available")
+        // Check if cabin has valid pricing or should show as "Quote Available"
+        const numericPrice = parseFloat(String(cabin.price).replace(/[$,]/g, ''));
         const hasValidPrice = cabin.price && 
                              cabin.price !== 'Quote Available' && 
                              cabin.price !== '' && 
-                             parseFloat(String(cabin.price).replace(/[$,]/g, '')) > 0;
+                             numericPrice > 0;
         
-        console.log(`BOOKING: Cabin ${cabin.type} - Price: ${cabin.price}, Valid: ${hasValidPrice}`);
+        // Show cabin if it has valid pricing OR if it's a river cruise (which often needs quotes)
+        const shouldShowCabin = hasValidPrice || 
+                               (deal.cruiseType && deal.cruiseType.toLowerCase().includes('river')) ||
+                               numericPrice === 0; // Show even if price is 0, as "Quote Available"
         
-        if (hasValidPrice) {
+        console.log(`BOOKING: Cabin ${cabin.type} - Price: ${cabin.price}, Valid: ${hasValidPrice}, Show: ${shouldShowCabin}`);
+        
+        if (shouldShowCabin) {
           const cabinElement = document.createElement('div');
           cabinElement.className = 'cabin-option';
           cabinElement.dataset.type = cabin.type;
-          cabinElement.dataset.price = cabin.price;
+          cabinElement.dataset.price = hasValidPrice ? cabin.price : 'Quote Available';
+          
+          const displayPrice = hasValidPrice ? formatPrice(cabin.price) : 'Quote Available';
           
           cabinElement.innerHTML = `
             <div>
               <span class="cabin-type">${cabin.icon} ${cabin.type} Cabin</span>
             </div>
-            <div class="cabin-price">${formatPrice(cabin.price)}</div>
+            <div class="cabin-price">${displayPrice}</div>
           `;
           
-          cabinElement.addEventListener('click', (e) => selectCabin(cabin.type, cabin.price, e));
+          cabinElement.addEventListener('click', (e) => selectCabin(cabin.type, hasValidPrice ? cabin.price : 'Quote Available', e));
           cabinContainer.appendChild(cabinElement);
           cabinCount++;
         }
@@ -865,18 +897,24 @@
     function updateBookingTotal() {
       if (!selectedCabin) {
         document.getElementById('selected-cabin-type').textContent = 'Please select a cabin type';
-        document.getElementById('price-per-person').textContent = '--';
+        document.getElementById('selected-cabin-price').textContent = '--';
         document.getElementById('total-amount').textContent = '--';
         return;
       }
       
-      const guestCount = 2; // Fixed at 2 guests
-      const pricePerPerson = parseFloat(selectedCabin.price.toString().replace(/[$,]/g, ''));
-      const totalAmount = pricePerPerson * guestCount;
-      
       document.getElementById('selected-cabin-type').textContent = `${selectedCabin.type} Cabin`;
-      document.getElementById('selected-cabin-price').textContent = formatPrice(selectedCabin.price);
-      document.getElementById('total-amount').textContent = formatPrice(totalAmount);
+      
+      if (selectedCabin.price === 'Quote Available') {
+        document.getElementById('selected-cabin-price').textContent = 'Quote Available';
+        document.getElementById('total-amount').textContent = 'Quote Available';
+      } else {
+        const guestCount = 2; // Fixed at 2 guests
+        const pricePerPerson = parseFloat(selectedCabin.price.toString().replace(/[$,]/g, ''));
+        const totalAmount = pricePerPerson * guestCount;
+        
+        document.getElementById('selected-cabin-price').textContent = formatPrice(selectedCabin.price);
+        document.getElementById('total-amount').textContent = formatPrice(totalAmount);
+      }
     }
 
     // Format price
@@ -920,11 +958,21 @@
 
     // Handle file uploads
     function setupFileUploads() {
-      const passportFile = document.getElementById('passport-file');
+      const passport1File = document.getElementById('passport1-file');
+      const passport2File = document.getElementById('passport2-file');
+      const travelIdFile = document.getElementById('travel-id-file');
       const employmentFile = document.getElementById('employment-file');
       
-      if (passportFile) {
-        passportFile.addEventListener('change', (e) => handleFileSelect(e, 'passport'));
+      if (passport1File) {
+        passport1File.addEventListener('change', (e) => handleFileSelect(e, 'passport1'));
+      }
+      
+      if (passport2File) {
+        passport2File.addEventListener('change', (e) => handleFileSelect(e, 'passport2'));
+      }
+      
+      if (travelIdFile) {
+        travelIdFile.addEventListener('change', (e) => handleFileSelect(e, 'travelId'));
       }
       
       if (employmentFile) {
@@ -972,8 +1020,18 @@
       }
       
       // Validate required documents
-      if (!uploadedFiles.passport) {
-        showError('Please upload your passport copy before submitting.');
+      if (!uploadedFiles.passport1) {
+        showError('Please upload Passenger 1 passport copy before submitting.');
+        return;
+      }
+      
+      if (!uploadedFiles.passport2) {
+        showError('Please upload Passenger 2 passport copy before submitting.');
+        return;
+      }
+      
+      if (!uploadedFiles.travelId) {
+        showError('Please upload your travel industry ID before submitting.');
         return;
       }
       
@@ -1030,7 +1088,9 @@
             ...bookingData,
             // Turnstile token handled automatically
             files: {
-              passport: uploadedFiles.passport?.name || null,
+              passport1: uploadedFiles.passport1?.name || null,
+              passport2: uploadedFiles.passport2?.name || null,
+              travelId: uploadedFiles.travelId?.name || null,
               employment: uploadedFiles.employment?.name || null
             }
           })

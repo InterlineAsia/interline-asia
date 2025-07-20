@@ -56,26 +56,35 @@
       try {
         console.log('DASHBOARD_CHOICE: Initializing...');
         
-        // Wait for Supabase client to initialize
-        if (window.supabaseClient) {
-          await window.supabaseClient.readyPromise;
+        // Initialize Supabase client if not already done
+        if (!window.supabase) {
+          console.error('DASHBOARD_CHOICE: Supabase not loaded');
+          window.location.href = '/login.html';
+          return;
         }
+
+        const supabaseClient = window.supabase.createClient(
+          window.SUPABASE_URL,
+          window.SUPABASE_ANON_KEY
+        );
         
-        // Check if user is logged in
-        if (!window.supabaseClient || !window.supabaseClient.isLoggedIn()) {
-          console.log('DASHBOARD_CHOICE: User not logged in, redirecting to login');
+        // Check current session using proper Supabase auth
+        const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+        
+        if (sessionError) {
+          console.error('DASHBOARD_CHOICE: Session error:', sessionError);
           window.location.href = '/login.html';
           return;
         }
 
-        const user = await window.supabaseClient.getCurrentUser();
-        console.log('DASHBOARD_CHOICE: Current user:', user?.email);
-
-        if (!user) {
-          console.log('DASHBOARD_CHOICE: No user found, redirecting to login');
+        if (!session || !session.user) {
+          console.log('DASHBOARD_CHOICE: No valid session found, redirecting to login');
           window.location.href = '/login.html';
           return;
         }
+
+        const user = session.user;
+        console.log('DASHBOARD_CHOICE: Current user:', user.email);
 
         // Determine user access levels
         const adminEmails = ['rodney@telenational.com.au', 'admin@telenational.com.au'];
@@ -191,12 +200,23 @@
       return button;
     }
 
-    function signOut() {
+    async function signOut() {
       if (confirm('Are you sure you want to sign out?')) {
         console.log('DASHBOARD_CHOICE: Signing out...');
-        if (window.supabaseClient) {
-          window.supabaseClient.signOut();
-        } else {
+        try {
+          const supabaseClient = window.supabase.createClient(
+            window.SUPABASE_URL,
+            window.SUPABASE_ANON_KEY
+          );
+          
+          const { error } = await supabaseClient.auth.signOut();
+          if (error) {
+            console.error('DASHBOARD_CHOICE: Sign out error:', error);
+          }
+        } catch (error) {
+          console.error('DASHBOARD_CHOICE: Sign out failed:', error);
+        } finally {
+          // Always redirect to login regardless of errors
           window.location.href = '/login.html';
         }
       }

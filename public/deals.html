@@ -859,21 +859,25 @@
           console.warn('⚠️ River CSV failed:', error);
         }
 
-        // Load ALL ocean cruise data - try multiple paths
+        // Load ALL ocean cruise data - use the correct Master Upload file
         try {
-          let oceanResponse = await fetch('/data/twins.csv?v=' + Date.now()); // Cache bust
+          let oceanResponse = await fetch('/1807 Master Upload Twins.csv?v=' + Date.now()); // Cache bust
           if (!oceanResponse.ok) {
-            console.log('⚠️ Trying alternate path for twins.csv...');
+            console.log('⚠️ Trying alternate path for Master Upload file...');
+            oceanResponse = await fetch('/data/twins.csv?v=' + Date.now());
+          }
+          if (!oceanResponse.ok) {
+            console.log('⚠️ Trying legacy twins.csv path...');
             oceanResponse = await fetch('/twins.csv?v=' + Date.now());
           }
           
           if (oceanResponse.ok) {
             const oceanCSV = await oceanResponse.text();
             const oceanDeals = parseCSVComplete(oceanCSV, 'Ocean Cruise');
-            console.log(`✅ OCEAN: Loaded ${oceanDeals.length} deals`);
+            console.log(`✅ OCEAN: Loaded ${oceanDeals.length} deals from Master Upload file`);
             allDeals = allDeals.concat(oceanDeals);
           } else {
-            console.warn('⚠️ Could not load twins.csv from any path');
+            console.warn('⚠️ Could not load cruise data from any CSV path');
           }
         } catch (error) {
           console.warn('⚠️ Ocean CSV failed:', error);

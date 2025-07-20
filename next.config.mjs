@@ -51,4 +51,4 @@ const sentryWebpackPluginOptions = {
   project: "interline-asia-frontend",
 };
 
-export default withSentryConfig(nextConfig, sentryWebpackPluginOptions);/* FORCE DEPLOY - CSS MIME FIX - 1737374400 */
+export default withSentryConfig(nextConfig, sentryWebpackPluginOptions);/* FORCE DEPLOY - COMPLETE FIX - 1737374500 */

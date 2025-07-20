@@ -315,7 +315,13 @@
           // Use the global client's signIn method
           const data = await window.supabaseClient.signIn(email, password);
           
-          if (!data.user) {
+          console.log('LOGIN: SignIn response received:', data);
+          console.log('LOGIN: User data:', data?.user);
+          console.log('LOGIN: Session data:', data?.session);
+          
+          // The signIn method returns { user, session }, so check for user
+          if (!data || !data.user) {
+            console.error('LOGIN: No user data in response:', data);
             throw new Error('Login failed - no user data returned');
           }
           
@@ -328,7 +334,12 @@
           
           // Simple, direct redirect - no complex logic
           console.log('LOGIN: REDIRECTING TO DASHBOARD');
-          window.location = '/dashboard-choice.html';
+          
+          // Force redirect immediately
+          setTimeout(() => {
+            console.log('LOGIN: Executing redirect now');
+            window.location.href = '/dashboard-choice.html';
+          }, 100);
           
         } catch (error) {
           console.error('LOGIN: Error:', error);

@@ -31,16 +31,17 @@ class SupabaseClient {
       throw new Error(msg);
     }
 
-    // Create client with limited session persistence for login flow
+    // Create client with robust session management
     this.supabase = window.supabase.createClient(
       window.SUPABASE_URL,
       window.SUPABASE_ANON_KEY,
       {
         auth: {
           persistSession: true,        // Enable for login flow
-          autoRefreshToken: false,     // Keep disabled for security
-          detectSessionInUrl: false,   // Keep disabled
-          storage: window.localStorage  // Use localStorage for persistent sessions
+          autoRefreshToken: true,      // CRITICAL: Enable auto token refresh to prevent expiration
+          detectSessionInUrl: false,   // Keep disabled for security
+          storage: window.localStorage, // Use localStorage for persistent sessions
+          flowType: 'pkce'            // Use PKCE flow for better security
         }
       }
     );

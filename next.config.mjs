@@ -18,6 +18,18 @@ const nextConfig = {
         source: '/api/:path*',
         destination: '/api/:path*',
       },
+      // Serve static HTML files from public folder
+      {
+        source: '/((?!api|_next|favicon.ico).*)',
+        destination: '/$1.html',
+        has: [
+          {
+            type: 'header',
+            key: 'accept',
+            value: '(.*text/html.*)',
+          },
+        ],
+      },
     ];
   },
 };

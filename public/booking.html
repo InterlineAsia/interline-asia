@@ -1079,10 +1079,19 @@
           body: formData
         });
 
-        const result = await response.json();
-
+        // Better error handling for non-JSON responses
+        let result;
         if (!response.ok) {
-          throw new Error(result.error || 'Failed to submit booking');
+          const text = await response.text();
+          throw new Error(`Server error: ${response.status} - ${text}`);
+        }
+        
+        try {
+          result = await response.json();
+        } catch (jsonError) {
+          const responseText = await response.text();
+          console.error('BOOKING: API returned non-JSON response:', responseText);
+          throw new Error('Server error occurred. Please try again or contact support.');
         }
 
         // Track successful booking
@@ -1171,11 +1180,7 @@
       setupFileUploads();
     });
   </script>
-  
-  <!-- Enhanced CSV Loader -->
-  <script src="/js/enhanced-csv-loader.js"></script>
-</body>
-</html>teElement('div');
+
           cabinElement.className = 'cabin-option';
           
           const displayPrice = hasValidPrice ? formatPrice(cabin.price) : 'Quote Available';
@@ -1465,10 +1470,19 @@
           body: formData
         });
 
-        const result = await response.json();
-
+        // Better error handling for non-JSON responses
+        let result;
         if (!response.ok) {
-          throw new Error(result.error || 'Failed to submit booking');
+          const text = await response.text();
+          throw new Error(`Server error: ${response.status} - ${text}`);
+        }
+        
+        try {
+          result = await response.json();
+        } catch (jsonError) {
+          const responseText = await response.text();
+          console.error('BOOKING: API returned non-JSON response:', responseText);
+          throw new Error('Server error occurred. Please try again or contact support.');
         }
 
         // Track successful booking
@@ -1558,9 +1572,6 @@
       // Cloudflare Turnstile is initialized automatically
     });
   </script>
-  
-  <!-- Enhanced CSV Loader -->
-  <script src="/js/enhanced-csv-loader.js"></script>
   
   <div id="footer-placeholder"></div>
   <script src="/js/loadPartials.js" defer></script>

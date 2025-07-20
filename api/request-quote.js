@@ -30,21 +30,21 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    // Get cruise details from Supabase
-    const { data: cruise, error: cruiseError } = await supabase
-      .from('cruises')
-      .select('*')
-      .eq('id', cruiseId)
-      .single();
-
-    if (cruiseError || !cruise) {
-      return res.status(404).json({ error: 'Cruise not found' });
-    }
-
-    // Check if pricing is available
-    if (cruise.pricingStatus !== 'Available') {
-      return res.status(400).json({ error: 'Pricing not available for this cruise' });
-    }
+    // Since cruise data comes from CSV files, we'll create a mock cruise object
+    // The actual cruise details will be included in the request body
+    const { cruiseDetails } = req.body;
+    
+    // Create cruise object from the provided details or use defaults
+    const cruise = cruiseDetails || {
+      cruise_line: 'Cruise Line',
+      ship_name: 'Ship Name',
+      departure_date: 'TBD',
+      nights: 'TBD',
+      region: 'Various',
+      departure_port: 'TBD',
+      arrival_port: 'TBD',
+      itinerary: 'Details available upon quote'
+    };
 
     // Generate secure token for quote form
     const quoteToken = generateSecureToken();

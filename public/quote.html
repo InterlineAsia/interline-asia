@@ -318,10 +318,10 @@
     </div>
 
     <script>
-        // Get URL parameters
+        // Get URL parameters and handle both formats
         const urlParams = new URLSearchParams(window.location.search);
-        const cruiseData = {
-            dealId: urlParams.get('dealId') || '',
+        let cruiseData = {
+            dealId: urlParams.get('dealId') || urlParams.get('id') || '',
             cruiseLine: urlParams.get('cruiseLine') || '',
             shipName: urlParams.get('shipName') || '',
             departureDate: urlParams.get('departureDate') || '',
@@ -330,6 +330,9 @@
             departurePort: urlParams.get('departurePort') || '',
             arrivalPort: urlParams.get('arrivalPort') || ''
         };
+
+        // If we only have an ID (old format), we need to fetch the deal data
+        const needsDataFetch = cruiseData.dealId && !cruiseData.cruiseLine;
 
         // Populate cruise details
         function populateCruiseDetails() {
@@ -487,8 +490,66 @@
             }
         });
 
+        // Fetch deal data by ID (for old format support)
+        async function fetchDealData(dealId) {
+            try {
+                console.log('QUOTE: Fetching deal data for ID:', dealId);
+                
+                // Load the CSV loader if not already available
+                if (!window.csvLoader) {
+                    // Load the CSV loader script
+                    await new Promise((resolve, reject) => {
+                        const script = document.createElement('script');
+                        script.src = '/js/enhanced-csv-loader.js';
+                        script.onload = resolve;
+                        script.onerror = reject;
+                        document.head.appendChild(script);
+                    });
+                    
+                    // Initialize the CSV loader
+                    window.csvLoader = new EnhancedCSVLoader();
+                    await window.csvLoader.loadAllDeals();
+                }
+                
+                // Find the deal by ID
+                const deal = await window.csvLoader.findDealById(dealId);
+                
+                if (deal) {
+                    console.log('QUOTE: Found deal data:', deal);
+                    // Update cruiseData with the fetched deal information
+                    cruiseData = {
+                        dealId: deal.id,
+                        cruiseLine: deal.cruiseLine || '',
+                        shipName: deal.shipName || '',
+                        departureDate: deal.departureDate || '',
+                        region: deal.region || '',
+                        nights: deal.nights || '',
+                        departurePort: deal.departurePort || '',
+                        arrivalPort: deal.arrivalPort || ''
+                    };
+                    return true;
+                } else {
+                    console.error('QUOTE: Deal not found for ID:', dealId);
+                    return false;
+                }
+            } catch (error) {
+                console.error('QUOTE: Error fetching deal data:', error);
+                return false;
+            }
+        }
+
         // Initialize the page
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
+            // If we need to fetch deal data (old format), do it first
+            if (needsDataFetch) {
+                console.log('QUOTE: Old format detected, fetching deal data...');
+                const success = await fetchDealData(cruiseData.dealId);
+                if (!success) {
+                    showError('Deal not found. Please return to the deals page and select a cruise.');
+                    return;
+                }
+            }
+            
             populateCruiseDetails();
             
             // If no cruise data, show a message

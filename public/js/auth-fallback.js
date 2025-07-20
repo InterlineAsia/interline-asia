@@ -85,13 +85,17 @@ class AuthFallback {
 
   // Enhanced quote request with robust authentication
   async requestQuoteWithFallback(dealId, cruiseLine, shipName, buttonElement) {
+    // Store original button text before any operations
+    const originalText = buttonElement ? buttonElement.innerHTML : '';
+    
     try {
       console.log('AUTH_FALLBACK: Starting quote request with robust authentication');
       
       // Show loading state
-      const originalText = buttonElement.innerHTML;
-      buttonElement.disabled = true;
-      buttonElement.innerHTML = '<i class="ri-loader-4-line"></i> Checking authentication...';
+      if (buttonElement) {
+        buttonElement.disabled = true;
+        buttonElement.innerHTML = '<i class="ri-loader-4-line"></i> Checking authentication...';
+      }
 
       // Robust authentication check
       const isAuthenticated = await this.checkAuthWithRetries();
@@ -103,7 +107,9 @@ class AuthFallback {
       }
 
       // Update loading state
-      buttonElement.innerHTML = '<i class="ri-loader-4-line"></i> Requesting quote...';
+      if (buttonElement) {
+        buttonElement.innerHTML = '<i class="ri-loader-4-line"></i> Requesting quote...';
+      }
 
       // Get user information
       const user = await window.supabaseClient.getCurrentUser();

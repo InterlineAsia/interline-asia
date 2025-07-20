@@ -1838,12 +1838,6 @@ Would you like me to suggest similar routes or help you explore other options?`;
       }
     }
   }
-}
-
-// Initialize the bot when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-  window.cruiseBot = new CruiseHelperBot();
-});
 
   // Build search indexes for faster queries
   buildSearchIndexes() {
@@ -2354,3 +2348,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     return response;
   }
+}
+
+// Initialize the bot when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+  window.cruiseBot = new CruiseHelperBot();
+});

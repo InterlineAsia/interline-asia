@@ -39,9 +39,6 @@
   <link rel="stylesheet" href="/css/luxury-cruise-design.css">
   <link rel="stylesheet" href="auth.css">
   
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
   <!-- Favicon and App Icons -->
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico">
@@ -56,7 +53,7 @@
     gtag('config', 'G-FYGT92WCXC');
   </script>
   
-  <!-- Configuration and Supabase -->
+  <!-- Configuration and Supabase (single loading) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="supabase-client.js"></script>
@@ -325,46 +322,19 @@
           console.log('LOGIN: Success! User:', data.user.email);
           console.log('LOGIN: Global client session established');
           
-          // Track login
-          if (typeof gtag !== 'undefined') {
-            gtag('event', 'login', { method: 'email' });
-          }
-          
-          // Determine redirect
-          const adminEmails = [
-            'rodney@telenational.com.au',
-            'admin@telenational.com.au', 
-            'admin@interlineasia.com'
-          ];
-          
-          const isAdmin = adminEmails.includes(email.toLowerCase());
-          
+          // Show success message immediately
           showSuccess('Login successful! Redirecting...');
+          console.log('LOGIN: SUCCESS MESSAGE SHOWN');
           
-          // Store session info for debugging
-          console.log('LOGIN: Storing session data for debugging...');
-          localStorage.setItem('debug_login_success', JSON.stringify({
-            timestamp: Date.now(),
-            email: email,
-            userId: data.user.id,
-            loginMethod: 'global_client'
-          }));
+          // Force immediate redirect - no delays, no conditions
+          console.log('LOGIN: FORCING IMMEDIATE REDIRECT');
+          window.location.href = '/dashboard-choice.html';
           
-          // Force redirect with multiple fallbacks
-          console.log('LOGIN: Attempting redirect to dashboard choice');
-          
-          // Try immediate redirect first
-          try {
-            window.location.href = '/dashboard-choice.html';
-          } catch (redirectError) {
-            console.error('LOGIN: Immediate redirect failed:', redirectError);
-            
-            // Fallback with timeout
-            setTimeout(() => {
-              console.log('LOGIN: Fallback redirect attempt');
-              window.location.replace('/dashboard-choice.html');
-            }, 100);
-          }
+          // Additional fallback (should not be needed)
+          setTimeout(() => {
+            console.log('LOGIN: EMERGENCY FALLBACK REDIRECT');
+            window.location.replace('/dashboard-choice.html');
+          }, 50);
           
         } catch (error) {
           console.error('LOGIN: Error:', error);

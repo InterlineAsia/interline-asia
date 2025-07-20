@@ -58,26 +58,60 @@ class SupabaseClient {
     // Check for existing session to maintain login state
     const { data: { session } } = await this.supabase.auth.getSession();
     if (session) {
-      // console.log('AUTH: Existing session found:', session.user.email); // Reduce noise
+      console.log('AUTH: Existing session found for:', session.user.email);
       this.currentSession = session;
       await this._setCurrentUserWithMetadata(session.user);
+      
+      // Set up periodic session validation to prevent expiration issues
+      this.startSessionMonitoring();
     }
     
     this.authReady = true;
 
     this.supabase.auth.onAuthStateChange(async (event, session) => {
-      // console.log('AUTH: State change:', event, session ? 'session exists' : 'no session'); // Reduce noise
+      console.log('AUTH: State change:', event, session ? 'session exists' : 'no session');
       
       if (event === 'SIGNED_IN' && session) {
-        // console.log('AUTH: User signed in:', session.user.email); // Reduce noise
+        console.log('AUTH: User signed in:', session.user.email);
         this.currentSession = session;
         await this._setCurrentUserWithMetadata(session.user);
+        this.startSessionMonitoring();
       } else if (event === 'SIGNED_OUT') {
         console.log('AUTH: User signed out');
         this.currentUser = null;
         this.currentSession = null;
+        this.stopSessionMonitoring();
+      } else if (event === 'TOKEN_REFRESHED' && session) {
+        console.log('AUTH: Token refreshed successfully');
+        this.currentSession = session;
+        await this._setCurrentUserWithMetadata(session.user);
       }
     });
+  }
+
+  // Add session monitoring to prevent expiration issues
+  startSessionMonitoring() {
+    // Clear any existing monitoring
+    this.stopSessionMonitoring();
+    
+    // Check session health every 5 minutes
+    this.sessionMonitorInterval = setInterval(async () => {
+      try {
+        await this.validateSession();
+      } catch (error) {
+        console.error('AUTH: Session monitoring error:', error);
+      }
+    }, 5 * 60 * 1000); // 5 minutes
+    
+    console.log('AUTH: Session monitoring started');
+  }
+
+  stopSessionMonitoring() {
+    if (this.sessionMonitorInterval) {
+      clearInterval(this.sessionMonitorInterval);
+      this.sessionMonitorInterval = null;
+      console.log('AUTH: Session monitoring stopped');
+    }
   }
 
   async _setCurrentUserWithMetadata(authUser) {
@@ -288,7 +322,54 @@ class SupabaseClient {
   }
 
   isLoggedIn() {
-    return !!this.currentSession;
+    // Check if we have a session and it's not expired
+    if (!this.currentSession) {
+      return false;
+    }
+    
+    // Check if session is expired
+    const now = Math.floor(Date.now() / 1000);
+    if (this.currentSession.expires_at && this.currentSession.expires_at < now) {
+      console.warn('AUTH: Session expired, clearing local state');
+      this.currentSession = null;
+      this.currentUser = null;
+      return false;
+    }
+    
+    return true;
+  }
+
+  // Add session health check method
+  async validateSession() {
+    try {
+      if (!this.currentSession) {
+        return false;
+      }
+
+      // Try to refresh the session to ensure it's still valid
+      const { data: { session }, error } = await this.supabase.auth.getSession();
+      
+      if (error || !session) {
+        console.warn('AUTH: Session validation failed, clearing state');
+        this.currentSession = null;
+        this.currentUser = null;
+        return false;
+      }
+
+      // Update session if it was refreshed
+      if (session.access_token !== this.currentSession.access_token) {
+        console.log('AUTH: Session was refreshed during validation');
+        this.currentSession = session;
+        await this._setCurrentUserWithMetadata(session.user);
+      }
+
+      return true;
+    } catch (error) {
+      console.error('AUTH: Session validation error:', error);
+      this.currentSession = null;
+      this.currentUser = null;
+      return false;
+    }
   }
 
   async getCurrentUser() {

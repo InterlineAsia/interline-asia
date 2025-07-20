@@ -13,6 +13,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="supabase-client.js"></script>
+  <script src="/js/auth-fallback.js"></script>
 
   <!-- Site-wide styles for header/footer consistency -->
   <style>
@@ -1153,8 +1154,18 @@
         // Wait for the client to be ready
         await window.supabaseClient.readyPromise;
 
-        // Check if user is logged in
+        // Validate session health first (this will refresh tokens if needed)
+        const sessionValid = await window.supabaseClient.validateSession();
+        if (!sessionValid) {
+          console.log('AUTH: Session validation failed, redirecting to login');
+          alert('Your session has expired. Please log in again.');
+          window.location.href = '/login.html';
+          return;
+        }
+
+        // Double-check login status after validation
         if (!window.supabaseClient.isLoggedIn()) {
+          console.log('AUTH: Not logged in after session validation');
           alert('Please log in to request a quote.');
           window.location.href = '/login.html';
           return;
@@ -1162,6 +1173,7 @@
 
         const user = await window.supabaseClient.getCurrentUser();
         if (!user) {
+          console.log('AUTH: No current user found');
           alert('Please log in to request a quote.');
           window.location.href = '/login.html';
           return;
@@ -1377,7 +1389,7 @@
                   View Details
                 </button>
                 ${shouldShowQuoteButton(deal) ? `
-                  <button class="btn-action btn-request-quote" onclick="requestQuote('${deal.id}', '${deal.cruiseLine}', '${deal.shipName}')">
+                  <button class="btn-action btn-request-quote" onclick="requestQuoteRobust('${deal.id}', '${deal.cruiseLine}', '${deal.shipName}')">
                     <i class="ri-mail-line"></i>
                     Request Quote
                   </button>

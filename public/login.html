@@ -344,11 +344,23 @@
           // Simple, direct redirect - no complex logic
           console.log('LOGIN: REDIRECTING TO DASHBOARD');
           
-          // Force redirect immediately
-          setTimeout(() => {
-            console.log('LOGIN: Executing redirect now');
+          // Force redirect immediately with multiple fallbacks
+          try {
+            console.log('LOGIN: Attempting immediate redirect');
             window.location.href = '/dashboard-choice.html';
-          }, 100);
+          } catch (redirectError) {
+            console.error('LOGIN: Immediate redirect failed, trying setTimeout:', redirectError);
+            setTimeout(() => {
+              console.log('LOGIN: Executing delayed redirect now');
+              try {
+                window.location.href = '/dashboard-choice.html';
+              } catch (delayedError) {
+                console.error('LOGIN: Delayed redirect also failed:', delayedError);
+                // Last resort - use window.location.replace
+                window.location.replace('/dashboard-choice.html');
+              }
+            }, 100);
+          }
           
         } catch (error) {
           console.error('LOGIN: Error:', error);

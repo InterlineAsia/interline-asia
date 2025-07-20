@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Track Your Booking - Interline Asia">
+  <title>Track Your Booking - Interline Asia</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="/css/complete-redesign.css">
+  <link rel="stylesheet" href="/css/affiliate-tools.css">
+  <link rel="stylesheet" href="/css/social-media.css">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  
+  <style>
+    .track-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 2rem;
+      padding-top: 120px;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+    }
+    
+    .track-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    
+    .track-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .track-title {
+      color: #1e40af;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    
+    .track-subtitle {
+      color: #475569;
+      font-size: 1.1rem;
+    }
+    
+    .track-form {
+      margin-bottom: 2rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      color: #1e40af;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 1rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.2s ease;
+    }
+    
+    .form-group input:focus {
+      outline: none;
+      border-color: #3b82f6;
+    }
+    
+    .btn-track {
+      background: linear-gradient(135deg, #059669, #047857);
+      color: white;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+    
+    .btn-track:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(5, 150, 105, 0.3);
+    }
+    
+    .placeholder-message {
+      background: #f0f9ff;
+      border: 1px solid #3b82f6;
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      margin-top: 2rem;
+    }
+    
+    .placeholder-message h3 {
+      color: #1e40af;
+      margin: 0 0 1rem 0;
+      font-size: 1.2rem;
+    }
+    
+    .placeholder-message p {
+      color: #1d4ed8;
+      margin: 0;
+      line-height: 1.6;
+    }
+    
+    .info-section {
+      background: #fef3c7;
+      border: 1px solid #f59e0b;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 2rem;
+    }
+    
+    .info-section h4 {
+      color: #92400e;
+      margin: 0 0 0.5rem 0;
+      font-size: 1rem;
+    }
+    
+    .info-section p {
+      color: #78350f;
+      margin: 0;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    
+    @media (max-width: 768px) {
+      .track-container {
+        padding: 1rem;
+      }
+      
+      .track-card {
+        padding: 1.5rem;
+      }
+      
+      .track-title {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="main-nav">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <div class="brand-icon">IA</div>
+        <div class="brand-text">
+          <span class="brand-name">Interline Asia</span>
+          <span class="brand-subtitle">Luxury Cruise Experiences</span>
+        </div>
+      </div>
+      
+      <div class="nav-menu">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/#about" class="nav-link">About</a>
+        <a href="/#partners" class="nav-link">Partners</a>
+        <a href="/login.html" class="nav-cta">Member Login</a>
+      </div>
+      
+      <div class="nav-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </nav>
+  
+  <div class="track-container">
+    <div class="track-card">
+      <div class="track-header">
+        <h1 class="track-title">🔍 Track Your Booking</h1>
+        <p class="track-subtitle">Enter your booking reference to check the status</p>
+      </div>
+      
+      <form class="track-form" id="track-form">
+        <div class="form-group">
+          <label for="booking-reference">Booking Reference Number</label>
+          <input 
+            type="text" 
+            id="booking-reference" 
+            name="bookingReference" 
+            placeholder="e.g., BK-2025-ABC123"
+            required
+          >
+        </div>
+        
+        <button type="submit" class="btn-track">
+          🔍 Track Booking
+        </button>
+      </form>
+      
+      <div class="placeholder-message">
+        <h3>📋 Booking Status</h3>
+        <p>We will show your booking details and current status here once the tracking system is implemented.</p>
+      </div>
+      
+      <div class="info-section">
+        <h4>💡 Need Help?</h4>
+        <p>
+          If you can't find your booking reference, check your confirmation email or contact us at 
+          <strong>admin@interlineasia.com</strong> for assistance.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-placeholder"></div>
+  <script src="/js/loadPartials.js" defer></script>
+  
+  <script>
+    document.getElementById('track-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const bookingRef = document.getElementById('booking-reference').value;
+      
+      if (bookingRef) {
+        // Show a temporary message (since this is just UI)
+        const placeholderMessage = document.querySelector('.placeholder-message');
+        placeholderMessage.innerHTML = `
+          <h3>📋 Searching for Booking: ${bookingRef}</h3>
+          <p>Tracking functionality is currently under development. Please contact our team directly for booking status updates.</p>
+        `;
+        placeholderMessage.style.background = '#fef3c7';
+        placeholderMessage.style.borderColor = '#f59e0b';
+      }
+    });
+  </script>
+</body>
+</html>

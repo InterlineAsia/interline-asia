@@ -6,9 +6,18 @@ const nextConfig = {
   images: {
     unoptimized: true
   },
-  // Enable hybrid static + API deployment
-  experimental: {
-    outputFileTracingRoot: process.cwd(),
+  // Ensure proper static file serving
+  async rewrites() {
+    return [
+      {
+        source: '/',
+        destination: '/index.html',
+      },
+      {
+        source: '/((?!api|_next|favicon.ico).*)',
+        destination: '/$1.html',
+      },
+    ];
   },
 };
 

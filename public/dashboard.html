@@ -277,14 +277,14 @@
                 const user = session.user;
                 console.log('DASHBOARD: User authenticated:', user.email);
                 
+                // Load dashboard data
+                await loadDashboardData(user);
+                
             } catch (error) {
                 console.error('DASHBOARD: Authentication check failed:', error);
                 window.location.href = '/login.html';
                 return;
             }
-
-            // Load dashboard data
-            await loadDashboardData(user);
             
             // Setup event listeners
             setupEventListeners();

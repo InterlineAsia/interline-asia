@@ -1814,14 +1814,8 @@ Would you like me to suggest similar routes or help you explore other options?`;
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
   }
-}
 
-// Initialize the bot when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-  window.cruiseBot = new CruiseHelperBot();
-});
- 
- // Load additional CSV files for complete inventory
+  // Load additional CSV files for complete inventory
   async loadAdditionalCruiseFiles() {
     const additionalFiles = [
       'atlas.csv',
@@ -1844,6 +1838,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   }
+}
+
+// Initialize the bot when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+  window.cruiseBot = new CruiseHelperBot();
+});
 
   // Build search indexes for faster queries
   buildSearchIndexes() {

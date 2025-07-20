@@ -252,112 +252,49 @@
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('DASHBOARD: Initializing member dashboard...');
             
-            // Check for debug login info
-            const debugLogin = localStorage.getItem('debug_login_success');
-            if (debugLogin) {
-                console.log('DASHBOARD: Found debug login info:', JSON.parse(debugLogin));
-            }
-            
-            // Add delay to ensure all scripts are loaded, but not too long
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            // Check authentication using direct Supabase
+            // Simple authentication check (matching the working debug approach)
             try {
+                // Wait for config to load
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
                 if (!window.supabase || !window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
-                    console.error('DASHBOARD: Supabase configuration not available');
-                    console.log('DASHBOARD: Available:', { 
-                        supabase: !!window.supabase, 
-                        url: !!window.SUPABASE_URL, 
-                        key: !!window.SUPABASE_ANON_KEY 
-                    });
-                    
-                    // Try to wait a bit more for config to load
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                    
-                    if (!window.supabase || !window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
-                        console.error('DASHBOARD: Still no Supabase config after waiting');
-                        window.location.href = '/login.html?error=config';
-                        return;
-                    }
-                }
-
-                // Use a shared Supabase client to avoid multiple instances
-                if (!window.sharedSupabaseClient) {
-                    window.sharedSupabaseClient = window.supabase.createClient(
-                        window.SUPABASE_URL,
-                        window.SUPABASE_ANON_KEY
-                    );
-                }
-                const supabaseClient = window.sharedSupabaseClient;
-                
-                console.log('DASHBOARD: Supabase client ready, checking session...');
-                
-                // Try multiple times to get session
-                let session = null;
-                let sessionError = null;
-                
-                for (let i = 0; i < 5; i++) {
-                    try {
-                        const result = await supabaseClient.auth.getSession();
-                        session = result.data?.session;
-                        sessionError = result.error;
-                        
-                        console.log(`DASHBOARD: Session attempt ${i + 1}:`, {
-                            hasSession: !!session,
-                            hasUser: !!session?.user,
-                            hasError: !!sessionError
-                        });
-                        
-                        if (session && session.user) {
-                            break; // Success!
-                        }
-                        
-                        if (i < 4) { // Don't wait on last attempt
-                            await new Promise(resolve => setTimeout(resolve, 500));
-                        }
-                    } catch (err) {
-                        console.error(`DASHBOARD: Session attempt ${i + 1} error:`, err);
-                        sessionError = err;
-                    }
-                }
-                
-                if (sessionError && !session) {
-                    console.error('DASHBOARD: Session error after all attempts:', sessionError);
-                    window.location.href = '/login.html?error=session';
+                    console.error('DASHBOARD: Supabase configuration missing');
+                    window.location.href = '/login.html';
                     return;
                 }
-
+                
+                console.log('DASHBOARD: Supabase configuration loaded');
+                
+                const supabase = window.supabase.createClient(
+                    window.SUPABASE_URL,
+                    window.SUPABASE_ANON_KEY
+                );
+                
+                console.log('DASHBOARD: Supabase client created');
+                
+                const { data: { session }, error } = await supabase.auth.getSession();
+                
+                if (error) {
+                    console.error('DASHBOARD: Session error:', error);
+                    window.location.href = '/login.html';
+                    return;
+                }
+                
                 if (!session || !session.user) {
-                    console.log('DASHBOARD: No valid session found after all attempts');
-                    
-                    // Check localStorage for any auth tokens
-                    const keys = Object.keys(localStorage).filter(key => key.includes('supabase'));
-                    console.log('DASHBOARD: Supabase localStorage keys:', keys);
-                    
-                    // If we have debug login info, something went wrong with session persistence
-                    if (debugLogin) {
-                        console.error('DASHBOARD: Had successful login but no session - possible session persistence issue');
-                        window.location.href = '/login.html?error=persistence';
-                    } else {
-                        window.location.href = '/login.html';
-                    }
+                    console.log('DASHBOARD: No session found - redirecting to login');
+                    window.location.href = '/login.html';
                     return;
                 }
-
-                const user = session.user;
-                console.log('DASHBOARD: User authenticated successfully:', user.email);
-                console.log('DASHBOARD: Session expires at:', new Date(session.expires_at * 1000));
                 
-                // Clear debug info since we're successfully authenticated
-                localStorage.removeItem('debug_login_success');
+                console.log('DASHBOARD: Session found! User:', session.user.email);
+                console.log('DASHBOARD: Session expires:', new Date(session.expires_at * 1000));
                 
                 // Load dashboard data
-                await loadDashboardData(user);
+                await loadDashboardData(session.user);
                 
             } catch (error) {
-                console.error('DASHBOARD: Authentication check failed:', error);
-                console.error('DASHBOARD: Error stack:', error.stack);
-                window.location.href = '/login.html?error=exception';
+                console.error('DASHBOARD: Authentication error:', error);
+                window.location.href = '/login.html';
                 return;
             }
             

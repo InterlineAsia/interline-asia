@@ -51,4 +51,4 @@ const sentryWebpackPluginOptions = {
   project: "interline-asia-frontend",
 };
 
-export default withSentryConfig(nextConfig, sentryWebpackPluginOptions);/* FORCE DEPLOY - COMPLETE FIX - 1737374500 */
+export default withSentryConfig(nextConfig, sentryWebpackPluginOptions);/* FORCE DEPLOY - DASHBOARD FIX - 1737374600 */

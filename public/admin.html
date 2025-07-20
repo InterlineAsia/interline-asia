@@ -201,25 +201,48 @@
           })
         });
         
+        // Remove thinking indicator
+        if (thinkingDiv.parentNode) {
+          chatMessages.removeChild(thinkingDiv);
+        }
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
         const result = await response.json();
         
-        chatMessages.removeChild(thinkingDiv);
+        if (!result.success) {
+          throw new Error(result.error || 'Bot request failed');
+        }
         
         const botDiv = document.createElement('div');
-        botDiv.style.cssText = 'margin: 0.5rem 0; padding: 0.5rem; background: rgba(16, 185, 129, 0.2); border-radius: 8px;';
+        botDiv.style.cssText = 'margin: 0.5rem 0; padding: 0.5rem; background: rgba(16, 185, 129, 0.2); border-radius: 8px; white-space: pre-wrap;';
         botDiv.innerHTML = `<strong>Admin Helper:</strong> ${result.response || 'I apologize, but I encountered an issue processing your request. Please try again.'}`;
         chatMessages.appendChild(botDiv);
         
       } catch (error) {
         console.error('Chat error:', error);
         
+        // Remove thinking indicator if still present
         if (thinkingDiv.parentNode) {
           chatMessages.removeChild(thinkingDiv);
         }
         
         const errorDiv = document.createElement('div');
         errorDiv.style.cssText = 'margin: 0.5rem 0; padding: 0.5rem; background: rgba(239, 68, 68, 0.2); border-radius: 8px;';
-        errorDiv.innerHTML = '<strong>Admin Helper:</strong> I apologize, but I am currently experiencing technical difficulties. Please try again later.';
+        
+        let errorMessage = 'I apologize, but I am currently experiencing technical difficulties. Please try again later.';
+        
+        if (error.message.includes('404')) {
+          errorMessage = 'Bot service is temporarily unavailable. Please check back later.';
+        } else if (error.message.includes('500')) {
+          errorMessage = 'Internal server error. Please contact support if this persists.';
+        } else if (error.message.includes('Failed to fetch')) {
+          errorMessage = 'Network connection issue. Please check your internet connection and try again.';
+        }
+        
+        errorDiv.innerHTML = `<strong>Admin Helper:</strong> ${errorMessage}`;
         chatMessages.appendChild(errorDiv);
       }
       

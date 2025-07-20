@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Debug - Interline Asia</title>
+</head>
+<body>
+    <h1>Authentication Debug</h1>
+    <div id="debug-info"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const debugDiv = document.getElementById('debug-info');
+            
+            function log(message) {
+                console.log(message);
+                debugDiv.innerHTML += '<p>' + JSON.stringify(message) + '</p>';
+            }
+            
+            log('Starting auth debug...');
+            
+            // Check if Supabase is available
+            log('Supabase available: ' + !!window.supabase);
+            log('Config URL: ' + !!window.SUPABASE_URL);
+            log('Config Key: ' + !!window.SUPABASE_ANON_KEY);
+            
+            if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
+                try {
+                    const supabaseClient = window.supabase.createClient(
+                        window.SUPABASE_URL,
+                        window.SUPABASE_ANON_KEY
+                    );
+                    
+                    log('Supabase client created successfully');
+                    
+                    // Check session
+                    const { data: { session }, error } = await supabaseClient.auth.getSession();
+                    
+                    log('Session check result:');
+                    log('Has session: ' + !!session);
+                    log('Has user: ' + !!session?.user);
+                    log('Error: ' + (error?.message || 'none'));
+                    
+                    if (session) {
+                        log('User email: ' + session.user.email);
+                        log('Session expires: ' + new Date(session.expires_at * 1000));
+                    }
+                    
+                    // Check localStorage
+                    const keys = Object.keys(localStorage).filter(key => key.includes('supabase'));
+                    log('Supabase localStorage keys: ' + keys.length);
+                    keys.forEach(key => {
+                        log('Key: ' + key + ' (length: ' + localStorage.getItem(key).length + ')');
+                    });
+                    
+                } catch (error) {
+                    log('Error during debug: ' + error.message);
+                }
+            } else {
+                log('Supabase not properly configured');
+            }
+        });
+    </script>
+</body>
+</html>

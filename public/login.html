@@ -305,6 +305,11 @@
             }
           }
           
+          // Use shared Supabase client for consistency
+          if (!window.sharedSupabaseClient) {
+            window.sharedSupabaseClient = supabase;
+          }
+          
           // Simple Supabase login
           const { data, error } = await supabase.auth.signInWithPassword({
             email: email,
@@ -338,6 +343,15 @@
           const isAdmin = adminEmails.includes(email.toLowerCase());
           
           showSuccess('Login successful! Redirecting...');
+          
+          // Store session info for debugging
+          console.log('LOGIN: Storing session data for debugging...');
+          localStorage.setItem('debug_login_success', JSON.stringify({
+            timestamp: Date.now(),
+            email: email,
+            userId: data.user.id,
+            sessionId: data.session.access_token.substring(0, 20) + '...'
+          }));
           
           // Redirect after short delay
           setTimeout(() => {

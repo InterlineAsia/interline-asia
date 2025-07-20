@@ -603,7 +603,7 @@
               <i class="ri-ship-line"></i>
               Book This Cruise
             </a>
-            <a href="/quote.html" class="quote-btn">
+            <a href="#" class="quote-btn" id="quote-btn">
               <i class="ri-message-line"></i>
               Request Quote
             </a>
@@ -1056,13 +1056,14 @@
         };
       }
 
-      // Set up quote button with proper security token
+      // Set up quote button with deal data (new direct format)
       const quoteBtn = document.querySelector('.quote-btn');
       if (quoteBtn) {
-        // Generate a simple security token (6+ alphanumeric characters as required)
-        const token = generateSecurityToken();
-        quoteBtn.href = `/quote.html?id=${encodeURIComponent(deal.id)}&token=${token}`;
-        console.log('QUOTE: Generated quote URL with token for deal:', deal.id);
+        quoteBtn.onclick = function(e) {
+          e.preventDefault();
+          openQuoteFormWithDeal(deal);
+        };
+        console.log('QUOTE: Set up quote button for deal:', deal.id);
       }
 
       // Show the deal content with smooth transition
@@ -1133,7 +1134,26 @@
       window.location.href = '/deals.html';
     }
 
-    // Generate a security token for quote access
+    // Open quote form with deal data
+    function openQuoteFormWithDeal(deal) {
+      console.log('QUOTE: Opening quote form for deal:', deal.id);
+      
+      // Build URL with cruise data as parameters
+      const quoteUrl = new URL('/quote.html', window.location.origin);
+      quoteUrl.searchParams.set('dealId', deal.id);
+      quoteUrl.searchParams.set('cruiseLine', deal.cruiseLine || '');
+      quoteUrl.searchParams.set('shipName', deal.shipName || '');
+      quoteUrl.searchParams.set('departureDate', deal.departureDate || '');
+      quoteUrl.searchParams.set('region', deal.region || '');
+      quoteUrl.searchParams.set('nights', deal.nights || '');
+      quoteUrl.searchParams.set('departurePort', deal.departurePort || '');
+      quoteUrl.searchParams.set('arrivalPort', deal.arrivalPort || '');
+      
+      // Open in new tab
+      window.open(quoteUrl.toString(), '_blank');
+    }
+
+    // Generate a security token for quote access (kept for backward compatibility)
     function generateSecurityToken() {
       const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
       let token = '';

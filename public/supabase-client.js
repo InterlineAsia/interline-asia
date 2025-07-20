@@ -276,21 +276,29 @@ class SupabaseClient {
     
     if (data.user) {
       this.currentSession = data.session;
-      await this._setCurrentUserWithMetadata(data.user);
       
-      // Ensure session is properly stored
+      // Ensure session is properly stored first
       if (data.session) {
         await this.supabase.auth.setSession(data.session);
         console.log('AUTH: Session set in Supabase');
       }
       
+      // Wait for user metadata to be fully set
+      await this._setCurrentUserWithMetadata(data.user);
+      
       console.log('AUTH: Login successful, user set:', this.currentUser?.email);
       console.log('AUTH: Is logged in check:', this.isLoggedIn());
+      console.log('AUTH: Current user object:', this.currentUser);
     }
     
+    // Ensure we always return a user object
+    const userToReturn = this.currentUser || data.user;
+    console.log('AUTH: Returning user data:', userToReturn);
+    
     return {
-      user: this.currentUser,
-      session: data.session
+      user: userToReturn,
+      session: data.session,
+      originalUser: data.user // Include original user data for debugging
     };
   }
 

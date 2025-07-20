@@ -1139,8 +1139,14 @@
     // Request quote functionality
     async function requestQuote(dealId, cruiseLine, shipName) {
       try {
-        // Check if user is logged in
-        const user = await getCurrentUser();
+        // Check if user is logged in using global Supabase client
+        if (!window.supabaseClient || !window.supabaseClient.isLoggedIn()) {
+          alert('Please log in to request a quote.');
+          window.location.href = '/login.html';
+          return;
+        }
+
+        const user = window.supabaseClient.currentUser;
         if (!user) {
           alert('Please log in to request a quote.');
           window.location.href = '/login.html';
@@ -1167,12 +1173,15 @@
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${user.access_token}`
+            'Authorization': `Bearer ${user.access_token || 'authenticated'}`
           },
           body: JSON.stringify({
+            dealId: dealId,
             cruiseId: dealId,
             clientName: fullName,
-            userId: user.id
+            userEmail: user.email,
+            userId: user.id,
+            timestamp: new Date().toISOString()
           })
         });
 

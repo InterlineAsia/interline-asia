@@ -1207,6 +1207,16 @@
             clientName: fullName.trim(),
             userEmail: user.email,
             userId: user.id,
+            cruiseDetails: {
+              cruise_line: cruiseLine || 'Cruise Line',
+              ship_name: shipName || 'Ship Name',
+              departure_date: 'Available upon request',
+              nights: 'Various durations',
+              region: 'Multiple destinations',
+              departure_port: 'Various ports',
+              arrival_port: 'Various ports',
+              itinerary: 'Full itinerary details available upon quote'
+            },
             timestamp: new Date().toISOString()
           })
         });

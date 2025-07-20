@@ -2,14 +2,14 @@ import { withSentryConfig } from '@sentry/nextjs';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
   trailingSlash: true,
   images: {
     unoptimized: true
   },
-  distDir: 'out',
-  // Skip API routes for static export
-  skipTrailingSlashRedirect: true,
+  // Enable hybrid static + API deployment
+  experimental: {
+    outputFileTracingRoot: process.cwd(),
+  },
 };
 
 const sentryWebpackPluginOptions = {

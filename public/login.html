@@ -304,34 +304,27 @@
         setLoading(true);
         
         try {
-          if (!supabase) {
-            if (!initSupabase()) {
-              throw new Error('Failed to initialize authentication system');
-            }
+          // Use the global Supabase client for consistency
+          if (!window.supabaseClient) {
+            console.error('LOGIN: Global Supabase client not available');
+            showError('Authentication system not available. Please refresh the page.');
+            return;
           }
+
+          // Wait for the client to be ready
+          await window.supabaseClient.readyPromise;
           
-          // Use shared Supabase client for consistency
-          if (!window.sharedSupabaseClient) {
-            window.sharedSupabaseClient = supabase;
-          }
+          console.log('LOGIN: Using global Supabase client for authentication');
           
-          // Simple Supabase login
-          const { data, error } = await supabase.auth.signInWithPassword({
-            email: email,
-            password: password
-          });
+          // Use the global client's signIn method
+          const data = await window.supabaseClient.signIn(email, password);
           
-          if (error) {
-            console.error('LOGIN: Supabase error:', error);
-            throw error;
-          }
-          
-          if (!data.user || !data.session) {
-            throw new Error('Login failed - no user session created');
+          if (!data.user) {
+            throw new Error('Login failed - no user data returned');
           }
           
           console.log('LOGIN: Success! User:', data.user.email);
-          console.log('LOGIN: Session:', data.session);
+          console.log('LOGIN: Global client session established');
           
           // Track login
           if (typeof gtag !== 'undefined') {
@@ -355,12 +348,14 @@
             timestamp: Date.now(),
             email: email,
             userId: data.user.id,
-            sessionId: data.session.access_token.substring(0, 20) + '...'
+            loginMethod: 'global_client'
           }));
           
-          // Redirect immediately to dashboard choice for all users
-          console.log('LOGIN: Redirecting to dashboard choice');
-          window.location.href = '/dashboard-choice.html';
+          // Small delay to ensure session is fully established in global client
+          setTimeout(() => {
+            console.log('LOGIN: Redirecting to dashboard choice');
+            window.location.href = '/dashboard-choice.html';
+          }, 500);
           
         } catch (error) {
           console.error('LOGIN: Error:', error);

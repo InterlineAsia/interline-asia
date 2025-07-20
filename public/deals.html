@@ -1143,6 +1143,25 @@
     }
 
     // Request quote functionality
+    // New direct quote form function - opens quote form in new tab
+    function openQuoteForm(dealId, cruiseLine, shipName, departureDate, region, nights, departurePort, arrivalPort) {
+      console.log('QUOTE: Opening direct quote form for deal:', dealId);
+      
+      // Build URL with cruise data as parameters
+      const quoteUrl = new URL('/quote.html', window.location.origin);
+      quoteUrl.searchParams.set('dealId', dealId);
+      quoteUrl.searchParams.set('cruiseLine', cruiseLine || '');
+      quoteUrl.searchParams.set('shipName', shipName || '');
+      quoteUrl.searchParams.set('departureDate', departureDate || '');
+      quoteUrl.searchParams.set('region', region || '');
+      quoteUrl.searchParams.set('nights', nights || '');
+      quoteUrl.searchParams.set('departurePort', departurePort || '');
+      quoteUrl.searchParams.set('arrivalPort', arrivalPort || '');
+      
+      // Open in new tab
+      window.open(quoteUrl.toString(), '_blank');
+    }
+
     async function requestQuote(dealId, cruiseLine, shipName) {
       try {
         // Wait for Supabase client to be ready
@@ -1399,7 +1418,7 @@
                   View Details
                 </button>
                 ${shouldShowQuoteButton(deal) ? `
-                  <button class="btn-action btn-request-quote" onclick="requestQuoteRobust('${deal.id}', '${deal.cruiseLine}', '${deal.shipName}')">
+                  <button class="btn-action btn-request-quote" onclick="openQuoteForm('${deal.id}', '${deal.cruiseLine}', '${deal.shipName}', '${deal.departureDate}', '${deal.region}', '${deal.nights}', '${deal.departurePort}', '${deal.arrivalPort}')">
                     <i class="ri-mail-line"></i>
                     Request Quote
                   </button>

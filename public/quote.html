@@ -1,34 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Quote Request | Interline Asia</title>
-    <meta name="description" content="Request a secure quote for exclusive cruise deals - Interline Asia">
+    <title>Request Quote - Interline Asia</title>
+    <meta name="description" content="Request a quote for exclusive cruise deals - Interline Asia">
     <meta name="keywords" content="cruise quote, travel quote, cruise deals, interline rates">
     <meta name="author" content="Interline Asia">
     <meta name="robots" content="index, follow">
     
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Secure Quote Request | Interline Asia">
-    <meta property="og:description" content="Request a secure quote for exclusive cruise deals - Interline Asia">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://www.interlineasia.com/quote.html">
-    <meta property="og:image" content="https://www.interlineasia.com/cruise-ship.png">
-    <meta property="og:site_name" content="Interline Asia">
-    
-    <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Secure Quote Request | Interline Asia">
-    <meta name="twitter:description" content="Request a secure quote for exclusive cruise deals">
-    <meta name="twitter:image" content="https://www.interlineasia.com/cruise-ship.png">
-    
-    <!-- Additional SEO Meta Tags -->
-    <meta name="theme-color" content="#0f172a">
-    <meta name="msapplication-TileColor" content="#0f172a">
-    <link rel="canonical" href="https://www.interlineasia.com/quote.html">
-
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,474 +16,486 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
 
     <!-- Styles -->
-    <link rel="stylesheet" href="/css/complete-redesign.css">
-    <link rel="stylesheet" href="/css/affiliate-tools.css">
-    <link rel="stylesheet" href="/css/social-media.css">
-    <link rel="stylesheet" href="/css/quote.css">
-
-    <!-- Favicon and App Icons -->
+    <link rel="stylesheet" href="/css/luxury-cruise-design.css">
+    
+    <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico">
-    <link rel="manifest" href="/site.webmanifest">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            margin: 0;
+            padding: 0;
+        }
+
+        .quote-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .quote-header {
+            background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .quote-header h1 {
+            margin: 0 0 0.5rem 0;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .quote-header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .quote-content {
+            padding: 2rem;
+        }
+
+        .cruise-details {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid #0f172a;
+        }
+
+        .cruise-details h3 {
+            margin: 0 0 1rem 0;
+            color: #0f172a;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .cruise-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .cruise-info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cruise-info-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .cruise-info-value {
+            font-size: 1rem;
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section h3 {
+            margin: 0 0 1rem 0;
+            color: #0f172a;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .cabin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .cabin-input {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cabin-input label {
+            font-size: 0.875rem;
+            color: #374151;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .cabin-input input {
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            transition: border-color 0.3s;
+        }
+
+        .cabin-input input:focus {
+            outline: none;
+            border-color: #0f172a;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            color: #374151;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #0f172a;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(15, 23, 42, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .success-message {
+            background: #10b981;
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .error-message {
+            background: #ef4444;
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .loading i {
+            font-size: 2rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
-
 <body>
-    <!-- Navigation -->
-    <nav class="main-nav">
-        <div class="nav-container">
-            <div class="nav-brand">
-                <div class="brand-icon">IA</div>
-                <div class="brand-text">
-                    <span class="brand-name">Interline Asia</span>
-                    <span class="brand-subtitle">Luxury Cruise Experiences</span>
-                </div>
-            </div>
+    <div class="quote-container">
+        <div class="quote-header">
+            <h1>Request Your Quote</h1>
+            <p>Get personalized pricing for your cruise adventure</p>
+        </div>
+
+        <div class="quote-content">
+            <div class="success-message" id="success-message"></div>
+            <div class="error-message" id="error-message"></div>
             
-            <div class="nav-menu">
-                <a href="/" class="nav-link">Home</a>
-                <a href="/#about" class="nav-link">About</a>
-                <a href="/#partners" class="nav-link">Partners</a>
-                <a href="/login.html" class="nav-cta">Member Login</a>
-            </div>
-            
-            <div class="nav-toggle">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </div>
-        
-        <!-- Travel Tools Header Bar -->
-        <div class="travel-tools-header">
-            <div class="travel-tools-header-container">
-                <div class="travel-tools-header-label">
-                    <span class="tools-label">Essential Travel Tools</span>
-                </div>
-                <div class="travel-tools-header-grid">
-                    <a href="https://trip.tpk.mx/qhlnnQh8" target="_blank" rel="noopener noreferrer" class="header-tool-item" data-tool="flights">
-                        <div class="header-tool-icon">✈️</div>
-                        <span class="header-tool-label">Flights & Hotels</span>
-                    </a>
-                    <a href="https://kiwitaxi.tpk.mx/NGL3ovB3" target="_blank" rel="noopener noreferrer" class="header-tool-item" data-tool="transfers">
-                        <div class="header-tool-icon">🚖</div>
-                        <span class="header-tool-label">Transfers</span>
-                    </a>
-                    <a href="https://ektatraveling.tpk.mx/IUGS6Ovk" target="_blank" rel="noopener noreferrer" class="header-tool-item" data-tool="insurance">
-                        <div class="header-tool-icon">🛡️</div>
-                        <span class="header-tool-label">Insurance</span>
-                    </a>
-                    <a href="https://airalo.tpk.mx/M99krJZy" target="_blank" rel="noopener noreferrer" class="header-tool-item" data-tool="esim">
-                        <div class="header-tool-icon">📶</div>
-                        <span class="header-tool-label">eSIM</span>
-                    </a>
-                    <a href="https://getrentacar.tpk.mx/I3FuOWfB" target="_blank" rel="noopener noreferrer" class="header-tool-item" data-tool="cars">
-                        <div class="header-tool-icon">🚗</div>
-                        <span class="header-tool-label">Car Rentals</span>
-                    </a>
-                    <a href="https://wise.com/invite/ihpc/rodneyowenp" target="_blank" rel="noopener noreferrer" class="header-tool-item" data-tool="currency">
-                        <div class="header-tool-icon">💳</div>
-                        <span class="header-tool-label">Currency</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Loading State -->
-    <div id="loading-state" class="loading">
-        <i class="ri-loader-4-line"></i>
-        <p>Verifying access and loading cruise details...</p>
-    </div>
-
-    <!-- Access Denied -->
-    <div id="access-denied" class="quote-container" style="display: none;">
-        <div class="access-denied">
-            <i class="ri-error-warning-line"></i>
-            <h2>Access Denied</h2>
-            <p>Invalid or missing security token. This page requires proper authorization to access.</p>
-            <a href="/deals.html" class="btn btn-primary">
-                <i class="ri-arrow-left-line"></i>
-                Return to Deals
-            </a>
-        </div>
-    </div>
-
-    <!-- Main Quote Content -->
-    <div id="quote-content" class="quote-container" style="display: none;">
-        <!-- Cruise Summary -->
-        <div class="cruise-summary">
-            <div class="cruise-summary-header">
-                <img id="cruise-logo" src="" alt="" class="cruise-logo">
-                <div class="cruise-info">
-                    <h2 id="ship-name">Loading...</h2>
-                    <p id="cruise-line">Loading...</p>
-                </div>
-                <div id="cruise-type-badge" class="cruise-type-badge">Loading...</div>
+            <div class="loading" id="loading">
+                <i class="ri-loader-4-line"></i>
+                <p>Sending your quote request...</p>
             </div>
 
-            <div class="cruise-details-grid">
-                <div class="detail-item">
-                    <i class="ri-map-pin-line"></i>
-                    <div>
-                        <div class="detail-label">Departure Port</div>
-                        <div class="detail-value" id="departure-port">Loading...</div>
+            <div id="quote-form">
+                <div class="cruise-details">
+                    <h3>Cruise Details</h3>
+                    <div class="cruise-info" id="cruise-info">
+                        <!-- Cruise details will be populated here -->
                     </div>
                 </div>
 
-                <div class="detail-item">
-                    <i class="ri-calendar-line"></i>
-                    <div>
-                        <div class="detail-label">Departure Date</div>
-                        <div class="detail-value" id="departure-date">Loading...</div>
-                    </div>
-                </div>
-
-                <div class="detail-item">
-                    <i class="ri-time-line"></i>
-                    <div>
-                        <div class="detail-label">Duration</div>
-                        <div class="detail-value" id="duration">Loading...</div>
-                    </div>
-                </div>
-
-                <div class="detail-item">
-                    <i class="ri-global-line"></i>
-                    <div>
-                        <div class="detail-label">Region</div>
-                        <div class="detail-value" id="region">Loading...</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Quote Form -->
-        <div class="quote-form" style="position: relative;">
-            <button class="print-button" onclick="window.print()">
-                <i class="ri-printer-line"></i>
-                Print Quote
-            </button>
-
-            <div class="form-header">
-                <h3>Staff Quote Request</h3>
-                <p>Enter pricing information for this cruise. The quote will be sent directly to the client.</p>
-            </div>
-
-            <!-- Session Timer -->
-            <div class="session-timer" id="session-timer">
-                <i class="ri-time-line"></i>
-                <span id="timer-text">This session will expire in 15:00</span>
-            </div>
-
-            <div class="success-message" id="success-message">
-                <i class="ri-check-line"></i>
-                Quote sent successfully! The client has been notified via email.
-            </div>
-
-            <form id="quote-form">
-                <div class="pricing-grid">
-                    <div class="price-input-group">
-                        <label for="interior-price">Interior Cabin</label>
-                        <div class="price-input-wrapper">
-                            <input type="number" id="interior-price" name="interior-price" class="price-input"
-                                placeholder="0.00" step="0.01" min="0">
+                <form id="quoteForm">
+                    <div class="form-section">
+                        <h3>Contact Information</h3>
+                        <div class="form-group">
+                            <label for="clientName">Full Name *</label>
+                            <input type="text" id="clientName" name="clientName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="clientEmail">Email Address *</label>
+                            <input type="email" id="clientEmail" name="clientEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="clientPhone">Phone Number</label>
+                            <input type="tel" id="clientPhone" name="clientPhone">
                         </div>
                     </div>
 
-                    <div class="price-input-group">
-                        <label for="oceanview-price">Oceanview Cabin</label>
-                        <div class="price-input-wrapper">
-                            <input type="number" id="oceanview-price" name="oceanview-price" class="price-input"
-                                placeholder="0.00" step="0.01" min="0">
+                    <div class="form-section">
+                        <h3>Cabin Preferences</h3>
+                        <p style="color: #6b7280; margin-bottom: 1rem;">Please indicate how many cabins you need for each category:</p>
+                        <div class="cabin-grid">
+                            <div class="cabin-input">
+                                <label for="interiorCabins">Interior Cabins</label>
+                                <input type="number" id="interiorCabins" name="interiorCabins" min="0" value="0">
+                            </div>
+                            <div class="cabin-input">
+                                <label for="oceanviewCabins">Oceanview Cabins</label>
+                                <input type="number" id="oceanviewCabins" name="oceanviewCabins" min="0" value="0">
+                            </div>
+                            <div class="cabin-input">
+                                <label for="balconyCabins">Balcony Cabins</label>
+                                <input type="number" id="balconyCabins" name="balconyCabins" min="0" value="0">
+                            </div>
+                            <div class="cabin-input">
+                                <label for="suiteCabins">Suite Cabins</label>
+                                <input type="number" id="suiteCabins" name="suiteCabins" min="0" value="0">
+                            </div>
                         </div>
                     </div>
 
-                    <div class="price-input-group">
-                        <label for="balcony-price">Balcony Cabin</label>
-                        <div class="price-input-wrapper">
-                            <input type="number" id="balcony-price" name="balcony-price" class="price-input"
-                                placeholder="0.00" step="0.01" min="0">
+                    <div class="form-section">
+                        <h3>Additional Information</h3>
+                        <div class="form-group">
+                            <label for="specialRequests">Special Requests or Notes</label>
+                            <textarea id="specialRequests" name="specialRequests" placeholder="Any special requirements, dietary needs, accessibility requests, or upgrade preferences..."></textarea>
                         </div>
                     </div>
 
-                    <div class="price-input-group">
-                        <label for="suite-price">Suite</label>
-                        <div class="price-input-wrapper">
-                            <input type="number" id="suite-price" name="suite-price" class="price-input"
-                                placeholder="0.00" step="0.01" min="0">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="notes-group">
-                    <label for="notes">Notes & Upgrade Suggestions</label>
-                    <textarea id="notes" name="notes" class="notes-textarea"
-                        placeholder="Add any special notes, upgrade suggestions, or additional information for the client..."></textarea>
-                </div>
-
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="window.history.back()">
-                        <i class="ri-arrow-left-line"></i>
-                        Cancel
-                    </button>
-                    <button type="submit" class="btn btn-primary" id="send-quote-btn">
+                    <button type="submit" class="submit-btn" id="submitBtn">
                         <i class="ri-mail-send-line"></i>
-                        Send Quote
+                        Send Quote Request
                     </button>
-                </div>
-            </form>
-        </div>
-
-        <!-- Success Panel -->
-        <div class="success-panel" id="success-panel">
-            <i class="ri-check-circle-line"></i>
-            <h3>Quote Submitted Successfully!</h3>
-            <p>Your quote has been sent to the client and a copy has been sent to the admin team.</p>
-            <a href="/deals.html" class="btn btn-primary">
-                <i class="ri-arrow-left-line"></i>
-                Back to Deals
-            </a>
+                </form>
+            </div>
         </div>
     </div>
 
-    <!-- Session Expired Overlay -->
-    <div class="session-expired-overlay" id="session-expired-overlay">
-        <div class="session-expired-modal">
-            <i class="ri-time-line"></i>
-            <h3>Session Expired</h3>
-            <p>This quote session has expired. Please start again from the cruise details page.</p>
-            <a href="/deals.html" class="btn btn-primary">
-                <i class="ri-arrow-left-line"></i>
-                Return to Deals
-            </a>
-        </div>
-    </div>
-
-    <!-- Auto-save Indicator -->
-    <div class="auto-save-indicator" id="auto-save-indicator">
-        <i class="ri-save-line"></i>
-        Draft saved
-    </div>
-
-    <!-- Footer -->
-    <div id="footer-placeholder"></div>
-
-    <!-- Core Security & Performance Scripts -->
-    <script src="/js/error-handler.js"></script>
-    <script src="/js/performance-optimizer.js"></script>
-    <script src="/js/accessibility-enhancer.js"></script>
-    <script src="/js/input-validator.js"></script>
-    <script src="/js/secure-auth.js"></script>
-    
-    <!-- Advanced Services -->
-    <script src="/js/cache-manager.js"></script>
-    <script src="/js/cruise-query-service.js"></script>
-    <script src="/js/sync-worker.js"></script>
-    
-    <!-- Application Scripts -->
-    <script src="/js/social-media.js"></script>
-    <script src="/js/enhanced-csv-loader.js"></script>
-    <script src="/js/quote.js"></script>
-    
     <script>
-        // Load footer with error handling and input validation
-        ErrorHandler.safeAsync(async () => {
-            const response = await fetch('/partials/footer.html');
-            if (response.ok) {
-                const html = await response.text();
-                // Validate HTML content before inserting
-                const validation = InputValidator.validateText(html, { required: true });
-                if (validation.isValid) {
-                    document.getElementById('footer-placeholder').innerHTML = validation.sanitized;
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const cruiseData = {
+            dealId: urlParams.get('dealId') || '',
+            cruiseLine: urlParams.get('cruiseLine') || '',
+            shipName: urlParams.get('shipName') || '',
+            departureDate: urlParams.get('departureDate') || '',
+            region: urlParams.get('region') || '',
+            nights: urlParams.get('nights') || '',
+            departurePort: urlParams.get('departurePort') || '',
+            arrivalPort: urlParams.get('arrivalPort') || ''
+        };
+
+        // Populate cruise details
+        function populateCruiseDetails() {
+            const cruiseInfoDiv = document.getElementById('cruise-info');
+            
+            cruiseInfoDiv.innerHTML = `
+                <div class="cruise-info-item">
+                    <div class="cruise-info-label">Cruise Line</div>
+                    <div class="cruise-info-value">${cruiseData.cruiseLine || 'N/A'}</div>
+                </div>
+                <div class="cruise-info-item">
+                    <div class="cruise-info-label">Ship Name</div>
+                    <div class="cruise-info-value">${cruiseData.shipName || 'N/A'}</div>
+                </div>
+                <div class="cruise-info-item">
+                    <div class="cruise-info-label">Departure Date</div>
+                    <div class="cruise-info-value">${cruiseData.departureDate || 'N/A'}</div>
+                </div>
+                <div class="cruise-info-item">
+                    <div class="cruise-info-label">Duration</div>
+                    <div class="cruise-info-value">${cruiseData.nights ? cruiseData.nights + ' nights' : 'N/A'}</div>
+                </div>
+                <div class="cruise-info-item">
+                    <div class="cruise-info-label">Region</div>
+                    <div class="cruise-info-value">${cruiseData.region || 'N/A'}</div>
+                </div>
+                <div class="cruise-info-item">
+                    <div class="cruise-info-label">Departure Port</div>
+                    <div class="cruise-info-value">${cruiseData.departurePort || 'N/A'}</div>
+                </div>
+                <div class="cruise-info-item">
+                    <div class="cruise-info-label">Arrival Port</div>
+                    <div class="cruise-info-value">${cruiseData.arrivalPort || 'N/A'}</div>
+                </div>
+            `;
+        }
+
+        // Show message functions
+        function showSuccess(message) {
+            const successDiv = document.getElementById('success-message');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            document.getElementById('error-message').style.display = 'none';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            document.getElementById('success-message').style.display = 'none';
+        }
+
+        function hideMessages() {
+            document.getElementById('success-message').style.display = 'none';
+            document.getElementById('error-message').style.display = 'none';
+        }
+
+        // Handle form submission
+        document.getElementById('quoteForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            const quoteForm = document.getElementById('quote-form');
+            
+            // Get form data
+            const formData = new FormData(this);
+            const clientName = formData.get('clientName');
+            const clientEmail = formData.get('clientEmail');
+            const clientPhone = formData.get('clientPhone');
+            const interiorCabins = formData.get('interiorCabins');
+            const oceanviewCabins = formData.get('oceanviewCabins');
+            const balconyCabins = formData.get('balconyCabins');
+            const suiteCabins = formData.get('suiteCabins');
+            const specialRequests = formData.get('specialRequests');
+
+            // Validate required fields
+            if (!clientName || !clientEmail) {
+                showError('Please fill in all required fields.');
+                return;
+            }
+
+            // Check if at least one cabin is selected
+            const totalCabins = parseInt(interiorCabins || 0) + parseInt(oceanviewCabins || 0) + 
+                              parseInt(balconyCabins || 0) + parseInt(suiteCabins || 0);
+            
+            if (totalCabins === 0) {
+                showError('Please select at least one cabin.');
+                return;
+            }
+
+            try {
+                hideMessages();
+                submitBtn.disabled = true;
+                quoteForm.style.display = 'none';
+                loading.style.display = 'block';
+
+                // Prepare quote request data
+                const quoteRequest = {
+                    // Cruise details
+                    cruiseDetails: cruiseData,
+                    
+                    // Client information
+                    clientName: clientName,
+                    clientEmail: clientEmail,
+                    clientPhone: clientPhone,
+                    
+                    // Cabin requirements
+                    cabinRequirements: {
+                        interior: parseInt(interiorCabins || 0),
+                        oceanview: parseInt(oceanviewCabins || 0),
+                        balcony: parseInt(balconyCabins || 0),
+                        suite: parseInt(suiteCabins || 0)
+                    },
+                    
+                    // Additional information
+                    specialRequests: specialRequests,
+                    
+                    // Metadata
+                    timestamp: new Date().toISOString(),
+                    source: 'direct_quote_form'
+                };
+
+                // Send quote request
+                const response = await fetch('/api/send-quote', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(quoteRequest)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to send quote request');
                 }
+
+                const result = await response.json();
+                
+                loading.style.display = 'none';
+                showSuccess('Quote request sent successfully! You will receive a response within 24-48 hours.');
+                
+                // Reset form after successful submission
+                setTimeout(() => {
+                    this.reset();
+                    document.querySelectorAll('.cabin-input input').forEach(input => input.value = '0');
+                }, 2000);
+
+            } catch (error) {
+                console.error('Quote request error:', error);
+                loading.style.display = 'none';
+                quoteForm.style.display = 'block';
+                showError('Failed to send quote request. Please try again or contact us directly.');
+            } finally {
+                submitBtn.disabled = false;
             }
         });
 
-        // Enhanced secure quote form processing
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Get quote ID and token from URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const quoteId = urlParams.get('id');
-            const token = urlParams.get('token');
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            populateCruiseDetails();
             
-            // Validate token and load quote details
-            if (!quoteId || !token) {
-                document.getElementById('access-denied').style.display = 'block';
-                document.getElementById('loading-state').style.display = 'none';
-                return;
-            }
-            
-            try {
-                // Verify quote request and load details
-                const response = await fetch('/api/verify-quote', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ quoteId, token })
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Invalid or expired quote request');
-                }
-                
-                const quoteData = await response.json();
-                
-                // Hide loading and show quote form
-                document.getElementById('loading-state').style.display = 'none';
-                document.getElementById('quote-content').style.display = 'block';
-                
-                // Populate cruise details
-                populateCruiseDetails(quoteData.cruise);
-                
-            } catch (error) {
-                console.error('Quote verification error:', error);
-                document.getElementById('access-denied').style.display = 'block';
-                document.getElementById('loading-state').style.display = 'none';
-                return;
-            }
-            
-            // Handle quote form submission
-            const quoteForm = document.getElementById('quote-form');
-            if (quoteForm) {
-                quoteForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    
-                    // Get form data
-                    const formData = new FormData(quoteForm);
-                    const data = Object.fromEntries(formData.entries());
-                    
-                    // Validate pricing inputs
-                    const priceFields = ['interiorPrice', 'oceanviewPrice', 'balconyPrice', 'suitePrice'];
-                    let hasValidPrice = false;
-                    
-                    for (const field of priceFields) {
-                        const value = data[field];
-                        if (value && parseFloat(value) > 0) {
-                            hasValidPrice = true;
-                            // Validate price format
-                            const validation = InputValidator.validate(value, 'numeric');
-                            if (!validation.isValid) {
-                                showError(`Invalid price format for ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`);
-                                return;
-                            }
-                        }
-                    }
-                    
-                    if (!hasValidPrice) {
-                        showError('Please enter at least one cabin price');
-                        return;
-                    }
-                    
-                    // Validate notes if provided
-                    if (data.notes) {
-                        const notesValidation = InputValidator.validate(data.notes, 'text', { maxLength: 1000 });
-                        if (!notesValidation.isValid) {
-                            showError('Notes contain invalid content or exceed maximum length');
-                            return;
-                        }
-                    }
-                    
-                    // Disable submit button
-                    const submitBtn = document.getElementById('send-quote-btn');
-                    const originalText = submitBtn.textContent;
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<i class="ri-loader-4-line"></i> Sending Quote...';
-                    
-                    try {
-                        // Send quote to client
-                        const response = await fetch('/api/send-quote', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                quoteId,
-                                token,
-                                interiorPrice: data.interiorPrice || null,
-                                oceanviewPrice: data.oceanviewPrice || null,
-                                balconyPrice: data.balconyPrice || null,
-                                suitePrice: data.suitePrice || null,
-                                notes: data.notes || null,
-                                validUntil: data.validUntil || null
-                            })
-                        });
-                        
-                        if (!response.ok) {
-                            const error = await response.json();
-                            throw new Error(error.error || 'Failed to send quote');
-                        }
-                        
-                        // Show success
-                        document.getElementById('success-panel').style.display = 'block';
-                        document.getElementById('quote-content').style.display = 'none';
-                        
-                    } catch (error) {
-                        console.error('Quote submission error:', error);
-                        showError(error.message || 'Failed to send quote. Please try again.');
-                    } finally {
-                        // Re-enable submit button
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = originalText;
-                    }
-                });
-            }
-            
-            function populateCruiseDetails(cruise) {
-                // Update cruise information in the form
-                const cruiseInfo = document.getElementById('cruise-info');
-                if (cruiseInfo) {
-                    cruiseInfo.innerHTML = `
-                        <h3>${cruise.cruise_line} - ${cruise.ship_name}</h3>
-                        <p><strong>Departure:</strong> ${new Date(cruise.departure_date).toLocaleDateString()}</p>
-                        <p><strong>Duration:</strong> ${cruise.nights} nights</p>
-                        <p><strong>Region:</strong> ${cruise.region}</p>
-                        <p><strong>Route:</strong> ${cruise.departure_port} → ${cruise.arrival_port}</p>
-                    `;
-                }
-            }
-            
-            function showError(message) {
-                const errorDiv = document.getElementById('error-message') || createErrorDiv();
-                errorDiv.textContent = message;
-                errorDiv.style.display = 'block';
-                setTimeout(() => {
-                    errorDiv.style.display = 'none';
-                }, 5000);
-            }
-            
-            function createErrorDiv() {
-                const errorDiv = document.createElement('div');
-                errorDiv.id = 'error-message';
-                errorDiv.style.cssText = `
-                    background: #fee; color: #c53030; padding: 1rem; 
-                    border-radius: 8px; margin: 1rem 0; border: 1px solid #feb2b2;
-                    display: none;
-                `;
-                document.getElementById('quote-content').insertBefore(errorDiv, document.getElementById('quote-form'));
-                return errorDiv;
-            }
-            
-            // Auto-save functionality with validation
-            const inputs = quoteForm?.querySelectorAll('input, textarea');
-            if (inputs) {
-                inputs.forEach(input => {
-                    input.addEventListener('input', ErrorHandler.debounce(() => {
-                        // Validate and save draft
-                        const validation = InputValidator.validate(input.value, input.type === 'number' ? 'numeric' : 'text');
-                        if (validation.isValid) {
-                            // Save to localStorage
-                            localStorage.setItem(`quote_draft_${input.name}`, validation.sanitized);
-                            
-                            // Show auto-save indicator
-                            const indicator = document.getElementById('auto-save-indicator');
-                            if (indicator) {
-                                indicator.style.display = 'block';
-                                setTimeout(() => {
-                                    indicator.style.display = 'none';
-                                }, 2000);
-                            }
-                        }
-                    }, 1000));
-                });
+            // If no cruise data, show a message
+            if (!cruiseData.dealId) {
+                showError('No cruise data found. Please return to the deals page and select a cruise.');
             }
         });
     </script>
 </body>
-
 </html>

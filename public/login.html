@@ -418,6 +418,33 @@
       }
       
       console.log('LOGIN: System ready');
+      
+      // Check if user is already logged in and redirect automatically
+      setTimeout(async () => {
+        try {
+          console.log('LOGIN: Checking if user is already logged in...');
+          
+          if (window.supabaseClient) {
+            await window.supabaseClient.readyPromise;
+            
+            if (window.supabaseClient.isLoggedIn()) {
+              const currentUser = await window.supabaseClient.getCurrentUser();
+              console.log('LOGIN: User already logged in:', currentUser?.email);
+              console.log('LOGIN: Auto-redirecting to dashboard...');
+              
+              showSuccess('Already logged in! Redirecting...');
+              
+              setTimeout(() => {
+                window.location.href = '/dashboard-choice.html';
+              }, 500);
+            } else {
+              console.log('LOGIN: User not logged in, staying on login page');
+            }
+          }
+        } catch (error) {
+          console.error('LOGIN: Error checking login status:', error);
+        }
+      }, 1000); // Wait 1 second for everything to initialize
     });
 
     // Auto-update year

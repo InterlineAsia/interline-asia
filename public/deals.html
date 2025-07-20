@@ -9,6 +9,11 @@
     rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
 
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+
   <!-- Site-wide styles for header/footer consistency -->
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap');
@@ -1139,24 +1144,33 @@
     // Request quote functionality
     async function requestQuote(dealId, cruiseLine, shipName) {
       try {
-        // Check if user is logged in using global Supabase client
-        if (!window.supabaseClient || !window.supabaseClient.isLoggedIn()) {
+        // Wait for Supabase client to be ready
+        if (!window.supabaseClient) {
+          alert('Please wait for the page to fully load and try again.');
+          return;
+        }
+
+        // Wait for the client to be ready
+        await window.supabaseClient.readyPromise;
+
+        // Check if user is logged in
+        if (!window.supabaseClient.isLoggedIn()) {
           alert('Please log in to request a quote.');
           window.location.href = '/login.html';
           return;
         }
 
-        const user = window.supabaseClient.currentUser;
+        const user = await window.supabaseClient.getCurrentUser();
         if (!user) {
           alert('Please log in to request a quote.');
           window.location.href = '/login.html';
           return;
         }
 
-        // Get user's full name
-        const fullName = `${user.user_metadata?.firstName || ''} ${user.user_metadata?.middleName || ''} ${user.user_metadata?.lastName || ''}`.trim();
+        // Get user's full name from the user object
+        const fullName = user.full_name || user.user_metadata?.full_name || '';
         
-        if (!fullName || fullName === '') {
+        if (!fullName || fullName.trim() === '') {
           alert('Please complete your profile with your full name before requesting a quote.');
           window.location.href = '/dashboard.html';
           return;
@@ -1173,12 +1187,12 @@
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${user.access_token || 'authenticated'}`
+            'Authorization': `Bearer ${window.supabaseClient.currentSession?.access_token || 'authenticated'}`
           },
           body: JSON.stringify({
             dealId: dealId,
             cruiseId: dealId,
-            clientName: fullName,
+            clientName: fullName.trim(),
             userEmail: user.email,
             userId: user.id,
             timestamp: new Date().toISOString()
@@ -1205,7 +1219,7 @@
         alert(error.message || 'Failed to request quote. Please try again.');
       } finally {
         // Restore button state
-        if (button) {
+        if (typeof button !== 'undefined' && button) {
           button.disabled = false;
           button.innerHTML = originalText;
         }

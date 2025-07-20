@@ -39,6 +39,11 @@
   <link rel="stylesheet" href="/css/luxury-cruise-design.css">
   <link rel="stylesheet" href="auth.css">
   
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+  
   <!-- Favicon and App Icons -->
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico">
@@ -353,16 +358,9 @@
             sessionId: data.session.access_token.substring(0, 20) + '...'
           }));
           
-          // Redirect after short delay
-          setTimeout(() => {
-            if (isAdmin) {
-              console.log('LOGIN: Redirecting admin to dashboard choice');
-              window.location.href = '/dashboard-choice.html';
-            } else {
-              console.log('LOGIN: Redirecting user to dashboard');
-              window.location.href = '/dashboard.html';
-            }
-          }, 1000);
+          // Redirect immediately to dashboard choice for all users
+          console.log('LOGIN: Redirecting to dashboard choice');
+          window.location.href = '/dashboard-choice.html';
           
         } catch (error) {
           console.error('LOGIN: Error:', error);

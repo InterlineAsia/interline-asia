@@ -55,42 +55,32 @@
       try {
         console.log('DASHBOARD_CHOICE: Initializing...');
         
-        // Initialize Supabase client if not already done
-        if (!window.supabase) {
-          console.error('DASHBOARD_CHOICE: Supabase not loaded');
+        // Wait for the global Supabase client to be ready
+        if (!window.supabaseClient) {
+          console.error('DASHBOARD_CHOICE: Global Supabase client not available');
           window.location.href = '/login.html';
           return;
         }
 
-        const supabaseClient = window.supabase.createClient(
-          window.SUPABASE_URL,
-          window.SUPABASE_ANON_KEY
-        );
+        // Wait for the client to be fully initialized
+        await window.supabaseClient.readyPromise;
         
-        // Check current session using proper Supabase auth
-        const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
-        
-        if (sessionError) {
-          console.error('DASHBOARD_CHOICE: Session error:', sessionError);
+        // Check if user is logged in using the global client
+        if (!window.supabaseClient.isLoggedIn()) {
+          console.log('DASHBOARD_CHOICE: User not logged in, redirecting to login');
           window.location.href = '/login.html';
           return;
         }
 
-        if (!session || !session.user) {
-          console.log('DASHBOARD_CHOICE: No valid session found, redirecting to login');
-          window.location.href = '/login.html';
-          return;
-        }
-
-        const user = session.user;
+        const user = window.supabaseClient.currentUser;
         console.log('DASHBOARD_CHOICE: Current user:', user.email);
 
         // Determine user access levels
         const adminEmails = ['rodney@telenational.com.au', 'admin@telenational.com.au'];
         const hasAdminAccess = adminEmails.includes(user.email?.toLowerCase()) || 
-                              user.is_admin === true || 
-                              user.role === 'admin' || 
-                              user.role === 'super_admin';
+                              user.user_metadata?.is_admin === true || 
+                              user.app_metadata?.role === 'admin' || 
+                              user.app_metadata?.role === 'super_admin';
         
         const hasMemberAccess = true; // Everyone has member access
         

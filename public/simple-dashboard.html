@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Dashboard Test - Interline Asia</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 2rem; }
+        .status { padding: 1rem; margin: 1rem 0; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>Simple Dashboard Test</h1>
+    <div id="status">Loading...</div>
+    <div id="user-info"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    
+    <script>
+        async function testAuth() {
+            const statusDiv = document.getElementById('status');
+            const userDiv = document.getElementById('user-info');
+            
+            try {
+                // Wait for config to load
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                if (!window.supabase || !window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
+                    statusDiv.innerHTML = '<div class="error">❌ Supabase configuration missing</div>';
+                    return;
+                }
+                
+                statusDiv.innerHTML = '<div class="info">✅ Supabase configuration loaded</div>';
+                
+                const supabase = window.supabase.createClient(
+                    window.SUPABASE_URL,
+                    window.SUPABASE_ANON_KEY
+                );
+                
+                statusDiv.innerHTML += '<div class="info">✅ Supabase client created</div>';
+                
+                const { data: { session }, error } = await supabase.auth.getSession();
+                
+                if (error) {
+                    statusDiv.innerHTML += '<div class="error">❌ Session error: ' + error.message + '</div>';
+                    return;
+                }
+                
+                if (!session) {
+                    statusDiv.innerHTML += '<div class="error">❌ No session found - please login</div>';
+                    statusDiv.innerHTML += '<div><a href="/login.html">Go to Login</a></div>';
+                    return;
+                }
+                
+                statusDiv.innerHTML += '<div class="success">✅ Session found!</div>';
+                statusDiv.innerHTML += '<div class="success">✅ User authenticated: ' + session.user.email + '</div>';
+                
+                userDiv.innerHTML = `
+                    <h2>User Information</h2>
+                    <p><strong>Email:</strong> ${session.user.email}</p>
+                    <p><strong>User ID:</strong> ${session.user.id}</p>
+                    <p><strong>Created:</strong> ${new Date(session.user.created_at).toLocaleString()}</p>
+                    <p><strong>Session Expires:</strong> ${new Date(session.expires_at * 1000).toLocaleString()}</p>
+                    <p><a href="/dashboard.html">Go to Full Dashboard</a></p>
+                `;
+                
+            } catch (error) {
+                statusDiv.innerHTML += '<div class="error">❌ Error: ' + error.message + '</div>';
+                console.error('Auth test error:', error);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', testAuth);
+    </script>
+</body>
+</html>

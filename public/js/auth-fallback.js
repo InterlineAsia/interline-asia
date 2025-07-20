@@ -132,6 +132,7 @@ class AuthFallback {
       });
 
       if (response.success) {
+        console.log('✅ QUOTE: Request successfully sent to reservations team');
         alert('Quote request sent successfully! You will receive an email with pricing details within 24-48 hours.');
         
         if (confirm('Would you like to view your quote requests in your dashboard?')) {

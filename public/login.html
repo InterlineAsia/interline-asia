@@ -321,8 +321,16 @@
           
           console.log('LOGIN: Using global Supabase client for authentication');
           
-          // Use the global client's signIn method
-          const data = await window.supabaseClient.signIn(email, password);
+          // Use the global client's signIn method with better error handling
+          let data;
+          try {
+            console.log('LOGIN: Calling signIn method...');
+            data = await window.supabaseClient.signIn(email, password);
+            console.log('LOGIN: SignIn method completed successfully');
+          } catch (signInError) {
+            console.error('LOGIN: SignIn method threw error:', signInError);
+            throw signInError;
+          }
           
           console.log('LOGIN: SignIn response received:', data);
           console.log('LOGIN: User data:', data?.user);
@@ -431,19 +439,26 @@
       
       console.log('LOGIN: System ready');
       
-      // Check if user is already logged in and redirect immediately
-      setTimeout(async () => {
-        try {
-          if (window.supabaseClient && window.supabaseClient.isLoggedIn()) {
-            console.log('LOGIN: User already logged in, redirecting immediately');
-            window.location.href = '/dashboard-choice.html';
+      // Add auth state change listener for automatic redirect
+      if (window.supabaseClient && window.supabaseClient.supabase) {
+        console.log('LOGIN: Setting up auth state listener...');
+        window.supabaseClient.supabase.auth.onAuthStateChange((event, session) => {
+          console.log('LOGIN: Auth state change detected:', event, session?.user?.email);
+          
+          if (event === 'SIGNED_IN' && session && session.user) {
+            console.log('LOGIN: User signed in via auth state change, redirecting...');
+            showSuccess('Login successful! Redirecting...');
+            
+            // Immediate redirect on auth state change
+            setTimeout(() => {
+              console.log('LOGIN: Executing auth state redirect');
+              window.location.href = '/dashboard-choice.html';
+            }, 500);
           }
-        } catch (error) {
-          console.log('LOGIN: Session check failed:', error);
-        }
-      }, 1000);
+        });
+      }
       
-      // Check if user is already logged in and redirect automatically
+      // Check if user is already logged in
       setTimeout(async () => {
         try {
           console.log('LOGIN: Checking if user is already logged in...');
@@ -454,7 +469,6 @@
             if (window.supabaseClient.isLoggedIn()) {
               const currentUser = await window.supabaseClient.getCurrentUser();
               console.log('LOGIN: User already logged in:', currentUser?.email);
-              console.log('LOGIN: Auto-redirecting to dashboard...');
               
               showSuccess('Already logged in! Redirecting...');
               

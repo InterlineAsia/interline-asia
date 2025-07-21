@@ -330,34 +330,38 @@
             console.log('LOGIN: Calling signIn method...');
             data = await window.supabaseClient.signIn(email, password);
             console.log('LOGIN: SignIn method completed successfully');
+            console.log('LOGIN: SignIn response received:', data);
           } catch (signInError) {
             console.error('LOGIN: SignIn method threw error:', signInError);
             throw signInError;
           }
           
-          console.log('LOGIN: SignIn response received:', data);
-          console.log('LOGIN: User data:', data?.user);
-          console.log('LOGIN: Session data:', data?.session);
+          // Check if login was successful by checking the current session
+          console.log('LOGIN: Checking if user is now logged in...');
+          const isLoggedIn = window.supabaseClient.isLoggedIn();
+          console.log('LOGIN: Is logged in:', isLoggedIn);
           
-          // The signIn method returns { user, session }, so check for user
-          if (!data || !data.user) {
-            console.error('LOGIN: No user data in response:', data);
-            throw new Error('Login failed - no user data returned');
+          if (isLoggedIn) {
+            const currentUser = await window.supabaseClient.getCurrentUser();
+            console.log('LOGIN: Success! Current user:', currentUser?.email);
+            
+            // Show success message immediately
+            showSuccess('Login successful! Redirecting...');
+            console.log('LOGIN: SUCCESS MESSAGE SHOWN');
+            
+            // Reset loading state
+            setLoading(false);
+            
+            // Redirect to dashboard after successful login
+            console.log('LOGIN: REDIRECTING TO DASHBOARD');
+            setTimeout(() => {
+              console.log('LOGIN: Executing redirect to dashboard');
+              window.location.href = '/dashboard.html';
+            }, 1000);
+          } else {
+            console.error('LOGIN: Login appeared to succeed but user is not logged in');
+            throw new Error('Login failed - authentication not established');
           }
-          
-          console.log('LOGIN: Success! User:', data.user.email);
-          console.log('LOGIN: Global client session established');
-          
-          // Show success message immediately
-          showSuccess('Login successful! Redirecting...');
-          console.log('LOGIN: SUCCESS MESSAGE SHOWN');
-          
-          // Redirect to dashboard after successful login
-          console.log('LOGIN: REDIRECTING TO DASHBOARD');
-          setTimeout(() => {
-            console.log('LOGIN: Executing redirect to dashboard');
-            window.location.href = '/dashboard.html';
-          }, 1000);
           
         } catch (error) {
           console.error('LOGIN: Error:', error);

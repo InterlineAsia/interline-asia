@@ -770,6 +770,18 @@
     // Load deal by ID from CSV data
     async function loadDealById(dealId) {
       try {
+        console.log('BOOKING: Loading deal by ID:', dealId);
+        
+        // First try to load from JSON chunk files
+        const deal = await loadDealFromChunks(dealId);
+        if (deal) {
+          selectedDeal = deal;
+          console.log('BOOKING: Found deal in JSON chunks:', selectedDeal);
+          populateDealDetails(selectedDeal);
+          populateCabinOptions(selectedDeal);
+          return;
+        }
+        
         // Initialize the CSV loader if not available
         if (!window.csvLoader) {
           console.log('BOOKING: Initializing CSV loader...');
@@ -778,10 +790,10 @@
         }
         
         // Use the enhanced CSV loader
-        const deal = await window.csvLoader.findDealById(dealId);
-        if (deal) {
-          selectedDeal = deal;
-          console.log('BOOKING: Loaded deal by ID:', selectedDeal);
+        const csvDeal = await window.csvLoader.findDealById(dealId);
+        if (csvDeal) {
+          selectedDeal = csvDeal;
+          console.log('BOOKING: Loaded deal by ID from CSV:', selectedDeal);
           populateDealDetails(selectedDeal);
           populateCabinOptions(selectedDeal);
           return;
@@ -793,6 +805,73 @@
       } catch (error) {
         console.error('BOOKING: Error loading deal by ID:', error);
         showError('Unable to load deal details. Please try again.');
+      }
+    }
+
+    // Load deal from JSON chunk files
+    async function loadDealFromChunks(dealId) {
+      try {
+        console.log('BOOKING: Searching for deal in JSON chunks:', dealId);
+        
+        // Extract the SEQ number from the deal ID
+        const seq = dealId.split('_').pop();
+        console.log('BOOKING: Looking for SEQ:', seq);
+        
+        // Load the deals index to know which chunks to search
+        const indexResponse = await fetch('/data/deals-index.json');
+        if (!indexResponse.ok) {
+          console.warn('BOOKING: Could not load deals index');
+          return null;
+        }
+        
+        const index = await indexResponse.json();
+        
+        // Search through all chunks
+        for (let i = 1; i <= index.totalChunks; i++) {
+          try {
+            const chunkResponse = await fetch(`/data/deals-chunk-${i}.json`);
+            if (chunkResponse.ok) {
+              const chunk = await chunkResponse.json();
+              
+              // Look for the deal by SEQ
+              const deal = chunk.find(d => d.seq === seq);
+              if (deal) {
+                console.log('BOOKING: Found deal in chunk', i, ':', deal);
+                
+                // Convert to the format expected by the booking page
+                return {
+                  id: dealId,
+                  seq: deal.seq,
+                  cruiseType: 'Ocean Cruise',
+                  cruiseLine: deal.cruiseLine,
+                  shipName: deal.shipName,
+                  region: deal.region,
+                  nights: parseInt(deal.nights || 0),
+                  departureDate: parseDate(deal.departureDate),
+                  departurePort: deal.departurePort || deal.from || '',
+                  arrivalPort: deal.arrivalPort || deal.to || '',
+                  itinerary: deal.itinerary || '',
+                  insidePrice: parsePrice(deal.insidePrice || deal.inside),
+                  oceanviewPrice: parsePrice(deal.oceanviewPrice || deal.oceanview),
+                  balconyPrice: parsePrice(deal.balconyPrice || deal.balcony),
+                  suitePrice: parsePrice(deal.suitePrice || deal.suite),
+                  saleEndDate: parseDate(deal.saleEndDate || deal.sale),
+                  shipMap: deal.shipmap || '',
+                  cruiseOfferUrl: deal.cruiseOfferURL || ''
+                };
+              }
+            }
+          } catch (chunkError) {
+            console.warn(`BOOKING: Error loading chunk ${i}:`, chunkError);
+          }
+        }
+        
+        console.log('BOOKING: Deal not found in any chunks');
+        return null;
+        
+      } catch (error) {
+        console.error('BOOKING: Error searching chunks:', error);
+        return null;
       }
     }
 
@@ -1402,11 +1481,21 @@
       try {
         if (!dateString) return 'TBA';
         
-        // If the string contains a time part (like "00:00:00"), strip it out
-        if (typeof dateString === 'string' && dateString.includes('00:00:00')) {
-          // Extract just the date part before the time
-          const datePart = dateString.split(' ')[0] + ' ' + dateString.split(' ')[1] + ' ' + dateString.split(' ')[2];
-          return datePart;
+        // If the string contains time information, strip it out and format properly
+        if (typeof dateString === 'string') {
+          // Handle full date strings like "Fri Oct 17 2025 00:00:00 GMT+0700 (Indochina Time)"
+          if (dateString.includes('GMT') || dateString.includes('00:00:00') || dateString.includes(':')) {
+            // Parse the date and format it cleanly
+            const parsedDate = new Date(dateString);
+            if (!isNaN(parsedDate.getTime())) {
+              return parsedDate.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                timeZone: 'UTC'
+              });
+            }
+          }
         }
         
         if (dateString instanceof Date) {

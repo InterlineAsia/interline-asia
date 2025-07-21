@@ -248,22 +248,20 @@
       
       let isLoading = false;
       
-      // Initialize Supabase
+      // Use the shared singleton instead of creating a new instance
       let supabase = null;
       
-      function initSupabase() {
-        if (!window.supabase || !window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
-          console.error('LOGIN: Supabase not available');
+      async function initSupabase() {
+        try {
+          // Wait for the shared singleton to initialize
+          await window.supabaseClient.readyPromise;
+          supabase = window.supabaseClient.supabase;
+          console.log('LOGIN: Using shared Supabase singleton');
+          return true;
+        } catch (error) {
+          console.error('LOGIN: Failed to initialize shared Supabase client:', error);
           return false;
         }
-        
-        supabase = window.supabase.createClient(
-          window.SUPABASE_URL,
-          window.SUPABASE_ANON_KEY
-        );
-        
-        console.log('LOGIN: Supabase initialized');
-        return true;
       }
       
       function showError(message) {

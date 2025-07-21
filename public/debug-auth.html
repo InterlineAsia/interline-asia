@@ -30,7 +30,9 @@
             
             if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
                 try {
-                    const supabaseClient = window.supabase.createClient(
+                    // Use the shared singleton instead of creating a new instance
+                    await window.supabaseClient.readyPromise;
+                    const supabaseClient = window.supabaseClient.supabase;
                         window.SUPABASE_URL,
                         window.SUPABASE_ANON_KEY
                     );

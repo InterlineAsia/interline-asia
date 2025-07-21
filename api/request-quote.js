@@ -63,8 +63,8 @@ export default async function handler(req, res) {
     const shipName = cruiseData?.ship_name || 'Not specified';
     const duration = cruiseData?.nights ? `${cruiseData.nights} nights` : 'Duration TBD';
 
-    // Generate secure quote response link
-    const quoteResponseUrl = `https://interlineasia.com/quote-response?id=${encodeURIComponent(quoteId)}`;
+    // Generate secure quote response link (TODO: Update when quote-response page is implemented)
+    const quoteResponseUrl = `https://interlineasia.com/quote-confirmation?quote=${encodeURIComponent(quoteId)}`;
 
     // Prepare email content with client information
     const emailSubject = `New Quote Request - ${quoteId}`;

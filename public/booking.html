@@ -1402,6 +1402,13 @@
       try {
         if (!dateString) return 'TBA';
         
+        // If the string contains a time part (like "00:00:00"), strip it out
+        if (typeof dateString === 'string' && dateString.includes('00:00:00')) {
+          // Extract just the date part before the time
+          const datePart = dateString.split(' ')[0] + ' ' + dateString.split(' ')[1] + ' ' + dateString.split(' ')[2];
+          return datePart;
+        }
+        
         if (dateString instanceof Date) {
           // Create a new date at noon to avoid timezone issues
           const dateOnly = new Date(dateString.getFullYear(), dateString.getMonth(), dateString.getDate(), 12, 0, 0);

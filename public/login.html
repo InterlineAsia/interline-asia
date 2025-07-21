@@ -352,14 +352,12 @@
           showSuccess('Login successful! Redirecting...');
           console.log('LOGIN: SUCCESS MESSAGE SHOWN');
           
-          // Simple, direct redirect - all users go to dashboard choice
-          console.log('LOGIN: REDIRECTING TO DASHBOARD CHOICE');
-          
-          // Force all users to dashboard-choice.html to eliminate redirect issues
+          // Redirect to dashboard after successful login
+          console.log('LOGIN: REDIRECTING TO DASHBOARD');
           setTimeout(() => {
-            console.log('LOGIN: Executing redirect to dashboard-choice');
-            window.location.href = '/dashboard-choice.html';
-          }, 100);
+            console.log('LOGIN: Executing redirect to dashboard');
+            window.location.href = '/dashboard.html';
+          }, 1000);
           
         } catch (error) {
           console.error('LOGIN: Error:', error);

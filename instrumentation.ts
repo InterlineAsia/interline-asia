@@ -11,6 +11,9 @@ export async function register() {
       debug: false,
       enabled: !!process.env.SENTRY_DSN,
     });
+  } else {
+    // For client-side, we use the instrumentation-client.ts file
+    await import('./instrumentation-client');
   }
 }
 

@@ -40,6 +40,8 @@
   <link rel="stylesheet" href="auth.css">
   <!-- UI Polish Styles -->
   <link rel="stylesheet" href="/css/ui-polish.css">
+  <!-- UI Enhancements -->
+  <link rel="stylesheet" href="/css/ui-enhancements.css">
   
   <!-- Favicon and App Icons -->
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -355,22 +357,31 @@
           // Simple, direct redirect - no complex logic
           console.log('LOGIN: REDIRECTING TO DASHBOARD');
           
-          // Force redirect immediately with multiple fallbacks
+          // Check if user is admin and redirect accordingly
           try {
-            console.log('LOGIN: Attempting immediate redirect');
-            window.location.href = '/dashboard-choice.html';
+            console.log('LOGIN: Checking user role for redirect...');
+            
+            // Get user profile to check admin status
+            const userEmail = data.user.email?.toLowerCase();
+            const adminEmails = ['rodney@telenational.com.au', 'admin@telenational.com.au', 'admin@interlineasia.com'];
+            const isAdmin = adminEmails.includes(userEmail) || 
+                           data.user.user_metadata?.is_admin === true || 
+                           data.user.app_metadata?.role === 'admin';
+            
+            console.log('LOGIN: User email:', userEmail);
+            console.log('LOGIN: Is admin:', isAdmin);
+            
+            if (isAdmin) {
+              console.log('LOGIN: Admin user detected, redirecting to dashboard choice');
+              window.location.href = '/dashboard-choice.html';
+            } else {
+              console.log('LOGIN: Regular user, redirecting to member dashboard');
+              window.location.href = '/member-dashboard.html';
+            }
           } catch (redirectError) {
-            console.error('LOGIN: Immediate redirect failed, trying setTimeout:', redirectError);
-            setTimeout(() => {
-              console.log('LOGIN: Executing delayed redirect now');
-              try {
-                window.location.href = '/dashboard-choice.html';
-              } catch (delayedError) {
-                console.error('LOGIN: Delayed redirect also failed:', delayedError);
-                // Last resort - use window.location.replace
-                window.location.replace('/dashboard-choice.html');
-              }
-            }, 100);
+            console.error('LOGIN: Redirect logic failed, using fallback:', redirectError);
+            // Fallback to dashboard choice for all users
+            window.location.href = '/dashboard-choice.html';
           }
           
         } catch (error) {
@@ -510,5 +521,8 @@
       }
     });
   </script>
+  
+  <!-- UI Enhancements JavaScript -->
+  <script src="/js/ui-enhancements.js"></script>
 </body>
 </html>

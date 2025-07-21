@@ -96,7 +96,11 @@
         const roleText = hasAdminAccess ? ' (Admin)' : ' (Member)';
         
         if (userInfo) {
-          userInfo.textContent = `Hello ${displayName}${roleText}! You have access to both dashboards. Choose one to continue:`;
+          if (hasAdminAccess) {
+            userInfo.textContent = `Hello ${displayName}! As an admin, you can choose between:`;
+          } else {
+            userInfo.textContent = `Hello ${displayName}! Choose your preferred dashboard:`;
+          }
         }
 
         // Create dashboard buttons
@@ -111,13 +115,13 @@
         // Create Member Dashboard Button (always available)
         if (hasMemberAccess) {
           const memberBtn = createDashboardButton({
-            icon: 'ri-user-line',
-            title: 'Member Dashboard',
-            description: 'Access cruise deals, bookings, and your account',
-            gradient: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+            icon: 'ri-ship-line',
+            title: 'Use Website',
+            description: 'Browse cruise deals and manage your bookings',
+            gradient: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
             onClick: () => {
               console.log('DASHBOARD_CHOICE: Navigating to member dashboard');
-              window.location.href = '/dashboard.html';
+              window.location.href = '/member-dashboard.html';
             }
           });
           buttonsContainer.appendChild(memberBtn);
@@ -127,9 +131,9 @@
         if (hasAdminAccess) {
           console.log('DASHBOARD_CHOICE: Adding admin button');
           const adminBtn = createDashboardButton({
-            icon: 'ri-admin-line',
-            title: 'Admin Dashboard',
-            description: 'Manage users, bookings, and system settings',
+            icon: 'ri-settings-3-line',
+            title: 'Manage Website',
+            description: 'Admin panel - manage users, approvals, and system logs',
             gradient: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
             onClick: () => {
               console.log('DASHBOARD_CHOICE: Navigating to admin dashboard');

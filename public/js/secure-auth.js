@@ -11,7 +11,9 @@ class SecureAuthService {
         try {
             // Initialize Supabase client securely
             if (window.supabase && window.supabase.createClient) {
-                this.supabase = window.supabase.createClient(
+                // Use the shared singleton instead of creating a new instance
+                await window.supabaseClient.readyPromise;
+                this.supabase = window.supabaseClient.supabase;
                     window.SUPABASE_URL,
                     window.SUPABASE_ANON_KEY,
                     {

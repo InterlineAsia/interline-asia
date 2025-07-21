@@ -176,7 +176,9 @@
         }
         
         const { createClient } = supabase;
-        supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+        // Use the shared singleton instead of creating a new instance
+        await window.supabaseClient.readyPromise;
+        supabaseClient = window.supabaseClient.supabase;
         
         const { data: { session } } = await supabaseClient.auth.getSession();
         

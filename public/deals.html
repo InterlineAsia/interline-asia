@@ -1582,6 +1582,13 @@
     function formatDate(date) {
       if (!date) return 'TBA';
       
+      // Handle string dates with time part
+      if (typeof date === 'string' && date.includes('00:00:00')) {
+        // Extract just the date part before the time
+        const datePart = date.split(' ')[0] + ' ' + date.split(' ')[1] + ' ' + date.split(' ')[2];
+        return datePart;
+      }
+      
       // Handle Date objects - create date-only version to avoid time display
       if (date instanceof Date) {
         const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0);

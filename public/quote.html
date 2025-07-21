@@ -556,7 +556,7 @@
                 };
 
                 // Send quote request
-                const response = await fetch('/api/send-quote', {
+                const response = await fetch('/api/quotes?action=send', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

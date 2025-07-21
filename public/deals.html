@@ -1246,7 +1246,7 @@
         button.innerHTML = '<i class="ri-loader-4-line"></i> Requesting...';
 
         // Send quote request
-        const response = await fetch('/api/request-quote', {
+        const response = await fetch('/api/quotes?action=request', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

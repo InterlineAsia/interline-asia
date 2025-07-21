@@ -273,7 +273,7 @@
           throw new Error('No session found');
         }
         
-        const response = await fetch('/api/admin-verifications', {
+        const response = await fetch('/api/admin?action=verifications', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${session.access_token}`,
@@ -459,7 +459,7 @@
         const reason = document.getElementById('reasonInput').value.trim();
         
         const session = window.supabaseClient.currentSession;
-        const response = await fetch('/api/admin-verifications', {
+        const response = await fetch('/api/admin?action=verifications', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${session.access_token}`,

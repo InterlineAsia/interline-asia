@@ -299,7 +299,7 @@
         });
         
         // Send CSV content as JSON
-        const response = await fetch('/api/process-csv-text', {
+        const response = await fetch('/api/admin?action=csv', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

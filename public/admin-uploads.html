@@ -117,7 +117,7 @@
         document.getElementById('error').classList.add('hidden');
         document.getElementById('uploads-container').classList.add('hidden');
 
-        const response = await fetch('/api/admin-tools?tool=get-uploads');
+        const response = await fetch('/api/admin?action=tools&tool=get-uploads');
         const data = await response.json();
 
         if (!data.success) {
@@ -268,7 +268,7 @@
 
         const adminNotes = document.getElementById('admin-notes').value.trim();
 
-        const response = await fetch('/api/admin-tools?tool=update-upload', {
+        const response = await fetch('/api/admin?action=tools&tool=update-upload', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

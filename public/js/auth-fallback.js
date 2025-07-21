@@ -157,7 +157,7 @@ class AuthFallback {
   // Send quote request with retries
   async sendQuoteRequestWithRetries(requestData, retries = 0) {
     try {
-      const response = await fetch('/api/request-quote', {
+      const response = await fetch('/api/quotes?action=request', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

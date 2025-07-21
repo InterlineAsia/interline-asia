@@ -6,27 +6,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Interline Asia - Exclusive Cruise Experiences for Travel Professionals</title>
   <meta name="description"
-    content="The world's most exclusive cruise booking platform for verified travel industry professionals. Unlock extraordinary experiences at unbeatable interline rates.">
+    content="The world's most exclusive cruise booking platform for verified travel industry professionals. Access luxury cruises from Royal Caribbean, Norwegian, Celebrity, Princess and more at unbeatable interline rates. Join 5,000+ travel professionals saving up to 70% on premium cruise experiences.">
   <meta name="keywords"
-    content="cruise deals, interline rates, travel professionals, luxury cruises, cruise booking, travel industry, exclusive cruises, cruise discounts">
+    content="cruise deals, interline rates, travel professionals, luxury cruises, cruise booking, travel industry, exclusive cruises, cruise discounts, Royal Caribbean deals, Norwegian cruise deals, Celebrity cruise offers, Princess cruise specials">
   <meta name="author" content="Interline Asia">
   <meta name="robots" content="index, follow">
+  <meta name="geo.region" content="AU">
+  <meta name="geo.placename" content="Australia">
 
   <!-- Open Graph Meta Tags -->
-  <meta property="og:title" content="Interline Asia - Exclusive Cruise Experiences for Travel Professionals">
+  <meta property="og:title" content="Interline Asia - Exclusive Cruise Experiences for Travel Professionals | Save up to 70%">
   <meta property="og:description"
-    content="The world's most exclusive cruise booking platform for verified travel industry professionals. Unlock extraordinary experiences at unbeatable interline rates.">
+    content="Join 5,000+ verified travel professionals accessing luxury cruise deals from Royal Caribbean, Norwegian, Celebrity, Princess and 20+ premium cruise lines. Exclusive interline rates with savings up to 70% off public prices.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.interlineasia.com">
   <meta property="og:image" content="https://www.interlineasia.com/cruise-ship.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta property="og:site_name" content="Interline Asia">
+  <meta property="og:locale" content="en_AU">
 
   <!-- Twitter Card Meta Tags -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Interline Asia - Exclusive Cruise Experiences">
+  <meta name="twitter:title" content="Interline Asia - Exclusive Cruise Deals for Travel Professionals">
   <meta name="twitter:description"
-    content="Exclusive cruise booking platform for travel professionals with unbeatable interline rates.">
+    content="Access luxury cruise deals from 20+ premium cruise lines. Verified travel professionals save up to 70% with exclusive interline rates.">
   <meta name="twitter:image" content="https://www.interlineasia.com/cruise-ship.png">
+  <meta name="twitter:site" content="@InterlineAsia">
+  <meta name="twitter:creator" content="@InterlineAsia">
 
   <!-- Additional SEO Meta Tags -->
   <meta name="theme-color" content="#0f172a">
@@ -44,6 +51,10 @@
   <link rel="stylesheet" href="/css/luxury-cruise-design.css">
   <!-- UI Polish Styles -->
   <link rel="stylesheet" href="/css/ui-polish.css">
+  <!-- UI Enhancements v2 -->
+  <link rel="stylesheet" href="/css/ui-enhancements.css">
+  <!-- UI Enhancements v2 -->
+  <link rel="stylesheet" href="/css/ui-enhancements.css">
 
   <!-- Favicon and App Icons -->
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -130,6 +141,12 @@
           <div class="hero-actions">
             <a href="/signup.html" class="btn btn-primary">Join Now</a>
             <a href="#partners" class="btn btn-secondary">View Partners</a>
+          </div>
+          <div style="margin-top: 2rem; text-align: center;">
+            <a href="/deals.html" class="cta-link">
+              <i class="ri-ship-line"></i>
+              Browse Current Cruise Deals
+            </a>
           </div>
         </div>
       </div>
@@ -239,7 +256,10 @@
           for their exclusive cruise experiences.
         </p>
         <div class="cta-actions">
-          <a href="/signup" class="btn btn-primary">Join Now</a>
+          <a href="/signup.html" class="btn btn-primary">Join Now</a>
+        </div>
+        <div style="margin-top: 1.5rem; text-align: center;">
+          <a href="/login.html" class="internal-link">Already a member? Sign in to access your deals</a>
         </div>
       </div>
     </div>
@@ -389,6 +409,48 @@
     // Auto-update year
     document.getElementById('current-year').textContent = new Date().getFullYear();
 
+    // Sticky navigation with scroll effects
+    let lastScrollTop = 0;
+    const nav = document.querySelector('.luxury-header');
+    const toolsBar = document.querySelector('.luxury-tools-bar');
+    
+    window.addEventListener('scroll', function() {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      
+      // Add scrolled class for styling
+      if (scrollTop > 50) {
+        nav?.classList.add('nav-scrolled');
+      } else {
+        nav?.classList.remove('nav-scrolled');
+      }
+      
+      // Hide/show tools bar on scroll
+      if (scrollTop > lastScrollTop && scrollTop > 200) {
+        toolsBar?.classList.add('travel-tools-scrolled');
+      } else {
+        toolsBar?.classList.remove('travel-tools-scrolled');
+      }
+      
+      lastScrollTop = scrollTop;
+    });
+
+    // Lazy loading for images
+    if ('IntersectionObserver' in window) {
+      const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const img = entry.target;
+            img.classList.add('loaded');
+            observer.unobserve(img);
+          }
+        });
+      });
+
+      document.querySelectorAll('img[loading="lazy"]').forEach(img => {
+        imageObserver.observe(img);
+      });
+    }
+
     // Chatbot functionality
     document.addEventListener('DOMContentLoaded', function () {
       const chatToggle = document.getElementById('chat-toggle');
@@ -430,6 +492,9 @@
       }
     });
   </script>
+  
+  <!-- UI Enhancements v2 JavaScript -->
+  <script src="/js/ui-enhancements.js"></script>
 </body>
 
 </html>

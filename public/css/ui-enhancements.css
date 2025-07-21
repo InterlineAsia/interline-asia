@@ -1,0 +1,385 @@
+/* UI Enhancements v2 - Advanced Frontend Polish for Interline Asia */
+
+/* ===========================================
+   STICKY NAVIGATION WITH SCROLL EFFECTS
+   =========================================== */
+
+.main-nav,
+.luxury-header {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 1000 !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+}
+
+/* Enhanced scroll effect for navigation */
+.nav-scrolled {
+    background: rgba(15, 23, 42, 0.98) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.luxury-header.nav-scrolled {
+    background: rgba(255, 255, 255, 0.98) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Ensure content doesn't hide behind sticky nav */
+body {
+    padding-top: 0 !important;
+}
+
+.hero-section,
+.dashboard-main,
+.booking-container,
+.quote-container,
+.track-container,
+.auth-container,
+.content-section {
+    margin-top: 120px !important;
+}
+
+/* Travel tools bar adjustment */
+.travel-tools-header,
+.luxury-tools-bar {
+    position: fixed !important;
+    top: 80px !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 999 !important;
+    transition: all 0.3s ease !important;
+}
+
+.travel-tools-scrolled {
+    transform: translateY(-100%) !important;
+    opacity: 0 !important;
+}
+
+/* ===========================================
+   SMOOTH SCROLL BEHAVIOR
+   =========================================== */
+
+html {
+    scroll-behavior: smooth !important;
+}
+
+/* Scroll padding for anchor links */
+:target {
+    scroll-margin-top: 140px !important;
+}
+
+/* ===========================================
+   IMAGE PERFORMANCE ENHANCEMENTS
+   =========================================== */
+
+/* Responsive image containers */
+.responsive-image-container {
+    position: relative !important;
+    overflow: hidden !important;
+    border-radius: 8px !important;
+}
+
+.responsive-image-container img {
+    width: 100% !important;
+    height: auto !important;
+    transition: transform 0.3s ease !important;
+}
+
+.responsive-image-container:hover img {
+    transform: scale(1.05) !important;
+}
+
+/* Cruise logo optimization */
+.partner-logo img,
+.cruise-logo {
+    object-fit: contain !important;
+    max-width: 100% !important;
+    height: auto !important;
+    transition: opacity 0.3s ease !important;
+}
+
+.partner-logo img:hover {
+    opacity: 0.8 !important;
+}
+
+/* ===========================================
+   ENHANCED VISUAL FEEDBACK
+   =========================================== */
+
+/* Loading states for images */
+img[loading="lazy"] {
+    opacity: 0 !important;
+    transition: opacity 0.3s ease !important;
+}
+
+img[loading="lazy"].loaded {
+    opacity: 1 !important;
+}
+
+/* Skeleton loading for images */
+.image-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%) !important;
+    background-size: 200% 100% !important;
+    animation: loading 1.5s infinite !important;
+    border-radius: 8px !important;
+}
+
+/* ===========================================
+   CROSS-PAGE NAVIGATION ENHANCEMENTS
+   =========================================== */
+
+/* Enhanced internal link styling */
+.internal-link {
+    color: #0a3d62 !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+    position: relative !important;
+}
+
+.internal-link::after {
+    content: '' !important;
+    position: absolute !important;
+    bottom: -2px !important;
+    left: 0 !important;
+    width: 0 !important;
+    height: 2px !important;
+    background: linear-gradient(135deg, #0a3d62, #192a56) !important;
+    transition: width 0.3s ease !important;
+}
+
+.internal-link:hover::after {
+    width: 100% !important;
+}
+
+.internal-link:hover {
+    color: #192a56 !important;
+}
+
+/* Call-to-action link styling */
+.cta-link {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    padding: 0.5rem 1rem !important;
+    background: rgba(10, 61, 98, 0.1) !important;
+    border: 1px solid rgba(10, 61, 98, 0.2) !important;
+    border-radius: 6px !important;
+    color: #0a3d62 !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+}
+
+.cta-link:hover {
+    background: rgba(10, 61, 98, 0.15) !important;
+    border-color: rgba(10, 61, 98, 0.3) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* ===========================================
+   RESPONSIVE BREAKPOINT OPTIMIZATIONS
+   =========================================== */
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+    .hero-section,
+    .dashboard-main,
+    .booking-container,
+    .quote-container,
+    .track-container,
+    .auth-container,
+    .content-section {
+        margin-top: 140px !important;
+    }
+    
+    .main-nav,
+    .luxury-header {
+        height: auto !important;
+        min-height: 80px !important;
+    }
+    
+    .travel-tools-header,
+    .luxury-tools-bar {
+        top: auto !important;
+        position: relative !important;
+    }
+    
+    /* Simplified mobile navigation */
+    .nav-scrolled {
+        background: rgba(15, 23, 42, 0.95) !important;
+    }
+}
+
+/* Tablet optimizations */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .deals-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 1.5rem !important;
+    }
+    
+    .partners-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
+
+/* Desktop optimizations */
+@media (min-width: 1025px) {
+    .deals-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+    
+    .partners-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+    }
+}
+
+/* Ultrawide optimizations */
+@media (min-width: 1440px) {
+    .deals-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+    }
+    
+    .partners-grid {
+        grid-template-columns: repeat(5, 1fr) !important;
+    }
+    
+    .section-container,
+    .dashboard-container,
+    .main-content {
+        max-width: 1400px !important;
+    }
+}
+
+/* ===========================================
+   LAYOUT STABILITY IMPROVEMENTS
+   =========================================== */
+
+/* Prevent layout shifts */
+.deal-card,
+.booking-card,
+.dashboard-card,
+.quote-card {
+    min-height: 300px !important;
+    contain: layout !important;
+}
+
+.partner-logo {
+    min-height: 120px !important;
+    contain: layout !important;
+}
+
+/* Image aspect ratio containers */
+.aspect-ratio-container {
+    position: relative !important;
+    width: 100% !important;
+    height: 0 !important;
+    overflow: hidden !important;
+}
+
+.aspect-ratio-16-9 {
+    padding-bottom: 56.25% !important;
+}
+
+.aspect-ratio-4-3 {
+    padding-bottom: 75% !important;
+}
+
+.aspect-ratio-1-1 {
+    padding-bottom: 100% !important;
+}
+
+.aspect-ratio-container img {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+
+/* ===========================================
+   ENHANCED ANIMATIONS
+   =========================================== */
+
+/* Fade in animation for content */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out !important;
+}
+
+/* Stagger animation for cards */
+.deal-card:nth-child(1) { animation-delay: 0.1s !important; }
+.deal-card:nth-child(2) { animation-delay: 0.2s !important; }
+.deal-card:nth-child(3) { animation-delay: 0.3s !important; }
+.deal-card:nth-child(4) { animation-delay: 0.4s !important; }
+
+/* ===========================================
+   PERFORMANCE OPTIMIZATIONS
+   =========================================== */
+
+/* GPU acceleration for smooth animations */
+.deal-card,
+.booking-card,
+.dashboard-card,
+.btn-primary,
+.btn-secondary {
+    will-change: transform !important;
+    transform: translateZ(0) !important;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* ===========================================
+   PRINT OPTIMIZATIONS
+   =========================================== */
+
+@media print {
+    .main-nav,
+    .luxury-header,
+    .travel-tools-header,
+    .luxury-tools-bar,
+    #chatbot-container {
+        display: none !important;
+    }
+    
+    .hero-section,
+    .dashboard-main,
+    .booking-container,
+    .quote-container,
+    .track-container,
+    .auth-container,
+    .content-section {
+        margin-top: 0 !important;
+    }
+    
+    .deal-card,
+    .booking-card,
+    .dashboard-card {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+    }
+}

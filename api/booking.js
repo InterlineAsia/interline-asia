@@ -5,6 +5,11 @@ import { createClient } from '@supabase/supabase-js';
 import formidable from 'formidable';
 import fs from 'fs';
 
+const { rateLimitMiddleware } = require('../lib/rate-limiter-enhanced');
+const { logBookingSubmission, logApiError } = require('../lib/audit-logger');
+const { generateFallbackResponse } = require('../lib/fallback-handler');
+const { validateBookingRequest, sanitizeObject } = require('../lib/server-validation');
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -16,20 +21,52 @@ export const config = {
   },
 };
 
+// Apply rate limiting
+const rateLimiter = rateLimitMiddleware('booking');
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  // Apply rate limiting
+  await new Promise((resolve, reject) => {
+    rateLimiter(req, res, (err) => {
+      if (err) reject(err);
+      else resolve();
+    });
+  });
+
+  const startTime = Date.now();
+
   try {
-    // Parse form data with file uploads
+    // Parse form data with file uploads - Enhanced error handling
     const form = formidable({
       maxFileSize: 10 * 1024 * 1024, // 10MB limit
       allowEmptyFiles: false,
       multiples: true
     });
 
-    const [fields, files] = await form.parse(req);
+    // Add timeout and error boundary for form parsing
+    const parseWithTimeout = (form, req, timeout = 25000) => {
+      return Promise.race([
+        form.parse(req),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Form parsing timeout - request too large or slow')), timeout)
+        )
+      ]);
+    };
+
+    let fields, files;
+    try {
+      [fields, files] = await parseWithTimeout(form, req);
+    } catch (parseError) {
+      console.error('BOOKING: Form parsing failed:', parseError.message);
+      return res.status(400).json({ 
+        error: 'Failed to process form data', 
+        details: parseError.message.includes('timeout') ? 'Request timeout - please try with smaller files' : 'Invalid form data'
+      });
+    }
     
     // Extract form data
     const bookingData = {
@@ -44,13 +81,24 @@ export default async function handler(req, res) {
       specialRequests: Array.isArray(fields.specialRequests) ? fields.specialRequests[0] : fields.specialRequests
     };
 
-    // Validate required fields
-    const requiredFields = ['quoteId', 'firstName', 'lastName', 'dateOfBirth', 'email', 'phone', 'cabinType'];
-    for (const field of requiredFields) {
-      if (!bookingData[field]) {
-        return res.status(400).json({ error: `Missing required field: ${field}` });
-      }
+    // Sanitize and validate booking data
+    const sanitizedData = sanitizeObject(bookingData);
+    const validation = validateBookingRequest(sanitizedData);
+    
+    if (!validation.isValid) {
+      await logApiError(req, new Error('Booking validation failed'), { 
+        statusCode: 400, 
+        validationErrors: validation.errors 
+      });
+      return res.status(400).json({
+        error: 'Validation failed',
+        message: 'Please check your booking information and try again',
+        details: validation.errors
+      });
     }
+    
+    // Use sanitized data
+    Object.assign(bookingData, sanitizedData);
 
     // Verify quote exists and is valid
     const { data: quoteRequest, error: quoteError } = await supabase
@@ -68,7 +116,10 @@ export default async function handler(req, res) {
     }
 
     const cruise = quoteRequest.cruises;
-    const bookingId = `booking_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    // Generate clean booking ID using same format as quotes
+    const { generateQuoteId } = require('../lib/quote-id-generator');
+    const bookingId = generateQuoteId().replace('Q-', 'B-'); // B for Booking
 
     // Process file uploads to Supabase Storage
     const uploadedFiles = [];
@@ -164,7 +215,7 @@ export default async function handler(req, res) {
           <div style="background: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3 style="color: #1e293b; margin-top: 0;">Passenger Information</h3>
             <p><strong>Full Name:</strong> ${fullName}</p>
-            <p><strong>Date of Birth:</strong> ${new Date(bookingData.dateOfBirth).toLocaleDateString()}</p>
+            <p><strong>Date of Birth:</strong> ${require('../lib/date-formatter').formatEmailDate(bookingData.dateOfBirth)}</p>
             <p><strong>Email:</strong> ${bookingData.email}</p>
             <p><strong>Phone:</strong> ${bookingData.phone}</p>
             <p><strong>Cabin Type:</strong> ${bookingData.cabinType}</p>
@@ -174,7 +225,7 @@ export default async function handler(req, res) {
             <h3 style="color: #1e293b; margin-top: 0;">Cruise Details</h3>
             <p><strong>Cruise Line:</strong> ${cruise.cruise_line}</p>
             <p><strong>Ship:</strong> ${cruise.ship_name}</p>
-            <p><strong>Departure Date:</strong> ${new Date(cruise.departure_date).toLocaleDateString()}</p>
+            <p><strong>Departure Date:</strong> ${require('../lib/date-formatter').formatEmailDate(cruise.departure_date)}</p>
             <p><strong>Duration:</strong> ${cruise.nights} nights</p>
             <p><strong>Region:</strong> ${cruise.region}</p>
             <p><strong>Route:</strong> ${cruise.departure_port} → ${cruise.arrival_port}</p>
@@ -303,14 +354,32 @@ export default async function handler(req, res) {
       })
     });
 
-    res.status(200).json({
+    const result = {
       success: true,
       message: 'Booking submitted successfully',
-      bookingId: bookingId
-    });
+      bookingId: bookingId,
+      filesUploaded: uploadedFiles.length,
+      hasFiles: uploadedFiles.length > 0,
+      processingTime: Date.now() - startTime
+    };
+
+    // Log successful booking
+    await logBookingSubmission(req, bookingData, result);
+
+    res.status(200).json(result);
 
   } catch (error) {
     console.error('Booking processing error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    
+    // Log the error
+    await logApiError(req, error, { statusCode: 500 });
+    
+    // Use fallback handler for user-friendly error
+    const fallbackResponse = generateFallbackResponse(error, { 
+      operation: 'booking',
+      endpoint: req.url 
+    });
+    
+    res.status(500).json(fallbackResponse);
   }
 }

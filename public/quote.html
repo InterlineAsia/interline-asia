@@ -4,10 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Request Quote - Interline Asia</title>
-    <meta name="description" content="Request a quote for exclusive cruise deals - Interline Asia">
-    <meta name="keywords" content="cruise quote, travel quote, cruise deals, interline rates">
+    <meta name="description" content="Request a personalized quote for exclusive cruise deals - Interline Asia offers special interline rates for travel industry professionals">
+    <meta name="keywords" content="cruise quote, travel quote, cruise deals, interline rates, travel professionals, luxury cruises">
     <meta name="author" content="Interline Asia">
     <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Request Cruise Quote - Interline Asia">
+    <meta property="og:description" content="Request a personalized quote for exclusive cruise deals with special interline rates for travel industry professionals">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.interlineasia.com/quote.html">
+    <meta property="og:image" content="https://www.interlineasia.com/cruise-ship.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="Interline Asia">
+    <meta property="og:locale" content="en_AU">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Request Cruise Quote - Interline Asia">
+    <meta name="twitter:description" content="Request a personalized quote for exclusive cruise deals with special interline rates">
+    <meta name="twitter:image" content="https://www.interlineasia.com/cruise-ship.png">
+    <meta name="twitter:site" content="@InterlineAsia">
+    
+    <!-- Additional SEO Meta Tags -->
+    <meta name="theme-color" content="#0f172a">
+    <meta name="msapplication-TileColor" content="#0f172a">
+    <link rel="canonical" href="https://www.interlineasia.com/quote.html">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,6 +42,8 @@
     <link rel="stylesheet" href="/css/luxury-cruise-design.css">
     <!-- UI Polish Styles -->
     <link rel="stylesheet" href="/css/ui-polish.css">
+    <!-- UI Enhancements -->
+    <link rel="stylesheet" href="/css/ui-enhancements.css">
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -305,6 +330,17 @@
                     <div class="form-section">
                         <h3>Additional Information</h3>
                         <div class="form-group">
+                            <label for="preferredCabinType">Preferred Cabin Type *</label>
+                            <select id="preferredCabinType" name="preferredCabinType" required>
+                                <option value="">Select cabin preference...</option>
+                                <option value="Interior">Interior Cabin</option>
+                                <option value="Oceanview">Oceanview Cabin</option>
+                                <option value="Balcony">Balcony Cabin</option>
+                                <option value="Suite">Suite</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
                             <label for="specialRequests">Special Requests or Notes</label>
                             <textarea id="specialRequests" name="specialRequests" placeholder="Any special requirements, dietary needs, accessibility requests, or upgrade preferences..."></textarea>
                         </div>
@@ -428,6 +464,7 @@
             const clientName = formData.get('clientName');
             const clientEmail = formData.get('clientEmail');
             const clientPhone = formData.get('clientPhone');
+            const preferredCabinType = formData.get('preferredCabinType');
             const interiorCabins = formData.get('interiorCabins');
             const oceanviewCabins = formData.get('oceanviewCabins');
             const balconyCabins = formData.get('balconyCabins');
@@ -435,8 +472,8 @@
             const specialRequests = formData.get('specialRequests');
 
             // Validate required fields
-            if (!clientName || !clientEmail) {
-                showError('Please fill in all required fields.');
+            if (!clientName || !clientEmail || !preferredCabinType) {
+                showError('Please fill in all required fields (Name, Email, and Preferred Cabin Type).');
                 return;
             }
 
@@ -464,6 +501,9 @@
                     clientName: clientName,
                     clientEmail: clientEmail,
                     clientPhone: clientPhone,
+                    
+                    // Cabin preference
+                    preferredCabinType: preferredCabinType,
                     
                     // Cabin requirements
                     cabinRequirements: {
@@ -583,5 +623,8 @@
             }
         });
     </script>
+    
+    <!-- UI Enhancements JavaScript -->
+    <script src="/js/ui-enhancements.js"></script>
 </body>
 </html>

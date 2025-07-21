@@ -5,6 +5,34 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cruise Deals - Interline Asia</title>
+  <meta name="description" content="Exclusive cruise deals for travel industry professionals. Access special interline rates on luxury cruises from top cruise lines including Royal Caribbean, Norwegian, Celebrity, and more.">
+  <meta name="keywords" content="cruise deals, interline rates, travel professionals, luxury cruises, cruise discounts, Royal Caribbean, Norwegian, Celebrity, Princess">
+  <meta name="author" content="Interline Asia">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="Exclusive Cruise Deals - Interline Asia">
+  <meta property="og:description" content="Access special interline rates on luxury cruises. Verified travel professionals save up to 70% on premium cruise experiences.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.interlineasia.com/deals.html">
+  <meta property="og:image" content="https://www.interlineasia.com/cruise-ship.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="Interline Asia">
+  <meta property="og:locale" content="en_AU">
+  
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Exclusive Cruise Deals - Interline Asia">
+  <meta name="twitter:description" content="Access special interline rates on luxury cruises. Verified travel professionals save up to 70% on premium cruise experiences.">
+  <meta name="twitter:image" content="https://www.interlineasia.com/cruise-ship.png">
+  <meta name="twitter:site" content="@InterlineAsia">
+  
+  <!-- Additional SEO Meta Tags -->
+  <meta name="theme-color" content="#0f172a">
+  <meta name="msapplication-TileColor" content="#0f172a">
+  <link rel="canonical" href="https://www.interlineasia.com/deals.html">
+  
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
@@ -1379,10 +1407,15 @@
           container.innerHTML = displayDeals.map(deal => `
             <div class="deal-card">
               <div class="deal-header">
-                <img src="/logos/cruiselines/${getCruiseLineLogo(deal.cruiseLine)}" 
-                     alt="${deal.cruiseLine}" 
-                     class="cruise-logo"
-                     onerror="this.src='/logos/cruiselines/placeholder.png'">
+                <picture>
+                  <source media="(max-width: 480px)" srcset="/logos/cruiselines/mobile/${getCruiseLineLogo(deal.cruiseLine)}">
+                  <source media="(min-width: 481px)" srcset="/logos/cruiselines/${getCruiseLineLogo(deal.cruiseLine)}">
+                  <img src="/logos/cruiselines/${getCruiseLineLogo(deal.cruiseLine)}" 
+                       alt="${deal.cruiseLine}" 
+                       class="cruise-logo"
+                       loading="lazy"
+                       onerror="this.src='/logos/cruiselines/placeholder.png'">
+                </picture>
                 <div class="cruise-type-badge ${deal.cruiseType.toLowerCase().replace(/\s+/g, '-')}">${deal.cruiseType}</div>
               </div>
               

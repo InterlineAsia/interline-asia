@@ -60,7 +60,8 @@ export default async function handler(req, res) {
       }
     }
 
-    const bookingId = `BK-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+    const { generateQuoteId } = require('../lib/quote-id-generator');
+    const bookingId = generateQuoteId().replace('Q-', 'BK-'); // BK for Direct Booking
 
     // Process file uploads to Supabase Storage
     const uploadedFiles = [];

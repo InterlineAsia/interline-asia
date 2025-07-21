@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vercel Deployment Test</title>
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    .success-message {
+      background-color: #dcfce7;
+      border: 1px solid #86efac;
+      color: #166534;
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 2rem 0;
+    }
+    .timestamp {
+      font-size: 0.875rem;
+      color: #64748b;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Vercel Deployment Test</h1>
+  
+  <div class="success-message">
+    <h2>✅ Deployment Successful</h2>
+    <p>If you can see this page, the Vercel deployment is working correctly.</p>
+    <p>This test page was created to verify that deployments are functioning properly.</p>
+  </div>
+  
+  <div class="timestamp">
+    <p>Deployment timestamp: <span id="timestamp"></span></p>
+  </div>
+  
+  <script>
+    // Display current timestamp
+    document.getElementById('timestamp').textContent = new Date().toISOString();
+  </script>
+</body>
+</html>

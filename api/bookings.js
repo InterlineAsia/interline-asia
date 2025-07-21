@@ -2,22 +2,22 @@
 // Combines: booking.js + direct-booking.js
 // Routes: /api/bookings?type=standard | /api/bookings?type=direct
 
-import { createClient } from '@supabase/supabase-js';
-import formidable from 'formidable';
-import fs from 'fs';
+const { createClient } = require('@supabase/supabase-js');
+const formidable = require('formidable');
+const fs = require('fs');
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-export const config = {
+const config = {
   api: {
     bodyParser: false,
   },
 };
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -452,3 +452,5 @@ async function handleStandardBooking(req, res) {
     });
   }
 }
+module.exports = handler;
+module.exports.config = config;

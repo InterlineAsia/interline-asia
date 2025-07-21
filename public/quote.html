@@ -528,8 +528,13 @@
 
                 // Prepare quote request data
                 const quoteRequest = {
-                    // Cruise details
-                    cruiseDetails: cruiseData,
+                    // Cruise details (fallback if cruiseData is undefined)
+                    cruiseDetails: cruiseData || {
+                        cruiseLine: 'Not specified',
+                        shipName: 'Not specified', 
+                        departureDate: 'To be confirmed',
+                        duration: 'To be confirmed'
+                    },
                     
                     // Client information
                     clientName: clientName,
@@ -555,6 +560,9 @@
                     source: 'direct_quote_form'
                 };
 
+                // Debug log the request data
+                console.log('QUOTE: Sending request data:', quoteRequest);
+                
                 // Send quote request
                 const response = await fetch('/api/quotes?action=send', {
                     method: 'POST',
@@ -565,7 +573,9 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error('Failed to send quote request');
+                    const errorData = await response.json();
+                    console.error('QUOTE: Server error:', errorData);
+                    throw new Error(errorData.error || 'Failed to send quote request');
                 }
 
                 const result = await response.json();

@@ -2,14 +2,14 @@
 // Combines: admin-tools.js + admin-verifications.js + process-csv-text.js
 // Routes: /api/admin?action=tools | /api/admin?action=verifications | /api/admin?action=csv
 
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   const action = req.query.action || 'tools';
 
   try {
@@ -412,3 +412,4 @@ async function updateVerification(req, res) {
     res.status(500).json({ error: 'Internal server error' });
   }
 }
+module.exports = handler;

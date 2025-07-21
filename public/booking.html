@@ -1220,7 +1220,7 @@
           formData.append('employment_proof', uploadedFiles.employment);
         }
 
-        const response = await fetch('/api/direct-booking', {
+        const response = await fetch('/api/bookings?type=direct', {
           method: 'POST',
           body: formData
         });

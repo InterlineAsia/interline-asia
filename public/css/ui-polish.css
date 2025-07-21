@@ -1,0 +1,408 @@
+/* UI Polish - Standardized Components for Interline Asia */
+
+/* ===========================================
+   STANDARDIZED BUTTON STYLES
+   =========================================== */
+
+.btn-primary {
+    background: linear-gradient(135deg, #0a3d62, #192a56) !important;
+    color: white !important;
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    border: none !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+    min-height: 48px !important; /* Touch target size */
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(10, 61, 98, 0.4) !important;
+}
+
+.btn-primary:focus {
+    outline: 2px solid #0a3d62 !important;
+    outline-offset: 2px !important;
+}
+
+.btn-primary:active {
+    transform: translateY(0) !important;
+}
+
+.btn-primary:disabled {
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+}
+
+/* Secondary Button Standardization */
+.btn-secondary {
+    background: transparent !important;
+    color: #0a3d62 !important;
+    border: 2px solid #0a3d62 !important;
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    font-size: 1rem !important;
+    min-height: 48px !important;
+}
+
+.btn-secondary:hover {
+    background: #0a3d62 !important;
+    color: white !important;
+    transform: translateY(-1px) !important;
+}
+
+.btn-secondary:focus {
+    outline: 2px solid #0a3d62 !important;
+    outline-offset: 2px !important;
+}
+
+/* ===========================================
+   STANDARDIZED FORM INPUT STYLES
+   =========================================== */
+
+.form-input,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="date"],
+input[type="number"],
+textarea,
+select {
+    padding: 0.875rem !important;
+    border: 2px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    font-size: 16px !important; /* Prevents iOS zoom */
+    font-family: 'Inter', sans-serif !important;
+    transition: border-color 0.3s ease !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    background: white !important;
+    color: #374151 !important;
+    min-height: 48px !important; /* Touch target size */
+}
+
+.form-input:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="tel"]:focus,
+input[type="date"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+select:focus {
+    outline: none !important;
+    border-color: #0a3d62 !important;
+    box-shadow: 0 0 0 3px rgba(10, 61, 98, 0.1) !important;
+}
+
+/* Form Labels */
+.form-group label,
+label {
+    display: block !important;
+    font-weight: 600 !important;
+    color: #374151 !important;
+    margin-bottom: 0.5rem !important;
+    font-size: 0.875rem !important;
+}
+
+/* Form Groups */
+.form-group {
+    margin-bottom: 1.5rem !important;
+}
+
+/* ===========================================
+   MOBILE OPTIMIZATIONS
+   =========================================== */
+
+/* Travel Tools Bar Mobile */
+@media (max-width: 768px) {
+    .luxury-tools-bar,
+    .travel-tools-header {
+        padding: 0.5rem 0 !important;
+    }
+    
+    .luxury-tools-container,
+    .travel-tools-header-container {
+        padding: 0 1rem !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    
+    .luxury-tools-links,
+    .travel-tools-header-grid {
+        display: flex !important;
+        gap: 0.75rem !important;
+        min-width: max-content !important;
+        padding-bottom: 0.5rem !important;
+    }
+    
+    .luxury-tool-link,
+    .header-tool-item {
+        font-size: 0.75rem !important;
+        padding: 0.5rem !important;
+        white-space: nowrap !important;
+        min-width: auto !important;
+    }
+    
+    .luxury-tool-link span:first-child,
+    .header-tool-icon {
+        font-size: 1rem !important;
+    }
+}
+
+/* Mobile Card Improvements */
+@media (max-width: 768px) {
+    .deal-card,
+    .booking-card,
+    .dashboard-card,
+    .quote-card {
+        margin-bottom: 1.5rem !important;
+        padding: 1.5rem !important;
+    }
+    
+    .deals-grid {
+        gap: 1.5rem !important;
+    }
+}
+
+/* ===========================================
+   ACCESSIBILITY IMPROVEMENTS
+   =========================================== */
+
+/* Focus States for All Interactive Elements */
+a:focus,
+button:focus,
+input:focus,
+textarea:focus,
+select:focus,
+[tabindex]:focus {
+    outline: 2px solid #0a3d62 !important;
+    outline-offset: 2px !important;
+}
+
+/* Skip to Content Link */
+.skip-to-content {
+    position: absolute !important;
+    top: -40px !important;
+    left: 6px !important;
+    background: #0a3d62 !important;
+    color: white !important;
+    padding: 8px !important;
+    text-decoration: none !important;
+    border-radius: 4px !important;
+    z-index: 10000 !important;
+}
+
+.skip-to-content:focus {
+    top: 6px !important;
+}
+
+/* Improved Button Focus for Keyboard Navigation */
+.luxury-nav-link:focus,
+.nav-link:focus {
+    outline: 2px solid white !important;
+    outline-offset: 2px !important;
+    border-radius: 4px !important;
+}
+
+/* Chatbot Accessibility */
+#chat-toggle {
+    position: relative !important;
+}
+
+#chat-toggle:focus {
+    outline: 2px solid white !important;
+    outline-offset: 2px !important;
+}
+
+/* ===========================================
+   CONSISTENT CARD COMPONENTS
+   =========================================== */
+
+.card,
+.deal-card,
+.booking-card,
+.dashboard-card,
+.quote-card,
+.admin-card {
+    background: white !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+    padding: 1.5rem !important;
+    transition: all 0.3s ease !important;
+    border: 1px solid #f1f5f9 !important;
+}
+
+.card:hover,
+.deal-card:hover,
+.booking-card:hover,
+.dashboard-card:hover,
+.quote-card:hover,
+.admin-card:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ===========================================
+   DROPDOWN AND NAVIGATION ACCESSIBILITY
+   =========================================== */
+
+/* Ensure dropdowns are keyboard accessible */
+.dropdown,
+.nav-menu {
+    position: relative !important;
+}
+
+.dropdown-menu {
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    background: white !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+    z-index: 1000 !important;
+    min-width: 200px !important;
+}
+
+.dropdown-item {
+    display: block !important;
+    padding: 0.75rem 1rem !important;
+    color: #374151 !important;
+    text-decoration: none !important;
+    transition: background-color 0.2s ease !important;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: #f9fafb !important;
+    outline: none !important;
+}
+
+/* ===========================================
+   LOADING AND ERROR STATES
+   =========================================== */
+
+.loading-skeleton {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+}
+
+.skeleton-item {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%) !important;
+    background-size: 200% 100% !important;
+    animation: loading 1.5s infinite !important;
+    border-radius: 4px !important;
+    height: 1rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* ===========================================
+   RESPONSIVE IMPROVEMENTS
+   =========================================== */
+
+@media (max-width: 480px) {
+    .btn-primary,
+    .btn-secondary {
+        width: 100% !important;
+        margin-bottom: 0.75rem !important;
+    }
+    
+    .form-input,
+    input,
+    textarea,
+    select {
+        font-size: 16px !important; /* Critical for iOS */
+    }
+    
+    .card,
+    .deal-card,
+    .booking-card,
+    .dashboard-card {
+        padding: 1rem !important;
+        margin-bottom: 1rem !important;
+    }
+}
+
+/* ===========================================
+   SCREEN READER SUPPORT
+   =========================================== */
+
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+.sr-only:focus {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 0.5rem !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    clip: auto !important;
+    white-space: normal !important;
+    background: #0a3d62 !important;
+    color: white !important;
+    border-radius: 4px !important;
+}
+
+/* ===========================================
+   PRINT STYLES
+   =========================================== */
+
+@media print {
+    .luxury-tools-bar,
+    .travel-tools-header,
+    #chatbot-container,
+    .nav-toggle {
+        display: none !important;
+    }
+    
+    .main-nav {
+        position: static !important;
+        background: white !important;
+        color: black !important;
+    }
+    
+    .btn-primary,
+    .btn-secondary {
+        background: white !important;
+        color: black !important;
+        border: 1px solid black !important;
+    }
+}

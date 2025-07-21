@@ -1581,6 +1581,19 @@
 
     function formatDate(date) {
       if (!date) return 'TBA';
+      
+      // Handle Date objects - create date-only version to avoid time display
+      if (date instanceof Date) {
+        const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0);
+        return dateOnly.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          timeZone: 'UTC'
+        });
+      }
+      
+      // Handle string dates
       return date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',

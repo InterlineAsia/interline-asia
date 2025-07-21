@@ -1397,16 +1397,19 @@
       return '$' + numPrice.toLocaleString();
     }
 
-    // Format date
+    // Format date (without time)
     function formatDate(dateString) {
       try {
         if (!dateString) return 'TBA';
         
         if (dateString instanceof Date) {
-          return dateString.toLocaleDateString('en-US', { 
+          // Create a new date at noon to avoid timezone issues
+          const dateOnly = new Date(dateString.getFullYear(), dateString.getMonth(), dateString.getDate(), 12, 0, 0);
+          return dateOnly.toLocaleDateString('en-US', { 
             year: 'numeric', 
             month: 'long', 
-            day: 'numeric' 
+            day: 'numeric',
+            timeZone: 'UTC'
           });
         }
         
@@ -1422,11 +1425,13 @@
           };
           
           if (monthMap[month]) {
-            const date = new Date(`${year}-${monthMap[month]}-${day}`);
+            // Create date at noon UTC to avoid timezone issues
+            const date = new Date(`${year}-${monthMap[month]}-${day}T12:00:00Z`);
             return date.toLocaleDateString('en-US', { 
               year: 'numeric', 
               month: 'long', 
-              day: 'numeric' 
+              day: 'numeric',
+              timeZone: 'UTC'
             });
           }
         }

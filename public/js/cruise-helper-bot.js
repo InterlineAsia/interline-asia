@@ -688,16 +688,23 @@ class CruiseHelperBot {
         headers['Authorization'] = `Bearer ${authToken}`;
       }
 
-      // Call the enhanced cruise intelligence API
-      const response = await fetch('/api/cruise-intelligence-handler-enhanced', {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify({
-          message: message,
-          userId: this.getUserId(),
-          conversationHistory: this.getConversationHistory()
-        })
-      });
+      // TODO: Cruise intelligence feature is currently disabled
+      // const response = await fetch('/api/cruise-intelligence-handler-enhanced', {
+      //   method: 'POST',
+      //   headers: headers,
+      //   body: JSON.stringify({
+      //     message: message,
+      //     userId: this.getUserId(),
+      //     conversationHistory: this.getConversationHistory()
+      //   })
+      // });
+      
+      console.log('Cruise intelligence feature is currently disabled - using fallback response');
+      const response = { 
+        ok: false, 
+        status: 503,
+        json: () => Promise.resolve({ error: 'Service temporarily unavailable' })
+      };
 
       console.log('🧠 CRUISE_BOT: API Intelligence response status:', response.status);
 

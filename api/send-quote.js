@@ -12,6 +12,7 @@ export default async function handler(req, res) {
       clientName,
       clientEmail,
       clientPhone,
+      preferredCabinType,
       cabinRequirements,
       specialRequests,
       timestamp,
@@ -39,7 +40,8 @@ export default async function handler(req, res) {
     if (cabinRequirements.suite > 0) cabinSummary.push(`${cabinRequirements.suite} Suite cabin(s)`);
 
     // Generate unique quote ID for tracking
-    const quoteId = `quote_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const { generateQuoteId } = require('../lib/quote-id-generator');
+    const quoteId = generateQuoteId();
 
     // Prepare email to reservations team
     const emailData = {
@@ -69,6 +71,12 @@ export default async function handler(req, res) {
                 <tr>
                   <td style="padding: 8px 0; font-weight: bold; color: #374151;">Phone:</td>
                   <td style="padding: 8px 0; color: #1f2937;">${clientPhone}</td>
+                </tr>
+                ` : ''}
+                ${preferredCabinType ? `
+                <tr>
+                  <td style="padding: 8px 0; font-weight: bold; color: #374151;">Preferred Cabin:</td>
+                  <td style="padding: 8px 0; color: #1f2937; font-weight: 600;">${preferredCabinType}</td>
                 </tr>
                 ` : ''}
               </table>

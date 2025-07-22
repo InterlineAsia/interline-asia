@@ -58,41 +58,23 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (data.user) {
-                // ** FIX: Check for and create user profile if it's missing **
-                let { error: profileError } = await supabase
-                    .from('profiles')
-                    .select('id')
-                    .eq('id', data.user.id)
-                    .single();
-
-                // If profile is missing (PGRST116: 0 rows returned), create it.
-                if (profileError && profileError.code === 'PGRST116') {
-                    console.warn(`User profile for ${data.user.email} not found. Creating a new one.`);
-                    
-                    const { error: createError } = await supabase
-                        .from('profiles')
-                        .insert({ 
-                            id: data.user.id, 
-                            email: data.user.email 
-                        });
-
-                    if (createError) {
-                        // Log the error but still proceed as requested.
-                        console.error('Failed to create user profile:', createError.message);
-                    }
-                } else if (profileError) {
-                    // A different, more serious database error occurred. Halt execution.
-                    throw new Error(`Error fetching user profile: ${profileError.message}`);
-                }
-
+                console.log('LOGIN.JS: User authenticated successfully:', data.user.email);
+                
                 showSuccess('Login successful! Redirecting...');
+                
+                // Wait a moment for auth state to fully update
+                await new Promise(resolve => setTimeout(resolve, 500));
                 
                 // Check if there's a redirect URL stored (for booking page access)
                 const redirectUrl = localStorage.getItem('redirectAfterLogin');
+                console.log('LOGIN.JS: Stored redirect URL:', redirectUrl);
+                
                 if (redirectUrl) {
                     localStorage.removeItem('redirectAfterLogin');
+                    console.log('LOGIN.JS: Redirecting to stored URL:', redirectUrl);
                     window.location.href = redirectUrl;
                 } else {
+                    console.log('LOGIN.JS: Redirecting to dashboard choice');
                     // Default redirect to dashboard choice
                     window.location.href = '/dashboard-choice.html';
                 }

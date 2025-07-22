@@ -59,25 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (data.user) {
                 console.log('LOGIN.JS: User authenticated successfully:', data.user.email);
-                
-                showSuccess('Login successful! Redirecting...');
-                
-                // Wait a moment for auth state to fully update
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                // Check if there's a redirect URL stored (for booking page access)
-                const redirectUrl = localStorage.getItem('redirectAfterLogin');
-                console.log('LOGIN.JS: Stored redirect URL:', redirectUrl);
-                
-                if (redirectUrl) {
-                    localStorage.removeItem('redirectAfterLogin');
-                    console.log('LOGIN.JS: Redirecting to stored URL:', redirectUrl);
-                    window.location.href = redirectUrl;
-                } else {
-                    console.log('LOGIN.JS: Redirecting to dashboard choice');
-                    // Default redirect to dashboard choice
-                    window.location.href = '/dashboard-choice.html';
-                }
+                await handleLoginSuccess();
             }
         } catch (error) {
             console.error('Login failed:', error.message);
@@ -86,3 +68,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+// Handle successful login redirect
+async function handleLoginSuccess() {
+  const redirectUrl = localStorage.getItem('redirectAfterLogin') || '/dashboard-choice.html';
+  console.log('LOGIN: Login successful, handling redirect to:', redirectUrl);
+  localStorage.removeItem('redirectAfterLogin');
+  window.location.replace(redirectUrl);
+}

@@ -66,8 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 await handleLoginSuccess();
             } else {
                 throw new Error('Login failed - authentication not established');
-            } else {
-                throw new Error('Login failed: no user returned.');
             }
         } catch (error) {
             console.error('Login failed:', error.message);

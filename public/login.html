@@ -454,6 +454,43 @@
       // Initialize Supabase on load
       initSupabase();
       
+      // Add auth state listener for immediate redirect
+      let authListenerAdded = false;
+      function addAuthListener() {
+        if (authListenerAdded || !window.supabaseClient) return;
+        authListenerAdded = true;
+        
+        console.log('LOGIN: Adding auth state listener for redirect');
+        window.supabaseClient.supabase.auth.onAuthStateChange((event, session) => {
+          console.log('LOGIN: Auth state change:', event, session?.user?.email);
+          
+          if (event === 'SIGNED_IN' && session?.user) {
+            console.log('LOGIN: Auth listener detected sign in, triggering redirect...');
+            
+            // Small delay to ensure UI updates
+            setTimeout(() => {
+              showSuccess('Login successful! Redirecting...');
+              setLoading(false);
+              
+              const redirectUrl = localStorage.getItem('redirectAfterLogin');
+              console.log('LOGIN: Auth listener redirect URL:', redirectUrl);
+              
+              if (redirectUrl) {
+                localStorage.removeItem('redirectAfterLogin');
+                console.log('LOGIN: Auth listener redirecting to:', redirectUrl);
+                window.location.href = redirectUrl;
+              } else {
+                console.log('LOGIN: Auth listener redirecting to dashboard choice');
+                window.location.href = '/dashboard-choice.html';
+              }
+            }, 500);
+          }
+        });
+      }
+      
+      // Add listener after Supabase is ready
+      setTimeout(addAuthListener, 1000);
+      
       // Show success message if coming from registration
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('registered') === 'true') {

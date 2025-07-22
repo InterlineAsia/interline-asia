@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirect Test - Interline Asia</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .container {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+    }
+    
+    h1 {
+      color: #333;
+      margin-top: 0;
+    }
+    
+    button {
+      padding: 0.75rem 1.5rem;
+      background-color: #0070f3;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin: 0.5rem;
+    }
+    
+    button:hover {
+      background-color: #0051a8;
+    }
+    
+    .log {
+      background-color: #f8f9fa;
+      border: 1px solid #eee;
+      border-radius: 4px;
+      padding: 1rem;
+      margin-top: 1rem;
+      font-family: monospace;
+      font-size: 0.875rem;
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .success {
+      color: #28a745;
+    }
+    
+    .error {
+      color: #dc3545;
+    }
+    
+    .info {
+      color: #007bff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Redirect Test Page</h1>
+    <p>This page tests different redirect methods to diagnose why login redirects aren't working.</p>
+    
+    <h2>Test Different Redirect Methods</h2>
+    <button onclick="testWindowLocationHref()">Test window.location.href</button>
+    <button onclick="testWindowLocationReplace()">Test window.location.replace</button>
+    <button onclick="testWindowLocationAssign()">Test window.location.assign</button>
+    <button onclick="testFormSubmit()">Test Form Submit</button>
+    <button onclick="testMetaRefresh()">Test Meta Refresh</button>
+    <button onclick="testHistoryPushState()">Test History API</button>
+    
+    <h2>Test Dashboard Pages</h2>
+    <button onclick="redirectTo('/dashboard-choice.html')">Go to Dashboard Choice</button>
+    <button onclick="redirectTo('/dashboard-simple.html')">Go to Simple Dashboard</button>
+    <button onclick="redirectTo('/auth-diagnostics.html')">Go to Auth Diagnostics</button>
+    
+    <h2>Manual Links (for comparison)</h2>
+    <a href="/dashboard-choice.html" target="_blank">Dashboard Choice (new tab)</a><br>
+    <a href="/dashboard-simple.html" target="_blank">Simple Dashboard (new tab)</a><br>
+    <a href="/auth-diagnostics.html" target="_blank">Auth Diagnostics (new tab)</a>
+    
+    <h2>Browser Information</h2>
+    <div id="browser-info"></div>
+    
+    <h2>Test Log</h2>
+    <div id="log" class="log"></div>
+    
+    <button onclick="clearLog()">Clear Log</button>
+  </div>
+
+  <script>
+    const logDiv = document.getElementById('log');
+    const browserInfoDiv = document.getElementById('browser-info');
+    
+    // Log function
+    function log(message, type = 'info') {
+      const timestamp = new Date().toLocaleTimeString();
+      const logEntry = `[${timestamp}] ${message}\n`;
+      
+      const span = document.createElement('span');
+      span.className = type;
+      span.textContent = logEntry;
+      
+      logDiv.appendChild(span);
+      logDiv.scrollTop = logDiv.scrollHeight;
+      
+      console.log(message);
+    }
+    
+    // Clear log
+    function clearLog() {
+      logDiv.innerHTML = '';
+    }
+    
+    // Show browser information
+    function showBrowserInfo() {
+      const info = {
+        userAgent: navigator.userAgent,
+        cookiesEnabled: navigator.cookieEnabled,
+        localStorage: !!window.localStorage,
+        sessionStorage: !!window.sessionStorage,
+        location: window.location.href,
+        referrer: document.referrer,
+        protocol: window.location.protocol,
+        host: window.location.host
+      };
+      
+      browserInfoDiv.innerHTML = '<pre>' + JSON.stringify(info, null, 2) + '</pre>';
+      log('Browser info displayed', 'info');
+    }
+    
+    // Test window.location.href
+    function testWindowLocationHref() {
+      log('Testing window.location.href redirect...', 'info');
+      try {
+        setTimeout(() => {
+          window.location.href = '/dashboard-choice.html?test=href&t=' + Date.now();
+        }, 1000);
+        log('window.location.href redirect initiated', 'success');
+      } catch (error) {
+        log('window.location.href failed: ' + error.message, 'error');
+      }
+    }
+    
+    // Test window.location.replace
+    function testWindowLocationReplace() {
+      log('Testing window.location.replace redirect...', 'info');
+      try {
+        setTimeout(() => {
+          window.location.replace('/dashboard-choice.html?test=replace&t=' + Date.now());
+        }, 1000);
+        log('window.location.replace redirect initiated', 'success');
+      } catch (error) {
+        log('window.location.replace failed: ' + error.message, 'error');
+      }
+    }
+    
+    // Test window.location.assign
+    function testWindowLocationAssign() {
+      log('Testing window.location.assign redirect...', 'info');
+      try {
+        setTimeout(() => {
+          window.location.assign('/dashboard-choice.html?test=assign&t=' + Date.now());
+        }, 1000);
+        log('window.location.assign redirect initiated', 'success');
+      } catch (error) {
+        log('window.location.assign failed: ' + error.message, 'error');
+      }
+    }
+    
+    // Test form submit
+    function testFormSubmit() {
+      log('Testing form submit redirect...', 'info');
+      try {
+        const form = document.createElement('form');
+        form.method = 'GET';
+        form.action = '/dashboard-choice.html';
+        
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'test';
+        input.value = 'form';
+        
+        const timeInput = document.createElement('input');
+        timeInput.type = 'hidden';
+        timeInput.name = 't';
+        timeInput.value = Date.now();
+        
+        form.appendChild(input);
+        form.appendChild(timeInput);
+        document.body.appendChild(form);
+        
+        setTimeout(() => {
+          form.submit();
+        }, 1000);
+        
+        log('Form submit redirect initiated', 'success');
+      } catch (error) {
+        log('Form submit failed: ' + error.message, 'error');
+      }
+    }
+    
+    // Test meta refresh
+    function testMetaRefresh() {
+      log('Testing meta refresh redirect...', 'info');
+      try {
+        const meta = document.createElement('meta');
+        meta.httpEquiv = 'refresh';
+        meta.content = '2;url=/dashboard-choice.html?test=meta&t=' + Date.now();
+        document.head.appendChild(meta);
+        log('Meta refresh redirect initiated', 'success');
+      } catch (error) {
+        log('Meta refresh failed: ' + error.message, 'error');
+      }
+    }
+    
+    // Test History API
+    function testHistoryPushState() {
+      log('Testing History API redirect...', 'info');
+      try {
+        const url = '/dashboard-choice.html?test=history&t=' + Date.now();
+        history.pushState({}, '', url);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+        log('History API redirect initiated', 'success');
+      } catch (error) {
+        log('History API failed: ' + error.message, 'error');
+      }
+    }
+    
+    // Generic redirect function
+    function redirectTo(url) {
+      log('Redirecting to: ' + url, 'info');
+      try {
+        window.location.href = url + '?test=generic&t=' + Date.now();
+        log('Generic redirect initiated', 'success');
+      } catch (error) {
+        log('Generic redirect failed: ' + error.message, 'error');
+      }
+    }
+    
+    // Check for Content Security Policy
+    function checkCSP() {
+      const metas = document.getElementsByTagName('meta');
+      for (let meta of metas) {
+        if (meta.httpEquiv && meta.httpEquiv.toLowerCase() === 'content-security-policy') {
+          log('CSP found: ' + meta.content, 'info');
+          return;
+        }
+      }
+      log('No CSP meta tag found', 'info');
+    }
+    
+    // Check for errors
+    window.addEventListener('error', function(e) {
+      log('JavaScript error: ' + e.message + ' at ' + e.filename + ':' + e.lineno, 'error');
+    });
+    
+    // Check for unhandled promise rejections
+    window.addEventListener('unhandledrejection', function(e) {
+      log('Unhandled promise rejection: ' + e.reason, 'error');
+    });
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      log('Redirect test page loaded', 'info');
+      showBrowserInfo();
+      checkCSP();
+      
+      // Check if we came from a redirect test
+      const urlParams = new URLSearchParams(window.location.search);
+      const testType = urlParams.get('test');
+      if (testType) {
+        log('Redirect test successful! Method: ' + testType, 'success');
+      }
+    });
+  </script>
+</body>
+</html>

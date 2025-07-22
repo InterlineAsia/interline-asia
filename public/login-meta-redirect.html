@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login with Meta Redirect - Interline Asia</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    
+    .login-container {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      width: 100%;
+      max-width: 400px;
+    }
+    
+    h1 {
+      margin-top: 0;
+      color: #333;
+      text-align: center;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #555;
+    }
+    
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #0070f3;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    
+    button:hover {
+      background-color: #0051a8;
+    }
+    
+    .error-message {
+      color: #e53e3e;
+      margin-top: 20px;
+      text-align: center;
+      display: none;
+    }
+    
+    .success-message {
+      color: #38a169;
+      margin-top: 20px;
+      text-align: center;
+      display: none;
+    }
+    
+    .loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      display: none;
+    }
+    
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #0070f3;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .redirect-info {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #e3f2fd;
+      border: 1px solid #2196f3;
+      border-radius: 4px;
+      text-align: center;
+      display: none;
+    }
+    
+    .manual-link {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 8px 16px;
+      background-color: #4caf50;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div id="loading" class="loading">
+    <div class="spinner"></div>
+  </div>
+
+  <div class="login-container">
+    <h1>Login (Meta Redirect)</h1>
+    <p style="text-align: center; color: #666; font-size: 14px;">Uses HTML meta refresh for redirect</p>
+    
+    <form id="login-form">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required>
+      </div>
+      
+      <button type="submit" id="login-button">Sign In</button>
+      
+      <div id="error-message" class="error-message"></div>
+      <div id="success-message" class="success-message"></div>
+      
+      <div id="redirect-info" class="redirect-info">
+        <p><strong>Login Successful!</strong></p>
+        <p>You will be redirected to the dashboard in <span id="countdown">5</span> seconds.</p>
+        <p>If you are not redirected automatically:</p>
+        <a href="/dashboard-choice.html" class="manual-link">Click here to go to Dashboard</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Initialize variables
+    const loginForm = document.getElementById('login-form');
+    const loginButton = document.getElementById('login-button');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const errorMessage = document.getElementById('error-message');
+    const successMessage = document.getElementById('success-message');
+    const loading = document.getElementById('loading');
+    const redirectInfo = document.getElementById('redirect-info');
+    const countdown = document.getElementById('countdown');
+    
+    // Initialize Supabase client
+    const supabaseUrl = 'https://nxreyyxbuwxjfmtvdkji.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im54cmV5eXhidXd4amZtdHZka2ppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NTg4NDQsImV4cCI6MjA2NzAzNDg0NH0.SuaK9TqBLbysPCe0zyrMA8owMK4R-q7iNZbtLQzEKcE';
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: false,
+        storage: window.localStorage
+      }
+    });
+    
+    // Helper functions
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.style.display = 'block';
+      successMessage.style.display = 'none';
+      redirectInfo.style.display = 'none';
+    }
+    
+    function showSuccess(message) {
+      successMessage.textContent = message;
+      successMessage.style.display = 'block';
+      errorMessage.style.display = 'none';
+    }
+    
+    function showLoading(isLoading) {
+      loading.style.display = isLoading ? 'flex' : 'none';
+      loginButton.disabled = isLoading;
+    }
+    
+    // Meta refresh redirect function
+    function redirectWithMeta() {
+      // Hide other messages
+      errorMessage.style.display = 'none';
+      successMessage.style.display = 'none';
+      
+      // Show redirect info
+      redirectInfo.style.display = 'block';
+      
+      // Start countdown
+      let timeLeft = 5;
+      const countdownInterval = setInterval(() => {
+        timeLeft--;
+        countdown.textContent = timeLeft;
+        
+        if (timeLeft <= 0) {
+          clearInterval(countdownInterval);
+          
+          // Create meta refresh tag
+          const meta = document.createElement('meta');
+          meta.httpEquiv = 'refresh';
+          meta.content = '0;url=/dashboard-choice.html?login=success&t=' + Date.now();
+          document.head.appendChild(meta);
+          
+          // Fallback: try JavaScript redirect after a short delay
+          setTimeout(() => {
+            try {
+              window.location.href = '/dashboard-choice.html?login=success&t=' + Date.now();
+            } catch (e) {
+              console.error('JavaScript redirect also failed:', e);
+            }
+          }, 1000);
+        }
+      }, 1000);
+    }
+    
+    // Handle form submission
+    loginForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+      
+      if (!email || !password) {
+        showError('Please enter both email and password.');
+        return;
+      }
+      
+      showLoading(true);
+      console.log('META_LOGIN: Attempting login for', email);
+      
+      try {
+        // Clear any existing sessions
+        await supabase.auth.signOut({ scope: 'local' });
+        
+        // Attempt login
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+        
+        if (error) {
+          throw error;
+        }
+        
+        if (!data.user || !data.session) {
+          throw new Error('Login failed - no user session created');
+        }
+        
+        console.log('META_LOGIN: Login successful!', data.user.email);
+        showLoading(false);
+        
+        // Use meta refresh redirect
+        redirectWithMeta();
+        
+      } catch (error) {
+        console.error('META_LOGIN: Error', error);
+        
+        let message = 'Login failed. Please try again.';
+        
+        if (error.message) {
+          if (error.message.includes('Invalid login credentials')) {
+            message = 'Invalid email or password.';
+          } else if (error.message.includes('Email not confirmed')) {
+            message = 'Please check your email and confirm your account first.';
+          } else {
+            message = error.message;
+          }
+        }
+        
+        showError(message);
+        showLoading(false);
+      }
+    });
+    
+    // Check if already logged in
+    async function checkExistingSession() {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session) {
+          console.log('META_LOGIN: Existing session found', session.user.email);
+          redirectWithMeta();
+        }
+      } catch (error) {
+        console.error('META_LOGIN: Session check error', error);
+      }
+    }
+    
+    // Check for existing session on page load
+    checkExistingSession();
+  </script>
+</body>
+</html>

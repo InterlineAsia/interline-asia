@@ -58,6 +58,7 @@ class MemberGate {
         // Replace price with login prompt
         element.innerHTML = '<span class="login-to-view">🔒 Login to view</span>';
         element.style.cursor = 'pointer';
+        // Note: Consider using requireAuth() from auth-guard.js for consistency
         element.onclick = () => this.redirectToLogin();
       }
     });
@@ -147,7 +148,8 @@ class MemberGate {
   }
 
   redirectToLogin() {
-    // Store current page for redirect after login
+    // Note: This method is deprecated - use requireAuth() from auth-guard.js instead
+    console.warn('MEMBER_GATE: redirectToLogin() is deprecated, use requireAuth() instead');
     localStorage.setItem('redirectAfterLogin', window.location.href);
     window.location.href = 'login.html';
   }

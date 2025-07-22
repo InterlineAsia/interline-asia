@@ -190,6 +190,12 @@ class MemberGate {
       return null;
     }
   }
+
+  // Export for use in other modules
+  static async ensureVerified() {
+    const gate = new MemberGate();
+    return await gate.ensureVerified();
+  }
 }
 
 // CSS Styles for member gate

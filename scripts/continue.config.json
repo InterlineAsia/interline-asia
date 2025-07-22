@@ -1,0 +1,18 @@
+{
+  "models": [
+    {
+      "title": "DeepSeek",
+      "provider": "openrouter",
+      "model": "deepseek-coder",
+      "apiKey": "openrouter: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"
+    }
+  ],
+  "continue": {
+    "enabled": true,
+    "model": "deepseek-coder",
+    "maxTokens": 1000,
+    "temperature": 0.7,
+    "topP": 0.9,
+    "stopSequences": ["\n\n"]
+  }
+}

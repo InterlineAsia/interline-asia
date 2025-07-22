@@ -59,16 +59,29 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data && window.supabaseClient.isLoggedIn()) {
                 console.log('LOGIN.JS: User authenticated successfully');
                 showSuccess('Login successful! Redirecting...');
-                // Handle redirect immediately
-                const redirectUrl = localStorage.getItem('redirectAfterLogin') || '/dashboard-choice.html';
-                console.log('LOGIN: Login successful, handling redirect to:', redirectUrl);
-                localStorage.removeItem('redirectAfterLogin');
-                console.log('LOGIN: Executing redirect now...');
                 
-                // Reset button state before redirect
-                setLoadingState(false);
-                
-                window.location.replace(redirectUrl);
+                // Validate session persistence
+                try {
+                    await window.supabaseClient.validateSession();
+                    console.log('LOGIN: Session validated successfully');
+                    
+                    // Handle redirect immediately
+                    const redirectUrl = localStorage.getItem('redirectAfterLogin') || '/dashboard-choice.html';
+                    console.log('LOGIN: Login successful, handling redirect to:', redirectUrl);
+                    localStorage.removeItem('redirectAfterLogin');
+                    
+                    // Reset button state before redirect
+                    setLoadingState(false);
+                    
+                    // Force redirect with cache busting
+                    window.location.replace(redirectUrl + '?t=' + Date.now());
+                } catch (sessionError) {
+                    console.error('LOGIN: Session validation failed:', sessionError);
+                    showError('Login failed - session not persisted');
+                    setLoadingState(false);
+                    // Force reload to clear any partial state
+                    window.location.reload();
+                }
             } else {
                 showError('Login failed - authentication not established');
                 throw new Error('Login failed - authentication not established');

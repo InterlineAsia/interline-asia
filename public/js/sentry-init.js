@@ -1,12 +1,17 @@
+// SENTRY DISABLED FOR LOCAL DEV - COMMENTED OUT TO PREVENT CRASHES
 // Sentry initialization for client-side error tracking
 // Following Sentry best practices for proper instrumentation
 
 (function() {
+  // SENTRY DISABLED
+  console.log('Sentry disabled for local development');
+  return;
+  
   // Sentry DSN
-  const SENTRY_DSN = 'https://0d303493dda99798ec54797ed93d27fa@o4509632867598336.ingest.de.sentry.io/4509632880967760';
+  // const SENTRY_DSN = 'https://0d303493dda99798ec54797ed93d27fa@o4509632867598336.ingest.de.sentry.io/4509632880967760';
   
   // Only initialize if Sentry library is available
-  if (typeof Sentry !== 'undefined') {
+  // if (typeof Sentry !== 'undefined') {
     try {
       Sentry.init({
         dsn: SENTRY_DSN,

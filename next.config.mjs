@@ -1,4 +1,5 @@
-import { withSentryConfig } from '@sentry/nextjs';
+// SENTRY DISABLED FOR LOCAL DEV
+// import { withSentryConfig } from '@sentry/nextjs';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -22,11 +23,13 @@ const nextConfig = {
   },
 };
 
-const sentryWebpackPluginOptions = {
-  // Additional config options for the Sentry Webpack plugin
-  silent: true, // Suppresses source map uploading logs during build
-  org: "interline-asia",
-  project: "interline-asia-frontend",
-};
+// SENTRY DISABLED
+// const sentryWebpackPluginOptions = {
+//   // Additional config options for the Sentry Webpack plugin
+//   silent: true, // Suppresses source map uploading logs during build
+//   org: "interline-asia",
+//   project: "interline-asia-frontend",
+// };
 
-export default withSentryConfig(nextConfig, sentryWebpackPluginOptions);/* FORCE DEPLOY - BUILD FIX - $(date +%s) */
+// export default withSentryConfig(nextConfig, sentryWebpackPluginOptions);
+export default nextConfig;/* FORCE DEPLOY - BUILD FIX - $(date +%s) */

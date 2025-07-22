@@ -1389,8 +1389,14 @@
         if (window.supabaseClient) {
           await window.supabaseClient.readyPromise;
           
+          // Give auth state time to settle
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          
           // Check if user is logged in
-          if (!window.supabaseClient.isLoggedIn()) {
+          const isLoggedIn = window.supabaseClient.isLoggedIn();
+          console.log('BOOKING: Auth check result:', isLoggedIn);
+          
+          if (!isLoggedIn) {
             console.log('BOOKING: User not logged in, redirecting to login');
             // Store current URL for redirect after login
             localStorage.setItem('redirectAfterLogin', window.location.href);
@@ -1401,7 +1407,7 @@
           console.log('BOOKING: User is logged in, proceeding with booking page');
           return true;
         } else {
-          console.warn('BOOKING: Supabase client not available');
+          console.warn('BOOKING: Supabase client not available, proceeding anyway');
           return true; // Proceed anyway
         }
       } catch (error) {

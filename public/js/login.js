@@ -51,23 +51,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // Ensure supabase is available
-            if (typeof supabase === 'undefined') {
-                throw new Error("Supabase client is not defined. Check your HTML includes the correct Supabase initialization script *before* this login.js.");
+            if (!window.supabaseClient) {
+                throw new Error("Supabase client is not available. Check your HTML includes the correct Supabase initialization script *before* this login.js.");
             }
 
-            // Sign in using Supabase client
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email,
-                password,
-            });
+            // Wait for Supabase client to be ready
+            await window.supabaseClient.readyPromise;
 
-            if (error) {
-                throw new Error(error.message);
-            }
+            // Sign in using the global Supabase client
+            const data = await window.supabaseClient.signIn(email, password);
 
-            if (data.user) {
-                console.log('LOGIN.JS: User authenticated successfully:', data.user.email);
+            if (data && window.supabaseClient.isLoggedIn()) {
+                console.log('LOGIN.JS: User authenticated successfully');
                 await handleLoginSuccess();
+            } else {
+                throw new Error('Login failed - authentication not established');
             } else {
                 throw new Error('Login failed: no user returned.');
             }

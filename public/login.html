@@ -58,6 +58,7 @@
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
 </head>
 <body>
   <!-- Navigation -->
@@ -128,10 +129,10 @@
         <p>Sign in to access your exclusive travel deals</p>
       </div>
 
-      <div id="error-message" class="error-message" style="display: none;"></div>
-      <div id="success-message" class="success-message" style="display: none;"></div>
-
-      <div id="login-form">
+      <form id="login-form">
+        <div id="error-message" class="error-message" style="display: none;"></div>
+        <div id="success-message" class="success-message" style="display: none;"></div>
+        
         <div class="form-group">
           <label for="email">Email Address</label>
           <input type="email" id="email" name="email" required>
@@ -142,8 +143,8 @@
           <input type="password" id="password" name="password" required>
         </div>
 
-        <button type="button" class="btn btn-primary" id="login-button">Sign In</button>
-      </div>
+        <button type="submit" class="btn btn-primary" id="login-button">Sign In</button>
+      </form>
 
       <div class="auth-links">
         <p><a href="reset-password.html">Forgot your password?</a></p>
@@ -156,107 +157,12 @@
   <!-- Footer -->
   <div id="footer-placeholder"></div>
 
-  <!-- Core Security & Performance Scripts -->
-  <script src="/js/error-handler.js"></script>
-  <script src="/js/performance-optimizer.js"></script>
-  <script src="/js/accessibility-enhancer.js"></script>
-  <script src="/js/input-validator.js"></script>
-  <script src="/js/secure-auth.js"></script>
-  
-  <!-- Advanced Services -->
-  <script src="/js/cache-manager.js"></script>
-  <script src="/js/cruise-query-service.js"></script>
-  <script src="/js/sync-worker.js"></script>
-  
-  <!-- Application Scripts -->
-  <script src="/js/social-media.js"></script>
+  <!-- UNIFIED LOGIN SYSTEM - SINGLE CLEAN IMPLEMENTATION -->
   <script>
-    // Load footer with error handling and input validation
-    ErrorHandler.safeAsync(async () => {
-      const response = await fetch('/partials/footer.html');
-      if (response.ok) {
-        const html = await response.text();
-        // Validate HTML content before inserting
-        const validation = InputValidator.validateText(html, { required: true });
-        if (validation.isValid) {
-          document.getElementById('footer-placeholder').innerHTML = validation.sanitized;
-        }
-      }
-    });
-
-    // Enhanced login form security
-    document.addEventListener('DOMContentLoaded', () => {
-      const loginButton = document.getElementById('login-button');
-      const emailInput = document.getElementById('email');
-      const passwordInput = document.getElementById('password');
-      const errorMessage = document.getElementById('error-message');
-
-      if (loginButton && emailInput && passwordInput) {
-        loginButton.addEventListener('click', async (e) => {
-          e.preventDefault();
-          
-          // Clear previous errors
-          errorMessage.style.display = 'none';
-          
-          // Get and validate inputs
-          const email = emailInput.value.trim();
-          const password = passwordInput.value;
-          
-          // Validate email
-          const emailValidation = InputValidator.validate(email, 'email');
-          if (!emailValidation.isValid) {
-            errorMessage.textContent = emailValidation.errors.join(', ');
-            errorMessage.style.display = 'block';
-            return;
-          }
-          
-          // Validate password
-          if (!password || password.length < 6) {
-            errorMessage.textContent = 'Password is required';
-            errorMessage.style.display = 'block';
-            return;
-          }
-          
-          // Check rate limiting
-          if (!InputValidator.validateRateLimit('login', email)) {
-            errorMessage.textContent = 'Too many login attempts. Please try again later.';
-            errorMessage.style.display = 'block';
-            return;
-          }
-          
-          // Disable button during login
-          loginButton.disabled = true;
-          loginButton.textContent = 'Signing In...';
-          
-          try {
-            // Use secure auth service
-            const result = await SecureAuth.login(emailValidation.sanitized, password);
-            
-            if (result.success) {
-              // Redirect to dashboard or home
-              window.location.href = '/dashboard.html';
-            } else {
-              errorMessage.textContent = result.error || 'Login failed';
-              errorMessage.style.display = 'block';
-            }
-          } catch (error) {
-            console.error('Login error:', error);
-            errorMessage.textContent = 'An unexpected error occurred. Please try again.';
-            errorMessage.style.display = 'block';
-          } finally {
-            // Re-enable button
-            loginButton.disabled = false;
-            loginButton.textContent = 'Sign In';
-          }
-        });
-      }
-    });
-  </script>
-  <script>
-    // Simple, clean login system
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('LOGIN: Initializing clean login system...');
-      
+    console.log('LOGIN: Initializing unified login system...');
+    
+    document.addEventListener('DOMContentLoaded', async function() {
+      const loginForm = document.getElementById('login-form');
       const loginButton = document.getElementById('login-button');
       const emailInput = document.getElementById('email');
       const passwordInput = document.getElementById('password');
@@ -265,23 +171,10 @@
       
       let isLoading = false;
       
-      // Initialize Supabase
-      let supabase = null;
-      
-      function initSupabase() {
-        if (!window.supabase || !window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
-          console.error('LOGIN: Supabase not available');
-          return false;
-        }
-        
-        supabase = window.supabase.createClient(
-          window.SUPABASE_URL,
-          window.SUPABASE_ANON_KEY
-        );
-        
-        console.log('LOGIN: Supabase initialized');
-        return true;
-      }
+      // Wait for Supabase client to be ready
+      console.log('LOGIN: Waiting for Supabase client...');
+      await window.supabaseClient.readyPromise;
+      console.log('LOGIN: Supabase client ready');
       
       function showError(message) {
         errorDiv.textContent = message;
@@ -306,7 +199,10 @@
         loginButton.textContent = loading ? 'Signing In...' : 'Sign In';
       }
       
-      async function handleLogin() {
+      async function handleLogin(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
         if (isLoading) return;
         
         const email = emailInput.value.trim();
@@ -322,14 +218,8 @@
         setLoading(true);
         
         try {
-          if (!supabase) {
-            if (!initSupabase()) {
-              throw new Error('Failed to initialize authentication system');
-            }
-          }
-          
-          // Simple Supabase login
-          const { data, error } = await supabase.auth.signInWithPassword({
+          // Use the singleton Supabase client
+          const { data, error } = await window.supabaseClient.supabase.auth.signInWithPassword({
             email: email,
             password: password
           });
@@ -344,34 +234,23 @@
           }
           
           console.log('LOGIN: Success! User:', data.user.email);
-          console.log('LOGIN: Session:', data.session);
+          console.log('LOGIN: Session created:', !!data.session);
           
           // Track login
           if (typeof gtag !== 'undefined') {
             gtag('event', 'login', { method: 'email' });
           }
           
-          // Determine redirect
-          const adminEmails = [
-            'rodney@telenational.com.au',
-            'admin@telenational.com.au', 
-            'admin@interlineasia.com'
-          ];
-          
-          const isAdmin = adminEmails.includes(email.toLowerCase());
-          
           showSuccess('Login successful! Redirecting...');
           
-          // Redirect after short delay
-          setTimeout(() => {
-            if (isAdmin) {
-              console.log('LOGIN: Redirecting admin to dashboard choice');
-              window.location.href = '/dashboard-choice.html';
-            } else {
-              console.log('LOGIN: Redirecting user to dashboard');
-              window.location.href = '/dashboard.html';
-            }
-          }, 1000);
+          // Get redirect URL from localStorage or use default
+          const redirectUrl = localStorage.getItem('redirectAfterLogin') || '/dashboard-choice.html';
+          localStorage.removeItem('redirectAfterLogin');
+          
+          console.log('LOGIN: Redirecting to:', redirectUrl);
+          
+          // Redirect immediately - no delay needed
+          window.location.replace(redirectUrl);
           
         } catch (error) {
           console.error('LOGIN: Error:', error);
@@ -396,19 +275,7 @@
       }
       
       // Event listeners
-      loginButton.addEventListener('click', handleLogin);
-      
-      // Enter key support
-      emailInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') handleLogin();
-      });
-      
-      passwordInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') handleLogin();
-      });
-      
-      // Initialize Supabase on load
-      initSupabase();
+      loginForm.addEventListener('submit', handleLogin);
       
       // Show success message if coming from registration
       const urlParams = new URLSearchParams(window.location.search);
@@ -418,6 +285,14 @@
       
       console.log('LOGIN: System ready');
     });
+    
+    // Load footer
+    fetch('/partials/footer.html')
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('footer-placeholder').innerHTML = html;
+      })
+      .catch(error => console.warn('Could not load footer:', error));
   </script>
 </body>
 </html>

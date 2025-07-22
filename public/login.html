@@ -507,38 +507,8 @@
       // Note: Auth state listener removed to prevent conflicts with dashboard-choice.html
       // Only dashboard-choice.html should handle auth state changes
       
-      // Check if user is already logged in
-      setTimeout(async () => {
-        try {
-          console.log('LOGIN: Checking if user is already logged in...');
-          
-          if (window.supabaseClient) {
-            await window.supabaseClient.readyPromise;
-            
-            if (window.supabaseClient.isLoggedIn()) {
-              const currentUser = await window.supabaseClient.getCurrentUser();
-              console.log('LOGIN: User already logged in:', currentUser?.email);
-              
-              showSuccess('Already logged in! Redirecting...');
-              
-              setTimeout(() => {
-                // Check if there's a redirect URL stored (for booking page access)
-                const redirectUrl = localStorage.getItem('redirectAfterLogin');
-                if (redirectUrl) {
-                    localStorage.removeItem('redirectAfterLogin');
-                    window.location.href = redirectUrl;
-                } else {
-                    window.location.href = '/dashboard-choice.html';
-                }
-              }, 500);
-            } else {
-              console.log('LOGIN: User not logged in, staying on login page');
-            }
-          }
-        } catch (error) {
-          console.error('LOGIN: Error checking login status:', error);
-        }
-      }, 1000); // Wait 1 second for everything to initialize
+      // Note: Removed automatic redirect check to prevent flickering
+      // Users can manually navigate if already logged in
     });
 
     // Auto-update year

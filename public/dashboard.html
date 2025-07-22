@@ -37,6 +37,11 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico">
     <link rel="manifest" href="/site.webmanifest">
+    
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="supabase-client.js"></script>
 </head>
 <body>
     <!-- Navigation -->
@@ -240,15 +245,38 @@
     <script>
         // Member Dashboard Implementation
         document.addEventListener('DOMContentLoaded', async () => {
-            // Check authentication
-            const user = await SecureAuth.getCurrentUser();
-            if (!user) {
-                window.location.href = '/login.html';
+            console.log('DASHBOARD: Loading...');
+            
+            try {
+                // Wait for Supabase client to be ready
+                await window.supabaseClient.readyPromise;
+                console.log('DASHBOARD: Supabase client ready');
+                
+                // Check authentication using proper Supabase session
+                const { data: { session }, error } = await window.supabaseClient.supabase.auth.getSession();
+                
+                if (error) {
+                    console.error('DASHBOARD: Session error:', error);
+                    window.location.replace('/login.html');
+                    return;
+                }
+                
+                if (!session || !session.user) {
+                    console.log('DASHBOARD: No session found, redirecting to login');
+                    localStorage.setItem('redirectAfterLogin', window.location.href);
+                    window.location.replace('/login.html');
+                    return;
+                }
+                
+                console.log('DASHBOARD: User authenticated:', session.user.email);
+                
+                // Load dashboard data
+                await loadDashboardData(session.user);
+            } catch (error) {
+                console.error('DASHBOARD: Authentication check failed:', error);
+                window.location.replace('/login.html');
                 return;
             }
-
-            // Load dashboard data
-            await loadDashboardData(user);
             
             // Setup event listeners
             setupEventListeners();
@@ -295,9 +323,10 @@
 
         async function loadUserQuotes(userId) {
             try {
+                const { data: { session } } = await window.supabaseClient.supabase.auth.getSession();
                 const response = await fetch('/api/user-quotes', {
                     headers: {
-                        'Authorization': `Bearer ${await SecureAuth.getSession()?.access_token}`
+                        'Authorization': `Bearer ${session?.access_token}`
                     }
                 });
 
@@ -316,9 +345,10 @@
 
         async function loadUserBookings(userId) {
             try {
+                const { data: { session } } = await window.supabaseClient.supabase.auth.getSession();
                 const response = await fetch('/api/user-bookings', {
                     headers: {
-                        'Authorization': `Bearer ${await SecureAuth.getSession()?.access_token}`
+                        'Authorization': `Bearer ${session?.access_token}`
                     }
                 });
 
@@ -483,8 +513,8 @@
         function setupEventListeners() {
             // Logout button
             document.getElementById('logout-btn').addEventListener('click', async () => {
-                await SecureAuth.logout();
-                window.location.href = '/';
+                console.log('DASHBOARD: Logging out...');
+                await window.supabaseClient.signOut();
             });
 
             // Edit profile button

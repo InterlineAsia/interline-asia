@@ -125,20 +125,19 @@
       <div id="error-message" class="error-message" style="display: none;"></div>
       <div id="success-message" class="success-message" style="display: none;"></div>
 
-      <div id="login-form">
+      <form id="login-form">
         <div class="form-group">
           <label for="email">Email Address</label>
           <input type="email" id="email" name="email" required>
         </div>
-
         <div class="form-group">
           <label for="password">Password</label>
           <input type="password" id="password" name="password" required>
         </div>
-
-        <button type="button" class="btn btn-primary" id="login-button" aria-describedby="login-help">Sign In</button>
-        <div id="login-help" class="sr-only">Sign in to access your exclusive cruise deals and member dashboard</div>
-      </div>
+        <button type="submit" class="btn btn-primary" id="submit-button">Sign In</button>
+        <div id="error-message" class="error-message" style="display: none;"></div>
+        <div id="success-message" class="success-message" style="display: none;"></div>
+      </form>
 
       <div class="auth-links">
         <p><a href="reset-password.html">Forgot your password?</a></p>

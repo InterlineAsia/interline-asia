@@ -308,6 +308,7 @@
         }
         
         console.log('LOGIN: Starting login for:', email);
+        loginInProgress = true; // Set flag to indicate fresh login
         hideMessages();
         setLoading(true);
         
@@ -454,8 +455,10 @@
       // Initialize Supabase on load
       initSupabase();
       
-      // Add auth state listener for immediate redirect
+      // Add auth state listener for immediate redirect (only for fresh logins)
       let authListenerAdded = false;
+      let loginInProgress = false;
+      
       function addAuthListener() {
         if (authListenerAdded || !window.supabaseClient) return;
         authListenerAdded = true;
@@ -464,8 +467,10 @@
         window.supabaseClient.supabase.auth.onAuthStateChange((event, session) => {
           console.log('LOGIN: Auth state change:', event, session?.user?.email);
           
-          if (event === 'SIGNED_IN' && session?.user) {
-            console.log('LOGIN: Auth listener detected sign in, triggering redirect...');
+          // Only redirect if we're in the middle of a login process
+          if (event === 'SIGNED_IN' && session?.user && loginInProgress) {
+            console.log('LOGIN: Auth listener detected fresh sign in, triggering redirect...');
+            loginInProgress = false; // Reset flag
             
             // Small delay to ensure UI updates
             setTimeout(() => {

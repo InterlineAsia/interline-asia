@@ -352,11 +352,20 @@
             // Reset loading state
             setLoading(false);
             
-            // Redirect to dashboard after successful login
-            console.log('LOGIN: REDIRECTING TO DASHBOARD');
+            // Redirect after successful login
+            console.log('LOGIN: REDIRECTING AFTER LOGIN');
             setTimeout(() => {
-              console.log('LOGIN: Executing redirect to dashboard');
-              window.location.href = '/dashboard.html';
+              console.log('LOGIN: Executing redirect');
+              // Check if there's a redirect URL stored (for booking page access)
+              const redirectUrl = localStorage.getItem('redirectAfterLogin');
+              if (redirectUrl) {
+                  localStorage.removeItem('redirectAfterLogin');
+                  console.log('LOGIN: Redirecting to stored URL:', redirectUrl);
+                  window.location.href = redirectUrl;
+              } else {
+                  console.log('LOGIN: Redirecting to dashboard choice');
+                  window.location.href = '/dashboard-choice.html';
+              }
             }, 1000);
           } else {
             console.error('LOGIN: Login appeared to succeed but user is not logged in');
@@ -450,7 +459,14 @@
               showSuccess('Already logged in! Redirecting...');
               
               setTimeout(() => {
-                window.location.href = '/dashboard-choice.html';
+                // Check if there's a redirect URL stored (for booking page access)
+                const redirectUrl = localStorage.getItem('redirectAfterLogin');
+                if (redirectUrl) {
+                    localStorage.removeItem('redirectAfterLogin');
+                    window.location.href = redirectUrl;
+                } else {
+                    window.location.href = '/dashboard-choice.html';
+                }
               }, 500);
             } else {
               console.log('LOGIN: User not logged in, staying on login page');

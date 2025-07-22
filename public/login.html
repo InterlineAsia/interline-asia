@@ -344,7 +344,7 @@
               const currentUser = await window.supabaseClient.getCurrentUser();
               console.log('LOGIN: Success! Current user:', currentUser?.email);
               
-              // Use the simplified redirect handler
+              // Call the unified redirect handler
               await handleLoginSuccess();
             } else {
               console.error('LOGIN: Login appeared to succeed but user is not logged in');

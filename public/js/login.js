@@ -59,7 +59,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data && window.supabaseClient.isLoggedIn()) {
                 console.log('LOGIN.JS: User authenticated successfully');
                 showSuccess('Login successful! Redirecting...');
-                await handleLoginSuccess();
+                // Handle redirect immediately
+                const redirectUrl = localStorage.getItem('redirectAfterLogin') || '/dashboard-choice.html';
+                console.log('LOGIN: Login successful, handling redirect to:', redirectUrl);
+                localStorage.removeItem('redirectAfterLogin');
+                console.log('LOGIN: Executing redirect now...');
+                window.location.replace(redirectUrl);
             } else {
                 showError('Login failed - authentication not established');
                 throw new Error('Login failed - authentication not established');
@@ -73,10 +78,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Handle successful login redirect
-async function handleLoginSuccess() {
-    const redirectUrl = localStorage.getItem('redirectAfterLogin') || '/dashboard-choice.html';
-    console.log('LOGIN: Login successful, handling redirect to:', redirectUrl);
-    localStorage.removeItem('redirectAfterLogin');
-    window.location.replace(redirectUrl);
-}
+// Removed handleLoginSuccess - redirect logic moved inline for immediate execution

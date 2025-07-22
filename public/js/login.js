@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const setLoadingState = (isLoading) => {
         if (submitButton) {
             submitButton.disabled = isLoading;
-            submitButton.textContent = isLoading ? 'Verifying...' : 'Login';
+            submitButton.textContent = isLoading ? 'Verifying...' : 'Sign In';
         }
     };
 
@@ -50,26 +50,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            // Ensure supabase is available
-            if (!window.supabaseClient) {
-                throw new Error("Supabase client is not available. Check your HTML includes the correct Supabase initialization script *before* this login.js.");
-            }
-
-            // Wait for Supabase client to be ready
+            // Use the global Supabase singleton
             await window.supabaseClient.readyPromise;
 
-            // Sign in using the global Supabase client
+            // Use the singleton's signIn method (which wraps Supabase v2)
             const data = await window.supabaseClient.signIn(email, password);
 
             if (data && window.supabaseClient.isLoggedIn()) {
                 console.log('LOGIN.JS: User authenticated successfully');
+                showSuccess('Login successful! Redirecting...');
                 await handleLoginSuccess();
             } else {
+                showError('Login failed - authentication not established');
                 throw new Error('Login failed - authentication not established');
             }
         } catch (error) {
             console.error('Login failed:', error.message);
             showError(`Login failed: ${error.message.replace('Error: ', '')}`);
+        } finally {
             setLoadingState(false);
         }
     });
@@ -77,9 +75,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Handle successful login redirect
 async function handleLoginSuccess() {
-  const redirectUrl = localStorage.getItem('redirectAfterLogin') || '/dashboard-choice.html';
-  console.log('LOGIN: Login successful, handling redirect to:', redirectUrl);
-  alert('Redirecting to: ' + redirectUrl); // <-- You can remove this line later if you wish
-  localStorage.removeItem('redirectAfterLogin');
-  window.location.replace(redirectUrl);
+    const redirectUrl = localStorage.getItem('redirectAfterLogin') || '/dashboard-choice.html';
+    console.log('LOGIN: Login successful, handling redirect to:', redirectUrl);
+    localStorage.removeItem('redirectAfterLogin');
+    window.location.replace(redirectUrl);
 }

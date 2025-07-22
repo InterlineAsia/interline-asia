@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login with Meta Redirect - Interline Asia</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <title>Direct Login - Interline Asia</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -86,32 +85,36 @@
       display: none;
     }
     
-    .redirect-links {
+    .redirect-container {
       margin-top: 20px;
       text-align: center;
       display: none;
     }
     
-    .redirect-links a {
-      display: block;
-      margin-bottom: 10px;
-      padding: 10px;
-      background-color: #f0f0f0;
+    .redirect-button {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
       border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
       text-decoration: none;
-      color: #333;
+      margin: 5px;
     }
     
-    .redirect-links a:hover {
-      background-color: #e0e0e0;
+    .redirect-button:hover {
+      background-color: #388e3c;
     }
   </style>
 </head>
 <body>
   <div class="login-container">
-    <h1>Login with Meta Redirect</h1>
+    <h1>Direct Login</h1>
+    <p style="text-align: center;">Simple login without redirects</p>
     
-    <form id="login-form">
+    <div id="login-form">
       <div class="form-group">
         <label for="email">Email</label>
         <input type="email" id="email" name="email" required>
@@ -122,47 +125,60 @@
         <input type="password" id="password" name="password" required>
       </div>
       
-      <button type="submit" id="login-button">Sign In</button>
+      <button type="button" id="login-button">Sign In</button>
       
       <div id="error-message" class="message error"></div>
       <div id="success-message" class="message success"></div>
       
-      <div id="redirect-links" class="redirect-links">
-        <p>Click one of these links to go to the dashboard:</p>
-        <a href="/dashboard-choice.html" target="_self">Dashboard Choice</a>
-        <a href="/dashboard-simple.html" target="_self">Simple Dashboard</a>
-        <a href="/dashboard.html" target="_self">Member Dashboard</a>
+      <div id="redirect-container" class="redirect-container">
+        <p>Login successful! Click a button to continue:</p>
+        <a href="/dashboard-choice.html" class="redirect-button">Dashboard Choice</a>
+        <a href="/dashboard-simple.html" class="redirect-button">Simple Dashboard</a>
+        <a href="/dashboard.html" class="redirect-button">Member Dashboard</a>
       </div>
-    </form>
+    </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    // Initialize variables
+    const loginButton = document.getElementById('login-button');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const errorMessage = document.getElementById('error-message');
+    const successMessage = document.getElementById('success-message');
+    const redirectContainer = document.getElementById('redirect-container');
+    
     // Initialize Supabase client
     const supabase = supabase.createClient(
       'https://nxreyyxbuwxjfmtvdkji.supabase.co',
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im54cmV5eXhidXd4amZtdHZka2ppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NTg4NDQsImV4cCI6MjA2NzAzNDg0NH0.SuaK9TqBLbysPCe0zyrMA8owMK4R-q7iNZbtLQzEKcE'
     );
     
-    // Get form elements
-    const loginForm = document.getElementById('login-form');
-    const loginButton = document.getElementById('login-button');
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    const errorMessage = document.getElementById('error-message');
-    const successMessage = document.getElementById('success-message');
-    const redirectLinks = document.getElementById('redirect-links');
+    // Helper functions
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.style.display = 'block';
+      successMessage.style.display = 'none';
+    }
     
-    // Handle form submission
-    loginForm.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      
+    function showSuccess(message) {
+      successMessage.textContent = message;
+      successMessage.style.display = 'block';
+      errorMessage.style.display = 'none';
+    }
+    
+    // Handle login button click
+    loginButton.addEventListener('click', async function() {
       // Get form values
       const email = emailInput.value.trim();
       const password = passwordInput.value.trim();
       
-      // Reset messages
-      errorMessage.style.display = 'none';
-      successMessage.style.display = 'none';
+      // Validate form
+      if (!email || !password) {
+        showError('Please enter both email and password.');
+        return;
+      }
       
       // Disable button
       loginButton.disabled = true;
@@ -189,23 +205,10 @@
         }
         
         // Show success message
-        successMessage.textContent = 'Login successful! Please click one of the links below to continue.';
-        successMessage.style.display = 'block';
+        showSuccess('Login successful!');
         
-        // Show redirect links
-        redirectLinks.style.display = 'block';
-        
-        // Add meta redirect (will activate after 3 seconds)
-        const meta = document.createElement('meta');
-        meta.httpEquiv = 'refresh';
-        meta.content = '3;url=/dashboard-choice.html?t=' + Date.now();
-        document.head.appendChild(meta);
-        
-        // Create an iframe for navigation
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = '/dashboard-choice.html?t=' + Date.now();
-        document.body.appendChild(iframe);
+        // Show redirect buttons
+        redirectContainer.style.display = 'block';
         
       } catch (error) {
         // Show error message
@@ -221,14 +224,33 @@
           }
         }
         
-        errorMessage.textContent = message;
-        errorMessage.style.display = 'block';
+        showError(message);
         
         // Re-enable button
         loginButton.disabled = false;
         loginButton.textContent = 'Sign In';
       }
     });
+    
+    // Check if already logged in
+    async function checkExistingSession() {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session) {
+          // Show success message
+          showSuccess('Already logged in!');
+          
+          // Show redirect buttons
+          redirectContainer.style.display = 'block';
+        }
+      } catch (error) {
+        console.error('Session check error:', error);
+      }
+    }
+    
+    // Check for existing session on page load
+    checkExistingSession();
   </script>
 </body>
 </html>

@@ -807,6 +807,11 @@ if (window.supabaseClient && !window.supabaseClient.readyPromise) {
   });
 }
 
+// Verify readyPromise works
+if (window.supabaseClient?.readyPromise) {
+  window.supabaseClient.readyPromise.then(s => console.log('AUTH: readyPromise resolved', !!s));
+}
+
 console.log('AUTH: Supabase client singleton ready with readyPromise');
 
 // Export the class and instance for module systems (optional, if not using global window)

@@ -48,18 +48,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email,
-                password,
-            });
-
-            if (error) {
-                throw new Error(error.message);
+            // Use the global Supabase client
+            if (!window.supabaseClient) {
+                throw new Error('Supabase client not available');
             }
 
-            if (data.user) {
-                console.log('LOGIN.JS: User authenticated successfully:', data.user.email);
+            console.log('LOGIN.JS: Starting login for:', email);
+            const data = await window.supabaseClient.signIn(email, password);
+            
+            if (data && window.supabaseClient.isLoggedIn()) {
+                console.log('LOGIN.JS: User authenticated successfully:', email);
                 await handleLoginSuccess();
+            } else {
+                throw new Error('Login failed - authentication not established');
             }
         } catch (error) {
             console.error('Login failed:', error.message);
@@ -73,6 +74,26 @@ document.addEventListener('DOMContentLoaded', () => {
 async function handleLoginSuccess() {
   const redirectUrl = localStorage.getItem('redirectAfterLogin') || '/dashboard-choice.html';
   console.log('LOGIN: Login successful, handling redirect to:', redirectUrl);
+  
+  // Reset UI state
+  const submitButton = document.getElementById('submit-button');
+  if (submitButton) {
+    submitButton.disabled = false;
+    submitButton.textContent = 'Sign In';
+  }
+  
+  // Show success message
+  const showSuccess = (message) => {
+    const successMessage = document.getElementById('success-message');
+    if (successMessage) {
+      successMessage.textContent = message;
+      successMessage.style.display = 'block';
+    }
+  };
+  showSuccess('Login successful! Redirecting...');
+  
+  // Remove redirect URL and navigate
   localStorage.removeItem('redirectAfterLogin');
+  console.log('LOGIN: Navigating to:', redirectUrl);
   window.location.replace(redirectUrl);
 }

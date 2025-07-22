@@ -57,17 +57,39 @@
         
         // Wait for the global Supabase client to be ready
         if (!window.supabaseClient) {
-          console.error('DASHBOARD_CHOICE: Global Supabase client not available');
-          window.location.href = '/login.html';
-          return;
+          console.error('DASHBOARD_CHOICE: Global Supabase client not available, waiting...');
+          // Wait a bit longer for the client to initialize
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          if (!window.supabaseClient) {
+            console.error('DASHBOARD_CHOICE: Still no client, redirecting to login');
+            window.location.href = '/login.html';
+            return;
+          }
         }
 
         // Wait for the client to be fully initialized
         await window.supabaseClient.readyPromise;
         
+        // Give auth state time to settle after login
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
         // Check if user is logged in using the global client
-        if (!window.supabaseClient.isLoggedIn()) {
-          console.log('DASHBOARD_CHOICE: User not logged in, redirecting to login');
+        const isLoggedIn = window.supabaseClient.isLoggedIn();
+        console.log('DASHBOARD_CHOICE: Auth check result:', isLoggedIn);
+        
+        if (!isLoggedIn) {
+          console.log('DASHBOARD_CHOICE: User not logged in, checking redirect URL...');
+          
+          // Check if we came from a redirect - if so, don't redirect back to login immediately
+          const redirectUrl = localStorage.getItem('redirectAfterLogin');
+          if (redirectUrl) {
+            console.log('DASHBOARD_CHOICE: Found redirect URL, user probably just logged in, redirecting to:', redirectUrl);
+            localStorage.removeItem('redirectAfterLogin');
+            window.location.href = redirectUrl;
+            return;
+          }
+          
+          console.log('DASHBOARD_CHOICE: No redirect URL, sending to login');
           window.location.href = '/login.html';
           return;
         }

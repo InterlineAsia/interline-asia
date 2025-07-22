@@ -797,7 +797,17 @@ function hideSuccess(elementId = 'success-message') {
 }
 
 // Create a single, globally accessible instance of the SupabaseClient
-window.supabaseClient = new SupabaseClient();
+window.supabaseClient = window.supabaseClient || new SupabaseClient();
+
+// Ensure readyPromise is available on the singleton for session hydration
+if (window.supabaseClient && !window.supabaseClient.readyPromise) {
+  window.supabaseClient.readyPromise = window.supabaseClient.supabase?.auth.getSession().then(({ data }) => {
+    console.log('AUTH: Session loaded via readyPromise:', data.session ? 'session exists' : 'no session');
+    return data.session;
+  });
+}
+
+console.log('AUTH: Supabase client singleton ready with readyPromise');
 
 // Export the class and instance for module systems (optional, if not using global window)
 // export { SupabaseClient };

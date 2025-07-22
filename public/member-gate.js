@@ -163,6 +163,33 @@ class MemberGate {
     await this.checkAuthStatus();
     this.applyAccessGates();
   }
+
+  // New unified verification check using auth-guard
+  async ensureVerified() {
+    try {
+      // Import the unified auth guard
+      const { requireAuth } = await import('/js/auth-guard.js');
+      
+      // First ensure user is authenticated
+      const session = await requireAuth();
+      if (!session) return null; // Already redirected by requireAuth
+      
+      // Then check verification status
+      await this.checkAuthStatus();
+      
+      if (!this.isVerified()) {
+        console.log('MEMBER_GATE: User not verified, showing verification banner');
+        this.addAccessBanner();
+        return { authenticated: true, verified: false };
+      }
+      
+      console.log('MEMBER_GATE: User authenticated and verified');
+      return { authenticated: true, verified: true };
+    } catch (error) {
+      console.error('MEMBER_GATE: Error in ensureVerified:', error);
+      return null;
+    }
+  }
 }
 
 // CSS Styles for member gate

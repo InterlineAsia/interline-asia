@@ -1382,10 +1382,41 @@
       if (successDiv) successDiv.innerHTML = '';
     }
 
+    // Check authentication status
+    async function checkAuthAndProceed() {
+      try {
+        // Wait for Supabase client to be ready
+        if (window.supabaseClient) {
+          await window.supabaseClient.readyPromise;
+          
+          // Check if user is logged in
+          if (!window.supabaseClient.isLoggedIn()) {
+            console.log('BOOKING: User not logged in, redirecting to login');
+            // Store current URL for redirect after login
+            localStorage.setItem('redirectAfterLogin', window.location.href);
+            window.location.href = '/login.html';
+            return false;
+          }
+          
+          console.log('BOOKING: User is logged in, proceeding with booking page');
+          return true;
+        } else {
+          console.warn('BOOKING: Supabase client not available');
+          return true; // Proceed anyway
+        }
+      } catch (error) {
+        console.error('BOOKING: Auth check failed:', error);
+        return true; // Proceed anyway
+      }
+    }
+
     // Initialize
     window.addEventListener('load', async () => {
-      // CSV loader is already loaded via script tag in head
+      // Check authentication first
+      const canProceed = await checkAuthAndProceed();
+      if (!canProceed) return;
       
+      // CSV loader is already loaded via script tag in head
       await loadDealDetails();
       setupFileUploads();
     });

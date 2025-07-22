@@ -452,5 +452,5 @@ async function handleStandardBooking(req, res) {
     });
   }
 }
-module.exports = handler;
-module.exports.config = config;
+export default handler;
+export { config };

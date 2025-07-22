@@ -336,6 +336,9 @@
             throw signInError;
           }
           
+          // Wait a moment for auth state to update
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
           // Check if login was successful by checking the current session
           console.log('LOGIN: Checking if user is now logged in...');
           const isLoggedIn = window.supabaseClient.isLoggedIn();
@@ -354,19 +357,19 @@
             
             // Redirect after successful login
             console.log('LOGIN: REDIRECTING AFTER LOGIN');
-            setTimeout(() => {
-              console.log('LOGIN: Executing redirect');
-              // Check if there's a redirect URL stored (for booking page access)
-              const redirectUrl = localStorage.getItem('redirectAfterLogin');
-              if (redirectUrl) {
-                  localStorage.removeItem('redirectAfterLogin');
-                  console.log('LOGIN: Redirecting to stored URL:', redirectUrl);
-                  window.location.href = redirectUrl;
-              } else {
-                  console.log('LOGIN: Redirecting to dashboard choice');
-                  window.location.href = '/dashboard-choice.html';
-              }
-            }, 1000);
+            
+            // Check if there's a redirect URL stored (for booking page access)
+            const redirectUrl = localStorage.getItem('redirectAfterLogin');
+            console.log('LOGIN: Stored redirect URL:', redirectUrl);
+            
+            if (redirectUrl) {
+                localStorage.removeItem('redirectAfterLogin');
+                console.log('LOGIN: Redirecting to stored URL:', redirectUrl);
+                window.location.href = redirectUrl;
+            } else {
+                console.log('LOGIN: Redirecting to dashboard choice');
+                window.location.href = '/dashboard-choice.html';
+            }
           } else {
             console.error('LOGIN: Login appeared to succeed but user is not logged in');
             throw new Error('Login failed - authentication not established');

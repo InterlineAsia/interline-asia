@@ -73,9 +73,15 @@ export async function requireAuth(redirectOnFail = '/login.html') {
   console.log('AUTH_GUARD: Checking authentication...');
   
   try {
-    // Wait until Supabase has loaded (max 2s fallback)
+    // Wait for the global Supabase client to be ready
+    if (!window.supabaseClient) {
+      console.log('AUTH_GUARD: Waiting for Supabase client...');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    
+    // Use the singleton's readyPromise with fallback
     const session = await Promise.race([
-      supabase.readyPromise,
+      window.supabaseClient?.readyPromise || Promise.resolve(null),
       new Promise(res => setTimeout(() => res(null), 2000))
     ]);
 

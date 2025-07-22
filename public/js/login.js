@@ -85,10 +85,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new Error(`Error fetching user profile: ${profileError.message}`);
                 }
 
-                showSuccess('Login successful! Redirecting to your dashboard...');
+                showSuccess('Login successful! Redirecting...');
                 
-                // Redirect to the dashboard choice page as per the latest project architecture.
-                window.location.href = '/dashboard-choice.html';
+                // Check if there's a redirect URL stored (for booking page access)
+                const redirectUrl = localStorage.getItem('redirectAfterLogin');
+                if (redirectUrl) {
+                    localStorage.removeItem('redirectAfterLogin');
+                    window.location.href = redirectUrl;
+                } else {
+                    // Default redirect to dashboard choice
+                    window.location.href = '/dashboard-choice.html';
+                }
             }
         } catch (error) {
             console.error('Login failed:', error.message);

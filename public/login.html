@@ -461,8 +461,23 @@
       
       function addAuthListener() {
         if (authListenerAdded || !window.supabaseClient) return;
-        authListenerAdded = true;
         
+        // Check if user is already logged in - if so, handle it immediately without adding listener
+        if (window.supabaseClient.isLoggedIn()) {
+          console.log('LOGIN: User already logged in, handling redirect immediately');
+          const redirectUrl = localStorage.getItem('redirectAfterLogin');
+          if (redirectUrl) {
+            console.log('LOGIN: Found redirect URL for existing user, redirecting to:', redirectUrl);
+            localStorage.removeItem('redirectAfterLogin');
+            window.location.href = redirectUrl;
+          } else {
+            console.log('LOGIN: User already logged in, going to dashboard choice');
+            window.location.href = '/dashboard-choice.html';
+          }
+          return;
+        }
+        
+        authListenerAdded = true;
         console.log('LOGIN: Adding auth state listener for redirect');
         window.supabaseClient.supabase.auth.onAuthStateChange((event, session) => {
           console.log('LOGIN: Auth state change:', event, session?.user?.email);

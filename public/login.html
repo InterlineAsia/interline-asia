@@ -325,54 +325,72 @@
           console.log('LOGIN: Using global Supabase client for authentication');
           
           // Use the global client's signIn method with better error handling
-          let data;
           try {
             console.log('LOGIN: Calling signIn method...');
-            data = await window.supabaseClient.signIn(email, password);
+            const data = await window.supabaseClient.signIn(email, password);
             console.log('LOGIN: SignIn method completed successfully');
             console.log('LOGIN: SignIn response received:', data);
+            
+            // Wait a moment for auth state to update
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Check if login was successful by checking the current session
+            console.log('LOGIN: Checking if user is now logged in...');
+            const isLoggedIn = window.supabaseClient.isLoggedIn();
+            console.log('LOGIN: Is logged in:', isLoggedIn);
+            
+            if (isLoggedIn) {
+              const currentUser = await window.supabaseClient.getCurrentUser();
+              console.log('LOGIN: Success! Current user:', currentUser?.email);
+              
+              // Show success message immediately
+              showSuccess('Login successful! Redirecting...');
+              console.log('LOGIN: SUCCESS MESSAGE SHOWN');
+              
+              // Reset loading state
+              setLoading(false);
+              
+              // Redirect after successful login
+              console.log('LOGIN: REDIRECTING AFTER LOGIN');
+              
+              // Check if there's a redirect URL stored (for booking page access)
+              const redirectUrl = localStorage.getItem('redirectAfterLogin');
+              console.log('LOGIN: Stored redirect URL:', redirectUrl);
+              
+              if (redirectUrl) {
+                  localStorage.removeItem('redirectAfterLogin');
+                  console.log('LOGIN: Redirecting to stored URL:', redirectUrl);
+                  window.location.href = redirectUrl;
+              } else {
+                  console.log('LOGIN: Redirecting to dashboard choice');
+                  window.location.href = '/dashboard-choice.html';
+              }
+            } else {
+              console.error('LOGIN: Login appeared to succeed but user is not logged in');
+              throw new Error('Login failed - authentication not established');
+            }
           } catch (signInError) {
             console.error('LOGIN: SignIn method threw error:', signInError);
-            throw signInError;
-          }
-          
-          // Wait a moment for auth state to update
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
-          // Check if login was successful by checking the current session
-          console.log('LOGIN: Checking if user is now logged in...');
-          const isLoggedIn = window.supabaseClient.isLoggedIn();
-          console.log('LOGIN: Is logged in:', isLoggedIn);
-          
-          if (isLoggedIn) {
-            const currentUser = await window.supabaseClient.getCurrentUser();
-            console.log('LOGIN: Success! Current user:', currentUser?.email);
             
-            // Show success message immediately
-            showSuccess('Login successful! Redirecting...');
-            console.log('LOGIN: SUCCESS MESSAGE SHOWN');
+            // If the signIn method hangs, force a redirect check after auth state change
+            console.log('LOGIN: Forcing auth state check after error...');
+            await new Promise(resolve => setTimeout(resolve, 1500));
             
-            // Reset loading state
-            setLoading(false);
-            
-            // Redirect after successful login
-            console.log('LOGIN: REDIRECTING AFTER LOGIN');
-            
-            // Check if there's a redirect URL stored (for booking page access)
-            const redirectUrl = localStorage.getItem('redirectAfterLogin');
-            console.log('LOGIN: Stored redirect URL:', redirectUrl);
-            
-            if (redirectUrl) {
-                localStorage.removeItem('redirectAfterLogin');
-                console.log('LOGIN: Redirecting to stored URL:', redirectUrl);
-                window.location.href = redirectUrl;
+            if (window.supabaseClient.isLoggedIn()) {
+              console.log('LOGIN: User is actually logged in despite error, redirecting...');
+              showSuccess('Login successful! Redirecting...');
+              setLoading(false);
+              
+              const redirectUrl = localStorage.getItem('redirectAfterLogin');
+              if (redirectUrl) {
+                  localStorage.removeItem('redirectAfterLogin');
+                  window.location.href = redirectUrl;
+              } else {
+                  window.location.href = '/dashboard-choice.html';
+              }
             } else {
-                console.log('LOGIN: Redirecting to dashboard choice');
-                window.location.href = '/dashboard-choice.html';
+              throw signInError;
             }
-          } else {
-            console.error('LOGIN: Login appeared to succeed but user is not logged in');
-            throw new Error('Login failed - authentication not established');
           }
           
         } catch (error) {

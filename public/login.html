@@ -344,28 +344,8 @@
               const currentUser = await window.supabaseClient.getCurrentUser();
               console.log('LOGIN: Success! Current user:', currentUser?.email);
               
-              // Show success message immediately
-              showSuccess('Login successful! Redirecting...');
-              console.log('LOGIN: SUCCESS MESSAGE SHOWN');
-              
-              // Reset loading state
-              setLoading(false);
-              
-              // Redirect after successful login
-              console.log('LOGIN: REDIRECTING AFTER LOGIN');
-              
-              // Check if there's a redirect URL stored (for booking page access)
-              const redirectUrl = localStorage.getItem('redirectAfterLogin');
-              console.log('LOGIN: Stored redirect URL:', redirectUrl);
-              
-              if (redirectUrl) {
-                  localStorage.removeItem('redirectAfterLogin');
-                  console.log('LOGIN: Redirecting to stored URL:', redirectUrl);
-                  window.location.href = redirectUrl;
-              } else {
-                  console.log('LOGIN: Redirecting to dashboard choice');
-                  window.location.href = '/dashboard-choice.html';
-              }
+              // Use the simplified redirect handler
+              await handleLoginSuccess();
             } else {
               console.error('LOGIN: Login appeared to succeed but user is not logged in');
               throw new Error('Login failed - authentication not established');
@@ -379,16 +359,7 @@
             
             if (window.supabaseClient.isLoggedIn()) {
               console.log('LOGIN: User is actually logged in despite error, redirecting...');
-              showSuccess('Login successful! Redirecting...');
-              setLoading(false);
-              
-              const redirectUrl = localStorage.getItem('redirectAfterLogin');
-              if (redirectUrl) {
-                  localStorage.removeItem('redirectAfterLogin');
-                  window.location.href = redirectUrl;
-              } else {
-                  window.location.href = '/dashboard-choice.html';
-              }
+              await handleLoginSuccess();
             } else {
               throw signInError;
             }

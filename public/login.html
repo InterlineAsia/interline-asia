@@ -455,73 +455,23 @@
       // Initialize Supabase on load
       initSupabase();
       
-      // Add auth state listener for immediate redirect (only for fresh logins)
-      let authListenerAdded = false;
-      let loginInProgress = false;
-      
-      function addAuthListener() {
-        if (authListenerAdded || !window.supabaseClient) return;
+      // Simplified: Only handle successful login redirect
+      async function handleLoginSuccess() {
+        console.log('LOGIN: Login successful, handling redirect...');
+        showSuccess('Login successful! Redirecting...');
+        setLoading(false);
         
-        // Check if user is already logged in - if so, handle it immediately without adding listener
-        if (window.supabaseClient.isLoggedIn()) {
-          console.log('LOGIN: User already logged in, handling redirect immediately');
-          const redirectUrl = localStorage.getItem('redirectAfterLogin');
-          if (redirectUrl) {
-            console.log('LOGIN: Found redirect URL for existing user, redirecting to:', redirectUrl);
-            localStorage.removeItem('redirectAfterLogin');
-            window.location.href = redirectUrl;
-          } else {
-            console.log('LOGIN: User already logged in, going to dashboard choice');
-            window.location.href = '/dashboard-choice.html';
-          }
-          return;
+        // Check for stored redirect URL
+        const redirectUrl = localStorage.getItem('redirectAfterLogin');
+        if (redirectUrl) {
+          console.log('LOGIN: Redirecting to stored URL:', redirectUrl);
+          localStorage.removeItem('redirectAfterLogin');
+          location.replace(redirectUrl);
+        } else {
+          console.log('LOGIN: Redirecting to dashboard choice');
+          location.replace('/dashboard-choice.html');
         }
-        
-        authListenerAdded = true;
-        console.log('LOGIN: Adding auth state listener for redirect');
-        window.supabaseClient.supabase.auth.onAuthStateChange((event, session) => {
-          console.log('LOGIN: Auth state change:', event, session?.user?.email);
-          
-          // Only redirect if we're in the middle of a login process AND it's a fresh sign in (not initial session)
-          if (event === 'SIGNED_IN' && session?.user && loginInProgress) {
-            console.log('LOGIN: Auth listener detected fresh sign in, triggering redirect...');
-            loginInProgress = false; // Reset flag
-            
-            // Small delay to ensure UI updates
-            setTimeout(() => {
-              showSuccess('Login successful! Redirecting...');
-              setLoading(false);
-              
-              const redirectUrl = localStorage.getItem('redirectAfterLogin');
-              console.log('LOGIN: Auth listener redirect URL:', redirectUrl);
-              
-              if (redirectUrl) {
-                localStorage.removeItem('redirectAfterLogin');
-                console.log('LOGIN: Auth listener redirecting to:', redirectUrl);
-                window.location.href = redirectUrl;
-              } else {
-                console.log('LOGIN: Auth listener redirecting to dashboard choice');
-                window.location.href = '/dashboard-choice.html';
-              }
-            }, 500);
-          } else if (event === 'INITIAL_SESSION' && session?.user) {
-            console.log('LOGIN: User already logged in, checking for redirect URL...');
-            // If user is already logged in and there's a redirect URL, go there
-            const redirectUrl = localStorage.getItem('redirectAfterLogin');
-            if (redirectUrl) {
-              console.log('LOGIN: Found redirect URL for existing session, redirecting to:', redirectUrl);
-              localStorage.removeItem('redirectAfterLogin');
-              window.location.href = redirectUrl;
-            } else {
-              console.log('LOGIN: User already logged in, going to dashboard choice');
-              window.location.href = '/dashboard-choice.html';
-            }
-          }
-        });
       }
-      
-      // Add listener after Supabase is ready
-      setTimeout(addAuthListener, 1000);
       
       // Show success message if coming from registration
       const urlParams = new URLSearchParams(window.location.search);

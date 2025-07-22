@@ -218,23 +218,15 @@
         setLoading(true);
         
         try {
-          // Use the singleton Supabase client
-          const { data, error } = await window.supabaseClient.supabase.auth.signInWithPassword({
-            email: email,
-            password: password
-          });
+          // Use the singleton Supabase client's signIn method for better error handling
+          const result = await window.supabaseClient.signIn(email, password);
           
-          if (error) {
-            console.error('LOGIN: Supabase error:', error);
-            throw error;
-          }
-          
-          if (!data.user || !data.session) {
+          if (!result.user || !result.session) {
             throw new Error('Login failed - no user session created');
           }
           
-          console.log('LOGIN: Success! User:', data.user.email);
-          console.log('LOGIN: Session created:', !!data.session);
+          console.log('LOGIN: Success! User:', result.user.email);
+          console.log('LOGIN: Session created:', !!result.session);
           
           // Track login
           if (typeof gtag !== 'undefined') {
@@ -249,8 +241,12 @@
           
           console.log('LOGIN: Redirecting to:', redirectUrl);
           
-          // Redirect immediately - no delay needed
-          window.location.replace(redirectUrl);
+          // Small delay to show success message, then redirect
+          setTimeout(() => {
+            console.log('LOGIN: Executing redirect to:', redirectUrl);
+            // Force a hard redirect with no caching
+            window.location.href = redirectUrl + '?t=' + new Date().getTime();
+          }, 500);
           
         } catch (error) {
           console.error('LOGIN: Error:', error);
@@ -264,10 +260,20 @@
               message = 'Please check your email and confirm your account first.';
             } else if (error.message.includes('Too many requests')) {
               message = 'Too many login attempts. Please wait and try again.';
+            } else if (error.message.includes('network') || error.message.includes('fetch')) {
+              message = 'Network error. Please check your connection and try again.';
             } else {
               message = error.message;
             }
           }
+          
+          // Log detailed error information for debugging
+          console.error('LOGIN: Detailed error info:', {
+            message: message,
+            originalError: error.message,
+            stack: error.stack,
+            user: emailInput.value
+          });
           
           showError(message);
           setLoading(false);
@@ -285,6 +291,39 @@
       
       console.log('LOGIN: System ready');
     });
+    
+    // Debug function to check authentication status
+    window.checkAuthStatus = async function() {
+      console.log('DEBUG: Checking auth status...');
+      if (!window.supabaseClient) {
+        console.error('DEBUG: Supabase client not initialized');
+        return 'Supabase client not initialized';
+      }
+      
+      try {
+        await window.supabaseClient.readyPromise;
+        const isLoggedIn = window.supabaseClient.isLoggedIn();
+        const session = window.supabaseClient.currentSession;
+        const user = await window.supabaseClient.getCurrentUser();
+        
+        console.log('DEBUG: Auth status:', {
+          isLoggedIn,
+          hasSession: !!session,
+          hasUser: !!user,
+          userEmail: user?.email
+        });
+        
+        return {
+          isLoggedIn,
+          hasSession: !!session,
+          hasUser: !!user,
+          userEmail: user?.email
+        };
+      } catch (error) {
+        console.error('DEBUG: Auth check error:', error);
+        return 'Error checking auth: ' + error.message;
+      }
+    };
     
     // Load footer
     fetch('/partials/footer.html')

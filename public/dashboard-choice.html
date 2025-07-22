@@ -58,13 +58,22 @@
         
         // Wait for Supabase client to initialize
         if (window.supabaseClient) {
+          console.log('DASHBOARD_CHOICE: Waiting for Supabase client to be ready...');
           await window.supabaseClient.readyPromise;
+          console.log('DASHBOARD_CHOICE: Supabase client ready');
+        } else {
+          console.error('DASHBOARD_CHOICE: Supabase client not found');
+          alert('Error: Authentication system not loaded. Please refresh the page.');
+          return;
         }
         
         // Check if user is logged in
-        if (!window.supabaseClient || !window.supabaseClient.isLoggedIn()) {
+        const isLoggedIn = window.supabaseClient.isLoggedIn();
+        console.log('DASHBOARD_CHOICE: User logged in status:', isLoggedIn);
+        
+        if (!isLoggedIn) {
           console.log('DASHBOARD_CHOICE: User not logged in, redirecting to login');
-          window.location.href = '/login.html';
+          window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.pathname);
           return;
         }
 

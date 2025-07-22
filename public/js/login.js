@@ -64,6 +64,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log('LOGIN: Login successful, handling redirect to:', redirectUrl);
                 localStorage.removeItem('redirectAfterLogin');
                 console.log('LOGIN: Executing redirect now...');
+                
+                // Reset button state before redirect
+                setLoadingState(false);
+                
                 window.location.replace(redirectUrl);
             } else {
                 showError('Login failed - authentication not established');

@@ -8,25 +8,6 @@
   <meta name="author" content="Interline Asia">
   <meta name="robots" content="index, follow">
   
-  <!-- Open Graph Meta Tags -->
-  <meta property="og:title" content="Sign In - Interline Asia">
-  <meta property="og:description" content="Sign in to Interline Asia - Access your exclusive cruise deals and VIP travel offers">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://www.interlineasia.com/login.html">
-  <meta property="og:image" content="https://www.interlineasia.com/cruise-ship.png">
-  <meta property="og:site_name" content="Interline Asia">
-  
-  <!-- Twitter Card Meta Tags -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Sign In - Interline Asia">
-  <meta name="twitter:description" content="Access your exclusive cruise deals and VIP travel offers">
-  <meta name="twitter:image" content="https://www.interlineasia.com/cruise-ship.png">
-  
-  <!-- Additional SEO Meta Tags -->
-  <meta name="theme-color" content="#0f172a">
-  <meta name="msapplication-TileColor" content="#0f172a">
-  <link rel="canonical" href="https://www.interlineasia.com/login.html">
-  
   <title>Sign In - Interline Asia</title>
   
   <!-- Fonts -->
@@ -46,20 +27,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico">
   <link rel="manifest" href="/site.webmanifest">
   
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FYGT92WCXC"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-FYGT92WCXC');
-  </script>
-  
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js"></script>
-  
-  <!-- Loading indicator -->
+  <!-- Loading Overlay -->
   <style>
     .loading-overlay {
       position: fixed;
@@ -79,7 +47,7 @@
       width: 40px;
       height: 40px;
       border: 4px solid #f3f3f3;
-      border-top: 4px solid #3498db;
+      border-top: 4px solid #0070f3;
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
@@ -89,13 +57,20 @@
       100% { transform: rotate(360deg); }
     }
   </style>
+  
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  
+  <!-- Login System Coordinator -->
+  <script src="/js/login.js"></script>
 </head>
 <body>
   <!-- Loading Overlay -->
   <div class="loading-overlay" id="loading-overlay">
     <div class="spinner"></div>
   </div>
-  
+
   <!-- Navigation -->
   <nav class="main-nav">
     <div class="nav-container">
@@ -118,41 +93,6 @@
         <span></span>
         <span></span>
         <span></span>
-      </div>
-    </div>
-    
-    <!-- Travel Tools Header Bar -->
-    <div class="travel-tools-header">
-      <div class="travel-tools-header-container">
-        <div class="travel-tools-header-label">
-          <span class="tools-label">Essential Travel Tools</span>
-        </div>
-        <div class="travel-tools-header-grid">
-          <a href="https://trip.tpk.mx/qhlnnQh8" target="_blank" rel="noopener noreferrer" class="header-tool-item" data-tool="flights">
-            <div class="header-tool-icon">✈️</div>
-            <span class="header-tool-label">Flights & Hotels</span>
-          </a>
-          <a href="https://kiwitaxi.tpk.mx/NGL3ovB3" target="_blank" rel="noopener noreferrer" class="header-tool-item" data-tool="transfers">
-            <div class="header-tool-icon">🚖</div>
-            <span class="header-tool-label">Transfers</span>
-          </a>
-          <a href="https://ektatraveling.tpk.mx/IUGS6Ovk" target="_blank" rel="noopener noreferrer" class="header-tool-item" data-tool="insurance">
-            <div class="header-tool-icon">🛡️</div>
-            <span class="header-tool-label">Insurance</span>
-          </a>
-          <a href="https://airalo.tpk.mx/M99krJZy" target="_blank" rel="noopener noreferrer" class="header-tool-item" data-tool="esim">
-            <div class="header-tool-icon">📶</div>
-            <span class="header-tool-label">eSIM</span>
-          </a>
-          <a href="https://getrentacar.tpk.mx/I3FuOWfB" target="_blank" rel="noopener noreferrer" class="header-tool-item" data-tool="cars">
-            <div class="header-tool-icon">🚗</div>
-            <span class="header-tool-label">Car Rentals</span>
-          </a>
-          <a href="https://wise.com/invite/ihpc/rodneyowenp" target="_blank" rel="noopener noreferrer" class="header-tool-item" data-tool="currency">
-            <div class="header-tool-icon">💳</div>
-            <span class="header-tool-label">Currency</span>
-          </a>
-        </div>
       </div>
     </div>
   </nav>
@@ -192,9 +132,10 @@
   <!-- Footer -->
   <div id="footer-placeholder"></div>
 
-  <!-- DIRECT LOGIN SYSTEM -->
-  <script src="/js/direct-login.js"></script>
+  <!-- Standardized Login System -->
+  <script src="/js/standardized-login.js"></script>
   
+  <!-- Footer Loader -->
   <script>
     // Load footer
     fetch('/partials/footer.html')

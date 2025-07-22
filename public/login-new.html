@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sign in to Interline Asia - Access your exclusive cruise deals and VIP travel offers">
+  <title>Sign In - Interline Asia</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="/css/complete-redesign.css">
+  <link rel="stylesheet" href="auth.css">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <style>
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      display: none;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .auth-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+    
+    .auth-card {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      padding: 3rem;
+      width: 100%;
+      max-width: 450px;
+      text-align: center;
+    }
+    
+    .auth-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #000;
+      margin-bottom: 0.5rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+    
+    .form-group label {
+      display: block;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+      transition: border-color 0.2s ease;
+      box-sizing: border-box;
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+    }
+    
+    .btn-primary {
+      background-color: #0070f3;
+      color: white;
+      width: 100%;
+    }
+    
+    .error-message {
+      background-color: #ffebee;
+      color: #c62828;
+      padding: 0.75rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    
+    .success-message {
+      background-color: #e8f5e8;
+      color: #2e7d32;
+      padding: 0.75rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+  
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1>Welcome Back</h1>
+        <p>Sign in to access your exclusive travel deals</p>
+      </div>
+
+      <form id="login-form">
+        <div id="error-message" class="error-message"></div>
+        <div id="success-message" class="success-message"></div>
+        
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="login-button">Sign In</button>
+      </form>
+
+      <div class="auth-links" style="margin-top: 2rem;">
+        <p><a href="reset-password.html">Forgot your password?</a></p>
+        <p>Don't have an account? <a href="/signup">Create one here</a></p>
+        <p><a href="/">Back to Home</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Simple direct login implementation
+    document.addEventListener('DOMContentLoaded', function() {
+      const loginForm = document.getElementById('login-form');
+      const loginButton = document.getElementById('login-button');
+      const emailInput = document.getElementById('email');
+      const passwordInput = document.getElementById('password');
+      const errorDiv = document.getElementById('error-message');
+      const successDiv = document.getElementById('success-message');
+      const loadingOverlay = document.getElementById('loading-overlay');
+      
+      // Initialize Supabase client directly
+      const supabase = supabase.createClient(
+        'https://nxreyyxbuwxjfmtvdkji.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im54cmV5eXhidXd4amZtdHZka2ppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NTg4NDQsImV4cCI6MjA2NzAzNDg0NH0.SuaK9TqBLbysPCe0zyrMA8owMK4R-q7iNZbtLQzEKcE',
+        {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: false,
+            storage: window.localStorage
+          }
+        }
+      );
+      
+      function showLoading() {
+        loadingOverlay.style.display = 'flex';
+        loginButton.disabled = true;
+      }
+      
+      function hideLoading() {
+        loadingOverlay.style.display = 'none';
+        loginButton.disabled = false;
+      }
+      
+      function showError(message) {
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+        successDiv.style.display = 'none';
+      }
+      
+      function showSuccess(message) {
+        successDiv.textContent = message;
+        successDiv.style.display = 'block';
+        errorDiv.style.display = 'none';
+      }
+      
+      loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const email = emailInput.value.trim();
+        const password = passwordInput.value.trim();
+        
+        if (!email || !password) {
+          showError('Please enter both email and password.');
+          return;
+        }
+        
+        showLoading();
+        console.log('Attempting login for:', email);
+        
+        try {
+          // Direct login with Supabase
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+          });
+          
+          if (error) {
+            throw error;
+          }
+          
+          if (!data.user || !data.session) {
+            throw new Error('Login failed - no user session created');
+          }
+          
+          console.log('Login successful!', data.user.email);
+          showSuccess('Login successful! Redirecting...');
+          
+          // Force redirect to dashboard
+          setTimeout(() => {
+            window.location.href = '/dashboard-choice.html?t=' + Date.now();
+          }, 500);
+          
+        } catch (error) {
+          console.error('Login error:', error);
+          
+          let message = 'Login failed. Please try again.';
+          
+          if (error.message) {
+            if (error.message.includes('Invalid login credentials')) {
+              message = 'Invalid email or password.';
+            } else if (error.message.includes('Email not confirmed')) {
+              message = 'Please check your email and confirm your account first.';
+            } else {
+              message = error.message;
+            }
+          }
+          
+          showError(message);
+          hideLoading();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auth Diagnostics - Interline Asia</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      background-color: #f5f5f5;
+    }
+    
+    h1, h2, h3 {
+      color: #1a202c;
+    }
+    
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .btn {
+      display: inline-block;
+      background-color: #0070f3;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .btn:hover {
+      background-color: #0051a8;
+    }
+    
+    .btn-danger {
+      background-color: #e53e3e;
+    }
+    
+    .btn-danger:hover {
+      background-color: #c53030;
+    }
+    
+    .btn-success {
+      background-color: #38a169;
+    }
+    
+    .btn-success:hover {
+      background-color: #2f855a;
+    }
+    
+    pre {
+      background-color: #f8f9fa;
+      border: 1px solid #eee;
+      border-radius: 4px;
+      padding: 1rem;
+      overflow-x: auto;
+      font-size: 0.875rem;
+    }
+    
+    .result-container {
+      margin-top: 1rem;
+      display: none;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+    }
+    
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    
+    th, td {
+      padding: 0.75rem;
+      text-align: left;
+    }
+    
+    th {
+      background-color: #f2f2f2;
+    }
+    
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+  </style>
+  
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+</head>
+<body>
+  <h1>Authentication Diagnostics</h1>
+  <p>Use this page to diagnose and fix authentication issues.</p>
+  
+  <div class="card">
+    <h2>Authentication Status</h2>
+    <p>Check the current authentication status.</p>
+    <button id="check-auth-btn" class="btn">Check Auth Status</button>
+    <div id="auth-status-result" class="result-container">
+      <h3>Results:</h3>
+      <pre id="auth-status-json"></pre>
+      <table id="auth-status-table">
+        <tr>
+          <th>Property</th>
+          <th>Value</th>
+        </tr>
+      </table>
+    </div>
+  </div>
+  
+  <div class="card">
+    <h2>Clear Authentication State</h2>
+    <p>Clear all authentication state (sessions, cookies, localStorage).</p>
+    <button id="clear-auth-btn" class="btn btn-danger">Clear Auth State</button>
+    <div id="clear-auth-result" class="result-container">
+      <h3>Results:</h3>
+      <pre id="clear-auth-json"></pre>
+    </div>
+  </div>
+  
+  <div class="card">
+    <h2>Fix Cookie Issues</h2>
+    <p>Attempt to fix cookie-related authentication issues.</p>
+    <button id="fix-cookies-btn" class="btn btn-success">Fix Cookie Issues</button>
+    <div id="fix-cookies-result" class="result-container">
+      <h3>Results:</h3>
+      <pre id="fix-cookies-json"></pre>
+    </div>
+  </div>
+  
+  <div class="card">
+    <h2>Full Diagnostics</h2>
+    <p>Run a comprehensive diagnostic check on the authentication system.</p>
+    <button id="full-diagnostics-btn" class="btn">Run Full Diagnostics</button>
+    <div id="full-diagnostics-result" class="result-container">
+      <h3>Results:</h3>
+      <pre id="full-diagnostics-json"></pre>
+    </div>
+  </div>
+  
+  <div class="card">
+    <h2>Test Login</h2>
+    <p>Test the login functionality.</p>
+    <form id="test-login-form">
+      <div style="margin-bottom: 1rem;">
+        <label for="email" style="display: block; margin-bottom: 0.5rem;">Email:</label>
+        <input type="email" id="email" name="email" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;" required>
+      </div>
+      <div style="margin-bottom: 1rem;">
+        <label for="password" style="display: block; margin-bottom: 0.5rem;">Password:</label>
+        <input type="password" id="password" name="password" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;" required>
+      </div>
+      <button type="submit" class="btn">Test Login</button>
+    </form>
+    <div id="test-login-result" class="result-container">
+      <h3>Results:</h3>
+      <pre id="test-login-json"></pre>
+    </div>
+  </div>
+  
+  <div class="card">
+    <h2>Navigation</h2>
+    <p>Navigate to other pages.</p>
+    <a href="/login.html" class="btn">Login Page</a>
+    <a href="/login-standardized.html" class="btn">Standardized Login</a>
+    <a href="/dashboard-choice.html" class="btn">Dashboard Choice</a>
+    <a href="/" class="btn">Home</a>
+  </div>
+  
+  <!-- Auth Diagnostics Script -->
+  <script src="/js/auth-diagnostics.js"></script>
+  
+  <!-- Page Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check Auth Status
+      document.getElementById('check-auth-btn').addEventListener('click', async function() {
+        const result = await window.checkAuthStatus();
+        document.getElementById('auth-status-json').textContent = JSON.stringify(result, null, 2);
+        
+        // Update table
+        const table = document.getElementById('auth-status-table');
+        table.innerHTML = '<tr><th>Property</th><th>Value</th></tr>';
+        
+        for (const [key, value] of Object.entries(result)) {
+          const row = document.createElement('tr');
+          
+          const keyCell = document.createElement('td');
+          keyCell.textContent = key;
+          row.appendChild(keyCell);
+          
+          const valueCell = document.createElement('td');
+          if (Array.isArray(value)) {
+            valueCell.textContent = value.join(', ');
+          } else if (typeof value === 'object' && value !== null) {
+            valueCell.textContent = JSON.stringify(value);
+          } else {
+            valueCell.textContent = value;
+          }
+          row.appendChild(valueCell);
+          
+          table.appendChild(row);
+        }
+        
+        document.getElementById('auth-status-result').style.display = 'block';
+      });
+      
+      // Clear Auth State
+      document.getElementById('clear-auth-btn').addEventListener('click', async function() {
+        const result = await window.clearAuthState();
+        document.getElementById('clear-auth-json').textContent = JSON.stringify(result, null, 2);
+        document.getElementById('clear-auth-result').style.display = 'block';
+      });
+      
+      // Fix Cookie Issues
+      document.getElementById('fix-cookies-btn').addEventListener('click', async function() {
+        const result = await window.fixCookieIssues();
+        document.getElementById('fix-cookies-json').textContent = JSON.stringify(result, null, 2);
+        document.getElementById('fix-cookies-result').style.display = 'block';
+      });
+      
+      // Full Diagnostics
+      document.getElementById('full-diagnostics-btn').addEventListener('click', async function() {
+        const result = await window.runFullDiagnostics();
+        document.getElementById('full-diagnostics-json').textContent = JSON.stringify(result, null, 2);
+        document.getElementById('full-diagnostics-result').style.display = 'block';
+      });
+      
+      // Test Login
+      document.getElementById('test-login-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        try {
+          // Initialize Supabase client
+          const supabase = window.supabase.createClient(
+            window.SUPABASE_URL || 'https://nxreyyxbuwxjfmtvdkji.supabase.co',
+            window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im54cmV5eXhidXd4amZtdHZka2ppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NTg4NDQsImV4cCI6MjA2NzAzNDg0NH0.SuaK9TqBLbysPCe0zyrMA8owMK4R-q7iNZbtLQzEKcE'
+          );
+          
+          // Attempt login
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+          });
+          
+          const result = {
+            success: !error,
+            hasUser: !!data?.user,
+            hasSession: !!data?.session,
+            error: error ? error.message : null,
+            timestamp: new Date().toISOString()
+          };
+          
+          document.getElementById('test-login-json').textContent = JSON.stringify(result, null, 2);
+          document.getElementById('test-login-result').style.display = 'block';
+          
+        } catch (error) {
+          const result = {
+            success: false,
+            error: error.message,
+            stack: error.stack,
+            timestamp: new Date().toISOString()
+          };
+          
+          document.getElementById('test-login-json').textContent = JSON.stringify(result, null, 2);
+          document.getElementById('test-login-result').style.display = 'block';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

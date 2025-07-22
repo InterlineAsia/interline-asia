@@ -10,9 +10,44 @@
   <link rel="stylesheet" href="/css/main.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script src="supabase-client.js"></script>
+  
+  <!-- Loading indicator -->
+  <style>
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      display: none;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+  
   <div id="header-placeholder"></div>
   
   <main style="min-height: 80vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
@@ -51,168 +86,30 @@
   <div id="footer-placeholder"></div>
 
   <script src="/js/loadPartials.js"></script>
+  <script src="/js/dashboard-auth.js"></script>
+  
   <script>
-    async function initializeDashboardChoice() {
-      try {
-        console.log('DASHBOARD_CHOICE: Initializing...');
-        
-        // Wait for Supabase client to initialize
-        if (window.supabaseClient) {
-          console.log('DASHBOARD_CHOICE: Waiting for Supabase client to be ready...');
-          await window.supabaseClient.readyPromise;
-          console.log('DASHBOARD_CHOICE: Supabase client ready');
-        } else {
-          console.error('DASHBOARD_CHOICE: Supabase client not found');
-          alert('Error: Authentication system not loaded. Please refresh the page.');
-          return;
-        }
-        
-        // Check if user is logged in
-        const isLoggedIn = window.supabaseClient.isLoggedIn();
-        console.log('DASHBOARD_CHOICE: User logged in status:', isLoggedIn);
-        
-        if (!isLoggedIn) {
-          console.log('DASHBOARD_CHOICE: User not logged in, redirecting to login');
-          window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.pathname);
-          return;
-        }
-
-        const user = await window.supabaseClient.getCurrentUser();
-        console.log('DASHBOARD_CHOICE: Current user:', user?.email);
-
-        if (!user) {
-          console.log('DASHBOARD_CHOICE: No user found, redirecting to login');
-          window.location.href = '/login.html';
-          return;
-        }
-
-        // Determine user access levels
-        const adminEmails = ['rodney@telenational.com.au', 'admin@telenational.com.au'];
-        const hasAdminAccess = adminEmails.includes(user.email?.toLowerCase()) || 
-                              user.is_admin === true || 
-                              user.role === 'admin' || 
-                              user.role === 'super_admin';
-        
-        const hasMemberAccess = true; // Everyone has member access
-        
-        console.log('DASHBOARD_CHOICE: Access levels:', {
-          hasAdminAccess,
-          hasMemberAccess,
-          userEmail: user.email
-        });
-
-        // Update user info display
-        const userInfo = document.getElementById('user-info');
-        const displayName = user.full_name || user.email?.split('@')[0] || 'User';
-        const roleText = hasAdminAccess ? ' (Admin)' : ' (Member)';
-        
-        if (userInfo) {
-          userInfo.textContent = `Hello ${displayName}${roleText}! You have access to both dashboards. Choose one to continue:`;
-        }
-
-        // Create dashboard buttons
-        const buttonsContainer = document.getElementById('dashboard-buttons');
-        if (!buttonsContainer) {
-          console.error('DASHBOARD_CHOICE: Buttons container not found');
-          return;
-        }
-
-        buttonsContainer.innerHTML = ''; // Clear existing buttons
-
-        // Create Member Dashboard Button (always available)
-        if (hasMemberAccess) {
-          const memberBtn = createDashboardButton({
-            icon: 'ri-user-line',
-            title: 'Member Dashboard',
-            description: 'Access cruise deals, bookings, and your account',
-            gradient: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-            onClick: () => {
-              console.log('DASHBOARD_CHOICE: Navigating to member dashboard');
-              window.location.href = '/dashboard.html';
-            }
-          });
-          buttonsContainer.appendChild(memberBtn);
-        }
-
-        // Create Admin Dashboard Button (only for admins)
-        if (hasAdminAccess) {
-          console.log('DASHBOARD_CHOICE: Adding admin button');
-          const adminBtn = createDashboardButton({
-            icon: 'ri-admin-line',
-            title: 'Admin Dashboard',
-            description: 'Manage users, bookings, and system settings',
-            gradient: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
-            onClick: () => {
-              console.log('DASHBOARD_CHOICE: Navigating to admin dashboard');
-              window.location.href = '/admin.html';
-            }
-          });
-          buttonsContainer.appendChild(adminBtn);
-        } else {
-          console.log('DASHBOARD_CHOICE: User does not have admin access, no admin button');
-        }
-
-        console.log('DASHBOARD_CHOICE: Choice screen rendered successfully');
-
-      } catch (error) {
-        console.error('DASHBOARD_CHOICE: Initialization error:', error);
-        window.location.href = '/login.html';
-      }
-    }
-
-    function createDashboardButton({ icon, title, description, gradient, onClick }) {
-      const button = document.createElement('button');
-      
-      button.innerHTML = `
-        <div style="display: flex; align-items: center; justify-content: center; gap: 1rem;">
-          <i class="${icon}" style="font-size: 1.5rem;"></i>
-          <div style="text-align: left;">
-            <div style="font-weight: 600; font-size: 1.1rem;">${title}</div>
-            <div style="font-size: 0.9rem; opacity: 0.8;">${description}</div>
-          </div>
-        </div>
-      `;
-      
-      button.style.cssText = `
-        background: ${gradient};
-        color: white;
-        border: none;
-        padding: 1.5rem;
-        border-radius: 12px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        width: 100%;
-        font-family: inherit;
-        margin-bottom: 0.5rem;
-      `;
-      
-      button.onmouseover = () => {
-        button.style.transform = 'translateY(-2px)';
-        button.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
-      };
-      
-      button.onmouseout = () => {
-        button.style.transform = 'translateY(0)';
-        button.style.boxShadow = 'none';
-      };
-      
-      button.onclick = onClick;
-      return button;
-    }
-
     function signOut() {
       if (confirm('Are you sure you want to sign out?')) {
         console.log('DASHBOARD_CHOICE: Signing out...');
-        if (window.supabaseClient) {
-          window.supabaseClient.signOut();
-        } else {
-          window.location.href = '/login.html';
-        }
+        
+        // Initialize Supabase client directly for sign out
+        const supabase = window.supabase.createClient(
+          window.SUPABASE_URL || 'https://nxreyyxbuwxjfmtvdkji.supabase.co',
+          window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im54cmV5eXhidXd4amZtdHZka2ppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NTg4NDQsImV4cCI6MjA2NzAzNDg0NH0.SuaK9TqBLbysPCe0zyrMA8owMK4R-q7iNZbtLQzEKcE'
+        );
+        
+        // Sign out and redirect
+        supabase.auth.signOut().then(() => {
+          // Clear any local storage
+          localStorage.clear();
+          sessionStorage.clear();
+          
+          // Redirect to login page
+          window.location.href = '/login.html?signout=true';
+        });
       }
     }
-
-    // Initialize when page loads
-    document.addEventListener('DOMContentLoaded', initializeDashboardChoice);
   </script>
 </body>
 </html>

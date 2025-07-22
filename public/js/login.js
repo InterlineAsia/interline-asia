@@ -1,11 +1,44 @@
+console.log('LOGIN: module loading …');
+
+async function handleLoginSuccess() {
+  const redirect = localStorage.getItem('redirectAfterLogin') || '/dashboard-choice.html';
+  console.log('LOGIN: redirecting to', redirect);
+  
+  /* optional UI reset */
+  const btn = document.getElementById('login-button');
+  if (btn) { btn.disabled = false; btn.textContent = 'Sign In'; }
+  
+  localStorage.removeItem('redirectAfterLogin');
+  window.location.replace(redirect);
+}
+
+async function handleLogin(email, password) {
+  console.log('LOGIN: starting login for', email);
+  
+  if (!window.supabaseClient) throw new Error('Supabase client not available');
+  
+  await window.supabaseClient.readyPromise;                 // wait for singleton
+  
+  // ✅ correct Supabase v2 call
+  const { data, error } = await window.supabaseClient.supabase.auth.signInWithPassword({ email, password });
+  
+  if (error) throw error;
+  if (!data.session) throw new Error('No session returned');
+  
+  await handleLoginSuccess();                               // redirect
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    const loginForm = document.getElementById('login-form');
-    const submitButton = document.getElementById('submit-button');
+    console.log('LOGIN: DOM loaded, initializing...');
+    
+    const loginButton = document.getElementById('login-button');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
     const errorMessage = document.getElementById('error-message');
     const successMessage = document.getElementById('success-message');
 
-    if (!loginForm) {
-        console.error('Login form not found. Make sure your form has id="login-form".');
+    if (!loginButton) {
+        console.error('LOGIN: Login button not found');
         return;
     }
 
@@ -25,75 +58,77 @@ document.addEventListener('DOMContentLoaded', () => {
         if (successMessage) successMessage.style.display = 'none';
     };
 
-    const setLoadingState = (isLoading) => {
-        if (submitButton) {
-            submitButton.disabled = isLoading;
-            submitButton.textContent = isLoading ? 'Verifying...' : 'Login';
-        }
+    const hideMessages = () => {
+        if (errorMessage) errorMessage.style.display = 'none';
+        if (successMessage) successMessage.style.display = 'none';
     };
 
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        setLoadingState(true);
-        showError('');
-        showSuccess('');
+    const setLoadingState = (isLoading) => {
+        loginButton.disabled = isLoading;
+        loginButton.textContent = isLoading ? 'Signing In...' : 'Sign In';
+    };
 
-        const email = loginForm.email.value;
-        const password = loginForm.password.value;
+    // Handle login button click
+    loginButton.addEventListener('click', async (e) => {
+        e.preventDefault();
+        console.log('LOGIN: Button clicked');
+        
+        const email = emailInput.value.trim();
+        const password = passwordInput.value.trim();
 
         if (!email || !password) {
             showError('Please enter both email and password.');
-            setLoadingState(false);
             return;
         }
 
-        try {
-            // Use the global Supabase client
-            if (!window.supabaseClient) {
-                throw new Error('Supabase client not available');
-            }
+        hideMessages();
+        setLoadingState(true);
 
-            console.log('LOGIN.JS: Starting login for:', email);
-            const data = await window.supabaseClient.signIn(email, password);
-            
-            if (data && window.supabaseClient.isLoggedIn()) {
-                console.log('LOGIN.JS: User authenticated successfully:', email);
-                await handleLoginSuccess();
-            } else {
-                throw new Error('Login failed - authentication not established');
-            }
+        try {
+            await handleLogin(email, password);
         } catch (error) {
-            console.error('Login failed:', error.message);
-            showError(`Login failed: ${error.message.replace('Error: ', '')}`);
+            console.error('LOGIN: Error:', error);
+            
+            let message = 'Login failed. Please try again.';
+            
+            if (error.message) {
+                if (error.message.includes('Invalid login credentials')) {
+                    message = 'Invalid email or password.';
+                } else if (error.message.includes('Email not confirmed')) {
+                    message = 'Please check your email and confirm your account first.';
+                } else if (error.message.includes('Too many requests')) {
+                    message = 'Too many login attempts. Please wait and try again.';
+                } else {
+                    message = error.message;
+                }
+            }
+            
+            showError(message);
+        } finally {
             setLoadingState(false);
         }
     });
-});
 
-// Handle successful login redirect
-async function handleLoginSuccess() {
-  const redirectUrl = localStorage.getItem('redirectAfterLogin') || '/dashboard-choice.html';
-  console.log('LOGIN: Login successful, handling redirect to:', redirectUrl);
-  
-  // Reset UI state
-  const submitButton = document.getElementById('submit-button');
-  if (submitButton) {
-    submitButton.disabled = false;
-    submitButton.textContent = 'Sign In';
-  }
-  
-  // Show success message
-  const showSuccess = (message) => {
-    const successMessage = document.getElementById('success-message');
-    if (successMessage) {
-      successMessage.textContent = message;
-      successMessage.style.display = 'block';
+    // Handle Enter key in form fields
+    const handleEnterKey = (e) => {
+        if (e.key === 'Enter') {
+            loginButton.click();
+        }
+    };
+
+    if (emailInput) {
+        emailInput.addEventListener('keypress', handleEnterKey);
     }
-  };
-  showSuccess('Login successful! Redirecting...');
-  
-  // Remove redirect URL and navigate
-  localStorage.removeItem('redirectAfterLogin');
-  console.log('LOGIN: Navigating to:', redirectUrl);
-  window.location.replace(redirectUrl);
-}
+    
+    if (passwordInput) {
+        passwordInput.addEventListener('keypress', handleEnterKey);
+    }
+
+    // Show success message if coming from registration
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('registered') === 'true') {
+        showSuccess('Account created successfully! Please check your email to verify your account, then sign in.');
+    }
+
+    console.log('LOGIN: Module initialized successfully');
+});

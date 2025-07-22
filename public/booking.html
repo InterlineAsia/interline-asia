@@ -628,15 +628,15 @@
             <div class="file-list" id="passport2-files"></div>
           </div>
 
-          <div class="upload-section" id="employment-upload">
+          <div class="upload-section" id="industry-id-upload">
             <div class="upload-icon">💼</div>
-            <h4>Travel Industry ID/Employment/Retirement Proof</h4>
-            <p>Upload your travel industry identification, employment credentials, or retirement documentation</p>
-            <input type="file" id="employment-file" accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
-            <button type="button" class="btn btn-secondary" onclick="document.getElementById('employment-file').click()">
+            <h4>Travel Industry ID</h4>
+            <p>Upload your travel industry identification (IATA card, employment letter, etc.)</p>
+            <input type="file" id="industry-id-file" accept=".jpg,.jpeg,.png" style="display: none;">
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('industry-id-file').click()">
               Choose File
             </button>
-            <div class="file-list" id="employment-files"></div>
+            <div class="file-list" id="industry-id-files"></div>
           </div>
         </div>
 
@@ -741,8 +741,7 @@
     let uploadedFiles = {
       passport1: null,
       passport2: null,
-      travelId: null,
-      employment: null
+      industry_id: null
     };
 
     // Load deal details from URL parameters
@@ -1201,7 +1200,7 @@
     function setupFileUploads() {
       const passport1File = document.getElementById('passport1-file');
       const passport2File = document.getElementById('passport2-file');
-      const employmentFile = document.getElementById('employment-file');
+      const industryIdFile = document.getElementById('industry-id-file');
 
       if (passport1File) {
         passport1File.addEventListener('change', (e) => handleFileSelect(e, 'passport1'));
@@ -1209,8 +1208,8 @@
       if (passport2File) {
         passport2File.addEventListener('change', (e) => handleFileSelect(e, 'passport2'));
       }
-      if (employmentFile) {
-        employmentFile.addEventListener('change', (e) => handleFileSelect(e, 'employment'));
+      if (industryIdFile) {
+        industryIdFile.addEventListener('change', (e) => handleFileSelect(e, 'industry_id'));
       }
     }
 
@@ -1258,8 +1257,8 @@
         showError('Please upload Passenger 2 passport copy before submitting.');
         return;
       }
-      if (!uploadedFiles.employment) {
-        showError('Please upload your travel industry ID/employment proof before submitting.');
+      if (!uploadedFiles.industry_id) {
+        showError('Please upload your travel industry ID before submitting.');
         return;
       }
 
@@ -1288,18 +1287,18 @@
         formData.append('shipName', selectedDeal.shipName || '');
         formData.append('totalAmount', document.getElementById('total-amount').textContent);
         
-        // Add files
+        // Add files with correct field names
         if (uploadedFiles.passport1) {
           formData.append('passport1', uploadedFiles.passport1);
         }
         if (uploadedFiles.passport2) {
           formData.append('passport2', uploadedFiles.passport2);
         }
-        if (uploadedFiles.employment) {
-          formData.append('employment_proof', uploadedFiles.employment);
+        if (uploadedFiles.industry_id) {
+          formData.append('industry_id', uploadedFiles.industry_id);
         }
 
-        const response = await fetch('/api/bookings?type=direct', {
+        const response = await fetch('/api/direct-booking', {
           method: 'POST',
           body: formData
         });
@@ -1537,29 +1536,6 @@
       }
     }
 
-    // Handle file uploads
-    function setupFileUploads() {
-      const passport1File = document.getElementById('passport1-file');
-      const passport2File = document.getElementById('passport2-file');
-      const travelIdFile = document.getElementById('travel-id-file');
-      const employmentFile = document.getElementById('employment-file');
-      
-      if (passport1File) {
-        passport1File.addEventListener('change', (e) => handleFileSelect(e, 'passport1'));
-      }
-      
-      if (passport2File) {
-        passport2File.addEventListener('change', (e) => handleFileSelect(e, 'passport2'));
-      }
-      
-      if (travelIdFile) {
-        travelIdFile.addEventListener('change', (e) => handleFileSelect(e, 'travelId'));
-      }
-      
-      if (employmentFile) {
-        employmentFile.addEventListener('change', (e) => handleFileSelect(e, 'employment'));
-      }
-    }
 
     function handleFileSelect(event, type) {
       const file = event.target.files[0];
@@ -1593,112 +1569,6 @@
       }
     }
 
-    // Handle form submission
-    document.getElementById('booking-form').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      
-      if (!selectedCabin) {
-        showError('Please select a cabin type before submitting.');
-        return;
-      }
-      
-      // Validate required documents
-      if (!uploadedFiles.passport1) {
-        showError('Please upload Passenger 1 passport copy before submitting.');
-        return;
-      }
-      
-      if (!uploadedFiles.passport2) {
-        showError('Please upload Passenger 2 passport copy before submitting.');
-        return;
-      }
-      
-      if (!uploadedFiles.travelId && !uploadedFiles.employment) {
-        showError('Please upload either your travel industry ID or employment/retirement proof before submitting.');
-        return;
-      }
-      
-      hideError();
-      hideSuccess();
-      
-      const submitButton = document.getElementById('submit-btn');
-      const originalText = submitButton.textContent;
-      submitButton.textContent = '📧 Sending Booking Request...';
-      submitButton.disabled = true;
-      
-      try {
-        // Submit booking using FormData for file uploads
-        const formData = new FormData(this);
-        
-        // Add additional fields
-        formData.append('cabinType', selectedCabin.type);
-        formData.append('quoteId', selectedDeal.id || 'direct-booking');
-        
-        // Add files
-        if (uploadedFiles.passport1) {
-          formData.append('passport', uploadedFiles.passport1);
-        }
-        if (uploadedFiles.passport2) {
-          formData.append('passport', uploadedFiles.passport2);
-        }
-        if (uploadedFiles.travelId) {
-          formData.append('employment_proof', uploadedFiles.travelId);
-        }
-        if (uploadedFiles.employment) {
-          formData.append('employment_proof', uploadedFiles.employment);
-        }
-        
-        const response = await fetch('/api/booking', {
-          method: 'POST',
-          body: formData
-        });
-
-        // Better error handling for non-JSON responses
-        let result;
-        if (!response.ok) {
-          const text = await response.text();
-          throw new Error(`Server error: ${response.status} - ${text}`);
-        }
-        
-        try {
-          result = await response.json();
-        } catch (jsonError) {
-          const responseText = await response.text();
-          console.error('BOOKING: API returned non-JSON response:', responseText);
-          throw new Error('Server error occurred. Please try again or contact support.');
-        }
-
-        // Track successful booking
-        if (typeof gtag !== 'undefined') {
-          gtag('event', 'booking_submission', {
-            cruise_line: selectedDeal.cruiseLine,
-            cabin_type: selectedCabin.type,
-            total_amount: document.getElementById('total-amount').textContent
-          });
-        }
-
-        showSuccess(`
-          ✅ Booking request submitted successfully!<br>
-          <strong>Booking ID:</strong> ${result.bookingId}<br>
-          You'll receive a confirmation email shortly.
-        `);
-        
-        // Scroll to success message
-        document.getElementById('success-message').scrollIntoView({ behavior: 'smooth' });
-        
-        // Optionally redirect after delay
-        setTimeout(() => {
-          window.location.href = 'dashboard.html?booking=success';
-        }, 5000);
-        
-      } catch (error) {
-        console.error('Booking submission error:', error);
-        showError(error.message || 'Failed to submit booking. Please try again.');
-      } finally {
-        submitButton.textContent = originalText;
-        submitButton.disabled = false;
-      }
-    });
 
     // Error and success message functions
     function showError(message) {
@@ -1839,35 +1709,6 @@
       }
     }
 
-    // Handle file uploads
-    function setupFileUploads() {
-      const passport1File = document.getElementById('passport1-file');
-      const passport2File = document.getElementById('passport2-file');
-      const travelIdFile = document.getElementById('travel-id-file');
-      const employmentFile = document.getElementById('employment-file');
-      
-      if (passport1File) {
-        passport1File.addEventListener('change', (e) => handleFileSelect(e, 'passport1'));
-      }
-      
-      if (passport2File) {
-        passport2File.addEventListener('change', (e) => handleFileSelect(e, 'passport2'));
-      }
-      
-      if (travelIdFile) {
-        travelIdFile.addEventListener('change', (e) => handleFileSelect(e, 'travelId'));
-      }
-      
-      if (employmentFile) {
-        employmentFile.addEventListener('change', (e) => handleFileSelect(e, 'employment'));
-      }
-      
-      // Guest count change - check if element exists
-      const guestCountElement = document.getElementById('guest-count');
-      if (guestCountElement) {
-        guestCountElement.addEventListener('change', updateBookingTotal);
-      }
-    }
 
     function handleFileSelect(event, type) {
       const file = event.target.files[0];
@@ -1895,153 +1736,6 @@
       document.getElementById(`${type}-file`).value = '';
     }
 
-    // Handle form submission
-    document.getElementById('booking-form').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      
-      if (!selectedCabin) {
-        showError('Please select a cabin type before submitting.');
-        return;
-      }
-      
-      // Validate required documents
-      if (!uploadedFiles.passport1) {
-        showError('Please upload Passenger 1 passport copy before submitting.');
-        return;
-      }
-      
-      if (!uploadedFiles.passport2) {
-        showError('Please upload Passenger 2 passport copy before submitting.');
-        return;
-      }
-      
-      if (!uploadedFiles.travelId) {
-        showError('Please upload your travel industry ID before submitting.');
-        return;
-      }
-      
-      if (!uploadedFiles.employment) {
-        showError('Please upload your employment/retirement proof before submitting.');
-        return;
-      }
-      
-      hideError();
-      hideSuccess();
-      
-      const submitButton = document.getElementById('submit-btn');
-      const originalText = submitButton.textContent;
-      submitButton.textContent = '📧 Sending Booking Request...';
-      submitButton.disabled = true;
-      
-      try {
-        // Validate that we have deal data before submitting
-        if (!selectedDeal) {
-          throw new Error('No cruise data found. Please return to the deals page and select a cruise.');
-        }
-        
-        if (!selectedCabin) {
-          throw new Error('Please select a cabin type before submitting.');
-        }
-        
-        const formData = new FormData(this);
-        
-        // Add selected cabin and deal info
-        const bookingData = {
-          // Personal info
-          firstName: formData.get('firstName'),
-          lastName: formData.get('lastName'),
-          dateOfBirth: formData.get('dateOfBirth'),
-          phone: formData.get('phone'),
-          email: formData.get('email'),
-          specialRequests: formData.get('specialRequests'),
-          
-          // Cabin selection
-          cabinType: selectedCabin.type,
-          cabinPrice: selectedCabin.price,
-          guestCount: 2, // Fixed at 2 guests
-          totalAmount: document.getElementById('total-amount').textContent,
-          
-          // Deal details
-          deal: selectedDeal,
-          
-          // Booking metadata
-          bookingDate: new Date().toISOString(),
-          bookingId: 'BK-' + Date.now()
-        };
-
-        // Using Cloudflare Turnstile for security verification
-        // Turnstile token is handled automatically by the widget
-
-        // Submit booking using FormData for file uploads
-        const formData = new FormData(this);
-        
-        // Add additional fields
-        formData.append('cabinType', selectedCabin.type);
-        formData.append('quoteId', selectedDeal.id || 'direct-booking');
-        
-        // Add files
-        if (uploadedFiles.passport1) {
-          formData.append('passport', uploadedFiles.passport1);
-        }
-        if (uploadedFiles.passport2) {
-          formData.append('passport', uploadedFiles.passport2);
-        }
-        if (uploadedFiles.travelId) {
-          formData.append('employment_proof', uploadedFiles.travelId);
-        }
-        if (uploadedFiles.employment) {
-          formData.append('employment_proof', uploadedFiles.employment);
-        }
-        
-        const response = await fetch('/api/booking', {
-          method: 'POST',
-          body: formData
-        });
-
-        // Better error handling for non-JSON responses
-        let result;
-        if (!response.ok) {
-          const text = await response.text();
-          throw new Error(`Server error: ${response.status} - ${text}`);
-        }
-        
-        try {
-          result = await response.json();
-        } catch (jsonError) {
-          const responseText = await response.text();
-          console.error('BOOKING: API returned non-JSON response:', responseText);
-          throw new Error('Server error occurred. Please try again or contact support.');
-        }
-
-        // Track successful booking
-        gtag('event', 'booking_submission', {
-          cruise_line: selectedDeal.cruiseLine,
-          cabin_type: selectedCabin.type,
-          total_amount: bookingData.totalAmount
-        });
-
-        showSuccess(`
-          ✅ Booking request submitted successfully!<br>
-          <strong>Booking ID:</strong> ${bookingData.bookingId}<br>
-          You'll receive a confirmation email shortly.
-        `);
-        
-        // Scroll to success message
-        document.getElementById('success-message').scrollIntoView({ behavior: 'smooth' });
-        
-        // Optionally redirect after delay
-        setTimeout(() => {
-          window.location.href = 'dashboard.html?booking=success';
-        }, 5000);
-        
-      } catch (error) {
-        console.error('Booking submission error:', error);
-        showError(error.message || 'Failed to submit booking. Please try again.');
-      } finally {
-        submitButton.textContent = originalText;
-        submitButton.disabled = false;
-      }
-    });
 
     // Error and success message functions
     function showError(message) {

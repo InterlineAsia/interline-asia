@@ -1,0 +1,123 @@
+/* Mobile Enhancements - Additive Only, No Breaking Changes */
+/* This CSS only improves mobile experience without affecting desktop */
+
+/* Touch-friendly buttons - only applies to mobile */
+@media (max-width: 768px) {
+  /* Improve button touch targets */
+  button, .btn, input[type="submit"], input[type="button"] {
+    min-height: 44px !important; /* Apple's recommended touch target */
+    min-width: 44px !important;
+    padding: 12px 16px !important;
+    font-size: 16px !important; /* Prevents zoom on iOS */
+  }
+  
+  /* Better form inputs on mobile */
+  input[type="text"], 
+  input[type="email"], 
+  input[type="password"], 
+  input[type="tel"], 
+  textarea, 
+  select {
+    min-height: 44px !important;
+    font-size: 16px !important; /* Prevents zoom */
+    padding: 12px !important;
+    border-radius: 8px !important;
+  }
+  
+  /* Improve navigation on mobile */
+  nav a, .nav-link {
+    padding: 12px 16px !important;
+    font-size: 16px !important;
+    display: block;
+  }
+  
+  /* Better card spacing on mobile */
+  .deal-card, .cruise-card, .card {
+    margin-bottom: 16px !important;
+    padding: 16px !important;
+  }
+  
+  /* Improve table readability on mobile */
+  table {
+    font-size: 14px !important;
+  }
+  
+  th, td {
+    padding: 8px 4px !important;
+  }
+  
+  /* Better modal/popup sizing on mobile */
+  .modal, .popup, .overlay {
+    margin: 10px !important;
+    max-width: calc(100vw - 20px) !important;
+  }
+  
+  /* Improve search inputs */
+  .search-input, input[type="search"] {
+    width: 100% !important;
+    margin-bottom: 10px !important;
+  }
+  
+  /* Better spacing for forms */
+  .form-group, .field-group {
+    margin-bottom: 16px !important;
+  }
+  
+  /* Improve readability */
+  body {
+    line-height: 1.6 !important;
+  }
+  
+  h1, h2, h3 {
+    line-height: 1.3 !important;
+    margin-bottom: 16px !important;
+  }
+  
+  p {
+    margin-bottom: 16px !important;
+  }
+}
+
+/* Tablet improvements */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .container {
+    padding: 0 20px !important;
+  }
+  
+  .deal-grid, .cruise-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 20px !important;
+  }
+}
+
+/* Improve focus indicators for accessibility */
+button:focus, 
+input:focus, 
+select:focus, 
+textarea:focus, 
+a:focus {
+  outline: 2px solid #3b82f6 !important;
+  outline-offset: 2px !important;
+}
+
+/* Better loading states on mobile */
+@media (max-width: 768px) {
+  .loading-overlay .loading-content {
+    margin: 20px !important;
+    padding: 20px !important;
+  }
+  
+  .loading-text {
+    font-size: 16px !important;
+  }
+}
+
+/* Improve notification positioning on mobile */
+@media (max-width: 768px) {
+  #error-notifications {
+    top: 10px !important;
+    right: 10px !important;
+    left: 10px !important;
+    max-width: none !important;
+  }
+}

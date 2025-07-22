@@ -65,9 +65,9 @@ export default async function handler(req, res) {
     // Process file uploads to Supabase Storage
     const uploadedFiles = [];
     const fileMapping = {
-      'passport1': 'passport_guest1',
-      'passport2': 'passport_guest2',
-      'employment_proof': 'employment_proof'
+      'passport1': 'passport1',
+      'passport2': 'passport2',
+      'industry_id': 'industry_id'
     };
 
     for (const [fileKey, fileType] of Object.entries(fileMapping)) {
@@ -112,13 +112,13 @@ export default async function handler(req, res) {
     }
 
     // Validate required documents
-    const hasPassports = uploadedFiles.some(f => f.type === 'passport_guest1') &&
-      uploadedFiles.some(f => f.type === 'passport_guest2');
-    const hasEmploymentProof = uploadedFiles.some(f => f.type === 'employment_proof');
+    const hasPassports = uploadedFiles.some(f => f.type === 'passport1') &&
+      uploadedFiles.some(f => f.type === 'passport2');
+    const hasIndustryId = uploadedFiles.some(f => f.type === 'industry_id');
 
-    if (!hasPassports || !hasEmploymentProof) {
+    if (!hasPassports || !hasIndustryId) {
       return res.status(400).json({
-        error: 'Passport copies for both guests and employment proof are required'
+        error: 'Passport copies for both guests and industry ID are required'
       });
     }
 

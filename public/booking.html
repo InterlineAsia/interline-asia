@@ -67,6 +67,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="supabase-client.js"></script>
+  <script type="module" src="/js/auth-guard.js"></script>
   
   <!-- CSV Loader for deal data -->
   <script src="/js/enhanced-csv-loader.js"></script>
@@ -1382,45 +1383,16 @@
       if (successDiv) successDiv.innerHTML = '';
     }
 
-    // Check authentication status
-    async function checkAuthAndProceed() {
-      try {
-        // Wait for Supabase client to be ready
-        if (window.supabaseClient) {
-          await window.supabaseClient.readyPromise;
-          
-          // Give auth state time to settle
-          await new Promise(resolve => setTimeout(resolve, 1500));
-          
-          // Check if user is logged in
-          const isLoggedIn = window.supabaseClient.isLoggedIn();
-          console.log('BOOKING: Auth check result:', isLoggedIn);
-          
-          if (!isLoggedIn) {
-            console.log('BOOKING: User not logged in, redirecting to login');
-            // Store current URL for redirect after login
-            localStorage.setItem('redirectAfterLogin', window.location.href);
-            window.location.href = '/login.html';
-            return false;
-          }
-          
-          console.log('BOOKING: User is logged in, proceeding with booking page');
-          return true;
-        } else {
-          console.warn('BOOKING: Supabase client not available, proceeding anyway');
-          return true; // Proceed anyway
-        }
-      } catch (error) {
-        console.error('BOOKING: Auth check failed:', error);
-        return true; // Proceed anyway
-      }
-    }
-
-    // Initialize
+    // Initialize with auth guard
     window.addEventListener('load', async () => {
+      // Import and use unified auth guard
+      const { requireAuth } = await import('/js/auth-guard.js');
+      
       // Check authentication first
-      const canProceed = await checkAuthAndProceed();
-      if (!canProceed) return;
+      const session = await requireAuth();
+      if (!session) return; // Already redirected by requireAuth
+      
+      console.log('BOOKING: User authenticated, proceeding with booking page');
       
       // CSV loader is already loaded via script tag in head
       await loadDealDetails();

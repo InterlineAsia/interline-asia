@@ -444,6 +444,9 @@
         }
       }
       
+      // Remove any existing auth state listeners that cause flicker
+      // No onAuthStateChange listeners, no setTimeout loops, no double-redirect logic
+      
       // Show success message if coming from registration
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('registered') === 'true') {
@@ -455,8 +458,8 @@
       // Note: Auth state listener removed to prevent conflicts with dashboard-choice.html
       // Only dashboard-choice.html should handle auth state changes
       
-      // Note: Removed automatic redirect check to prevent flickering
-      // Users can manually navigate if already logged in
+      // Clean initialization - no automatic redirects or auth listeners
+      console.log('LOGIN: Clean system ready - no flicker-causing listeners');
     });
 
     // Auto-update year

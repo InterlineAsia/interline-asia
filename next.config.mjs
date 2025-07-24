@@ -1,4 +1,4 @@
-import { withSentryConfig } from '@sentry/nextjs';
+// import { withSentryConfig } from '@sentry/nextjs';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -51,4 +51,4 @@ const sentryWebpackPluginOptions = {
   project: "interline-asia-frontend",
 };
 
-export default withSentryConfig(nextConfig, sentryWebpackPluginOptions);/* FORCE DEPLOY - DASHBOARD FIX - 1737374600 */
+export default nextConfig;/* FORCE DEPLOY - WAITLIST API FIX - 1753370500 */

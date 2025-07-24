@@ -229,7 +229,7 @@ export default async function handler(req, res) {
           SIGNUP_DATE: new Date().toISOString(),
           STATUS: 'waitlist'
         },
-        listIds: [2],
+        listIds: [14], // Interline Asia Waitlist
         updateEnabled: true
       };
 

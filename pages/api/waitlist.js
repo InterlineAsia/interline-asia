@@ -90,7 +90,7 @@ export default async function handler(req, res) {
             SIGNUP_DATE: new Date().toISOString(),
             STATUS: 'waitlist'
           },
-          listIds: [2], // Waitlist list ID in Brevo
+          listIds: [14], // Interline Asia Waitlist - List ID in Brevo
           updateEnabled: true
         };
 

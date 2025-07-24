@@ -1,0 +1,221 @@
+/* Enhanced Waitlist Styling */
+
+.waitlist-section {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 2rem;
+  margin: 2rem 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  text-align: center;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.waitlist-headline {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}
+
+.waitlist-subheadline {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.waitlist-referral {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 2rem;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+.waitlist-form {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.waitlist-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.waitlist-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.waitlist-form input[type="email"],
+.waitlist-form input[type="text"] {
+  padding: 12px 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  min-width: 200px;
+}
+
+.waitlist-form input[type="email"]::placeholder,
+.waitlist-form input[type="text"]::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.waitlist-form input[type="email"]:focus,
+.waitlist-form input[type="text"]:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+.waitlist-form .btn {
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  grid-column: 1 / -1;
+  margin-top: 0.5rem;
+}
+
+.waitlist-form .btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+}
+
+.waitlist-form .btn-primary:hover {
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* CTA Section Waitlist Styling */
+.cta-waitlist-container {
+  background: rgba(15, 23, 42, 0.05);
+  border-radius: 12px;
+  padding: 2rem;
+  margin: 2rem 0;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  text-align: center;
+}
+
+.cta-waitlist-form input[type="email"],
+.cta-waitlist-form input[type="text"] {
+  background: white;
+  color: #1e293b;
+  border: 2px solid #e2e8f0;
+  min-width: 200px;
+}
+
+.cta-waitlist-form input[type="email"]::placeholder,
+.cta-waitlist-form input[type="text"]::placeholder {
+  color: #64748b;
+}
+
+.cta-waitlist-form input[type="email"]:focus,
+.cta-waitlist-form input[type="text"]:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.cta-waitlist-form .waitlist-form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+/* Success/Error Messages */
+.waitlist-success {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.waitlist-success h3 {
+  color: white;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.waitlist-success p {
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+.error-message {
+  color: #ef4444;
+  font-size: 14px;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .waitlist-headline {
+    font-size: 1.5rem;
+  }
+  
+  .waitlist-subheadline {
+    font-size: 1rem;
+  }
+  
+  .waitlist-form-group {
+    flex-direction: column;
+  }
+  
+  .waitlist-form-row,
+  .cta-waitlist-form .waitlist-form-row {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .waitlist-form input[type="email"],
+  .waitlist-form input[type="text"] {
+    min-width: auto;
+    width: 100%;
+  }
+  
+  .waitlist-section {
+    padding: 1.5rem;
+  }
+  
+  .cta-waitlist-container {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .waitlist-section {
+    margin: 1rem 0;
+    padding: 1rem;
+  }
+  
+  .cta-waitlist-container {
+    padding: 1rem;
+  }
+  
+  .waitlist-headline {
+    font-size: 1.25rem;
+  }
+}

@@ -69,7 +69,7 @@ class EmergencyWaitlist {
     async directBrevoSubmission(email, firstName, lastName, company) {
         // Try Formspree as immediate backup solution
         try {
-            const formspreeResponse = await fetch('https://formspree.io/f/xdkogkqw', {
+            const formspreeResponse = await fetch('https://formspree.io/f/mjkvgqko', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

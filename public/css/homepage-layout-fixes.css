@@ -65,13 +65,16 @@
 
 .luxury-hero .hero-subtitle {
   font-size: 1.5rem;
-  color: #e1b12c;
+  color: #e1b12c !important;
   font-weight: 600;
   margin-bottom: 2rem;
   /* Ensure visibility and proper spacing */
   position: relative;
   z-index: 10;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .luxury-hero p {

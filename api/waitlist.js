@@ -1,13 +1,21 @@
-// Emergency Waitlist API - Minimal working version
-import { createClient } from '@supabase/supabase-js';
+// Direct Vercel Serverless Function - Waitlist
+const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-export default async function handler(req, res) {
-  // Only allow POST requests
+module.exports = async (req, res) => {
+  // Enable CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ 
       success: false, 
@@ -59,7 +67,7 @@ export default async function handler(req, res) {
           first_name: firstName || null,
           last_name: lastName || null,
           company: company || null,
-          source: source || 'homepage_waitlist',
+          source: source || 'direct_function',
           created_at: new Date().toISOString()
         }
       ]);
@@ -78,7 +86,7 @@ export default async function handler(req, res) {
             FIRSTNAME: firstName || '',
             LASTNAME: lastName || '',
             COMPANY: company || '',
-            SOURCE: source || 'homepage_waitlist',
+            SOURCE: source || 'direct_function',
             SIGNUP_DATE: new Date().toISOString(),
             STATUS: 'waitlist'
           },
@@ -115,7 +123,7 @@ export default async function handler(req, res) {
               FIRSTNAME: firstName || 'Travel Professional',
               COMPANY: company || ''
             },
-            tags: ['waitlist', 'welcome']
+            tags: ['waitlist', 'welcome', 'direct_function']
           })
         });
       } catch (brevoError) {
@@ -130,10 +138,10 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error('Waitlist API error:', error);
+    console.error('Direct function waitlist error:', error);
     return res.status(500).json({
       success: false,
       message: 'An error occurred while joining the waitlist. Please try again.'
     });
   }
-}
+};

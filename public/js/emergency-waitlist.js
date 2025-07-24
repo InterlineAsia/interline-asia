@@ -55,7 +55,7 @@ class EmergencyWaitlist {
             // API failed, use direct Brevo integration
             console.warn('API failed, using direct Brevo integration');
             await this.directBrevoSubmission(email, firstName, lastName, company);
-            this.showSuccess(form, 'Successfully joined the waitlist! You should receive a confirmation email shortly.');
+            this.showSuccess(form, 'Thanks! You\'ve been added to the priority waitlist Ñ check your email for confirmation.');
 
         } catch (error) {
             console.error('All submission methods failed:', error);

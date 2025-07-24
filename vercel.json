@@ -1,5 +1,10 @@
 {
   "version": 2,
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
   "rewrites": [
     {
       "source": "/admin",
@@ -18,7 +23,7 @@
       "destination": "/signup.html"
     },
     {
-      "source": "/((?!api|_next|favicon.ico).*)",
+      "source": "/((?!api|_next|favicon.ico|.*\\.).*)",
       "destination": "/$1.html"
     }
   ]

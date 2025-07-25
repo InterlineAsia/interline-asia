@@ -59,11 +59,12 @@
 .luxury-hero {
   background: linear-gradient(135deg, #0a3d62 0%, #192a56 100%);
   color: white;
-  padding: 4rem 0 6rem 0; /* Increased bottom padding for breathing room */
+  padding: 5rem 0 6rem 0; /* Increased top padding to show yellow text */
   position: relative;
-  overflow: hidden;
+  overflow: visible; /* Allow content to be visible */
   /* Ensure proper spacing from header */
   margin-top: 0;
+  min-height: 600px; /* Ensure enough space for all content */
 }
 
 .luxury-hero::before {
@@ -87,7 +88,8 @@
 }
 
 /* 3. Fix "For Travel Professionals" Heading Visibility */
-.luxury-hero h1 {
+.luxury-hero h1,
+.hero-title {
   font-size: 3.5rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
@@ -96,6 +98,19 @@
   position: relative;
   z-index: 10;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 2rem; /* Add top margin to ensure visibility */
+}
+
+/* Specifically target the yellow highlight text */
+.hero-highlight,
+.hero-title .hero-highlight,
+span.hero-highlight {
+  color: #e1b12c !important;
+  display: inline !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .luxury-hero .hero-subtitle {

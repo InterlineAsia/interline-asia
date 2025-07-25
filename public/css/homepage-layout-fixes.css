@@ -582,4 +582,4 @@
   height: 0 !important;
   margin: 0 !important;
   padding: 0 !important;
-}
+}/* Force yellow text visibility */ .hero-subtitle, .luxury-hero .hero-subtitle, h2.hero-subtitle { color: #e1b12c !important; display: block !important; opacity: 1 !important; visibility: visible !important; }

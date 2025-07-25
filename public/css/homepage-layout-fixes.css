@@ -59,12 +59,18 @@
 .luxury-hero {
   background: linear-gradient(135deg, #0a3d62 0%, #192a56 100%);
   color: white;
-  padding: 5rem 0 6rem 0; /* Increased top padding to show yellow text */
+  padding: 8rem 0 6rem 0; /* Significantly increased top padding */
   position: relative;
   overflow: visible; /* Allow content to be visible */
   /* Ensure proper spacing from header */
   margin-top: 0;
-  min-height: 600px; /* Ensure enough space for all content */
+  min-height: 700px; /* Increased minimum height */
+}
+
+/* Force hero content to have proper top spacing */
+.luxury-hero-content {
+  padding-top: 3rem; /* Additional top padding for content */
+  margin-top: 2rem; /* Extra margin to push content down */
 }
 
 .luxury-hero::before {
@@ -78,13 +84,23 @@
   pointer-events: none;
 }
 
-.luxury-hero-content {
+.luxury-hero-content,
+.hero-content {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 3rem 1.5rem 0 1.5rem; /* Added top padding */
   text-align: center;
   position: relative;
   z-index: 2;
+}
+
+.hero-container {
+  margin-top: 3rem; /* Push content down */
+  padding-top: 2rem;
+}
+
+.hero-text {
+  margin-top: 2rem; /* Additional spacing for text */
 }
 
 /* 3. Fix "For Travel Professionals" Heading Visibility */

@@ -598,3 +598,4 @@ span.hero-highlight {
   margin: 0 !important;
   padding: 0 !important;
 }/* Force yellow text visibility */ .hero-subtitle, .luxury-hero .hero-subtitle, h2.hero-subtitle { color: #e1b12c !important; display: block !important; opacity: 1 !important; visibility: visible !important; }
+/* Additional fix for hero highlight visibility */ .hero-section .hero-highlight { color: #e1b12c !important; font-weight: 600 !important; display: inline !important; opacity: 1 !important; visibility: visible !important; } .hero-content { padding-top: 2rem; } .hero-container { margin-top: 2rem; }

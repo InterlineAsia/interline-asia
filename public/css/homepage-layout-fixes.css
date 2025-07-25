@@ -6,9 +6,9 @@
   backdrop-filter: blur(10px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border-bottom: 1px solid rgba(10, 61, 98, 0.1);
-  position: sticky;
+  position: relative; /* Changed from sticky to relative */
   top: 0;
-  z-index: 1000;
+  z-index: 100; /* Reduced z-index */
   height: 80px;
   /* Remove any white bar issues */
   margin-bottom: 0;
@@ -59,18 +59,25 @@
 .luxury-hero {
   background: linear-gradient(135deg, #0a3d62 0%, #192a56 100%);
   color: white;
-  padding: 8rem 0 6rem 0; /* Significantly increased top padding */
+  padding: 12rem 0 6rem 0; /* MASSIVE top padding increase */
   position: relative;
   overflow: visible; /* Allow content to be visible */
   /* Ensure proper spacing from header */
   margin-top: 0;
-  min-height: 700px; /* Increased minimum height */
+  min-height: 800px; /* Much larger minimum height */
 }
 
 /* Force hero content to have proper top spacing */
 .luxury-hero-content {
-  padding-top: 3rem; /* Additional top padding for content */
-  margin-top: 2rem; /* Extra margin to push content down */
+  padding-top: 5rem; /* Much larger top padding */
+  margin-top: 4rem; /* Much larger margin */
+}
+
+/* Ensure the hero title is pushed down significantly */
+.hero-title,
+.luxury-hero h1 {
+  margin-top: 4rem !important;
+  padding-top: 2rem !important;
 }
 
 .luxury-hero::before {

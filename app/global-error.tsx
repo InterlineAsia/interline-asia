@@ -16,40 +16,24 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <html>
-      <body>
-        <div style={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          minHeight: '100vh',
-          fontFamily: 'Inter, sans-serif',
-          padding: '2rem'
-        }}>
-          <h1 style={{ fontSize: '2rem', marginBottom: '1rem', color: '#ef4444' }}>
-            Something went wrong!
-          </h1>
-          <p style={{ marginBottom: '2rem', color: '#64748b', textAlign: 'center' }}>
-            We're sorry, but something unexpected happened. Our team has been notified.
-          </p>
-          <button
-            onClick={reset}
-            style={{
-              padding: '0.75rem 1.5rem',
-              backgroundColor: '#3b82f6',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontSize: '1rem',
-              fontWeight: '600'
-            }}
-          >
-            Try again
-          </button>
-        </div>
-      </body>
-    </html>
+    <div className="flex flex-col items-center justify-center min-h-screen font-sans p-8">
+      <h1 className="text-2xl mb-4 text-red-500">
+        Something went wrong!
+      </h1>
+      <p className="mb-8 text-gray-500 text-center">
+        We're sorry, but something unexpected happened. Our team has been notified.
+        {error?.digest && (
+          <span className="block mt-2 text-xs text-gray-400">
+            Error ID: {error.digest}
+          </span>
+        )}
+      </p>
+      <button
+        onClick={reset}
+        className="px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600"
+      >
+        Try again
+      </button>
+    </div>
   );
 }

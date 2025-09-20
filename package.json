@@ -1,26 +1,35 @@
 {
   "name": "interline-asia",
-  "version": "1.0.3",
-  "type": "module",
-  "scripts": {
-    "dev": "next dev",
-    "setup-triggers": "tsx scripts/setup-db-triggers.ts",
-    "setup-triggers-node": "node --loader ts-node/esm scripts/setup-db-triggers.ts",
-    "check-webhook": "tsx scripts/check-webhook.ts",
-    "check-webhook-sh": "./scripts/check-webhook.sh",
-    "create-webhook": "./scripts/create-webhook.sh",
-    "build": "next build"
-  },
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.html",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "@supabase/supabase-js": "^2.50.4",
-    "formidable": "^3.5.4",
-    "next": "^15.3.5",
-    "node-schedule": "^2.1.1",
-    "react": "18.3.1",
-    "react-dom": "18.3.1"
+    "next": "^14.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "@supabase/supabase-js": "^2.45.0",
+    "@sentry/nextjs": "^7.120.2"
   },
   "devDependencies": {
-    "@types/react": "19.1.8",
-    "typescript": "5.8.3"
+    "typescript": "^5.6.3",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "eslint": "^8.56.0",
+    "prettier": "^3.0.0",
+    "eslint-config-next": "^14.0.0"
+  },
+  "scripts": {
+    "mcp": "bash ./scripts/start-mcp.sh",
+    "tunnel": "bash ./scripts/start-tunnel.sh",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx",
+    "format": "prettier --write .",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
   }
 }
